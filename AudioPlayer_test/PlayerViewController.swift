@@ -117,6 +117,7 @@ class PlayerViewController: UIViewController {
     
 //    Perviosly button action
     @IBAction func didTapPrev(_ sender: Any) {
+        player?.pause()
         if position > 0 {
             position = position - 1
             configure()
@@ -132,6 +133,7 @@ class PlayerViewController: UIViewController {
     
 //    Next button action
     @IBAction func didTapNext(_ sender: Any) {
+        player?.pause()
         if position < (initialSongs.count - 1) {
             position = position + 1
             configure()
