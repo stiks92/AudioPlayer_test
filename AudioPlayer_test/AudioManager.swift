@@ -49,6 +49,16 @@ final class AudioManager: NSObject, ObservableObject {
     private var baseQueue: [Song] = []
     private var currentIndex = 0
 
+    // Sleep timer
+    @Published private(set) var sleepTimerMinutes: Int?
+    private var sleepTimer: Timer?
+    private var sleepFireDate: Date?
+
+    var sleepRemaining: TimeInterval? {
+        guard let sleepFireDate else { return nil }
+        return max(0, sleepFireDate.timeIntervalSinceNow)
+    }
+
     private override init() {
         super.init()
         configureSession()
@@ -190,6 +200,30 @@ final class AudioManager: NSObject, ObservableObject {
             stopTimer()
         }
         updateNowPlayingInfo()
+    }
+
+    // MARK: - Sleep timer
+
+    func setSleepTimer(minutes: Int?) {
+        sleepTimer?.invalidate()
+        sleepTimer = nil
+        sleepTimerMinutes = minutes
+        guard let minutes, minutes > 0 else {
+            sleepFireDate = nil
+            return
+        }
+        let interval = Double(minutes) * 60
+        sleepFireDate = Date().addingTimeInterval(interval)
+        let t = Timer(timeInterval: interval, repeats: false) { [weak self] _ in
+            Task { @MainActor in self?.sleepTimerFired() }
+        }
+        RunLoop.main.add(t, forMode: .common)
+        sleepTimer = t
+    }
+
+    private func sleepTimerFired() {
+        pause()
+        setSleepTimer(minutes: nil)
     }
 
     // MARK: - Session & remote

@@ -11,6 +11,7 @@ import SwiftUI
 struct RootView: View {
     @StateObject private var audio = AudioManager.shared
     @StateObject private var library = MusicLibrary()
+    @StateObject private var proStore = ProStore()
 
     @State private var selection: AppTab = .home
     @State private var showNowPlaying = false
@@ -46,6 +47,7 @@ struct RootView: View {
         }
         .environmentObject(audio)
         .environmentObject(library)
+        .environmentObject(proStore)
         .preferredColorScheme(.dark)
         .onChange(of: audio.currentSong) { song in
             if let song { library.markPlayed(song) }

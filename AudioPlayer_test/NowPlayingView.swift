@@ -20,6 +20,9 @@ struct NowPlayingView: View {
     @State private var isScrubbing = false
     @State private var dragOffset: CGFloat = 0
     @State private var showQueue = false
+    @State private var showLyrics = false
+    @State private var showSleepOptions = false
+    @State private var shareItem: ShareableImage?
 
     private var song: Song? { audio.currentSong }
 
@@ -55,6 +58,21 @@ struct NowPlayingView: View {
         .gesture(dismissDrag)
         .sheet(isPresented: $showQueue) {
             QueueView().environmentObject(audio).environmentObject(library)
+        }
+        .sheet(isPresented: $showLyrics) {
+            LyricsView().environmentObject(audio)
+        }
+        .sheet(item: $shareItem) { item in
+            ShareSheet(items: [item.image])
+        }
+        .confirmationDialog("Sleep timer", isPresented: $showSleepOptions, titleVisibility: .visible) {
+            ForEach([15, 30, 45, 60], id: \.self) { minutes in
+                Button("\(minutes) minutes") { audio.setSleepTimer(minutes: minutes) }
+            }
+            if audio.sleepTimerMinutes != nil {
+                Button("Turn off", role: .destructive) { audio.setSleepTimer(minutes: nil) }
+            }
+            Button("Cancel", role: .cancel) {}
         }
         .onAppear { scrubValue = audio.progress }
     }
@@ -225,23 +243,29 @@ struct NowPlayingView: View {
     private var bottomBar: some View {
         HStack {
             Spacer()
-            Image(systemName: "airplayaudio")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundColor(.white.opacity(0.7))
+            bottomButton("quote.bubble", active: false) { showLyrics = true }
             Spacer()
-            Button { showQueue = true } label: {
-                Image(systemName: "quote.bubble")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.7))
+            bottomButton("moon.zzz\(audio.sleepTimerMinutes != nil ? ".fill" : "")",
+                         active: audio.sleepTimerMinutes != nil) {
+                showSleepOptions = true
             }
             Spacer()
-            Button { showQueue = true } label: {
-                Image(systemName: "list.bullet.rectangle")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.7))
+            bottomButton("square.and.arrow.up", active: false) {
+                if let song { shareItem = ShareCardRenderer.render(song) }
             }
+            Spacer()
+            bottomButton("list.bullet", active: false) { showQueue = true }
             Spacer()
         }
+    }
+
+    private func bottomButton(_ icon: String, active: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(active ? Theme.accentSoft : .white.opacity(0.7))
+        }
+        .buttonStyle(BouncyButtonStyle())
     }
 
     // MARK: - Drag to dismiss

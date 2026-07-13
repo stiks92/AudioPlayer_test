@@ -11,8 +11,11 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var library: MusicLibrary
+    @EnvironmentObject private var proStore: ProStore
 
     @StateObject private var trending = SongFeed()
+    @State private var showSettings = false
+    @State private var showAIMix = false
 
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -32,6 +35,7 @@ struct HomeView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 28) {
                         header
+                        aiMixCard
                         if !library.recentSongs.isEmpty {
                             recentlyPlayed
                         }
@@ -50,7 +54,58 @@ struct HomeView: View {
                     await trending.load { try await AudiusService.shared.trending() }
                 }
             }
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
+                    .environmentObject(audio)
+                    .environmentObject(proStore)
+            }
+            .sheet(isPresented: $showAIMix) {
+                AIMixView()
+                    .environmentObject(audio)
+                    .environmentObject(library)
+                    .environmentObject(proStore)
+            }
         }
+    }
+
+    // MARK: - AI Mix banner
+
+    private var aiMixCard: some View {
+        Button {
+            Haptics.impact()
+            showAIMix = true
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 26, weight: .bold))
+                    .foregroundColor(.white)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Create an AI Mix")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(.white)
+                    Text("Describe a vibe — get an instant mix")
+                        .font(.system(size: 12))
+                        .foregroundColor(.white.opacity(0.85))
+                }
+                Spacer()
+                if !proStore.isPro {
+                    Text("PRO")
+                        .font(.system(size: 10, weight: .heavy))
+                        .foregroundColor(Theme.background)
+                        .padding(.horizontal, 8).padding(.vertical, 3)
+                        .background(Capsule().fill(Color.white))
+                }
+                Image(systemName: "chevron.right").foregroundColor(.white.opacity(0.8))
+            }
+            .padding(16)
+            .background(
+                LinearGradient(colors: [Theme.accent, Color(hex: 0xFF6FD8), Color(hex: 0x4A00E0)],
+                               startPoint: .topLeading, endPoint: .bottomTrailing)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .shadow(color: Theme.accent.opacity(0.4), radius: 14, y: 8)
+        }
+        .buttonStyle(BouncyButtonStyle(scale: 0.98))
     }
 
     // MARK: - Trending on Audius (live)
@@ -116,10 +171,18 @@ struct HomeView: View {
                     .foregroundColor(Theme.textSecondary)
             }
             Spacer()
-            Circle()
-                .fill(LinearGradient(colors: [Theme.accent, Theme.accentSoft], startPoint: .top, endPoint: .bottom))
-                .frame(width: 40, height: 40)
-                .overlay(Image(systemName: "person.fill").foregroundColor(.white))
+            Button {
+                showSettings = true
+            } label: {
+                Circle()
+                    .fill(LinearGradient(colors: [Theme.accent, Theme.accentSoft], startPoint: .top, endPoint: .bottom))
+                    .frame(width: 40, height: 40)
+                    .overlay(
+                        Image(systemName: proStore.isPro ? "sparkles" : "person.fill")
+                            .foregroundColor(.white)
+                    )
+            }
+            .buttonStyle(BouncyButtonStyle())
         }
     }
 

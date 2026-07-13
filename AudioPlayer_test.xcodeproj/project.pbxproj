@@ -33,6 +33,15 @@
 		AA000000000000000000B024 /* SongFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F024 /* SongFeed.swift */; };
 		AA000000000000000000B025 /* Artwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F025 /* Artwork.swift */; };
 		AA000000000000000000B026 /* RadioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F026 /* RadioView.swift */; };
+		AA000000000000000000B027 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F027 /* Haptics.swift */; };
+		AA000000000000000000B028 /* ProStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F028 /* ProStore.swift */; };
+		AA000000000000000000B029 /* LyricsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F029 /* LyricsService.swift */; };
+		AA000000000000000000B030 /* AIMixService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F030 /* AIMixService.swift */; };
+		AA000000000000000000B031 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F031 /* PaywallView.swift */; };
+		AA000000000000000000B032 /* LyricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F032 /* LyricsView.swift */; };
+		AA000000000000000000B033 /* AIMixView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F033 /* AIMixView.swift */; };
+		AA000000000000000000B034 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F034 /* SettingsView.swift */; };
+		AA000000000000000000B035 /* ShareCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F035 /* ShareCard.swift */; };
 		7452B83527555A1400FA93A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7452B83427555A1400FA93A2 /* Assets.xcassets */; };
 		7452B83827555A1400FA93A2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7452B83627555A1400FA93A2 /* LaunchScreen.storyboard */; };
 		7452B84327555A1400FA93A2 /* AudioPlayer_testTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7452B84227555A1400FA93A2 /* AudioPlayer_testTests.swift */; };
@@ -101,6 +110,15 @@
 		AA000000000000000000F024 /* SongFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongFeed.swift; sourceTree = "<group>"; };
 		AA000000000000000000F025 /* Artwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artwork.swift; sourceTree = "<group>"; };
 		AA000000000000000000F026 /* RadioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioView.swift; sourceTree = "<group>"; };
+		AA000000000000000000F027 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
+		AA000000000000000000F028 /* ProStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProStore.swift; sourceTree = "<group>"; };
+		AA000000000000000000F029 /* LyricsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsService.swift; sourceTree = "<group>"; };
+		AA000000000000000000F030 /* AIMixService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIMixService.swift; sourceTree = "<group>"; };
+		AA000000000000000000F031 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		AA000000000000000000F032 /* LyricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsView.swift; sourceTree = "<group>"; };
+		AA000000000000000000F033 /* AIMixView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIMixView.swift; sourceTree = "<group>"; };
+		AA000000000000000000F034 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AA000000000000000000F035 /* ShareCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareCard.swift; sourceTree = "<group>"; };
 		7452B82827555A1100FA93A2 /* AudioPlayer_test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioPlayer_test.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7452B83427555A1400FA93A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7452B83727555A1400FA93A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -218,6 +236,10 @@
 				AA000000000000000000F022 /* AudiusService.swift */,
 				AA000000000000000000F023 /* RadioBrowserService.swift */,
 				AA000000000000000000F024 /* SongFeed.swift */,
+				AA000000000000000000F029 /* LyricsService.swift */,
+				AA000000000000000000F030 /* AIMixService.swift */,
+				AA000000000000000000F028 /* ProStore.swift */,
+				AA000000000000000000F027 /* Haptics.swift */,
 			);
 			name = Services;
 			sourceTree = "<group>";
@@ -247,6 +269,11 @@
 				AA000000000000000000F017 /* QueueView.swift */,
 				AA000000000000000000F018 /* PlaylistDetailView.swift */,
 				AA000000000000000000F019 /* SongRow.swift */,
+				AA000000000000000000F031 /* PaywallView.swift */,
+				AA000000000000000000F032 /* LyricsView.swift */,
+				AA000000000000000000F033 /* AIMixView.swift */,
+				AA000000000000000000F034 /* SettingsView.swift */,
+				AA000000000000000000F035 /* ShareCard.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -465,6 +492,15 @@
 				AA000000000000000000B024 /* SongFeed.swift in Sources */,
 				AA000000000000000000B025 /* Artwork.swift in Sources */,
 				AA000000000000000000B026 /* RadioView.swift in Sources */,
+				AA000000000000000000B027 /* Haptics.swift in Sources */,
+				AA000000000000000000B028 /* ProStore.swift in Sources */,
+				AA000000000000000000B029 /* LyricsService.swift in Sources */,
+				AA000000000000000000B030 /* AIMixService.swift in Sources */,
+				AA000000000000000000B031 /* PaywallView.swift in Sources */,
+				AA000000000000000000B032 /* LyricsView.swift in Sources */,
+				AA000000000000000000B033 /* AIMixView.swift in Sources */,
+				AA000000000000000000B034 /* SettingsView.swift in Sources */,
+				AA000000000000000000B035 /* ShareCard.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
