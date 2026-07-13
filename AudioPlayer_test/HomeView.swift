@@ -15,6 +15,7 @@ struct HomeView: View {
     @EnvironmentObject private var serverStore: ServerStore
 
     @StateObject private var trending = SongFeed()
+    @StateObject private var charts = SongFeed()
     @StateObject private var serverFeed = SongFeed()
     @State private var showSettings = false
     @State private var showAIMix = false
@@ -39,6 +40,7 @@ struct HomeView: View {
                     VStack(alignment: .leading, spacing: 28) {
                         header
                         aiMixCard
+                        popularSection
                         if !library.recentSongs.isEmpty {
                             recentlyPlayed
                         }
@@ -54,6 +56,9 @@ struct HomeView: View {
             }
             .navigationBarHidden(true)
             .task {
+                if charts.state == .idle {
+                    await charts.load { try await DeezerService.shared.chartTracks() }
+                }
                 if trending.state == .idle {
                     await trending.load { try await AudiusService.shared.trending() }
                 }
@@ -158,6 +163,41 @@ struct HomeView: View {
             .shadow(color: Theme.accent.opacity(0.4), radius: 14, y: 8)
         }
         .buttonStyle(BouncyButtonStyle(scale: 0.98))
+    }
+
+    // MARK: - Popular now (Deezer charts)
+
+    @ViewBuilder
+    private var popularSection: some View {
+        if charts.state == .loaded {
+            VStack(alignment: .leading, spacing: 14) {
+                SectionHeader(title: "Popular now")
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 14) {
+                        ForEach(charts.songs) { song in
+                            Button {
+                                audio.play(song, in: charts.songs)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    ArtworkThumbnail(song: song, size: 150, cornerRadius: 18, showBadge: true)
+                                    Text(song.title)
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundColor(Theme.textPrimary)
+                                        .lineLimit(1)
+                                        .frame(width: 150, alignment: .leading)
+                                    Text(song.artist)
+                                        .font(.system(size: 11))
+                                        .foregroundColor(Theme.textSecondary)
+                                        .lineLimit(1)
+                                        .frame(width: 150, alignment: .leading)
+                                }
+                            }
+                            .buttonStyle(BouncyButtonStyle(scale: 0.95))
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Trending on Audius (live)
