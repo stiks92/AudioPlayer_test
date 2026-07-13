@@ -13,7 +13,7 @@ struct Playlist: Identifiable, Equatable {
     var subtitle: String
     var systemImage: String
     var gradient: [Color]
-    var songIDs: [UUID]
+    var songIDs: [String]
 
     init(
         id: UUID = UUID(),
@@ -21,7 +21,7 @@ struct Playlist: Identifiable, Equatable {
         subtitle: String,
         systemImage: String,
         gradient: [Color],
-        songIDs: [UUID]
+        songIDs: [String]
     ) {
         self.id = id
         self.title = title
