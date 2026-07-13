@@ -54,7 +54,14 @@ final class AIMixService {
         var seen = Set<String>()
         var collected: [Song] = []
         for seed in seeds {
-            let results = (try? await AudiusService.shared.search(seed)) ?? []
+            // Blend full-length Audius tracks with mainstream previews,
+            // fetched concurrently.
+            async let audius = AudiusService.shared.search(seed)
+            async let deezer = DeezerService.shared.search(seed)
+            async let apple = iTunesService.shared.searchMusic(seed)
+            let results = ((try? await audius) ?? [])
+                + ((try? await deezer) ?? [])
+                + ((try? await apple) ?? [])
             for song in results where !seen.contains(song.id) {
                 seen.insert(song.id)
                 collected.append(song)
@@ -62,7 +69,7 @@ final class AIMixService {
         }
 
         collected.shuffle()
-        let songs = Array(collected.prefix(25))
+        let songs = Array(collected.prefix(30))
         return Mix(title: "\(label) Mix", songs: songs)
     }
 }

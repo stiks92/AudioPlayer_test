@@ -17,6 +17,7 @@ struct SearchView: View {
     @FocusState private var focused: Bool
     @StateObject private var audiusFeed = SongFeed()
     @StateObject private var appleFeed = SongFeed()
+    @StateObject private var deezerFeed = SongFeed()
     @StateObject private var serverFeed = SongFeed()
 
     private var localResults: [Song] { library.search(query) }
@@ -60,6 +61,7 @@ struct SearchView: View {
                 guard trimmed.count >= 2 else {
                     audiusFeed.clear()
                     appleFeed.clear()
+                    deezerFeed.clear()
                     serverFeed.clear()
                     return
                 }
@@ -69,6 +71,7 @@ struct SearchView: View {
                 if serverStore.isConnected {
                     await serverFeed.load { try await serverStore.search(trimmed) }
                 }
+                await deezerFeed.load { try await DeezerService.shared.search(trimmed) }
                 await appleFeed.load { try await iTunesService.shared.searchMusic(trimmed) }
                 await audiusFeed.load { try await AudiusService.shared.search(trimmed) }
             }
@@ -89,6 +92,7 @@ struct SearchView: View {
                     query = ""
                     audiusFeed.clear()
                     appleFeed.clear()
+                    deezerFeed.clear()
                     serverFeed.clear()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
@@ -120,6 +124,18 @@ struct SearchView: View {
                 }
             }
 
+            if deezerFeed.state == .loaded {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 8) {
+                        SectionHeader(title: "Deezer")
+                        Text("previews")
+                            .font(.caption2)
+                            .foregroundColor(Theme.textTertiary)
+                    }
+                    songList(deezerFeed.songs)
+                }
+            }
+
             if appleFeed.state == .loaded {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 8) {
@@ -142,7 +158,8 @@ struct SearchView: View {
                 audiusResults
             }
 
-            if localResults.isEmpty && audiusFeed.state == .empty && appleFeed.state == .empty {
+            if localResults.isEmpty && audiusFeed.state == .empty
+                && appleFeed.state == .empty && deezerFeed.state == .empty {
                 emptyState
             }
         }
