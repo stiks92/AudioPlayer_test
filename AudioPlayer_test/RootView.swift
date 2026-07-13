@@ -59,10 +59,11 @@ struct RootView: View {
     @ViewBuilder
     private var content: some View {
         switch selection {
-        case .home:    HomeView()
-        case .search:  SearchView()
-        case .radio:   RadioView()
-        case .library: LibraryView()
+        case .home:     HomeView()
+        case .search:   SearchView()
+        case .radio:    RadioView()
+        case .podcasts: PodcastsView()
+        case .library:  LibraryView()
         }
     }
 }
@@ -70,13 +71,14 @@ struct RootView: View {
 // MARK: - Tabs
 
 enum AppTab: String, CaseIterable {
-    case home, search, radio, library
+    case home, search, radio, podcasts, library
 
     var title: String {
         switch self {
         case .home: return "Home"
         case .search: return "Search"
         case .radio: return "Radio"
+        case .podcasts: return "Podcasts"
         case .library: return "Library"
         }
     }
@@ -86,6 +88,7 @@ enum AppTab: String, CaseIterable {
         case .home: return "house.fill"
         case .search: return "magnifyingglass"
         case .radio: return "dot.radiowaves.left.and.right"
+        case .podcasts: return "mic.fill"
         case .library: return "square.stack.fill"
         }
     }

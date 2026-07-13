@@ -32,8 +32,17 @@ final class AudioManager: NSObject, ObservableObject {
     @Published var volume: Float = 0.75 {
         didSet { activeEngine?.setVolume(volume) }
     }
+    @Published private(set) var playbackRate: Float = 1.0
 
     var isLive: Bool { currentSong?.isLive ?? false }
+
+    /// Speed control is only meaningful for spoken-word content (podcasts).
+    var supportsPlaybackRate: Bool { currentSong?.source == .podcast }
+
+    func setPlaybackRate(_ rate: Float) {
+        playbackRate = rate
+        activeEngine?.setRate(rate)
+    }
 
     var progress: Double {
         guard duration > 0 else { return 0 }
@@ -191,8 +200,12 @@ final class AudioManager: NSObject, ObservableObject {
         audioLevel = 0
         duration = song.isLive ? 0 : 1
 
+        // Speed persists across podcast episodes but resets for music/radio.
+        if song.source != .podcast { playbackRate = 1.0 }
+
         let ok = engine.prepare(url: url, isLive: song.isLive, autoplay: autoplay)
         if ok {
+            engine.setRate(playbackRate)
             isPlaying = autoplay
             if autoplay { startTimer() } else { stopTimer() }
         } else {

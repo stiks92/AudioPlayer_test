@@ -130,11 +130,38 @@ struct NowPlayingView: View {
                     .foregroundColor(.white.opacity(0.7))
             }
             Spacer(minLength: 8)
+            if audio.supportsPlaybackRate {
+                speedMenu
+            }
             if let song {
                 HeartButton(isOn: library.isFavorite(song), size: 24) {
                     withAnimation { library.toggleFavorite(song) }
                 }
             }
+        }
+    }
+
+    private var speedMenu: some View {
+        Menu {
+            ForEach([0.8, 1.0, 1.25, 1.5, 1.75, 2.0], id: \.self) { rate in
+                Button {
+                    audio.setPlaybackRate(Float(rate))
+                    Haptics.selection()
+                } label: {
+                    if audio.playbackRate == Float(rate) {
+                        Label(String(format: "%g×", rate), systemImage: "checkmark")
+                    } else {
+                        Text(String(format: "%g×", rate))
+                    }
+                }
+            }
+        } label: {
+            Text(String(format: "%g×", Double(audio.playbackRate)))
+                .font(.system(size: 13, weight: .bold))
+                .foregroundColor(.white)
+                .frame(minWidth: 40)
+                .padding(.vertical, 7)
+                .background(Capsule().fill(.ultraThinMaterial))
         }
     }
 

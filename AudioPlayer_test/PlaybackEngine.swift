@@ -25,6 +25,7 @@ protocol PlaybackEngine: AnyObject {
     func pause()
     func seek(to time: Double)
     func setVolume(_ volume: Float)
+    func setRate(_ rate: Float)   // playback speed (podcasts)
     func refresh()          // sampled by AudioManager's timer
     func teardown()
 }
@@ -36,6 +37,7 @@ final class LocalAudioEngine: NSObject, PlaybackEngine, AVAudioPlayerDelegate {
     private var player: AVAudioPlayer?
     private(set) var level: CGFloat = 0
     private var volume: Float = 0.75
+    private var rate: Float = 1.0
 
     var isLive: Bool { false }
     var isPlaying: Bool { player?.isPlaying ?? false }
@@ -48,7 +50,9 @@ final class LocalAudioEngine: NSObject, PlaybackEngine, AVAudioPlayerDelegate {
             let p = try AVAudioPlayer(contentsOf: url)
             p.delegate = self
             p.isMeteringEnabled = true
+            p.enableRate = true
             p.volume = volume
+            p.rate = rate
             p.prepareToPlay()
             player = p
             level = 0
@@ -65,6 +69,12 @@ final class LocalAudioEngine: NSObject, PlaybackEngine, AVAudioPlayerDelegate {
     func pause() { player?.pause() }
     func seek(to time: Double) { player?.currentTime = max(0, min(time, duration)) }
     func setVolume(_ volume: Float) { self.volume = volume; player?.volume = volume }
+
+    func setRate(_ rate: Float) {
+        self.rate = rate
+        player?.enableRate = true
+        if player?.isPlaying == true { player?.rate = rate }
+    }
 
     func refresh() {
         guard let player = player, player.isPlaying else { return }
@@ -95,6 +105,7 @@ final class RemoteAudioEngine: NSObject, PlaybackEngine {
     private var playing = false
     private var live = false
     private var volume: Float = 0.75
+    private var rate: Float = 1.0
     private(set) var level: CGFloat = 0
 
     var isLive: Bool { live }
@@ -117,6 +128,7 @@ final class RemoteAudioEngine: NSObject, PlaybackEngine {
         teardown()
         live = isLive
         let item = AVPlayerItem(url: url)
+        item.audioTimePitchAlgorithm = .timeDomain   // natural voice at higher speeds
         let p = AVPlayer(playerItem: item)
         p.volume = volume
         player = p
@@ -132,7 +144,12 @@ final class RemoteAudioEngine: NSObject, PlaybackEngine {
         return true
     }
 
-    func play() { player?.play(); playing = true }
+    func play() {
+        playing = true
+        // Setting rate resumes playback; live streams always play at 1×.
+        player?.rate = live ? 1.0 : rate
+    }
+
     func pause() { player?.pause(); playing = false }
 
     func seek(to time: Double) {
@@ -141,6 +158,11 @@ final class RemoteAudioEngine: NSObject, PlaybackEngine {
     }
 
     func setVolume(_ volume: Float) { self.volume = volume; player?.volume = volume }
+
+    func setRate(_ rate: Float) {
+        self.rate = rate
+        if playing && !live { player?.rate = rate }
+    }
 
     func refresh() {
         // AVPlayer exposes no metering; synthesise a gentle animated level.

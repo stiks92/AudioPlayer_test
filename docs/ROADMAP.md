@@ -3,6 +3,20 @@
 Turning the redesigned SwiftUI player into an "ultimate" cross-service music app.
 Companion doc: [`INTEGRATIONS.md`](./INTEGRATIONS.md).
 
+## Shipped so far
+
+- Full SwiftUI redesign; custom tab bar; expanding Now Playing; aurora visuals.
+- Provider abstraction + dual playback engine (local metering / remote streaming).
+- Sources: **Audius** (streaming), **Internet Radio** (Radio Browser),
+  **Podcasts** (iTunes discovery + RSS episodes, with 0.8×–2× speed),
+  **Self-hosted Subsonic** (Navidrome/Airsonic; Keychain-stored credentials).
+- **Aurora Pro** (StoreKit 2) + paywall + settings + Pro gating.
+- **AI Mix** (on-device natural-language mix), synced **karaoke lyrics** (LRCLIB),
+  **ShazamKit** recognition, **sleep timer**, **share card**, haptics.
+
+Remaining big rocks are tracked below (EQ/audio quality, Apple Music/Spotify,
+platform extensions, scrobbling, offline).
+
 ## 1. Positioning (the one-liner)
 
 > **Aurora — one beautiful player for *all* your music.**
