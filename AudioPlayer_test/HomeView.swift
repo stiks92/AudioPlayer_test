@@ -12,6 +12,8 @@ struct HomeView: View {
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var library: MusicLibrary
 
+    @StateObject private var trending = SongFeed()
+
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
         switch hour {
@@ -33,6 +35,7 @@ struct HomeView: View {
                         if !library.recentSongs.isEmpty {
                             recentlyPlayed
                         }
+                        trendingSection
                         featured
                         quickPicks
                     }
@@ -42,6 +45,61 @@ struct HomeView: View {
                 }
             }
             .navigationBarHidden(true)
+            .task {
+                if trending.state == .idle {
+                    await trending.load { try await AudiusService.shared.trending() }
+                }
+            }
+        }
+    }
+
+    // MARK: - Trending on Audius (live)
+
+    @ViewBuilder
+    private var trendingSection: some View {
+        switch trending.state {
+        case .idle, .failed, .empty:
+            EmptyView()
+        case .loading:
+            VStack(alignment: .leading, spacing: 14) {
+                SectionHeader(title: "Trending on Audius")
+                HStack(spacing: 14) {
+                    ForEach(0..<3, id: \.self) { _ in
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .fill(Theme.surface)
+                            .frame(width: 150, height: 190)
+                            .redacted(reason: .placeholder)
+                    }
+                }
+            }
+        case .loaded:
+            VStack(alignment: .leading, spacing: 14) {
+                SectionHeader(title: "Trending on Audius")
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 14) {
+                        ForEach(trending.songs) { song in
+                            Button {
+                                audio.play(song, in: trending.songs)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    ArtworkThumbnail(song: song, size: 150, cornerRadius: 18, showBadge: true)
+                                    Text(song.title)
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundColor(Theme.textPrimary)
+                                        .lineLimit(1)
+                                        .frame(width: 150, alignment: .leading)
+                                    Text(song.artist)
+                                        .font(.system(size: 11))
+                                        .foregroundColor(Theme.textSecondary)
+                                        .lineLimit(1)
+                                        .frame(width: 150, alignment: .leading)
+                                }
+                            }
+                            .buttonStyle(BouncyButtonStyle(scale: 0.95))
+                        }
+                    }
+                }
+            }
         }
     }
 

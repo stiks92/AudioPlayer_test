@@ -2,47 +2,93 @@
 //  Song.swift
 //  AudioPlayer_test
 //
-//  Core track model for the player.
+//  Universal track model. A track can be a bundled file, a remote
+//  streaming track (e.g. Audius), or a live radio station — all screens
+//  work against this single type.
 //
 
 import SwiftUI
 
-/// A single playable track backed by a bundled audio file.
+/// Where a track's audio comes from.
+enum TrackSource: String, Codable {
+    case local          // bundled resource
+    case audius         // Audius direct-stream catalogue
+    case radio          // internet radio (live stream)
+    case jamendo
+    case archive
+    case podcast
+
+    var badge: String? {
+        switch self {
+        case .local:   return nil
+        case .audius:  return "AUDIUS"
+        case .radio:   return "LIVE"
+        case .jamendo: return "JAMENDO"
+        case .archive: return "ARCHIVE"
+        case .podcast: return "PODCAST"
+        }
+    }
+}
+
 struct Song: Identifiable, Equatable, Hashable {
-    let id: UUID
+    /// Stable, globally-unique id, e.g. `local:song1` or `audius:aBc12`.
+    let id: String
     let title: String
     let artist: String
     let album: String
-    let fileName: String
+    let source: TrackSource
+    /// Bundled resource name (nil for remote tracks).
+    let fileName: String?
     let fileExtension: String
+    /// Local asset used as artwork fallback.
     let artworkName: String
-    /// Two-stop gradient used to theme the artwork and the Now Playing scene.
+    /// Remote artwork, if any.
+    let artworkURL: URL?
+    /// Remote audio stream, if any.
+    let streamURL: URL?
+    /// Live stream (radio) — has no fixed duration / scrubbing.
+    let isLive: Bool
     let gradient: [Color]
 
     init(
-        id: UUID = UUID(),
+        id: String,
         title: String,
         artist: String,
         album: String,
-        fileName: String,
+        source: TrackSource = .local,
+        fileName: String? = nil,
         fileExtension: String = "mp3",
         artworkName: String = "Cover",
+        artworkURL: URL? = nil,
+        streamURL: URL? = nil,
+        isLive: Bool = false,
         gradient: [Color]
     ) {
         self.id = id
         self.title = title
         self.artist = artist
         self.album = album
+        self.source = source
         self.fileName = fileName
         self.fileExtension = fileExtension
         self.artworkName = artworkName
+        self.artworkURL = artworkURL
+        self.streamURL = streamURL
+        self.isLive = isLive
         self.gradient = gradient
     }
 
-    /// Resolves the on-disk URL for the bundled resource.
+    /// Playable URL, resolving bundled resources for local tracks.
     var url: URL? {
-        Bundle.main.url(forResource: fileName, withExtension: fileExtension)
+        switch source {
+        case .local:
+            return fileName.flatMap { Bundle.main.url(forResource: $0, withExtension: fileExtension) }
+        default:
+            return streamURL
+        }
     }
+
+    var isRemote: Bool { source != .local }
 
     static func == (lhs: Song, rhs: Song) -> Bool { lhs.id == rhs.id }
     func hash(into hasher: inout Hasher) { hasher.combine(id) }

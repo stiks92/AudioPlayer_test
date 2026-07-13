@@ -2,8 +2,10 @@
 //  MusicLibrary.swift
 //  AudioPlayer_test
 //
-//  Owns the catalogue of songs and playlists plus lightweight
+//  Owns the bundled catalogue + curated playlists plus lightweight
 //  user state (favorites + recently played) persisted to UserDefaults.
+//  Tracks are keyed by their stable `id` so the same store works for
+//  local and (later) remote tracks.
 //
 
 import SwiftUI
@@ -14,23 +16,23 @@ final class MusicLibrary: ObservableObject {
 
     @Published private(set) var songs: [Song] = []
     @Published private(set) var playlists: [Playlist] = []
-    @Published private(set) var favoriteFiles: Set<String> = []
-    @Published private(set) var recentFiles: [String] = []
+    @Published private(set) var favoriteIDs: Set<String> = []
+    @Published private(set) var recentIDs: [String] = []
 
-    private let favoritesKey = "favorite.files.v1"
-    private let recentsKey = "recent.files.v1"
+    private let favoritesKey = "favorite.ids.v2"
+    private let recentsKey = "recent.ids.v2"
     private let maxRecents = 12
 
     init() {
         songs = MusicLibrary.makeCatalogue()
-        favoriteFiles = Set(UserDefaults.standard.stringArray(forKey: favoritesKey) ?? [])
-        recentFiles = UserDefaults.standard.stringArray(forKey: recentsKey) ?? []
+        favoriteIDs = Set(UserDefaults.standard.stringArray(forKey: favoritesKey) ?? [])
+        recentIDs = UserDefaults.standard.stringArray(forKey: recentsKey) ?? []
         playlists = makePlaylists()
     }
 
     // MARK: - Lookups
 
-    func song(withID id: UUID) -> Song? {
+    func song(withID id: String) -> Song? {
         songs.first { $0.id == id }
     }
 
@@ -39,11 +41,11 @@ final class MusicLibrary: ObservableObject {
     }
 
     var favoriteSongs: [Song] {
-        songs.filter { favoriteFiles.contains($0.fileName) }
+        songs.filter { favoriteIDs.contains($0.id) }
     }
 
     var recentSongs: [Song] {
-        recentFiles.compactMap { file in songs.first { $0.fileName == file } }
+        recentIDs.compactMap { id in songs.first { $0.id == id } }
     }
 
     func search(_ query: String) -> [Song] {
@@ -59,27 +61,27 @@ final class MusicLibrary: ObservableObject {
     // MARK: - Favorites
 
     func isFavorite(_ song: Song) -> Bool {
-        favoriteFiles.contains(song.fileName)
+        favoriteIDs.contains(song.id)
     }
 
     func toggleFavorite(_ song: Song) {
-        if favoriteFiles.contains(song.fileName) {
-            favoriteFiles.remove(song.fileName)
+        if favoriteIDs.contains(song.id) {
+            favoriteIDs.remove(song.id)
         } else {
-            favoriteFiles.insert(song.fileName)
+            favoriteIDs.insert(song.id)
         }
-        UserDefaults.standard.set(Array(favoriteFiles), forKey: favoritesKey)
+        UserDefaults.standard.set(Array(favoriteIDs), forKey: favoritesKey)
     }
 
     // MARK: - Recents
 
     func markPlayed(_ song: Song) {
-        recentFiles.removeAll { $0 == song.fileName }
-        recentFiles.insert(song.fileName, at: 0)
-        if recentFiles.count > maxRecents {
-            recentFiles = Array(recentFiles.prefix(maxRecents))
+        recentIDs.removeAll { $0 == song.id }
+        recentIDs.insert(song.id, at: 0)
+        if recentIDs.count > maxRecents {
+            recentIDs = Array(recentIDs.prefix(maxRecents))
         }
-        UserDefaults.standard.set(recentFiles, forKey: recentsKey)
+        UserDefaults.standard.set(recentIDs, forKey: recentsKey)
     }
 
     // MARK: - Playlists (curated / derived)
@@ -122,26 +124,6 @@ final class MusicLibrary: ObservableObject {
     // MARK: - Catalogue
 
     private static func makeCatalogue() -> [Song] {
-        let gradients: [[Color]] = [
-            [Color(hex: 0x7C5CFF), Color(hex: 0x3A1C71)],
-            [Color(hex: 0xFF6FD8), Color(hex: 0x3813C2)],
-            [Color(hex: 0x11998E), Color(hex: 0x38EF7D)],
-            [Color(hex: 0xF7971E), Color(hex: 0xFFD200)],
-            [Color(hex: 0xFC466B), Color(hex: 0x3F5EFB)],
-            [Color(hex: 0x00C6FF), Color(hex: 0x0072FF)],
-            [Color(hex: 0xFF512F), Color(hex: 0xDD2476)],
-            [Color(hex: 0x8E2DE2), Color(hex: 0x4A00E0)],
-            [Color(hex: 0xF953C6), Color(hex: 0xB91D73)],
-            [Color(hex: 0x43CEA2), Color(hex: 0x185A9D)],
-            [Color(hex: 0xFF9966), Color(hex: 0xFF5E62)],
-            [Color(hex: 0x36D1DC), Color(hex: 0x5B86E5)],
-            [Color(hex: 0xC33764), Color(hex: 0x1D2671)],
-            [Color(hex: 0xFDC830), Color(hex: 0xF37335)],
-            [Color(hex: 0x1FA2FF), Color(hex: 0x12D8FA)],
-            [Color(hex: 0xEC008C), Color(hex: 0xFC6767)],
-            [Color(hex: 0x654EA3), Color(hex: 0xEAAFC8)]
-        ]
-
         let titles = [
             "Hoyt's Office", "Defeated Clown", "Following Sophie",
             "Penny in the Hospital", "Young Penny", "Meeting Bruce Wayne",
@@ -152,12 +134,15 @@ final class MusicLibrary: ObservableObject {
         ]
 
         return titles.enumerated().map { index, title in
-            Song(
+            let file = "song\(index + 1)"
+            return Song(
+                id: "local:\(file)",
                 title: title,
                 artist: "Hildur Guðnadóttir",
                 album: "Joker",
-                fileName: "song\(index + 1)",
-                gradient: gradients[index % gradients.count]
+                source: .local,
+                fileName: file,
+                gradient: Palette.gradient(for: index)
             )
         }
     }

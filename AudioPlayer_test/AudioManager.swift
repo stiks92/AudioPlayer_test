@@ -2,9 +2,10 @@
 //  AudioManager.swift
 //  AudioPlayer_test
 //
-//  The playback engine. Wraps AVAudioPlayer, drives a live audio-level
-//  meter for the visualizer, manages the queue / shuffle / repeat, and
-//  integrates with the system Now Playing controls & lock screen.
+//  The playback engine orchestrator. Manages the queue / shuffle / repeat,
+//  delegates actual audio to a LocalAudioEngine (bundled files) or a
+//  RemoteAudioEngine (network streams & radio), drives the visualizer level,
+//  and integrates with the system Now Playing controls & lock screen.
 //
 
 import SwiftUI
@@ -29,8 +30,10 @@ final class AudioManager: NSObject, ObservableObject {
     /// Smoothed 0...1 output level used to drive the visualizer.
     @Published var audioLevel: CGFloat = 0
     @Published var volume: Float = 0.75 {
-        didSet { player?.volume = volume }
+        didSet { activeEngine?.setVolume(volume) }
     }
+
+    var isLive: Bool { currentSong?.isLive ?? false }
 
     var progress: Double {
         guard duration > 0 else { return 0 }
@@ -39,7 +42,9 @@ final class AudioManager: NSObject, ObservableObject {
 
     // MARK: - Private
 
-    private var player: AVAudioPlayer?
+    private let localEngine = LocalAudioEngine()
+    private let remoteEngine = RemoteAudioEngine()
+    private var activeEngine: PlaybackEngine?
     private var timer: Timer?
     private var baseQueue: [Song] = []
     private var currentIndex = 0
@@ -71,15 +76,15 @@ final class AudioManager: NSObject, ObservableObject {
     }
 
     func play() {
-        guard player != nil else { return }
-        player?.play()
+        guard activeEngine != nil else { return }
+        activeEngine?.play()
         isPlaying = true
         startTimer()
         updateNowPlayingInfo()
     }
 
     func pause() {
-        player?.pause()
+        activeEngine?.pause()
         isPlaying = false
         stopTimer()
         updateNowPlayingInfo()
@@ -90,7 +95,7 @@ final class AudioManager: NSObject, ObservableObject {
     }
 
     func previous() {
-        if currentTime > 3 {
+        if !isLive && currentTime > 3 {
             seek(to: 0)
             return
         }
@@ -100,10 +105,9 @@ final class AudioManager: NSObject, ObservableObject {
     }
 
     func seek(to time: Double) {
-        guard let player = player else { return }
-        let target = min(max(0, time), duration)
-        player.currentTime = target
-        currentTime = target
+        guard !isLive else { return }
+        activeEngine?.seek(to: time)
+        currentTime = min(max(0, time), duration)
         updateNowPlayingInfo()
     }
 
@@ -146,7 +150,6 @@ final class AudioManager: NSObject, ObservableObject {
             currentIndex += 1
             load(autoplay: true)
         } else if repeatMode == .off && auto {
-            // Reached the natural end of the queue — rewind and stop.
             currentIndex = 0
             load(autoplay: false)
         } else {
@@ -161,28 +164,30 @@ final class AudioManager: NSObject, ObservableObject {
         currentSong = song
 
         guard let url = song.url else {
-            print("AudioManager: missing file for \(song.fileName)")
+            print("AudioManager: missing URL for \(song.id)")
             return
         }
 
-        do {
-            let newPlayer = try AVAudioPlayer(contentsOf: url)
-            newPlayer.delegate = self
-            newPlayer.isMeteringEnabled = true
-            newPlayer.volume = volume
-            newPlayer.prepareToPlay()
-            player = newPlayer
-            duration = newPlayer.duration > 0 ? newPlayer.duration : 1
-            currentTime = 0
-            audioLevel = 0
-            if autoplay {
-                play()
-            } else {
-                isPlaying = false
-                stopTimer()
-            }
-        } catch {
-            print("AudioManager: failed to load \(song.fileName): \(error)")
+        // Swap to the correct backend for this track.
+        let engine: PlaybackEngine = song.isRemote ? remoteEngine : localEngine
+        if activeEngine !== engine { activeEngine?.teardown() }
+        activeEngine = engine
+        engine.onFinish = { [weak self] in
+            Task { @MainActor in self?.advance(auto: true) }
+        }
+        engine.setVolume(volume)
+
+        currentTime = 0
+        audioLevel = 0
+        duration = song.isLive ? 0 : 1
+
+        let ok = engine.prepare(url: url, isLive: song.isLive, autoplay: autoplay)
+        if ok {
+            isPlaying = autoplay
+            if autoplay { startTimer() } else { stopTimer() }
+        } else {
+            isPlaying = false
+            stopTimer()
         }
         updateNowPlayingInfo()
     }
@@ -234,17 +239,20 @@ final class AudioManager: NSObject, ObservableObject {
             MPMediaItemPropertyTitle: song.title,
             MPMediaItemPropertyArtist: song.artist,
             MPMediaItemPropertyAlbumTitle: song.album,
-            MPMediaItemPropertyPlaybackDuration: duration,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime,
-            MPNowPlayingInfoPropertyPlaybackRate: isPlaying ? 1.0 : 0.0
+            MPNowPlayingInfoPropertyPlaybackRate: isPlaying ? 1.0 : 0.0,
+            MPNowPlayingInfoPropertyIsLiveStream: song.isLive
         ]
-        if let image = UIImage(named: song.artworkName) {
+        if !song.isLive {
+            info[MPMediaItemPropertyPlaybackDuration] = duration
+        }
+        if !song.isRemote, let image = UIImage(named: song.artworkName) {
             info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
         }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
 
-    // MARK: - Metering timer
+    // MARK: - Sampling timer
 
     private func startTimer() {
         stopTimer()
@@ -261,21 +269,11 @@ final class AudioManager: NSObject, ObservableObject {
     }
 
     private func tick() {
-        guard let player = player else { return }
-        currentTime = player.currentTime
-        player.updateMeters()
-        let power = player.averagePower(forChannel: 0)   // ~ -160...0 dB
-        let normalized = max(0, (power + 55) / 55)        // → ~0...1
-        audioLevel = audioLevel * 0.75 + CGFloat(normalized) * 0.25
-    }
-}
-
-// MARK: - AVAudioPlayerDelegate
-
-extension AudioManager: AVAudioPlayerDelegate {
-    nonisolated func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        Task { @MainActor in
-            self.advance(auto: true)
-        }
+        guard let engine = activeEngine else { return }
+        engine.refresh()
+        currentTime = engine.currentTime
+        let d = engine.duration
+        duration = (d.isFinite && d > 0) ? d : (isLive ? 0 : 1)
+        audioLevel = engine.level
     }
 }

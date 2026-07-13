@@ -87,11 +87,8 @@ struct NowPlayingView: View {
             let side = min(geo.size.width, geo.size.height)
             ZStack {
                 if let song {
-                    Image(song.artworkName)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
+                    ArtworkImage(song: song, glyphSize: 72)
                         .frame(width: side, height: side)
-                        .background(LinearGradient(colors: song.gradient, startPoint: .top, endPoint: .bottom))
                         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
                         .matchedGeometryEffect(id: "artwork", in: namespace)
                         .shadow(color: song.gradient.first?.opacity(0.6) ?? .black, radius: 34, y: 20)
@@ -123,29 +120,47 @@ struct NowPlayingView: View {
         }
     }
 
+    @ViewBuilder
     private var scrubber: some View {
-        VStack(spacing: 6) {
-            ScrubberView(
-                value: Binding(
-                    get: { isScrubbing ? scrubValue : audio.progress },
-                    set: { scrubValue = $0 }
-                ),
-                onEditingChanged: { editing in
-                    if editing {
-                        isScrubbing = true
-                    } else {
-                        audio.seek(to: scrubValue * audio.duration)
-                        isScrubbing = false
-                    }
-                }
-            )
-            HStack {
-                Text((isScrubbing ? scrubValue * audio.duration : audio.currentTime).asClock)
+        if audio.isLive {
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(Color(hex: 0xFF3B6B))
+                    .frame(width: 8, height: 8)
+                    .opacity(audio.isPlaying ? 1 : 0.4)
+                Text("LIVE")
+                    .font(.system(size: 13, weight: .heavy))
+                    .tracking(2)
                 Spacer()
-                Text(audio.duration.asClock)
+                Text("Radio")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.white.opacity(0.6))
             }
-            .font(.system(size: 12, weight: .medium).monospacedDigit())
-            .foregroundColor(.white.opacity(0.6))
+            .frame(height: 24)
+        } else {
+            VStack(spacing: 6) {
+                ScrubberView(
+                    value: Binding(
+                        get: { isScrubbing ? scrubValue : audio.progress },
+                        set: { scrubValue = $0 }
+                    ),
+                    onEditingChanged: { editing in
+                        if editing {
+                            isScrubbing = true
+                        } else {
+                            audio.seek(to: scrubValue * audio.duration)
+                            isScrubbing = false
+                        }
+                    }
+                )
+                HStack {
+                    Text((isScrubbing ? scrubValue * audio.duration : audio.currentTime).asClock)
+                    Spacer()
+                    Text(audio.duration.asClock)
+                }
+                .font(.system(size: 12, weight: .medium).monospacedDigit())
+                .foregroundColor(.white.opacity(0.6))
+            }
         }
     }
 

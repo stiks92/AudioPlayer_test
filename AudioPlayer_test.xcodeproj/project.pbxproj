@@ -26,6 +26,13 @@
 		AA000000000000000000B017 /* QueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F017 /* QueueView.swift */; };
 		AA000000000000000000B018 /* PlaylistDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F018 /* PlaylistDetailView.swift */; };
 		AA000000000000000000B019 /* SongRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F019 /* SongRow.swift */; };
+		AA000000000000000000B020 /* PlaybackEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F020 /* PlaybackEngine.swift */; };
+		AA000000000000000000B021 /* TrackProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F021 /* TrackProvider.swift */; };
+		AA000000000000000000B022 /* AudiusService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F022 /* AudiusService.swift */; };
+		AA000000000000000000B023 /* RadioBrowserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F023 /* RadioBrowserService.swift */; };
+		AA000000000000000000B024 /* SongFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F024 /* SongFeed.swift */; };
+		AA000000000000000000B025 /* Artwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F025 /* Artwork.swift */; };
+		AA000000000000000000B026 /* RadioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F026 /* RadioView.swift */; };
 		7452B83527555A1400FA93A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7452B83427555A1400FA93A2 /* Assets.xcassets */; };
 		7452B83827555A1400FA93A2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7452B83627555A1400FA93A2 /* LaunchScreen.storyboard */; };
 		7452B84327555A1400FA93A2 /* AudioPlayer_testTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7452B84227555A1400FA93A2 /* AudioPlayer_testTests.swift */; };
@@ -87,6 +94,13 @@
 		AA000000000000000000F017 /* QueueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueView.swift; sourceTree = "<group>"; };
 		AA000000000000000000F018 /* PlaylistDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistDetailView.swift; sourceTree = "<group>"; };
 		AA000000000000000000F019 /* SongRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongRow.swift; sourceTree = "<group>"; };
+		AA000000000000000000F020 /* PlaybackEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackEngine.swift; sourceTree = "<group>"; };
+		AA000000000000000000F021 /* TrackProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackProvider.swift; sourceTree = "<group>"; };
+		AA000000000000000000F022 /* AudiusService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudiusService.swift; sourceTree = "<group>"; };
+		AA000000000000000000F023 /* RadioBrowserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioBrowserService.swift; sourceTree = "<group>"; };
+		AA000000000000000000F024 /* SongFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongFeed.swift; sourceTree = "<group>"; };
+		AA000000000000000000F025 /* Artwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artwork.swift; sourceTree = "<group>"; };
+		AA000000000000000000F026 /* RadioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioView.swift; sourceTree = "<group>"; };
 		7452B82827555A1100FA93A2 /* AudioPlayer_test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioPlayer_test.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7452B83427555A1400FA93A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7452B83727555A1400FA93A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -198,7 +212,12 @@
 			isa = PBXGroup;
 			children = (
 				AA000000000000000000F005 /* AudioManager.swift */,
+				AA000000000000000000F020 /* PlaybackEngine.swift */,
 				AA000000000000000000F006 /* MusicLibrary.swift */,
+				AA000000000000000000F021 /* TrackProvider.swift */,
+				AA000000000000000000F022 /* AudiusService.swift */,
+				AA000000000000000000F023 /* RadioBrowserService.swift */,
+				AA000000000000000000F024 /* SongFeed.swift */,
 			);
 			name = Services;
 			sourceTree = "<group>";
@@ -210,6 +229,7 @@
 				AA000000000000000000F008 /* DesignComponents.swift */,
 				AA000000000000000000F009 /* Visualizer.swift */,
 				AA000000000000000000F010 /* MarqueeText.swift */,
+				AA000000000000000000F025 /* Artwork.swift */,
 			);
 			name = DesignSystem;
 			sourceTree = "<group>";
@@ -220,6 +240,7 @@
 				AA000000000000000000F011 /* RootView.swift */,
 				AA000000000000000000F012 /* HomeView.swift */,
 				AA000000000000000000F013 /* SearchView.swift */,
+				AA000000000000000000F026 /* RadioView.swift */,
 				AA000000000000000000F014 /* LibraryView.swift */,
 				AA000000000000000000F015 /* NowPlayingView.swift */,
 				AA000000000000000000F016 /* MiniPlayerView.swift */,
@@ -437,6 +458,13 @@
 				AA000000000000000000B017 /* QueueView.swift in Sources */,
 				AA000000000000000000B018 /* PlaylistDetailView.swift in Sources */,
 				AA000000000000000000B019 /* SongRow.swift in Sources */,
+				AA000000000000000000B020 /* PlaybackEngine.swift in Sources */,
+				AA000000000000000000B021 /* TrackProvider.swift in Sources */,
+				AA000000000000000000B022 /* AudiusService.swift in Sources */,
+				AA000000000000000000B023 /* RadioBrowserService.swift in Sources */,
+				AA000000000000000000B024 /* SongFeed.swift in Sources */,
+				AA000000000000000000B025 /* Artwork.swift in Sources */,
+				AA000000000000000000B026 /* RadioView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

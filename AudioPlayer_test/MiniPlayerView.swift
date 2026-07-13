@@ -18,11 +18,8 @@ struct MiniPlayerView: View {
         if let song = audio.currentSong {
             VStack(spacing: 0) {
                 HStack(spacing: 12) {
-                    Image(song.artworkName)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
+                    ArtworkImage(song: song, glyphSize: 16)
                         .frame(width: 44, height: 44)
-                        .background(LinearGradient(colors: song.gradient, startPoint: .topLeading, endPoint: .bottomTrailing))
                         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                         .matchedGeometryEffect(id: "artwork", in: namespace)
 
