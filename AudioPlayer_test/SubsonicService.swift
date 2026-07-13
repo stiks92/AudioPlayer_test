@@ -100,7 +100,7 @@ struct SubsonicService {
             source: .subsonic,
             artworkURL: coverArtURL(id: song.coverArt),
             streamURL: streamURL(id: song.id),
-            gradient: Palette.gradient(forSeed: song.id)
+            gradientHex: Palette.hex(forSeed: song.id)
         )
     }
 }

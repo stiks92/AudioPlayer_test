@@ -32,7 +32,7 @@ enum TrackSource: String, Codable {
     }
 }
 
-struct Song: Identifiable, Equatable, Hashable {
+struct Song: Identifiable, Equatable, Hashable, Codable {
     /// Stable, globally-unique id, e.g. `local:song1` or `audius:aBc12`.
     let id: String
     let title: String
@@ -50,7 +50,11 @@ struct Song: Identifiable, Equatable, Hashable {
     let streamURL: URL?
     /// Live stream (radio) — has no fixed duration / scrubbing.
     let isLive: Bool
-    let gradient: [Color]
+    /// Two-stop gradient stored as hex so `Song` stays `Codable`.
+    let gradientHex: [UInt]
+
+    /// The track's theme gradient.
+    var gradient: [Color] { gradientHex.colors }
 
     init(
         id: String,
@@ -64,7 +68,7 @@ struct Song: Identifiable, Equatable, Hashable {
         artworkURL: URL? = nil,
         streamURL: URL? = nil,
         isLive: Bool = false,
-        gradient: [Color]
+        gradientHex: [UInt]
     ) {
         self.id = id
         self.title = title
@@ -77,7 +81,7 @@ struct Song: Identifiable, Equatable, Hashable {
         self.artworkURL = artworkURL
         self.streamURL = streamURL
         self.isLive = isLive
-        self.gradient = gradient
+        self.gradientHex = gradientHex
     }
 
     /// Playable URL, resolving bundled resources for local tracks.

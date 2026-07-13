@@ -109,7 +109,7 @@ private final class FeedParser: NSObject, XMLParserDelegate {
                 source: .podcast,
                 artworkURL: artwork,
                 streamURL: streamURL,
-                gradient: podcast.gradient
+                gradientHex: podcast.gradientHex
             )
         )
     }

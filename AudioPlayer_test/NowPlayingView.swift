@@ -15,6 +15,7 @@ struct NowPlayingView: View {
 
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var library: MusicLibrary
+    @EnvironmentObject private var playlistStore: PlaylistStore
 
     @State private var scrubValue: Double = 0
     @State private var isScrubbing = false
@@ -22,6 +23,7 @@ struct NowPlayingView: View {
     @State private var showQueue = false
     @State private var showLyrics = false
     @State private var showSleepOptions = false
+    @State private var showAddToPlaylist = false
     @State private var shareItem: ShareableImage?
 
     private var song: Song? { audio.currentSong }
@@ -61,6 +63,11 @@ struct NowPlayingView: View {
         }
         .sheet(isPresented: $showLyrics) {
             LyricsView().environmentObject(audio)
+        }
+        .sheet(isPresented: $showAddToPlaylist) {
+            if let song {
+                AddToPlaylistView(song: song).environmentObject(playlistStore)
+            }
         }
         .sheet(item: $shareItem) { item in
             ShareSheet(items: [item.image])
@@ -132,6 +139,16 @@ struct NowPlayingView: View {
             Spacer(minLength: 8)
             if audio.supportsPlaybackRate {
                 speedMenu
+            }
+            if song != nil {
+                Button {
+                    showAddToPlaylist = true
+                } label: {
+                    Image(systemName: "plus.circle")
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.85))
+                }
+                .buttonStyle(BouncyButtonStyle())
             }
             if let song {
                 HeartButton(isOn: library.isFavorite(song), size: 24) {

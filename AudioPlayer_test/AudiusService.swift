@@ -69,7 +69,7 @@ final class AudiusService: TrackProvider {
             artworkName: "Cover",
             artworkURL: art.flatMap(URL.init(string:)),
             streamURL: stream,
-            gradient: Palette.gradient(forSeed: track.id)
+            gradientHex: Palette.hex(forSeed: track.id)
         )
     }
 }

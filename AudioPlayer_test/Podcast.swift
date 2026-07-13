@@ -14,7 +14,9 @@ struct Podcast: Identifiable, Equatable {
     let author: String
     let artworkURL: URL?
     let feedURL: URL
-    let gradient: [Color]
+    let gradientHex: [UInt]
+
+    var gradient: [Color] { gradientHex.colors }
 
     init(title: String, author: String, artworkURL: URL?, feedURL: URL) {
         self.id = feedURL.absoluteString
@@ -22,7 +24,7 @@ struct Podcast: Identifiable, Equatable {
         self.author = author
         self.artworkURL = artworkURL
         self.feedURL = feedURL
-        self.gradient = Palette.gradient(forSeed: feedURL.absoluteString)
+        self.gradientHex = Palette.hex(forSeed: feedURL.absoluteString)
     }
 
     static func == (lhs: Podcast, rhs: Podcast) -> Bool { lhs.id == rhs.id }

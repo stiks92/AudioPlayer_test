@@ -63,7 +63,7 @@ final class RadioBrowserService: TrackProvider {
             artworkURL: station.favicon.flatMap { $0.isEmpty ? nil : URL(string: $0) },
             streamURL: stream,
             isLive: true,
-            gradient: Palette.gradient(forSeed: station.stationuuid)
+            gradientHex: Palette.hex(forSeed: station.stationuuid)
         )
     }
 }

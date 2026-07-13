@@ -11,6 +11,7 @@ import SwiftUI
 struct LibraryView: View {
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var library: MusicLibrary
+    @EnvironmentObject private var playlistStore: PlaylistStore
 
     enum Tab: String, CaseIterable {
         case playlists = "Playlists"
@@ -19,6 +20,8 @@ struct LibraryView: View {
     }
 
     @State private var tab: Tab = .playlists
+    @State private var showNewPlaylist = false
+    @State private var newPlaylistName = ""
     @Namespace private var seg
 
     var body: some View {
@@ -46,6 +49,15 @@ struct LibraryView: View {
                 }
             }
             .navigationBarHidden(true)
+            .alert("New playlist", isPresented: $showNewPlaylist) {
+                TextField("Name", text: $newPlaylistName)
+                Button("Create") {
+                    let name = newPlaylistName.trimmingCharacters(in: .whitespaces)
+                    if !name.isEmpty { playlistStore.create(name) }
+                    newPlaylistName = ""
+                }
+                Button("Cancel", role: .cancel) { newPlaylistName = "" }
+            }
         }
     }
 
@@ -79,6 +91,51 @@ struct LibraryView: View {
 
     private var playlistsSection: some View {
         LazyVStack(spacing: 12) {
+            Button {
+                showNewPlaylist = true
+            } label: {
+                HStack(spacing: 14) {
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color.white.opacity(0.08))
+                        .frame(width: 60, height: 60)
+                        .overlay(Image(systemName: "plus").font(.system(size: 22, weight: .semibold)).foregroundColor(Theme.accentSoft))
+                    Text("New Playlist")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(Theme.textPrimary)
+                    Spacer()
+                }
+                .padding(.vertical, 4)
+            }
+            .buttonStyle(.plain)
+
+            ForEach(playlistStore.playlists) { playlist in
+                NavigationLink {
+                    UserPlaylistDetailView(playlistID: playlist.id)
+                } label: {
+                    HStack(spacing: 14) {
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(LinearGradient(colors: playlist.gradient, startPoint: .topLeading, endPoint: .bottomTrailing))
+                            .frame(width: 60, height: 60)
+                            .overlay(Image(systemName: "music.note.list").foregroundColor(.white))
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(playlist.name)
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(Theme.textPrimary)
+                                .lineLimit(1)
+                            Text(playlist.subtitle)
+                                .font(.caption)
+                                .foregroundColor(Theme.textSecondary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(Theme.textTertiary)
+                    }
+                    .padding(.vertical, 4)
+                }
+                .buttonStyle(.plain)
+            }
+
             ForEach(library.playlists) { playlist in
                 NavigationLink {
                     PlaylistDetailView(playlist: playlist)

@@ -22,36 +22,31 @@ extension Color {
 }
 
 /// Deterministic gradient palettes shared by local and remote tracks.
+/// Stored as hex so tracks stay `Codable` (see `Song`).
 enum Palette {
-    static let gradients: [[Color]] = [
-        [Color(hex: 0x7C5CFF), Color(hex: 0x3A1C71)],
-        [Color(hex: 0xFF6FD8), Color(hex: 0x3813C2)],
-        [Color(hex: 0x11998E), Color(hex: 0x38EF7D)],
-        [Color(hex: 0xF7971E), Color(hex: 0xFFD200)],
-        [Color(hex: 0xFC466B), Color(hex: 0x3F5EFB)],
-        [Color(hex: 0x00C6FF), Color(hex: 0x0072FF)],
-        [Color(hex: 0xFF512F), Color(hex: 0xDD2476)],
-        [Color(hex: 0x8E2DE2), Color(hex: 0x4A00E0)],
-        [Color(hex: 0xF953C6), Color(hex: 0xB91D73)],
-        [Color(hex: 0x43CEA2), Color(hex: 0x185A9D)],
-        [Color(hex: 0xFF9966), Color(hex: 0xFF5E62)],
-        [Color(hex: 0x36D1DC), Color(hex: 0x5B86E5)],
-        [Color(hex: 0xC33764), Color(hex: 0x1D2671)],
-        [Color(hex: 0xFDC830), Color(hex: 0xF37335)],
-        [Color(hex: 0x1FA2FF), Color(hex: 0x12D8FA)],
-        [Color(hex: 0xEC008C), Color(hex: 0xFC6767)],
-        [Color(hex: 0x654EA3), Color(hex: 0xEAAFC8)]
+    static let gradientsHex: [[UInt]] = [
+        [0x7C5CFF, 0x3A1C71], [0xFF6FD8, 0x3813C2], [0x11998E, 0x38EF7D],
+        [0xF7971E, 0xFFD200], [0xFC466B, 0x3F5EFB], [0x00C6FF, 0x0072FF],
+        [0xFF512F, 0xDD2476], [0x8E2DE2, 0x4A00E0], [0xF953C6, 0xB91D73],
+        [0x43CEA2, 0x185A9D], [0xFF9966, 0xFF5E62], [0x36D1DC, 0x5B86E5],
+        [0xC33764, 0x1D2671], [0xFDC830, 0xF37335], [0x1FA2FF, 0x12D8FA],
+        [0xEC008C, 0xFC6767], [0x654EA3, 0xEAAFC8]
     ]
 
-    static func gradient(for index: Int) -> [Color] {
-        gradients[abs(index) % gradients.count]
+    static func hex(for index: Int) -> [UInt] {
+        gradientsHex[abs(index) % gradientsHex.count]
     }
 
     /// Stable seed for a string so a track keeps its colour across launches.
-    static func gradient(forSeed string: String) -> [Color] {
+    static func hex(forSeed string: String) -> [UInt] {
         let seed = string.unicodeScalars.reduce(0) { $0 &+ Int($1.value) }
-        return gradient(for: seed)
+        return hex(for: seed)
     }
+}
+
+extension Array where Element == UInt {
+    /// Convert stored hex stops into SwiftUI colours.
+    var colors: [Color] { map { Color(hex: $0) } }
 }
 
 enum Theme {

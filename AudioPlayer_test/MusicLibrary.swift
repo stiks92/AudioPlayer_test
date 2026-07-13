@@ -142,7 +142,7 @@ final class MusicLibrary: ObservableObject {
                 album: "Joker",
                 source: .local,
                 fileName: file,
-                gradient: Palette.gradient(for: index)
+                gradientHex: Palette.hex(for: index)
             )
         }
     }
