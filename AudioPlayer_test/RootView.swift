@@ -15,6 +15,7 @@ struct RootView: View {
     @StateObject private var serverStore = ServerStore()
     @StateObject private var playlistStore = PlaylistStore()
 
+    @AppStorage("hasOnboarded.v1") private var hasOnboarded = false
     @State private var selection: AppTab = .home
     @State private var showNowPlaying = false
     /// Tabs that have been opened at least once — kept alive so switching
@@ -52,6 +53,9 @@ struct RootView: View {
         .environmentObject(serverStore)
         .environmentObject(playlistStore)
         .preferredColorScheme(.dark)
+        .fullScreenCover(isPresented: Binding(get: { !hasOnboarded }, set: { hasOnboarded = !$0 })) {
+            OnboardingView { hasOnboarded = true }
+        }
         .onChange(of: audio.currentSong) { song in
             if let song { library.markPlayed(song) }
         }
