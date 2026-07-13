@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct ConnectServerView: View {
     @EnvironmentObject private var serverStore: ServerStore

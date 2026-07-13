@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 /// The visual card (fixed size, designed to render crisply via ImageRenderer).
 struct NowPlayingShareCard: View {
