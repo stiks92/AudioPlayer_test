@@ -2,7 +2,8 @@
 //  QueueView.swift
 //  AudioPlayer_test
 //
-//  The upcoming-tracks sheet. Tap any row to jump to it.
+//  The playing queue: jump to any track, reorder Up Next, and swipe to
+//  remove. Now Playing is pinned on top.
 //
 
 import SwiftUI
@@ -18,54 +19,86 @@ struct QueueView: View {
                 Theme.background.ignoresSafeArea()
                 AuroraBackground(colors: audio.currentSong?.gradient ?? [Theme.accent, Theme.background],
                                  animated: false)
-                    .opacity(0.4)
+                    .opacity(0.35)
+                    .ignoresSafeArea()
 
-                ScrollView {
-                    LazyVStack(spacing: 4) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Playing Queue")
-                                    .font(.system(.title2, design: .rounded).weight(.bold))
-                                Text("\(audio.queue.count) tracks")
-                                    .font(.subheadline)
-                                    .foregroundColor(Theme.textSecondary)
-                            }
-                            Spacer()
-                            HStack(spacing: 10) {
-                                Image(systemName: audio.isShuffling ? "shuffle.circle.fill" : "shuffle")
-                                    .foregroundColor(audio.isShuffling ? Theme.accentSoft : Theme.textSecondary)
-                                    .onTapGesture { withAnimation { audio.toggleShuffle() } }
-                                Image(systemName: audio.repeatMode.systemImage)
-                                    .foregroundColor(audio.repeatMode.isActive ? Theme.accentSoft : Theme.textSecondary)
-                                    .onTapGesture { withAnimation { audio.cycleRepeat() } }
-                            }
-                            .font(.system(size: 18, weight: .semibold))
-                        }
-                        .padding(.vertical, 8)
-
-                        ForEach(audio.queue) { song in
-                            Button {
-                                audio.playFromQueue(song)
-                            } label: {
-                                SongRow(song: song)
-                            }
-                            .buttonStyle(.plain)
+                List {
+                    if let current = audio.currentSong {
+                        Section {
+                            SongRow(song: current)
+                                .listRowBackground(Color.clear)
+                                .listRowSeparator(.hidden)
+                        } header: {
+                            header("Now Playing")
                         }
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 40)
+
+                    if !audio.upNext.isEmpty {
+                        Section {
+                            ForEach(audio.upNext) { song in
+                                Button {
+                                    audio.playFromQueue(song)
+                                } label: {
+                                    SongRow(song: song)
+                                }
+                                .buttonStyle(.plain)
+                                .listRowBackground(Color.clear)
+                                .listRowSeparator(.hidden)
+                            }
+                            .onMove { audio.moveUpNext(from: $0, to: $1) }
+                            .onDelete { audio.removeUpNext(at: $0) }
+                        } header: {
+                            upNextHeader
+                        }
+                    }
                 }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .environment(\.defaultMinListRowHeight, 10)
             }
             .foregroundColor(.white)
+            .navigationTitle("Queue")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    EditButton().foregroundColor(Theme.accentSoft)
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .foregroundColor(Theme.accentSoft)
+                    Button("Done") { dismiss() }.foregroundColor(Theme.accentSoft)
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
         }
         .presentationDetents([.large, .medium])
         .preferredColorScheme(.dark)
+    }
+
+    private func header(_ title: String) -> some View {
+        Text(title)
+            .font(.system(size: 13, weight: .bold))
+            .foregroundColor(Theme.textSecondary)
+            .textCase(nil)
+    }
+
+    private var upNextHeader: some View {
+        HStack {
+            Text("Up Next")
+                .font(.system(size: 13, weight: .bold))
+                .foregroundColor(Theme.textSecondary)
+            Spacer()
+            Button {
+                withAnimation { audio.toggleShuffle() }
+            } label: {
+                Image(systemName: "shuffle")
+                    .foregroundColor(audio.isShuffling ? Theme.accentSoft : Theme.textSecondary)
+            }
+            Button {
+                withAnimation { audio.cycleRepeat() }
+            } label: {
+                Image(systemName: audio.repeatMode.systemImage)
+                    .foregroundColor(audio.repeatMode.isActive ? Theme.accentSoft : Theme.textSecondary)
+            }
+        }
+        .textCase(nil)
+        .font(.system(size: 15, weight: .semibold))
     }
 }

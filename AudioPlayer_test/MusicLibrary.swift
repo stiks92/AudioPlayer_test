@@ -2,10 +2,10 @@
 //  MusicLibrary.swift
 //  AudioPlayer_test
 //
-//  Owns the bundled catalogue + curated playlists plus lightweight
-//  user state (favorites + recently played) persisted to UserDefaults.
-//  Tracks are keyed by their stable `id` so the same store works for
-//  local and (later) remote tracks.
+//  Owns the bundled catalogue + curated playlists plus the user's favorites
+//  and recently-played. Favorites/recents store full `Song` snapshots (JSON
+//  on disk) so tracks from any source — streaming, radio, server, podcast —
+//  survive relaunches, not just bundled songs.
 //
 
 import SwiftUI
@@ -16,17 +16,17 @@ final class MusicLibrary: ObservableObject {
 
     @Published private(set) var songs: [Song] = []
     @Published private(set) var playlists: [Playlist] = []
-    @Published private(set) var favoriteIDs: Set<String> = []
-    @Published private(set) var recentIDs: [String] = []
+    @Published private(set) var favorites: [Song] = []
+    @Published private(set) var recents: [Song] = []
 
-    private let favoritesKey = "favorite.ids.v2"
-    private let recentsKey = "recent.ids.v2"
-    private let maxRecents = 12
+    private let favoritesFile = "favorites.json"
+    private let recentsFile = "recents.json"
+    private let maxRecents = 20
 
     init() {
         songs = MusicLibrary.makeCatalogue()
-        favoriteIDs = Set(UserDefaults.standard.stringArray(forKey: favoritesKey) ?? [])
-        recentIDs = UserDefaults.standard.stringArray(forKey: recentsKey) ?? []
+        favorites = MusicLibrary.load(favoritesFile)
+        recents = MusicLibrary.load(recentsFile)
         playlists = makePlaylists()
     }
 
@@ -40,13 +40,8 @@ final class MusicLibrary: ObservableObject {
         playlist.songIDs.compactMap { id in songs.first { $0.id == id } }
     }
 
-    var favoriteSongs: [Song] {
-        songs.filter { favoriteIDs.contains($0.id) }
-    }
-
-    var recentSongs: [Song] {
-        recentIDs.compactMap { id in songs.first { $0.id == id } }
-    }
+    var favoriteSongs: [Song] { favorites }
+    var recentSongs: [Song] { recents }
 
     func search(_ query: String) -> [Song] {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -61,27 +56,47 @@ final class MusicLibrary: ObservableObject {
     // MARK: - Favorites
 
     func isFavorite(_ song: Song) -> Bool {
-        favoriteIDs.contains(song.id)
+        favorites.contains { $0.id == song.id }
     }
 
     func toggleFavorite(_ song: Song) {
-        if favoriteIDs.contains(song.id) {
-            favoriteIDs.remove(song.id)
+        if let index = favorites.firstIndex(where: { $0.id == song.id }) {
+            favorites.remove(at: index)
         } else {
-            favoriteIDs.insert(song.id)
+            favorites.insert(song, at: 0)
         }
-        UserDefaults.standard.set(Array(favoriteIDs), forKey: favoritesKey)
+        MusicLibrary.save(favorites, to: favoritesFile)
     }
 
     // MARK: - Recents
 
     func markPlayed(_ song: Song) {
-        recentIDs.removeAll { $0 == song.id }
-        recentIDs.insert(song.id, at: 0)
-        if recentIDs.count > maxRecents {
-            recentIDs = Array(recentIDs.prefix(maxRecents))
+        recents.removeAll { $0.id == song.id }
+        recents.insert(song, at: 0)
+        if recents.count > maxRecents {
+            recents = Array(recents.prefix(maxRecents))
         }
-        UserDefaults.standard.set(recentIDs, forKey: recentsKey)
+        MusicLibrary.save(recents, to: recentsFile)
+    }
+
+    // MARK: - Persistence
+
+    private static func fileURL(_ name: String) -> URL? {
+        guard let dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+        else { return nil }
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir.appendingPathComponent(name)
+    }
+
+    private static func load(_ name: String) -> [Song] {
+        guard let url = fileURL(name), let data = try? Data(contentsOf: url),
+              let songs = try? JSONDecoder().decode([Song].self, from: data) else { return [] }
+        return songs
+    }
+
+    private static func save(_ songs: [Song], to name: String) {
+        guard let url = fileURL(name), let data = try? JSONEncoder().encode(songs) else { return }
+        try? data.write(to: url, options: .atomic)
     }
 
     // MARK: - Playlists (curated / derived)

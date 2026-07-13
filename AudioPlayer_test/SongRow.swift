@@ -68,5 +68,20 @@ struct SongRow: View {
         }
         .padding(.vertical, 6)
         .contentShape(Rectangle())
+        .contextMenu {
+            Button {
+                audio.playNext(song)
+            } label: { Label("Play Next", systemImage: "text.insert") }
+            Button {
+                audio.addToQueue(song)
+            } label: { Label("Add to Queue", systemImage: "text.append") }
+            Divider()
+            Button {
+                library.toggleFavorite(song)
+            } label: {
+                Label(library.isFavorite(song) ? "Remove from Favorites" : "Favorite",
+                      systemImage: library.isFavorite(song) ? "heart.slash" : "heart")
+            }
+        }
     }
 }

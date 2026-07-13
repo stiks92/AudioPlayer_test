@@ -137,6 +137,41 @@ final class AudioManager: NSObject, ObservableObject {
         load(autoplay: true)
     }
 
+    // MARK: - Queue editing
+
+    /// Tracks after the current one.
+    var upNext: [Song] {
+        let start = currentIndex + 1
+        guard start < queue.count else { return [] }
+        return Array(queue[start...])
+    }
+
+    func playNext(_ song: Song) {
+        guard !queue.isEmpty else { play(song, in: [song]); return }
+        queue.insert(song, at: min(currentIndex + 1, queue.count))
+        Haptics.selection()
+    }
+
+    func addToQueue(_ song: Song) {
+        guard !queue.isEmpty else { play(song, in: [song]); return }
+        queue.append(song)
+        Haptics.selection()
+    }
+
+    func removeUpNext(at offsets: IndexSet) {
+        let base = currentIndex + 1
+        let absolute = IndexSet(offsets.map { base + $0 }.filter { $0 < queue.count })
+        queue.remove(atOffsets: absolute)
+    }
+
+    func moveUpNext(from source: IndexSet, to destination: Int) {
+        let base = currentIndex + 1
+        guard base <= queue.count else { return }
+        var sub = Array(queue[base...])
+        sub.move(fromOffsets: source, toOffset: destination)
+        queue.replaceSubrange(base..<queue.count, with: sub)
+    }
+
     // MARK: - Modes
 
     func cycleRepeat() {
