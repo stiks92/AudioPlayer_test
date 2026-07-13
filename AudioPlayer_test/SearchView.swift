@@ -11,10 +11,12 @@ import SwiftUI
 struct SearchView: View {
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var library: MusicLibrary
+    @EnvironmentObject private var serverStore: ServerStore
 
     @State private var query = ""
     @FocusState private var focused: Bool
     @StateObject private var audiusFeed = SongFeed()
+    @StateObject private var serverFeed = SongFeed()
 
     private var localResults: [Song] { library.search(query) }
 
@@ -56,11 +58,15 @@ struct SearchView: View {
                 let trimmed = query.trimmingCharacters(in: .whitespaces)
                 guard trimmed.count >= 2 else {
                     audiusFeed.clear()
+                    serverFeed.clear()
                     return
                 }
                 // Debounce keystrokes; task(id:) cancels the previous run.
                 try? await Task.sleep(nanoseconds: 350_000_000)
                 if Task.isCancelled { return }
+                if serverStore.isConnected {
+                    await serverFeed.load { try await serverStore.search(trimmed) }
+                }
                 await audiusFeed.load { try await AudiusService.shared.search(trimmed) }
             }
         }
@@ -99,6 +105,13 @@ struct SearchView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     SectionHeader(title: "In your library")
                     songList(localResults)
+                }
+            }
+
+            if serverStore.isConnected, serverFeed.state == .loaded {
+                VStack(alignment: .leading, spacing: 8) {
+                    SectionHeader(title: "Your server")
+                    songList(serverFeed.songs)
                 }
             }
 

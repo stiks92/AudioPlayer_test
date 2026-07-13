@@ -10,10 +10,12 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var proStore: ProStore
     @EnvironmentObject private var audio: AudioManager
+    @EnvironmentObject private var serverStore: ServerStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var showPaywall = false
     @State private var showSleepOptions = false
+    @State private var showConnectServer = false
 
     private var version: String {
         let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -49,6 +51,9 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $showPaywall) {
                 PaywallView().environmentObject(proStore)
+            }
+            .sheet(isPresented: $showConnectServer) {
+                ConnectServerView().environmentObject(serverStore)
             }
             .confirmationDialog("Sleep timer", isPresented: $showSleepOptions, titleVisibility: .visible) {
                 ForEach([15, 30, 45, 60], id: \.self) { minutes in
@@ -127,7 +132,10 @@ struct SettingsView: View {
                 divider
                 staticRow(icon: "dot.radiowaves.left.and.right", title: "Internet Radio", value: "Connected", valueColor: Color(hex: 0x38EF7D))
                 divider
-                staticRow(icon: "server.rack", title: "Self-hosted (Subsonic/Jellyfin)", value: "Soon", valueColor: Theme.textTertiary)
+                row(icon: "server.rack", title: "Self-hosted (Subsonic)",
+                    value: serverStore.isConnected ? (serverStore.host ?? "Connected") : "Connect") {
+                    showConnectServer = true
+                }
                 divider
                 staticRow(icon: "music.note.list", title: "Spotify / Apple Music", value: "Soon", valueColor: Theme.textTertiary)
             }

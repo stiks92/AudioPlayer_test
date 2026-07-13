@@ -6,6 +6,8 @@
 	<array>
 		<string>audio</string>
 	</array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Aurora uses the microphone to recognize the music playing around you.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<!-- Many internet radio streams are delivered over plain HTTP.

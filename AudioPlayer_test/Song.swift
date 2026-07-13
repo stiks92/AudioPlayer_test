@@ -14,18 +14,20 @@ enum TrackSource: String, Codable {
     case local          // bundled resource
     case audius         // Audius direct-stream catalogue
     case radio          // internet radio (live stream)
+    case subsonic       // user's self-hosted server (Navidrome/Airsonic/…)
     case jamendo
     case archive
     case podcast
 
     var badge: String? {
         switch self {
-        case .local:   return nil
-        case .audius:  return "AUDIUS"
-        case .radio:   return "LIVE"
-        case .jamendo: return "JAMENDO"
-        case .archive: return "ARCHIVE"
-        case .podcast: return "PODCAST"
+        case .local:    return nil
+        case .audius:   return "AUDIUS"
+        case .radio:    return "LIVE"
+        case .subsonic: return "SERVER"
+        case .jamendo:  return "JAMENDO"
+        case .archive:  return "ARCHIVE"
+        case .podcast:  return "PODCAST"
         }
     }
 }

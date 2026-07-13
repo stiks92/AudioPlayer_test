@@ -12,10 +12,13 @@ struct HomeView: View {
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var library: MusicLibrary
     @EnvironmentObject private var proStore: ProStore
+    @EnvironmentObject private var serverStore: ServerStore
 
     @StateObject private var trending = SongFeed()
+    @StateObject private var serverFeed = SongFeed()
     @State private var showSettings = false
     @State private var showAIMix = false
+    @State private var showShazam = false
 
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -39,6 +42,7 @@ struct HomeView: View {
                         if !library.recentSongs.isEmpty {
                             recentlyPlayed
                         }
+                        serverSection
                         trendingSection
                         featured
                         quickPicks
@@ -53,17 +57,65 @@ struct HomeView: View {
                 if trending.state == .idle {
                     await trending.load { try await AudiusService.shared.trending() }
                 }
+                await loadServerIfNeeded()
+            }
+            .onChange(of: serverStore.isConnected) { _ in
+                Task { await loadServerIfNeeded(force: true) }
             }
             .sheet(isPresented: $showSettings) {
                 SettingsView()
                     .environmentObject(audio)
                     .environmentObject(proStore)
+                    .environmentObject(serverStore)
             }
             .sheet(isPresented: $showAIMix) {
                 AIMixView()
                     .environmentObject(audio)
                     .environmentObject(library)
                     .environmentObject(proStore)
+            }
+            .sheet(isPresented: $showShazam) {
+                ShazamView().environmentObject(audio)
+            }
+        }
+    }
+
+    private func loadServerIfNeeded(force: Bool = false) async {
+        guard serverStore.isConnected else {
+            if serverFeed.state != .idle { serverFeed.clear() }
+            return
+        }
+        if force || serverFeed.state == .idle {
+            await serverFeed.load { try await serverStore.randomSongs() }
+        }
+    }
+
+    // MARK: - From your server
+
+    @ViewBuilder
+    private var serverSection: some View {
+        if serverStore.isConnected, serverFeed.state == .loaded {
+            VStack(alignment: .leading, spacing: 14) {
+                SectionHeader(title: "From your server")
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 14) {
+                        ForEach(serverFeed.songs) { song in
+                            Button {
+                                audio.play(song, in: serverFeed.songs)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    ArtworkThumbnail(song: song, size: 130, cornerRadius: 16, showBadge: true)
+                                    Text(song.title)
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundColor(Theme.textPrimary)
+                                        .lineLimit(1)
+                                        .frame(width: 130, alignment: .leading)
+                                }
+                            }
+                            .buttonStyle(BouncyButtonStyle(scale: 0.95))
+                        }
+                    }
+                }
             }
         }
     }
@@ -171,6 +223,17 @@ struct HomeView: View {
                     .foregroundColor(Theme.textSecondary)
             }
             Spacer()
+            Button {
+                Haptics.impact()
+                showShazam = true
+            } label: {
+                Image(systemName: "waveform.circle.fill")
+                    .font(.system(size: 30))
+                    .foregroundColor(Theme.accentSoft)
+                    .frame(width: 40, height: 40)
+            }
+            .buttonStyle(BouncyButtonStyle())
+
             Button {
                 showSettings = true
             } label: {
