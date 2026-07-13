@@ -17,31 +17,29 @@ struct RootView: View {
 
     @State private var selection: AppTab = .home
     @State private var showNowPlaying = false
-    @Namespace private var playerNamespace
+    /// Tabs that have been opened at least once — kept alive so switching
+    /// back is instant (no reload flicker).
+    @State private var visited: Set<AppTab> = [.home]
+
+    private let playerSpring = Animation.spring(response: 0.45, dampingFraction: 0.86)
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            content
-                .safeAreaInset(edge: .bottom) {
-                    VStack(spacing: 8) {
-                        if audio.currentSong != nil && !showNowPlaying {
-                            MiniPlayerView(namespace: playerNamespace) {
-                                withAnimation(.spring(response: 0.5, dampingFraction: 0.82)) {
-                                    showNowPlaying = true
-                                }
-                            }
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
-                        }
-                        AppTabBar(selection: $selection)
+            tabContent
+
+            VStack(spacing: 8) {
+                if audio.currentSong != nil && !showNowPlaying {
+                    MiniPlayerView {
+                        withAnimation(playerSpring) { showNowPlaying = true }
                     }
-                    .padding(.top, 6)
+                    .transition(.opacity)
                 }
+                AppTabBar(selection: $selection)
+            }
 
             if showNowPlaying {
-                NowPlayingView(namespace: playerNamespace) {
-                    withAnimation(.spring(response: 0.5, dampingFraction: 0.82)) {
-                        showNowPlaying = false
-                    }
+                NowPlayingView {
+                    withAnimation(playerSpring) { showNowPlaying = false }
                 }
                 .transition(.move(edge: .bottom))
                 .zIndex(2)
@@ -57,11 +55,28 @@ struct RootView: View {
         .onChange(of: audio.currentSong) { song in
             if let song { library.markPlayed(song) }
         }
+        .onChange(of: selection) { newValue in
+            visited.insert(newValue)
+            Haptics.selection()
+        }
+    }
+
+    /// All visited tabs stay in the hierarchy; only the selected one is shown.
+    private var tabContent: some View {
+        ZStack {
+            ForEach(AppTab.allCases, id: \.self) { tab in
+                if visited.contains(tab) {
+                    view(for: tab)
+                        .opacity(selection == tab ? 1 : 0)
+                        .allowsHitTesting(selection == tab)
+                }
+            }
+        }
     }
 
     @ViewBuilder
-    private var content: some View {
-        switch selection {
+    private func view(for tab: AppTab) -> some View {
+        switch tab {
         case .home:     HomeView()
         case .search:   SearchView()
         case .radio:    RadioView()

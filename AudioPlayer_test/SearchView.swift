@@ -16,6 +16,7 @@ struct SearchView: View {
     @State private var query = ""
     @FocusState private var focused: Bool
     @StateObject private var audiusFeed = SongFeed()
+    @StateObject private var appleFeed = SongFeed()
     @StateObject private var serverFeed = SongFeed()
 
     private var localResults: [Song] { library.search(query) }
@@ -58,6 +59,7 @@ struct SearchView: View {
                 let trimmed = query.trimmingCharacters(in: .whitespaces)
                 guard trimmed.count >= 2 else {
                     audiusFeed.clear()
+                    appleFeed.clear()
                     serverFeed.clear()
                     return
                 }
@@ -67,6 +69,7 @@ struct SearchView: View {
                 if serverStore.isConnected {
                     await serverFeed.load { try await serverStore.search(trimmed) }
                 }
+                await appleFeed.load { try await iTunesService.shared.searchMusic(trimmed) }
                 await audiusFeed.load { try await AudiusService.shared.search(trimmed) }
             }
         }
@@ -85,6 +88,8 @@ struct SearchView: View {
                 Button {
                     query = ""
                     audiusFeed.clear()
+                    appleFeed.clear()
+                    serverFeed.clear()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundColor(Theme.textSecondary)
@@ -115,6 +120,18 @@ struct SearchView: View {
                 }
             }
 
+            if appleFeed.state == .loaded {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 8) {
+                        SectionHeader(title: "Apple Music")
+                        Text("previews")
+                            .font(.caption2)
+                            .foregroundColor(Theme.textTertiary)
+                    }
+                    songList(appleFeed.songs)
+                }
+            }
+
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 8) {
                     SectionHeader(title: "Audius")
@@ -125,7 +142,7 @@ struct SearchView: View {
                 audiusResults
             }
 
-            if localResults.isEmpty && audiusFeed.state == .empty {
+            if localResults.isEmpty && audiusFeed.state == .empty && appleFeed.state == .empty {
                 emptyState
             }
         }

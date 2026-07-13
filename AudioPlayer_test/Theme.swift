@@ -69,7 +69,7 @@ struct AuroraBackground: View {
     var animated: Bool = true
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: !animated)) { timeline in
+        TimelineView(.animation(minimumInterval: 1.0 / 20.0, paused: !animated)) { timeline in
             let t = timeline.date.timeIntervalSinceReferenceDate
             GeometryReader { geo in
                 let w = geo.size.width

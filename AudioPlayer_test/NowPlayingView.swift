@@ -10,7 +10,6 @@
 import SwiftUI
 
 struct NowPlayingView: View {
-    var namespace: Namespace.ID
     let onClose: () -> Void
 
     @EnvironmentObject private var audio: AudioManager
@@ -31,7 +30,8 @@ struct NowPlayingView: View {
 
     var body: some View {
         ZStack {
-            AuroraBackground(colors: song?.gradient ?? [Theme.accent, Theme.background])
+            AuroraBackground(colors: song?.gradient ?? [Theme.accent, Theme.background],
+                             animated: audio.isPlaying)
                 .animation(.easeInOut(duration: 0.8), value: song)
 
             VStack(spacing: 0) {
@@ -116,7 +116,6 @@ struct NowPlayingView: View {
                     ArtworkImage(song: song, glyphSize: 72)
                         .frame(width: side, height: side)
                         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-                        .matchedGeometryEffect(id: "artwork", in: namespace)
                         .shadow(color: song.gradient.first?.opacity(0.6) ?? .black, radius: 34, y: 20)
                 }
             }
