@@ -15,6 +15,7 @@ enum TrackSource: String, Codable {
     case audius         // Audius direct-stream catalogue
     case radio          // internet radio (live stream)
     case subsonic       // user's self-hosted server (Navidrome/Airsonic/…)
+    case itunes         // Apple/iTunes 30-second previews
     case jamendo
     case archive
     case podcast
@@ -25,6 +26,7 @@ enum TrackSource: String, Codable {
         case .audius:   return "AUDIUS"
         case .radio:    return "LIVE"
         case .subsonic: return "SERVER"
+        case .itunes:   return "PREVIEW"
         case .jamendo:  return "JAMENDO"
         case .archive:  return "ARCHIVE"
         case .podcast:  return "PODCAST"

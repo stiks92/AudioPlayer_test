@@ -9,7 +9,6 @@
 import SwiftUI
 
 struct MiniPlayerView: View {
-    var namespace: Namespace.ID
     let onExpand: () -> Void
 
     @EnvironmentObject private var audio: AudioManager
@@ -22,7 +21,6 @@ struct MiniPlayerView: View {
                     ArtworkImage(song: song, glyphSize: 16)
                         .frame(width: 44, height: 44)
                         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                        .matchedGeometryEffect(id: "artwork", in: namespace)
 
                     VStack(alignment: .leading, spacing: 2) {
                         MarqueeText(text: song.title, font: .system(size: 14, weight: .semibold))

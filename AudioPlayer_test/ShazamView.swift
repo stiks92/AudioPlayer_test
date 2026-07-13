@@ -55,13 +55,13 @@ struct ShazamView: View {
             ZStack {
                 ForEach(0..<3, id: \.self) { i in
                     Circle()
-                        .stroke(Color.white.opacity(0.25), lineWidth: 2)
-                        .frame(width: 160 + CGFloat(i) * 60, height: 160 + CGFloat(i) * 60)
-                        .scaleEffect(shazam.isListening ? 1.15 : 1)
-                        .opacity(shazam.isListening ? 0 : 0.6)
+                        .stroke(Color.white.opacity(0.22), lineWidth: 2)
+                        .frame(width: 150 + CGFloat(i) * 46, height: 150 + CGFloat(i) * 46)
+                        .scaleEffect(shazam.isListening ? 1.18 : 1)
+                        .opacity(shazam.isListening ? 0 : 0.5)
                         .animation(
                             shazam.isListening
-                                ? .easeOut(duration: 1.6).repeatForever(autoreverses: false).delay(Double(i) * 0.4)
+                                ? .easeOut(duration: 1.8).repeatForever(autoreverses: false).delay(Double(i) * 0.45)
                                 : .default,
                             value: shazam.isListening
                         )
@@ -76,15 +76,16 @@ struct ShazamView: View {
                     }
                 } label: {
                     Image(systemName: shazam.isListening ? "waveform" : "waveform.circle.fill")
-                        .font(.system(size: 64, weight: .bold))
+                        .font(.system(size: 60, weight: .bold))
                         .foregroundColor(.white)
-                        .frame(width: 150, height: 150)
+                        .frame(width: 140, height: 140)
                         .background(Circle().fill(.ultraThinMaterial))
                         .overlay(Circle().strokeBorder(Color.white.opacity(0.3), lineWidth: 1.5))
                         .symbolEffectBounce(trigger: shazam.isListening)
                 }
                 .buttonStyle(BouncyButtonStyle(scale: 0.94))
             }
+            .frame(height: 250)
 
             Text(statusText)
                 .font(.system(.title3, design: .rounded).weight(.semibold))
@@ -98,7 +99,15 @@ struct ShazamView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 40)
             }
-            Spacer()
+
+            #if targetEnvironment(simulator)
+            Text("Music recognition needs a physical device.")
+                .font(.footnote)
+                .foregroundColor(.white.opacity(0.55))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+            #endif
+
             Spacer()
         }
     }
