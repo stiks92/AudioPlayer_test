@@ -17,12 +17,14 @@ final class PodcastFeed: ObservableObject {
         state = .loading
         do {
             let result = try await fetch()
-            if Task.isCancelled { return }
             podcasts = result
             state = result.isEmpty ? .empty : .loaded
+        } catch is CancellationError {
+            // Superseded by a newer request.
+        } catch let urlError as URLError where urlError.code == .cancelled {
+            // Superseded.
         } catch {
-            if let urlError = error as? URLError, urlError.code == .cancelled { return }
-            if Task.isCancelled { return }
+            podcasts = []
             state = .failed
         }
     }
@@ -118,7 +120,12 @@ struct PodcastsView: View {
             }
             .frame(maxWidth: .infinity).padding(.top, 60)
         case .failed:
-            message("wifi.slash", "Couldn't load podcasts.")
+            Button {
+                Task { await feed.load { try await iTunesService.shared.podcasts(genre: selectedGenre) } }
+            } label: {
+                message("wifi.slash", "Couldn't load podcasts.\nTap to retry.")
+            }
+            .buttonStyle(.plain)
         case .empty:
             message("magnifyingglass", "No podcasts found.")
         case .loaded:

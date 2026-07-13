@@ -14,6 +14,7 @@ struct NowPlayingView: View {
     let onClose: () -> Void
 
     @EnvironmentObject private var audio: AudioManager
+    @EnvironmentObject private var clock: PlaybackClock
     @EnvironmentObject private var library: MusicLibrary
     @EnvironmentObject private var playlistStore: PlaylistStore
 
@@ -62,7 +63,7 @@ struct NowPlayingView: View {
             QueueView().environmentObject(audio).environmentObject(library)
         }
         .sheet(isPresented: $showLyrics) {
-            LyricsView().environmentObject(audio)
+            LyricsView().environmentObject(audio).environmentObject(clock)
         }
         .sheet(isPresented: $showAddToPlaylist) {
             if let song {
@@ -81,7 +82,7 @@ struct NowPlayingView: View {
             }
             Button("Cancel", role: .cancel) {}
         }
-        .onAppear { scrubValue = audio.progress }
+        .onAppear { scrubValue = clock.progress }
     }
 
     // MARK: - Sections
@@ -203,22 +204,22 @@ struct NowPlayingView: View {
             VStack(spacing: 6) {
                 ScrubberView(
                     value: Binding(
-                        get: { isScrubbing ? scrubValue : audio.progress },
+                        get: { isScrubbing ? scrubValue : clock.progress },
                         set: { scrubValue = $0 }
                     ),
                     onEditingChanged: { editing in
                         if editing {
                             isScrubbing = true
                         } else {
-                            audio.seek(to: scrubValue * audio.duration)
+                            audio.seek(to: scrubValue * clock.duration)
                             isScrubbing = false
                         }
                     }
                 )
                 HStack {
-                    Text((isScrubbing ? scrubValue * audio.duration : audio.currentTime).asClock)
+                    Text((isScrubbing ? scrubValue * clock.duration : clock.currentTime).asClock)
                     Spacer()
-                    Text(audio.duration.asClock)
+                    Text(clock.duration.asClock)
                 }
                 .font(.system(size: 12, weight: .medium).monospacedDigit())
                 .foregroundColor(.white.opacity(0.6))
@@ -227,7 +228,7 @@ struct NowPlayingView: View {
     }
 
     private var visualizer: some View {
-        AudioVisualizerView(level: audio.audioLevel, isActive: audio.isPlaying, tint: .white)
+        AudioVisualizerView(level: clock.audioLevel, isActive: audio.isPlaying, tint: .white)
             .frame(height: 40)
             .opacity(0.9)
     }

@@ -13,6 +13,7 @@ struct MiniPlayerView: View {
     let onExpand: () -> Void
 
     @EnvironmentObject private var audio: AudioManager
+    @EnvironmentObject private var clock: PlaybackClock
 
     var body: some View {
         if let song = audio.currentSong {
@@ -63,7 +64,7 @@ struct MiniPlayerView: View {
                         Rectangle().fill(Color.white.opacity(0.14))
                         Rectangle()
                             .fill(LinearGradient(colors: song.gradient, startPoint: .leading, endPoint: .trailing))
-                            .frame(width: geo.size.width * CGFloat(audio.progress))
+                            .frame(width: geo.size.width * CGFloat(clock.progress))
                     }
                 }
                 .frame(height: 2)

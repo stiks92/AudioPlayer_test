@@ -42,13 +42,15 @@ struct AudioVisualizerView: View {
 
     private func barHeight(_ index: Int, t: TimeInterval, max maxHeight: CGFloat) -> CGFloat {
         guard isActive else { return maxHeight * 0.06 }
-        // Symmetric envelope so the middle is tallest, plus per-bar motion.
-        let position = Double(index) / Double(max(barCount - 1, 1))
-        let envelope = 0.4 + 0.6 * sin(position * .pi)
-        let wobble = 0.5 + 0.5 * sin(t * 7 + Double(index) * 0.55)
-        let dynamic = Double(level) * envelope * wobble
-        let value = 0.08 + dynamic
-        return maxHeight * CGFloat(min(max(value, 0.05), 1))
+        // Mirror-symmetric around the centre — tallest in the middle, and a
+        // gentle shimmer that depends on distance from centre (identical for
+        // mirrored bars) so it pulses in place rather than travelling sideways.
+        let mid = Double(max(barCount - 1, 1)) / 2
+        let dist = abs(Double(index) - mid) / mid          // 0 centre … 1 edge
+        let envelope = 1.0 - 0.55 * dist
+        let shimmer = 0.9 + 0.1 * sin(t * 2.4 + dist * 5)
+        let value = 0.1 + Double(level) * envelope * shimmer
+        return maxHeight * CGFloat(min(max(value, 0.06), 1))
     }
 }
 

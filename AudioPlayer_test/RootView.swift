@@ -48,6 +48,7 @@ struct RootView: View {
             }
         }
         .environmentObject(audio)
+        .environmentObject(audio.clock)
         .environmentObject(library)
         .environmentObject(proStore)
         .environmentObject(serverStore)

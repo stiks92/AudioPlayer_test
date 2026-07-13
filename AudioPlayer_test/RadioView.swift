@@ -79,7 +79,10 @@ struct RadioView: View {
         case .idle, .loading:
             loading
         case .failed:
-            message(icon: "wifi.slash", text: "Couldn't reach the radio directory.\nPull to retry.")
+            Button { Task { await reload() } } label: {
+                message(icon: "wifi.slash", text: "Couldn't reach the radio directory.\nTap to retry.")
+            }
+            .buttonStyle(.plain)
         case .empty:
             message(icon: "magnifyingglass", text: "No stations found for this genre.")
         case .loaded:

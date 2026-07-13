@@ -23,17 +23,16 @@ final class AudioManager: NSObject, ObservableObject {
 
     @Published private(set) var currentSong: Song?
     @Published private(set) var isPlaying = false
-    @Published var currentTime: Double = 0
-    @Published private(set) var duration: Double = 1
     @Published private(set) var queue: [Song] = []
     @Published var repeatMode: RepeatMode = .off
     @Published private(set) var isShuffling = false
-    /// Smoothed 0...1 output level used to drive the visualizer.
-    @Published var audioLevel: CGFloat = 0
     @Published var volume: Float = 0.75 {
         didSet { activeEngine?.setVolume(volume) }
     }
     @Published private(set) var playbackRate: Float = 1.0
+
+    /// Live time/level updates — observed only by Now Playing / mini / lyrics.
+    let clock = PlaybackClock()
 
     var isLive: Bool { currentSong?.isLive ?? false }
 
@@ -43,11 +42,6 @@ final class AudioManager: NSObject, ObservableObject {
     func setPlaybackRate(_ rate: Float) {
         playbackRate = rate
         activeEngine?.setRate(rate)
-    }
-
-    var progress: Double {
-        guard duration > 0 else { return 0 }
-        return min(max(currentTime / duration, 0), 1)
     }
 
     // MARK: - Private
@@ -115,7 +109,7 @@ final class AudioManager: NSObject, ObservableObject {
     }
 
     func previous() {
-        if !isLive && currentTime > 3 {
+        if !isLive && clock.currentTime > 3 {
             seek(to: 0)
             return
         }
@@ -127,7 +121,7 @@ final class AudioManager: NSObject, ObservableObject {
     func seek(to time: Double) {
         guard !isLive else { return }
         activeEngine?.seek(to: time)
-        currentTime = min(max(0, time), duration)
+        clock.currentTime = min(max(0, time), clock.duration)
         updateNowPlayingInfo()
     }
 
@@ -232,9 +226,7 @@ final class AudioManager: NSObject, ObservableObject {
         }
         engine.setVolume(volume)
 
-        currentTime = 0
-        audioLevel = 0
-        duration = song.isLive ? 0 : 1
+        clock.reset(duration: song.isLive ? 0 : 1)
 
         // Speed persists across podcast episodes but resets for music/radio.
         if song.source != .podcast { playbackRate = 1.0 }
@@ -322,12 +314,12 @@ final class AudioManager: NSObject, ObservableObject {
             MPMediaItemPropertyTitle: song.title,
             MPMediaItemPropertyArtist: song.artist,
             MPMediaItemPropertyAlbumTitle: song.album,
-            MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime,
+            MPNowPlayingInfoPropertyElapsedPlaybackTime: clock.currentTime,
             MPNowPlayingInfoPropertyPlaybackRate: isPlaying ? 1.0 : 0.0,
             MPNowPlayingInfoPropertyIsLiveStream: song.isLive
         ]
         if !song.isLive {
-            info[MPMediaItemPropertyPlaybackDuration] = duration
+            info[MPMediaItemPropertyPlaybackDuration] = clock.duration
         }
         if !song.isRemote, let image = UIImage(named: song.artworkName) {
             info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
@@ -354,9 +346,9 @@ final class AudioManager: NSObject, ObservableObject {
     private func tick() {
         guard let engine = activeEngine else { return }
         engine.refresh()
-        currentTime = engine.currentTime
+        clock.currentTime = engine.currentTime
         let d = engine.duration
-        duration = (d.isFinite && d > 0) ? d : (isLive ? 0 : 1)
-        audioLevel = engine.level
+        clock.duration = (d.isFinite && d > 0) ? d : (isLive ? 0 : 1)
+        clock.audioLevel = engine.level
     }
 }

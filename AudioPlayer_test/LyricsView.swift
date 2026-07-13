@@ -105,11 +105,12 @@ struct LyricsView: View {
 private struct SyncedLyricsList: View {
     let lines: [LyricLine]
     @EnvironmentObject private var audio: AudioManager
+    @EnvironmentObject private var clock: PlaybackClock
 
     private var activeIndex: Int? {
         var index: Int?
         for (i, line) in lines.enumerated() {
-            if line.time <= audio.currentTime + 0.25 { index = i } else { break }
+            if line.time <= clock.currentTime + 0.25 { index = i } else { break }
         }
         return index
     }

@@ -25,9 +25,9 @@ enum Net {
 
     private static let session: URLSession = {
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 15
-        config.waitsForConnectivity = true
-        config.requestCachePolicy = .returnCacheDataElseLoad
+        config.timeoutIntervalForRequest = 12
+        config.timeoutIntervalForResource = 20   // hard ceiling so requests never hang
+        config.requestCachePolicy = .reloadIgnoringLocalCacheData
         return URLSession(configuration: config)
     }()
 
