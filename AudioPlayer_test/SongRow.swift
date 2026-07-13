@@ -75,6 +75,13 @@ struct SongRow: View {
             Button {
                 audio.addToQueue(song)
             } label: { Label("Add to Queue", systemImage: "text.append") }
+            Button {
+                let seed = song
+                Task {
+                    let queue = await StationService.station(for: seed)
+                    audio.play(seed, in: queue)
+                }
+            } label: { Label("Start Station", systemImage: "dot.radiowaves.left.and.right") }
             Divider()
             Button {
                 library.toggleFavorite(song)
