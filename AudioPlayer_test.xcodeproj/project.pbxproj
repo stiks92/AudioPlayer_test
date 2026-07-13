@@ -26,6 +26,36 @@
 		AA000000000000000000B017 /* QueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F017 /* QueueView.swift */; };
 		AA000000000000000000B018 /* PlaylistDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F018 /* PlaylistDetailView.swift */; };
 		AA000000000000000000B019 /* SongRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F019 /* SongRow.swift */; };
+		AA000000000000000000B020 /* PlaybackEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F020 /* PlaybackEngine.swift */; };
+		AA000000000000000000B021 /* TrackProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F021 /* TrackProvider.swift */; };
+		AA000000000000000000B022 /* AudiusService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F022 /* AudiusService.swift */; };
+		AA000000000000000000B023 /* RadioBrowserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F023 /* RadioBrowserService.swift */; };
+		AA000000000000000000B024 /* SongFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F024 /* SongFeed.swift */; };
+		AA000000000000000000B025 /* Artwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F025 /* Artwork.swift */; };
+		AA000000000000000000B026 /* RadioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F026 /* RadioView.swift */; };
+		AA000000000000000000B027 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F027 /* Haptics.swift */; };
+		AA000000000000000000B028 /* ProStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F028 /* ProStore.swift */; };
+		AA000000000000000000B029 /* LyricsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F029 /* LyricsService.swift */; };
+		AA000000000000000000B030 /* AIMixService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F030 /* AIMixService.swift */; };
+		AA000000000000000000B031 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F031 /* PaywallView.swift */; };
+		AA000000000000000000B032 /* LyricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F032 /* LyricsView.swift */; };
+		AA000000000000000000B033 /* AIMixView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F033 /* AIMixView.swift */; };
+		AA000000000000000000B034 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F034 /* SettingsView.swift */; };
+		AA000000000000000000B035 /* ShareCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F035 /* ShareCard.swift */; };
+		AA000000000000000000B036 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F036 /* Keychain.swift */; };
+		AA000000000000000000B037 /* SubsonicService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F037 /* SubsonicService.swift */; };
+		AA000000000000000000B038 /* ServerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F038 /* ServerStore.swift */; };
+		AA000000000000000000B039 /* ConnectServerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F039 /* ConnectServerView.swift */; };
+		AA000000000000000000B040 /* ShazamService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F040 /* ShazamService.swift */; };
+		AA000000000000000000B041 /* ShazamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F041 /* ShazamView.swift */; };
+		AA000000000000000000B042 /* Podcast.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F042 /* Podcast.swift */; };
+		AA000000000000000000B043 /* iTunesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F043 /* iTunesService.swift */; };
+		AA000000000000000000B044 /* PodcastFeedService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F044 /* PodcastFeedService.swift */; };
+		AA000000000000000000B045 /* PodcastsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F045 /* PodcastsView.swift */; };
+		AA000000000000000000B046 /* PodcastDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F046 /* PodcastDetailView.swift */; };
+		AA000000000000000000B047 /* PlaylistStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F047 /* PlaylistStore.swift */; };
+		AA000000000000000000B048 /* AddToPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F048 /* AddToPlaylistView.swift */; };
+		AA000000000000000000B049 /* UserPlaylistDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F049 /* UserPlaylistDetailView.swift */; };
 		7452B83527555A1400FA93A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7452B83427555A1400FA93A2 /* Assets.xcassets */; };
 		7452B83827555A1400FA93A2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7452B83627555A1400FA93A2 /* LaunchScreen.storyboard */; };
 		7452B84327555A1400FA93A2 /* AudioPlayer_testTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7452B84227555A1400FA93A2 /* AudioPlayer_testTests.swift */; };
@@ -87,6 +117,36 @@
 		AA000000000000000000F017 /* QueueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueView.swift; sourceTree = "<group>"; };
 		AA000000000000000000F018 /* PlaylistDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistDetailView.swift; sourceTree = "<group>"; };
 		AA000000000000000000F019 /* SongRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongRow.swift; sourceTree = "<group>"; };
+		AA000000000000000000F020 /* PlaybackEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackEngine.swift; sourceTree = "<group>"; };
+		AA000000000000000000F021 /* TrackProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackProvider.swift; sourceTree = "<group>"; };
+		AA000000000000000000F022 /* AudiusService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudiusService.swift; sourceTree = "<group>"; };
+		AA000000000000000000F023 /* RadioBrowserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioBrowserService.swift; sourceTree = "<group>"; };
+		AA000000000000000000F024 /* SongFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongFeed.swift; sourceTree = "<group>"; };
+		AA000000000000000000F025 /* Artwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artwork.swift; sourceTree = "<group>"; };
+		AA000000000000000000F026 /* RadioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioView.swift; sourceTree = "<group>"; };
+		AA000000000000000000F027 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
+		AA000000000000000000F028 /* ProStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProStore.swift; sourceTree = "<group>"; };
+		AA000000000000000000F029 /* LyricsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsService.swift; sourceTree = "<group>"; };
+		AA000000000000000000F030 /* AIMixService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIMixService.swift; sourceTree = "<group>"; };
+		AA000000000000000000F031 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		AA000000000000000000F032 /* LyricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsView.swift; sourceTree = "<group>"; };
+		AA000000000000000000F033 /* AIMixView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIMixView.swift; sourceTree = "<group>"; };
+		AA000000000000000000F034 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AA000000000000000000F035 /* ShareCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareCard.swift; sourceTree = "<group>"; };
+		AA000000000000000000F036 /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
+		AA000000000000000000F037 /* SubsonicService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicService.swift; sourceTree = "<group>"; };
+		AA000000000000000000F038 /* ServerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerStore.swift; sourceTree = "<group>"; };
+		AA000000000000000000F039 /* ConnectServerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectServerView.swift; sourceTree = "<group>"; };
+		AA000000000000000000F040 /* ShazamService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShazamService.swift; sourceTree = "<group>"; };
+		AA000000000000000000F041 /* ShazamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShazamView.swift; sourceTree = "<group>"; };
+		AA000000000000000000F042 /* Podcast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Podcast.swift; sourceTree = "<group>"; };
+		AA000000000000000000F043 /* iTunesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iTunesService.swift; sourceTree = "<group>"; };
+		AA000000000000000000F044 /* PodcastFeedService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastFeedService.swift; sourceTree = "<group>"; };
+		AA000000000000000000F045 /* PodcastsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastsView.swift; sourceTree = "<group>"; };
+		AA000000000000000000F046 /* PodcastDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastDetailView.swift; sourceTree = "<group>"; };
+		AA000000000000000000F047 /* PlaylistStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistStore.swift; sourceTree = "<group>"; };
+		AA000000000000000000F048 /* AddToPlaylistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToPlaylistView.swift; sourceTree = "<group>"; };
+		AA000000000000000000F049 /* UserPlaylistDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPlaylistDetailView.swift; sourceTree = "<group>"; };
 		7452B82827555A1100FA93A2 /* AudioPlayer_test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioPlayer_test.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7452B83427555A1400FA93A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7452B83727555A1400FA93A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -190,6 +250,7 @@
 				AA000000000000000000F002 /* Song.swift */,
 				AA000000000000000000F003 /* Playlist.swift */,
 				AA000000000000000000F004 /* PlaybackModels.swift */,
+				AA000000000000000000F042 /* Podcast.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -198,7 +259,23 @@
 			isa = PBXGroup;
 			children = (
 				AA000000000000000000F005 /* AudioManager.swift */,
+				AA000000000000000000F020 /* PlaybackEngine.swift */,
 				AA000000000000000000F006 /* MusicLibrary.swift */,
+				AA000000000000000000F021 /* TrackProvider.swift */,
+				AA000000000000000000F022 /* AudiusService.swift */,
+				AA000000000000000000F023 /* RadioBrowserService.swift */,
+				AA000000000000000000F024 /* SongFeed.swift */,
+				AA000000000000000000F029 /* LyricsService.swift */,
+				AA000000000000000000F030 /* AIMixService.swift */,
+				AA000000000000000000F028 /* ProStore.swift */,
+				AA000000000000000000F027 /* Haptics.swift */,
+				AA000000000000000000F036 /* Keychain.swift */,
+				AA000000000000000000F037 /* SubsonicService.swift */,
+				AA000000000000000000F038 /* ServerStore.swift */,
+				AA000000000000000000F040 /* ShazamService.swift */,
+				AA000000000000000000F043 /* iTunesService.swift */,
+				AA000000000000000000F044 /* PodcastFeedService.swift */,
+				AA000000000000000000F047 /* PlaylistStore.swift */,
 			);
 			name = Services;
 			sourceTree = "<group>";
@@ -210,6 +287,7 @@
 				AA000000000000000000F008 /* DesignComponents.swift */,
 				AA000000000000000000F009 /* Visualizer.swift */,
 				AA000000000000000000F010 /* MarqueeText.swift */,
+				AA000000000000000000F025 /* Artwork.swift */,
 			);
 			name = DesignSystem;
 			sourceTree = "<group>";
@@ -220,12 +298,24 @@
 				AA000000000000000000F011 /* RootView.swift */,
 				AA000000000000000000F012 /* HomeView.swift */,
 				AA000000000000000000F013 /* SearchView.swift */,
+				AA000000000000000000F026 /* RadioView.swift */,
 				AA000000000000000000F014 /* LibraryView.swift */,
 				AA000000000000000000F015 /* NowPlayingView.swift */,
 				AA000000000000000000F016 /* MiniPlayerView.swift */,
 				AA000000000000000000F017 /* QueueView.swift */,
 				AA000000000000000000F018 /* PlaylistDetailView.swift */,
 				AA000000000000000000F019 /* SongRow.swift */,
+				AA000000000000000000F031 /* PaywallView.swift */,
+				AA000000000000000000F032 /* LyricsView.swift */,
+				AA000000000000000000F033 /* AIMixView.swift */,
+				AA000000000000000000F034 /* SettingsView.swift */,
+				AA000000000000000000F035 /* ShareCard.swift */,
+				AA000000000000000000F039 /* ConnectServerView.swift */,
+				AA000000000000000000F041 /* ShazamView.swift */,
+				AA000000000000000000F045 /* PodcastsView.swift */,
+				AA000000000000000000F046 /* PodcastDetailView.swift */,
+				AA000000000000000000F048 /* AddToPlaylistView.swift */,
+				AA000000000000000000F049 /* UserPlaylistDetailView.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -437,6 +527,36 @@
 				AA000000000000000000B017 /* QueueView.swift in Sources */,
 				AA000000000000000000B018 /* PlaylistDetailView.swift in Sources */,
 				AA000000000000000000B019 /* SongRow.swift in Sources */,
+				AA000000000000000000B020 /* PlaybackEngine.swift in Sources */,
+				AA000000000000000000B021 /* TrackProvider.swift in Sources */,
+				AA000000000000000000B022 /* AudiusService.swift in Sources */,
+				AA000000000000000000B023 /* RadioBrowserService.swift in Sources */,
+				AA000000000000000000B024 /* SongFeed.swift in Sources */,
+				AA000000000000000000B025 /* Artwork.swift in Sources */,
+				AA000000000000000000B026 /* RadioView.swift in Sources */,
+				AA000000000000000000B027 /* Haptics.swift in Sources */,
+				AA000000000000000000B028 /* ProStore.swift in Sources */,
+				AA000000000000000000B029 /* LyricsService.swift in Sources */,
+				AA000000000000000000B030 /* AIMixService.swift in Sources */,
+				AA000000000000000000B031 /* PaywallView.swift in Sources */,
+				AA000000000000000000B032 /* LyricsView.swift in Sources */,
+				AA000000000000000000B033 /* AIMixView.swift in Sources */,
+				AA000000000000000000B034 /* SettingsView.swift in Sources */,
+				AA000000000000000000B035 /* ShareCard.swift in Sources */,
+				AA000000000000000000B036 /* Keychain.swift in Sources */,
+				AA000000000000000000B037 /* SubsonicService.swift in Sources */,
+				AA000000000000000000B038 /* ServerStore.swift in Sources */,
+				AA000000000000000000B039 /* ConnectServerView.swift in Sources */,
+				AA000000000000000000B040 /* ShazamService.swift in Sources */,
+				AA000000000000000000B041 /* ShazamView.swift in Sources */,
+				AA000000000000000000B042 /* Podcast.swift in Sources */,
+				AA000000000000000000B043 /* iTunesService.swift in Sources */,
+				AA000000000000000000B044 /* PodcastFeedService.swift in Sources */,
+				AA000000000000000000B045 /* PodcastsView.swift in Sources */,
+				AA000000000000000000B046 /* PodcastDetailView.swift in Sources */,
+				AA000000000000000000B047 /* PlaylistStore.swift in Sources */,
+				AA000000000000000000B048 /* AddToPlaylistView.swift in Sources */,
+				AA000000000000000000B049 /* UserPlaylistDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

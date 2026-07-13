@@ -15,11 +15,16 @@ struct NowPlayingView: View {
 
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var library: MusicLibrary
+    @EnvironmentObject private var playlistStore: PlaylistStore
 
     @State private var scrubValue: Double = 0
     @State private var isScrubbing = false
     @State private var dragOffset: CGFloat = 0
     @State private var showQueue = false
+    @State private var showLyrics = false
+    @State private var showSleepOptions = false
+    @State private var showAddToPlaylist = false
+    @State private var shareItem: ShareableImage?
 
     private var song: Song? { audio.currentSong }
 
@@ -56,6 +61,26 @@ struct NowPlayingView: View {
         .sheet(isPresented: $showQueue) {
             QueueView().environmentObject(audio).environmentObject(library)
         }
+        .sheet(isPresented: $showLyrics) {
+            LyricsView().environmentObject(audio)
+        }
+        .sheet(isPresented: $showAddToPlaylist) {
+            if let song {
+                AddToPlaylistView(song: song).environmentObject(playlistStore)
+            }
+        }
+        .sheet(item: $shareItem) { item in
+            ShareSheet(items: [item.image])
+        }
+        .confirmationDialog("Sleep timer", isPresented: $showSleepOptions, titleVisibility: .visible) {
+            ForEach([15, 30, 45, 60], id: \.self) { minutes in
+                Button("\(minutes) minutes") { audio.setSleepTimer(minutes: minutes) }
+            }
+            if audio.sleepTimerMinutes != nil {
+                Button("Turn off", role: .destructive) { audio.setSleepTimer(minutes: nil) }
+            }
+            Button("Cancel", role: .cancel) {}
+        }
         .onAppear { scrubValue = audio.progress }
     }
 
@@ -87,11 +112,8 @@ struct NowPlayingView: View {
             let side = min(geo.size.width, geo.size.height)
             ZStack {
                 if let song {
-                    Image(song.artworkName)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
+                    ArtworkImage(song: song, glyphSize: 72)
                         .frame(width: side, height: side)
-                        .background(LinearGradient(colors: song.gradient, startPoint: .top, endPoint: .bottom))
                         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
                         .matchedGeometryEffect(id: "artwork", in: namespace)
                         .shadow(color: song.gradient.first?.opacity(0.6) ?? .black, radius: 34, y: 20)
@@ -115,6 +137,19 @@ struct NowPlayingView: View {
                     .foregroundColor(.white.opacity(0.7))
             }
             Spacer(minLength: 8)
+            if audio.supportsPlaybackRate {
+                speedMenu
+            }
+            if song != nil {
+                Button {
+                    showAddToPlaylist = true
+                } label: {
+                    Image(systemName: "plus.circle")
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.85))
+                }
+                .buttonStyle(BouncyButtonStyle())
+            }
             if let song {
                 HeartButton(isOn: library.isFavorite(song), size: 24) {
                     withAnimation { library.toggleFavorite(song) }
@@ -123,29 +158,71 @@ struct NowPlayingView: View {
         }
     }
 
-    private var scrubber: some View {
-        VStack(spacing: 6) {
-            ScrubberView(
-                value: Binding(
-                    get: { isScrubbing ? scrubValue : audio.progress },
-                    set: { scrubValue = $0 }
-                ),
-                onEditingChanged: { editing in
-                    if editing {
-                        isScrubbing = true
+    private var speedMenu: some View {
+        Menu {
+            ForEach([0.8, 1.0, 1.25, 1.5, 1.75, 2.0], id: \.self) { rate in
+                Button {
+                    audio.setPlaybackRate(Float(rate))
+                    Haptics.selection()
+                } label: {
+                    if audio.playbackRate == Float(rate) {
+                        Label(String(format: "%g×", rate), systemImage: "checkmark")
                     } else {
-                        audio.seek(to: scrubValue * audio.duration)
-                        isScrubbing = false
+                        Text(String(format: "%g×", rate))
                     }
                 }
-            )
-            HStack {
-                Text((isScrubbing ? scrubValue * audio.duration : audio.currentTime).asClock)
-                Spacer()
-                Text(audio.duration.asClock)
             }
-            .font(.system(size: 12, weight: .medium).monospacedDigit())
-            .foregroundColor(.white.opacity(0.6))
+        } label: {
+            Text(String(format: "%g×", Double(audio.playbackRate)))
+                .font(.system(size: 13, weight: .bold))
+                .foregroundColor(.white)
+                .frame(minWidth: 40)
+                .padding(.vertical, 7)
+                .background(Capsule().fill(.ultraThinMaterial))
+        }
+    }
+
+    @ViewBuilder
+    private var scrubber: some View {
+        if audio.isLive {
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(Color(hex: 0xFF3B6B))
+                    .frame(width: 8, height: 8)
+                    .opacity(audio.isPlaying ? 1 : 0.4)
+                Text("LIVE")
+                    .font(.system(size: 13, weight: .heavy))
+                    .tracking(2)
+                Spacer()
+                Text("Radio")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.white.opacity(0.6))
+            }
+            .frame(height: 24)
+        } else {
+            VStack(spacing: 6) {
+                ScrubberView(
+                    value: Binding(
+                        get: { isScrubbing ? scrubValue : audio.progress },
+                        set: { scrubValue = $0 }
+                    ),
+                    onEditingChanged: { editing in
+                        if editing {
+                            isScrubbing = true
+                        } else {
+                            audio.seek(to: scrubValue * audio.duration)
+                            isScrubbing = false
+                        }
+                    }
+                )
+                HStack {
+                    Text((isScrubbing ? scrubValue * audio.duration : audio.currentTime).asClock)
+                    Spacer()
+                    Text(audio.duration.asClock)
+                }
+                .font(.system(size: 12, weight: .medium).monospacedDigit())
+                .foregroundColor(.white.opacity(0.6))
+            }
         }
     }
 
@@ -210,23 +287,29 @@ struct NowPlayingView: View {
     private var bottomBar: some View {
         HStack {
             Spacer()
-            Image(systemName: "airplayaudio")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundColor(.white.opacity(0.7))
+            bottomButton("quote.bubble", active: false) { showLyrics = true }
             Spacer()
-            Button { showQueue = true } label: {
-                Image(systemName: "quote.bubble")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.7))
+            bottomButton("moon.zzz\(audio.sleepTimerMinutes != nil ? ".fill" : "")",
+                         active: audio.sleepTimerMinutes != nil) {
+                showSleepOptions = true
             }
             Spacer()
-            Button { showQueue = true } label: {
-                Image(systemName: "list.bullet.rectangle")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.7))
+            bottomButton("square.and.arrow.up", active: false) {
+                if let song { shareItem = ShareCardRenderer.render(song) }
             }
+            Spacer()
+            bottomButton("list.bullet", active: false) { showQueue = true }
             Spacer()
         }
+    }
+
+    private func bottomButton(_ icon: String, active: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(active ? Theme.accentSoft : .white.opacity(0.7))
+        }
+        .buttonStyle(BouncyButtonStyle())
     }
 
     // MARK: - Drag to dismiss

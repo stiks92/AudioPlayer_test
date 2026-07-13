@@ -6,5 +6,15 @@
 	<array>
 		<string>audio</string>
 	</array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Aurora uses the microphone to recognize the music playing around you.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<!-- Many internet radio streams are delivered over plain HTTP.
+		     This exception only relaxes ATS for media loaded via AVFoundation,
+		     not for general networking. -->
+		<key>NSAllowsArbitraryLoadsForMedia</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

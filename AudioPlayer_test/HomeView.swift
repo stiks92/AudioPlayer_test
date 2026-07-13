@@ -11,6 +11,14 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var library: MusicLibrary
+    @EnvironmentObject private var proStore: ProStore
+    @EnvironmentObject private var serverStore: ServerStore
+
+    @StateObject private var trending = SongFeed()
+    @StateObject private var serverFeed = SongFeed()
+    @State private var showSettings = false
+    @State private var showAIMix = false
+    @State private var showShazam = false
 
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -30,9 +38,12 @@ struct HomeView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 28) {
                         header
+                        aiMixCard
                         if !library.recentSongs.isEmpty {
                             recentlyPlayed
                         }
+                        serverSection
+                        trendingSection
                         featured
                         quickPicks
                     }
@@ -42,6 +53,160 @@ struct HomeView: View {
                 }
             }
             .navigationBarHidden(true)
+            .task {
+                if trending.state == .idle {
+                    await trending.load { try await AudiusService.shared.trending() }
+                }
+                await loadServerIfNeeded()
+            }
+            .onChange(of: serverStore.isConnected) { _ in
+                Task { await loadServerIfNeeded(force: true) }
+            }
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
+                    .environmentObject(audio)
+                    .environmentObject(proStore)
+                    .environmentObject(serverStore)
+            }
+            .sheet(isPresented: $showAIMix) {
+                AIMixView()
+                    .environmentObject(audio)
+                    .environmentObject(library)
+                    .environmentObject(proStore)
+            }
+            .sheet(isPresented: $showShazam) {
+                ShazamView().environmentObject(audio)
+            }
+        }
+    }
+
+    private func loadServerIfNeeded(force: Bool = false) async {
+        guard serverStore.isConnected else {
+            if serverFeed.state != .idle { serverFeed.clear() }
+            return
+        }
+        if force || serverFeed.state == .idle {
+            await serverFeed.load { try await serverStore.randomSongs() }
+        }
+    }
+
+    // MARK: - From your server
+
+    @ViewBuilder
+    private var serverSection: some View {
+        if serverStore.isConnected, serverFeed.state == .loaded {
+            VStack(alignment: .leading, spacing: 14) {
+                SectionHeader(title: "From your server")
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 14) {
+                        ForEach(serverFeed.songs) { song in
+                            Button {
+                                audio.play(song, in: serverFeed.songs)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    ArtworkThumbnail(song: song, size: 130, cornerRadius: 16, showBadge: true)
+                                    Text(song.title)
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundColor(Theme.textPrimary)
+                                        .lineLimit(1)
+                                        .frame(width: 130, alignment: .leading)
+                                }
+                            }
+                            .buttonStyle(BouncyButtonStyle(scale: 0.95))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - AI Mix banner
+
+    private var aiMixCard: some View {
+        Button {
+            Haptics.impact()
+            showAIMix = true
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 26, weight: .bold))
+                    .foregroundColor(.white)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Create an AI Mix")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(.white)
+                    Text("Describe a vibe — get an instant mix")
+                        .font(.system(size: 12))
+                        .foregroundColor(.white.opacity(0.85))
+                }
+                Spacer()
+                if !proStore.isPro {
+                    Text("PRO")
+                        .font(.system(size: 10, weight: .heavy))
+                        .foregroundColor(Theme.background)
+                        .padding(.horizontal, 8).padding(.vertical, 3)
+                        .background(Capsule().fill(Color.white))
+                }
+                Image(systemName: "chevron.right").foregroundColor(.white.opacity(0.8))
+            }
+            .padding(16)
+            .background(
+                LinearGradient(colors: [Theme.accent, Color(hex: 0xFF6FD8), Color(hex: 0x4A00E0)],
+                               startPoint: .topLeading, endPoint: .bottomTrailing)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .shadow(color: Theme.accent.opacity(0.4), radius: 14, y: 8)
+        }
+        .buttonStyle(BouncyButtonStyle(scale: 0.98))
+    }
+
+    // MARK: - Trending on Audius (live)
+
+    @ViewBuilder
+    private var trendingSection: some View {
+        switch trending.state {
+        case .idle, .failed, .empty:
+            EmptyView()
+        case .loading:
+            VStack(alignment: .leading, spacing: 14) {
+                SectionHeader(title: "Trending on Audius")
+                HStack(spacing: 14) {
+                    ForEach(0..<3, id: \.self) { _ in
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .fill(Theme.surface)
+                            .frame(width: 150, height: 190)
+                            .redacted(reason: .placeholder)
+                    }
+                }
+            }
+        case .loaded:
+            VStack(alignment: .leading, spacing: 14) {
+                SectionHeader(title: "Trending on Audius")
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 14) {
+                        ForEach(trending.songs) { song in
+                            Button {
+                                audio.play(song, in: trending.songs)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    ArtworkThumbnail(song: song, size: 150, cornerRadius: 18, showBadge: true)
+                                    Text(song.title)
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundColor(Theme.textPrimary)
+                                        .lineLimit(1)
+                                        .frame(width: 150, alignment: .leading)
+                                    Text(song.artist)
+                                        .font(.system(size: 11))
+                                        .foregroundColor(Theme.textSecondary)
+                                        .lineLimit(1)
+                                        .frame(width: 150, alignment: .leading)
+                                }
+                            }
+                            .buttonStyle(BouncyButtonStyle(scale: 0.95))
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -58,10 +223,29 @@ struct HomeView: View {
                     .foregroundColor(Theme.textSecondary)
             }
             Spacer()
-            Circle()
-                .fill(LinearGradient(colors: [Theme.accent, Theme.accentSoft], startPoint: .top, endPoint: .bottom))
-                .frame(width: 40, height: 40)
-                .overlay(Image(systemName: "person.fill").foregroundColor(.white))
+            Button {
+                Haptics.impact()
+                showShazam = true
+            } label: {
+                Image(systemName: "waveform.circle.fill")
+                    .font(.system(size: 30))
+                    .foregroundColor(Theme.accentSoft)
+                    .frame(width: 40, height: 40)
+            }
+            .buttonStyle(BouncyButtonStyle())
+
+            Button {
+                showSettings = true
+            } label: {
+                Circle()
+                    .fill(LinearGradient(colors: [Theme.accent, Theme.accentSoft], startPoint: .top, endPoint: .bottom))
+                    .frame(width: 40, height: 40)
+                    .overlay(
+                        Image(systemName: proStore.isPro ? "sparkles" : "person.fill")
+                            .foregroundColor(.white)
+                    )
+            }
+            .buttonStyle(BouncyButtonStyle())
         }
     }
 

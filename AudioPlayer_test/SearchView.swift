@@ -2,7 +2,8 @@
 //  SearchView.swift
 //  AudioPlayer_test
 //
-//  Search with a custom field and a mood grid shown when idle.
+//  Unified search: the local library + live results from Audius, with a
+//  mood grid shown when idle.
 //
 
 import SwiftUI
@@ -10,11 +11,14 @@ import SwiftUI
 struct SearchView: View {
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var library: MusicLibrary
+    @EnvironmentObject private var serverStore: ServerStore
 
     @State private var query = ""
     @FocusState private var focused: Bool
+    @StateObject private var audiusFeed = SongFeed()
+    @StateObject private var serverFeed = SongFeed()
 
-    private var results: [Song] { library.search(query) }
+    private var localResults: [Song] { library.search(query) }
 
     private let moods: [(String, [Color])] = [
         ("Cinematic", [Color(hex: 0x654EA3), Color(hex: 0xEAAFC8)]),
@@ -40,10 +44,8 @@ struct SearchView: View {
 
                         if query.isEmpty {
                             moodGrid
-                        } else if results.isEmpty {
-                            emptyState
                         } else {
-                            resultsList
+                            resultsSections
                         }
                     }
                     .padding(.horizontal, 20)
@@ -52,6 +54,21 @@ struct SearchView: View {
                 }
             }
             .navigationBarHidden(true)
+            .task(id: query) {
+                let trimmed = query.trimmingCharacters(in: .whitespaces)
+                guard trimmed.count >= 2 else {
+                    audiusFeed.clear()
+                    serverFeed.clear()
+                    return
+                }
+                // Debounce keystrokes; task(id:) cancels the previous run.
+                try? await Task.sleep(nanoseconds: 350_000_000)
+                if Task.isCancelled { return }
+                if serverStore.isConnected {
+                    await serverFeed.load { try await serverStore.search(trimmed) }
+                }
+                await audiusFeed.load { try await AudiusService.shared.search(trimmed) }
+            }
         }
     }
 
@@ -59,13 +76,15 @@ struct SearchView: View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(Theme.textSecondary)
-            TextField("Songs, artists, albums", text: $query)
+            TextField("Songs, artists, stations…", text: $query)
                 .focused($focused)
                 .foregroundColor(.white)
                 .autocorrectionDisabled()
+                .submitLabel(.search)
             if !query.isEmpty {
                 Button {
                     query = ""
+                    audiusFeed.clear()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundColor(Theme.textSecondary)
@@ -75,6 +94,74 @@ struct SearchView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
         .glass(cornerRadius: 16)
+    }
+
+    // MARK: - Results
+
+    @ViewBuilder
+    private var resultsSections: some View {
+        VStack(alignment: .leading, spacing: 22) {
+            if !localResults.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    SectionHeader(title: "In your library")
+                    songList(localResults)
+                }
+            }
+
+            if serverStore.isConnected, serverFeed.state == .loaded {
+                VStack(alignment: .leading, spacing: 8) {
+                    SectionHeader(title: "Your server")
+                    songList(serverFeed.songs)
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    SectionHeader(title: "Audius")
+                    if audiusFeed.state == .loading {
+                        ProgressView().tint(Theme.accentSoft)
+                    }
+                }
+                audiusResults
+            }
+
+            if localResults.isEmpty && audiusFeed.state == .empty {
+                emptyState
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var audiusResults: some View {
+        switch audiusFeed.state {
+        case .loaded:
+            songList(audiusFeed.songs)
+        case .failed:
+            Text("Couldn't reach Audius. Check your connection.")
+                .font(.footnote)
+                .foregroundColor(Theme.textTertiary)
+        case .idle, .loading, .empty:
+            if audiusFeed.state == .empty {
+                Text("No Audius tracks matched.")
+                    .font(.footnote)
+                    .foregroundColor(Theme.textTertiary)
+            } else {
+                EmptyView()
+            }
+        }
+    }
+
+    private func songList(_ songs: [Song]) -> some View {
+        LazyVStack(spacing: 2) {
+            ForEach(songs) { song in
+                Button {
+                    audio.play(song, in: songs)
+                } label: {
+                    SongRow(song: song, showBadge: true)
+                }
+                .buttonStyle(.plain)
+            }
+        }
     }
 
     private var moodGrid: some View {
@@ -97,24 +184,9 @@ struct SearchView: View {
                     .frame(height: 96)
                     .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                     .onTapGesture {
-                        if let random = library.songs.randomElement() {
-                            audio.play(random, in: library.songs)
-                        }
+                        query = mood.0
                     }
                 }
-            }
-        }
-    }
-
-    private var resultsList: some View {
-        LazyVStack(spacing: 2) {
-            ForEach(results) { song in
-                Button {
-                    audio.play(song, in: results)
-                } label: {
-                    SongRow(song: song)
-                }
-                .buttonStyle(.plain)
             }
         }
     }
@@ -129,6 +201,6 @@ struct SearchView: View {
                 .foregroundColor(Theme.textSecondary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, 60)
+        .padding(.top, 40)
     }
 }

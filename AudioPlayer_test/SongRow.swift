@@ -12,20 +12,21 @@ struct ArtworkThumbnail: View {
     let song: Song
     var size: CGFloat = 52
     var cornerRadius: CGFloat = 12
+    var showBadge: Bool = false
 
     var body: some View {
-        Image(song.artworkName)
-            .resizable()
-            .aspectRatio(contentMode: .fill)
+        ArtworkImage(song: song, glyphSize: size * 0.34)
             .frame(width: size, height: size)
-            .background(
-                LinearGradient(colors: song.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
-            )
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
             )
+            .overlay(alignment: .bottomLeading) {
+                if showBadge {
+                    SourceBadge(source: song.source).padding(4)
+                }
+            }
             .shadow(color: song.gradient.first?.opacity(0.4) ?? .clear, radius: 8, y: 4)
     }
 }
@@ -33,6 +34,7 @@ struct ArtworkThumbnail: View {
 struct SongRow: View {
     let song: Song
     var index: Int? = nil
+    var showBadge: Bool = false
 
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var library: MusicLibrary
@@ -41,7 +43,7 @@ struct SongRow: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            ArtworkThumbnail(song: song)
+            ArtworkThumbnail(song: song, showBadge: showBadge)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(song.title)
@@ -66,5 +68,20 @@ struct SongRow: View {
         }
         .padding(.vertical, 6)
         .contentShape(Rectangle())
+        .contextMenu {
+            Button {
+                audio.playNext(song)
+            } label: { Label("Play Next", systemImage: "text.insert") }
+            Button {
+                audio.addToQueue(song)
+            } label: { Label("Add to Queue", systemImage: "text.append") }
+            Divider()
+            Button {
+                library.toggleFavorite(song)
+            } label: {
+                Label(library.isFavorite(song) ? "Remove from Favorites" : "Favorite",
+                      systemImage: library.isFavorite(song) ? "heart.slash" : "heart")
+            }
+        }
     }
 }

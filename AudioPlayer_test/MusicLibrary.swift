@@ -2,8 +2,10 @@
 //  MusicLibrary.swift
 //  AudioPlayer_test
 //
-//  Owns the catalogue of songs and playlists plus lightweight
-//  user state (favorites + recently played) persisted to UserDefaults.
+//  Owns the bundled catalogue + curated playlists plus the user's favorites
+//  and recently-played. Favorites/recents store full `Song` snapshots (JSON
+//  on disk) so tracks from any source — streaming, radio, server, podcast —
+//  survive relaunches, not just bundled songs.
 //
 
 import SwiftUI
@@ -14,23 +16,23 @@ final class MusicLibrary: ObservableObject {
 
     @Published private(set) var songs: [Song] = []
     @Published private(set) var playlists: [Playlist] = []
-    @Published private(set) var favoriteFiles: Set<String> = []
-    @Published private(set) var recentFiles: [String] = []
+    @Published private(set) var favorites: [Song] = []
+    @Published private(set) var recents: [Song] = []
 
-    private let favoritesKey = "favorite.files.v1"
-    private let recentsKey = "recent.files.v1"
-    private let maxRecents = 12
+    private let favoritesFile = "favorites.json"
+    private let recentsFile = "recents.json"
+    private let maxRecents = 20
 
     init() {
         songs = MusicLibrary.makeCatalogue()
-        favoriteFiles = Set(UserDefaults.standard.stringArray(forKey: favoritesKey) ?? [])
-        recentFiles = UserDefaults.standard.stringArray(forKey: recentsKey) ?? []
+        favorites = MusicLibrary.load(favoritesFile)
+        recents = MusicLibrary.load(recentsFile)
         playlists = makePlaylists()
     }
 
     // MARK: - Lookups
 
-    func song(withID id: UUID) -> Song? {
+    func song(withID id: String) -> Song? {
         songs.first { $0.id == id }
     }
 
@@ -38,13 +40,8 @@ final class MusicLibrary: ObservableObject {
         playlist.songIDs.compactMap { id in songs.first { $0.id == id } }
     }
 
-    var favoriteSongs: [Song] {
-        songs.filter { favoriteFiles.contains($0.fileName) }
-    }
-
-    var recentSongs: [Song] {
-        recentFiles.compactMap { file in songs.first { $0.fileName == file } }
-    }
+    var favoriteSongs: [Song] { favorites }
+    var recentSongs: [Song] { recents }
 
     func search(_ query: String) -> [Song] {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -59,27 +56,47 @@ final class MusicLibrary: ObservableObject {
     // MARK: - Favorites
 
     func isFavorite(_ song: Song) -> Bool {
-        favoriteFiles.contains(song.fileName)
+        favorites.contains { $0.id == song.id }
     }
 
     func toggleFavorite(_ song: Song) {
-        if favoriteFiles.contains(song.fileName) {
-            favoriteFiles.remove(song.fileName)
+        if let index = favorites.firstIndex(where: { $0.id == song.id }) {
+            favorites.remove(at: index)
         } else {
-            favoriteFiles.insert(song.fileName)
+            favorites.insert(song, at: 0)
         }
-        UserDefaults.standard.set(Array(favoriteFiles), forKey: favoritesKey)
+        MusicLibrary.save(favorites, to: favoritesFile)
     }
 
     // MARK: - Recents
 
     func markPlayed(_ song: Song) {
-        recentFiles.removeAll { $0 == song.fileName }
-        recentFiles.insert(song.fileName, at: 0)
-        if recentFiles.count > maxRecents {
-            recentFiles = Array(recentFiles.prefix(maxRecents))
+        recents.removeAll { $0.id == song.id }
+        recents.insert(song, at: 0)
+        if recents.count > maxRecents {
+            recents = Array(recents.prefix(maxRecents))
         }
-        UserDefaults.standard.set(recentFiles, forKey: recentsKey)
+        MusicLibrary.save(recents, to: recentsFile)
+    }
+
+    // MARK: - Persistence
+
+    private static func fileURL(_ name: String) -> URL? {
+        guard let dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+        else { return nil }
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir.appendingPathComponent(name)
+    }
+
+    private static func load(_ name: String) -> [Song] {
+        guard let url = fileURL(name), let data = try? Data(contentsOf: url),
+              let songs = try? JSONDecoder().decode([Song].self, from: data) else { return [] }
+        return songs
+    }
+
+    private static func save(_ songs: [Song], to name: String) {
+        guard let url = fileURL(name), let data = try? JSONEncoder().encode(songs) else { return }
+        try? data.write(to: url, options: .atomic)
     }
 
     // MARK: - Playlists (curated / derived)
@@ -122,26 +139,6 @@ final class MusicLibrary: ObservableObject {
     // MARK: - Catalogue
 
     private static func makeCatalogue() -> [Song] {
-        let gradients: [[Color]] = [
-            [Color(hex: 0x7C5CFF), Color(hex: 0x3A1C71)],
-            [Color(hex: 0xFF6FD8), Color(hex: 0x3813C2)],
-            [Color(hex: 0x11998E), Color(hex: 0x38EF7D)],
-            [Color(hex: 0xF7971E), Color(hex: 0xFFD200)],
-            [Color(hex: 0xFC466B), Color(hex: 0x3F5EFB)],
-            [Color(hex: 0x00C6FF), Color(hex: 0x0072FF)],
-            [Color(hex: 0xFF512F), Color(hex: 0xDD2476)],
-            [Color(hex: 0x8E2DE2), Color(hex: 0x4A00E0)],
-            [Color(hex: 0xF953C6), Color(hex: 0xB91D73)],
-            [Color(hex: 0x43CEA2), Color(hex: 0x185A9D)],
-            [Color(hex: 0xFF9966), Color(hex: 0xFF5E62)],
-            [Color(hex: 0x36D1DC), Color(hex: 0x5B86E5)],
-            [Color(hex: 0xC33764), Color(hex: 0x1D2671)],
-            [Color(hex: 0xFDC830), Color(hex: 0xF37335)],
-            [Color(hex: 0x1FA2FF), Color(hex: 0x12D8FA)],
-            [Color(hex: 0xEC008C), Color(hex: 0xFC6767)],
-            [Color(hex: 0x654EA3), Color(hex: 0xEAAFC8)]
-        ]
-
         let titles = [
             "Hoyt's Office", "Defeated Clown", "Following Sophie",
             "Penny in the Hospital", "Young Penny", "Meeting Bruce Wayne",
@@ -152,12 +149,15 @@ final class MusicLibrary: ObservableObject {
         ]
 
         return titles.enumerated().map { index, title in
-            Song(
+            let file = "song\(index + 1)"
+            return Song(
+                id: "local:\(file)",
                 title: title,
                 artist: "Hildur Guðnadóttir",
                 album: "Joker",
-                fileName: "song\(index + 1)",
-                gradient: gradients[index % gradients.count]
+                source: .local,
+                fileName: file,
+                gradientHex: Palette.hex(for: index)
             )
         }
     }

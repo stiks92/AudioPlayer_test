@@ -2,12 +2,14 @@
 //  AudioManager.swift
 //  AudioPlayer_test
 //
-//  The playback engine. Wraps AVAudioPlayer, drives a live audio-level
-//  meter for the visualizer, manages the queue / shuffle / repeat, and
-//  integrates with the system Now Playing controls & lock screen.
+//  The playback engine orchestrator. Manages the queue / shuffle / repeat,
+//  delegates actual audio to a LocalAudioEngine (bundled files) or a
+//  RemoteAudioEngine (network streams & radio), drives the visualizer level,
+//  and integrates with the system Now Playing controls & lock screen.
 //
 
 import SwiftUI
+import UIKit
 import AVFoundation
 import MediaPlayer
 import Combine
@@ -29,7 +31,18 @@ final class AudioManager: NSObject, ObservableObject {
     /// Smoothed 0...1 output level used to drive the visualizer.
     @Published var audioLevel: CGFloat = 0
     @Published var volume: Float = 0.75 {
-        didSet { player?.volume = volume }
+        didSet { activeEngine?.setVolume(volume) }
+    }
+    @Published private(set) var playbackRate: Float = 1.0
+
+    var isLive: Bool { currentSong?.isLive ?? false }
+
+    /// Speed control is only meaningful for spoken-word content (podcasts).
+    var supportsPlaybackRate: Bool { currentSong?.source == .podcast }
+
+    func setPlaybackRate(_ rate: Float) {
+        playbackRate = rate
+        activeEngine?.setRate(rate)
     }
 
     var progress: Double {
@@ -39,10 +52,22 @@ final class AudioManager: NSObject, ObservableObject {
 
     // MARK: - Private
 
-    private var player: AVAudioPlayer?
+    private let localEngine = LocalAudioEngine()
+    private let remoteEngine = RemoteAudioEngine()
+    private var activeEngine: PlaybackEngine?
     private var timer: Timer?
     private var baseQueue: [Song] = []
     private var currentIndex = 0
+
+    // Sleep timer
+    @Published private(set) var sleepTimerMinutes: Int?
+    private var sleepTimer: Timer?
+    private var sleepFireDate: Date?
+
+    var sleepRemaining: TimeInterval? {
+        guard let sleepFireDate else { return nil }
+        return max(0, sleepFireDate.timeIntervalSinceNow)
+    }
 
     private override init() {
         super.init()
@@ -71,15 +96,15 @@ final class AudioManager: NSObject, ObservableObject {
     }
 
     func play() {
-        guard player != nil else { return }
-        player?.play()
+        guard activeEngine != nil else { return }
+        activeEngine?.play()
         isPlaying = true
         startTimer()
         updateNowPlayingInfo()
     }
 
     func pause() {
-        player?.pause()
+        activeEngine?.pause()
         isPlaying = false
         stopTimer()
         updateNowPlayingInfo()
@@ -90,7 +115,7 @@ final class AudioManager: NSObject, ObservableObject {
     }
 
     func previous() {
-        if currentTime > 3 {
+        if !isLive && currentTime > 3 {
             seek(to: 0)
             return
         }
@@ -100,10 +125,9 @@ final class AudioManager: NSObject, ObservableObject {
     }
 
     func seek(to time: Double) {
-        guard let player = player else { return }
-        let target = min(max(0, time), duration)
-        player.currentTime = target
-        currentTime = target
+        guard !isLive else { return }
+        activeEngine?.seek(to: time)
+        currentTime = min(max(0, time), duration)
         updateNowPlayingInfo()
     }
 
@@ -112,6 +136,41 @@ final class AudioManager: NSObject, ObservableObject {
         guard let idx = queue.firstIndex(of: song) else { return }
         currentIndex = idx
         load(autoplay: true)
+    }
+
+    // MARK: - Queue editing
+
+    /// Tracks after the current one.
+    var upNext: [Song] {
+        let start = currentIndex + 1
+        guard start < queue.count else { return [] }
+        return Array(queue[start...])
+    }
+
+    func playNext(_ song: Song) {
+        guard !queue.isEmpty else { play(song, in: [song]); return }
+        queue.insert(song, at: min(currentIndex + 1, queue.count))
+        Haptics.selection()
+    }
+
+    func addToQueue(_ song: Song) {
+        guard !queue.isEmpty else { play(song, in: [song]); return }
+        queue.append(song)
+        Haptics.selection()
+    }
+
+    func removeUpNext(at offsets: IndexSet) {
+        let base = currentIndex + 1
+        let absolute = IndexSet(offsets.map { base + $0 }.filter { $0 < queue.count })
+        queue.remove(atOffsets: absolute)
+    }
+
+    func moveUpNext(from source: IndexSet, to destination: Int) {
+        let base = currentIndex + 1
+        guard base <= queue.count else { return }
+        var sub = Array(queue[base...])
+        sub.move(fromOffsets: source, toOffset: destination)
+        queue.replaceSubrange(base..<queue.count, with: sub)
     }
 
     // MARK: - Modes
@@ -146,7 +205,6 @@ final class AudioManager: NSObject, ObservableObject {
             currentIndex += 1
             load(autoplay: true)
         } else if repeatMode == .off && auto {
-            // Reached the natural end of the queue — rewind and stop.
             currentIndex = 0
             load(autoplay: false)
         } else {
@@ -161,30 +219,60 @@ final class AudioManager: NSObject, ObservableObject {
         currentSong = song
 
         guard let url = song.url else {
-            print("AudioManager: missing file for \(song.fileName)")
+            print("AudioManager: missing URL for \(song.id)")
             return
         }
 
-        do {
-            let newPlayer = try AVAudioPlayer(contentsOf: url)
-            newPlayer.delegate = self
-            newPlayer.isMeteringEnabled = true
-            newPlayer.volume = volume
-            newPlayer.prepareToPlay()
-            player = newPlayer
-            duration = newPlayer.duration > 0 ? newPlayer.duration : 1
-            currentTime = 0
-            audioLevel = 0
-            if autoplay {
-                play()
-            } else {
-                isPlaying = false
-                stopTimer()
-            }
-        } catch {
-            print("AudioManager: failed to load \(song.fileName): \(error)")
+        // Swap to the correct backend for this track.
+        let engine: PlaybackEngine = song.isRemote ? remoteEngine : localEngine
+        if activeEngine !== engine { activeEngine?.teardown() }
+        activeEngine = engine
+        engine.onFinish = { [weak self] in
+            Task { @MainActor in self?.advance(auto: true) }
+        }
+        engine.setVolume(volume)
+
+        currentTime = 0
+        audioLevel = 0
+        duration = song.isLive ? 0 : 1
+
+        // Speed persists across podcast episodes but resets for music/radio.
+        if song.source != .podcast { playbackRate = 1.0 }
+
+        let ok = engine.prepare(url: url, isLive: song.isLive, autoplay: autoplay)
+        if ok {
+            engine.setRate(playbackRate)
+            isPlaying = autoplay
+            if autoplay { startTimer() } else { stopTimer() }
+        } else {
+            isPlaying = false
+            stopTimer()
         }
         updateNowPlayingInfo()
+    }
+
+    // MARK: - Sleep timer
+
+    func setSleepTimer(minutes: Int?) {
+        sleepTimer?.invalidate()
+        sleepTimer = nil
+        sleepTimerMinutes = minutes
+        guard let minutes, minutes > 0 else {
+            sleepFireDate = nil
+            return
+        }
+        let interval = Double(minutes) * 60
+        sleepFireDate = Date().addingTimeInterval(interval)
+        let t = Timer(timeInterval: interval, repeats: false) { [weak self] _ in
+            Task { @MainActor in self?.sleepTimerFired() }
+        }
+        RunLoop.main.add(t, forMode: .common)
+        sleepTimer = t
+    }
+
+    private func sleepTimerFired() {
+        pause()
+        setSleepTimer(minutes: nil)
     }
 
     // MARK: - Session & remote
@@ -234,17 +322,20 @@ final class AudioManager: NSObject, ObservableObject {
             MPMediaItemPropertyTitle: song.title,
             MPMediaItemPropertyArtist: song.artist,
             MPMediaItemPropertyAlbumTitle: song.album,
-            MPMediaItemPropertyPlaybackDuration: duration,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime,
-            MPNowPlayingInfoPropertyPlaybackRate: isPlaying ? 1.0 : 0.0
+            MPNowPlayingInfoPropertyPlaybackRate: isPlaying ? 1.0 : 0.0,
+            MPNowPlayingInfoPropertyIsLiveStream: song.isLive
         ]
-        if let image = UIImage(named: song.artworkName) {
+        if !song.isLive {
+            info[MPMediaItemPropertyPlaybackDuration] = duration
+        }
+        if !song.isRemote, let image = UIImage(named: song.artworkName) {
             info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
         }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
 
-    // MARK: - Metering timer
+    // MARK: - Sampling timer
 
     private func startTimer() {
         stopTimer()
@@ -261,21 +352,11 @@ final class AudioManager: NSObject, ObservableObject {
     }
 
     private func tick() {
-        guard let player = player else { return }
-        currentTime = player.currentTime
-        player.updateMeters()
-        let power = player.averagePower(forChannel: 0)   // ~ -160...0 dB
-        let normalized = max(0, (power + 55) / 55)        // → ~0...1
-        audioLevel = audioLevel * 0.75 + CGFloat(normalized) * 0.25
-    }
-}
-
-// MARK: - AVAudioPlayerDelegate
-
-extension AudioManager: AVAudioPlayerDelegate {
-    nonisolated func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        Task { @MainActor in
-            self.advance(auto: true)
-        }
+        guard let engine = activeEngine else { return }
+        engine.refresh()
+        currentTime = engine.currentTime
+        let d = engine.duration
+        duration = (d.isFinite && d > 0) ? d : (isLive ? 0 : 1)
+        audioLevel = engine.level
     }
 }
