@@ -18,8 +18,8 @@ final class RadioBrowserService: TrackProvider {
     let id = "radio"
     let displayName = "Radio"
 
-    // A stable mirror; the service also offers round-robin hosts.
-    private let host = "https://de1.api.radio-browser.info"
+    // Round-robin DNS across all mirrors for reliability.
+    private let host = "https://all.api.radio-browser.info"
 
     // MARK: TrackProvider
 

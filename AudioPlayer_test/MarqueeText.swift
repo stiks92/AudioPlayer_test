@@ -32,7 +32,7 @@ struct MarqueeText: View {
                     .onChange(of: textWidth) { _ in restart() }
                 } else {
                     label
-                        .frame(width: geo.size.width, alignment: .center)
+                        .frame(width: geo.size.width, alignment: .leading)
                 }
             }
             .frame(width: geo.size.width, height: geo.size.height, alignment: .leading)

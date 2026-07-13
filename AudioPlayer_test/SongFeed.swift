@@ -22,14 +22,14 @@ final class SongFeed: ObservableObject {
         state = .loading
         do {
             let result = try await fetch()
-            if Task.isCancelled { return }
             songs = result
             state = result.isEmpty ? .empty : .loaded
         } catch is CancellationError {
-            // superseded by a newer request
+            // A newer request is taking over; it will drive the state.
+        } catch let urlError as URLError where urlError.code == .cancelled {
+            // Same as above — superseded.
         } catch {
-            if let urlError = error as? URLError, urlError.code == .cancelled { return }
-            if Task.isCancelled { return }
+            songs = []
             state = .failed
         }
     }

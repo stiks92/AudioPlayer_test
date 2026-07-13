@@ -56,6 +56,7 @@
 		AA000000000000000000B047 /* PlaylistStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F047 /* PlaylistStore.swift */; };
 		AA000000000000000000B048 /* AddToPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F048 /* AddToPlaylistView.swift */; };
 		AA000000000000000000B049 /* UserPlaylistDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F049 /* UserPlaylistDetailView.swift */; };
+		AA000000000000000000B050 /* PlaybackClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F050 /* PlaybackClock.swift */; };
 		7452B83527555A1400FA93A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7452B83427555A1400FA93A2 /* Assets.xcassets */; };
 		7452B83827555A1400FA93A2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7452B83627555A1400FA93A2 /* LaunchScreen.storyboard */; };
 		7452B84327555A1400FA93A2 /* AudioPlayer_testTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7452B84227555A1400FA93A2 /* AudioPlayer_testTests.swift */; };
@@ -147,6 +148,7 @@
 		AA000000000000000000F047 /* PlaylistStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistStore.swift; sourceTree = "<group>"; };
 		AA000000000000000000F048 /* AddToPlaylistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToPlaylistView.swift; sourceTree = "<group>"; };
 		AA000000000000000000F049 /* UserPlaylistDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPlaylistDetailView.swift; sourceTree = "<group>"; };
+		AA000000000000000000F050 /* PlaybackClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackClock.swift; sourceTree = "<group>"; };
 		7452B82827555A1100FA93A2 /* AudioPlayer_test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioPlayer_test.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7452B83427555A1400FA93A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7452B83727555A1400FA93A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -259,6 +261,7 @@
 			isa = PBXGroup;
 			children = (
 				AA000000000000000000F005 /* AudioManager.swift */,
+				AA000000000000000000F050 /* PlaybackClock.swift */,
 				AA000000000000000000F020 /* PlaybackEngine.swift */,
 				AA000000000000000000F006 /* MusicLibrary.swift */,
 				AA000000000000000000F021 /* TrackProvider.swift */,
@@ -557,6 +560,7 @@
 				AA000000000000000000B047 /* PlaylistStore.swift in Sources */,
 				AA000000000000000000B048 /* AddToPlaylistView.swift in Sources */,
 				AA000000000000000000B049 /* UserPlaylistDetailView.swift in Sources */,
+				AA000000000000000000B050 /* PlaybackClock.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
