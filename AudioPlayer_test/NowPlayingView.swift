@@ -82,12 +82,12 @@ struct NowPlayingView: View {
         }
         .confirmationDialog("Sleep timer", isPresented: $showSleepOptions, titleVisibility: .visible) {
             ForEach([15, 30, 45, 60], id: \.self) { minutes in
-                Button("\(minutes) minutes") { audio.setSleepTimer(minutes: minutes) }
+                Button("\(minutes) \(L("min"))") { audio.setSleepTimer(minutes: minutes) }
             }
             if audio.sleepTimerMinutes != nil {
-                Button("Turn off", role: .destructive) { audio.setSleepTimer(minutes: nil) }
+                Button(L("Turn off"), role: .destructive) { audio.setSleepTimer(minutes: nil) }
             }
-            Button("Cancel", role: .cancel) {}
+            Button(L("Cancel"), role: .cancel) {}
         }
         .onAppear { scrubValue = clock.progress }
     }
@@ -101,7 +101,7 @@ struct NowPlayingView: View {
             }
             Spacer()
             VStack(spacing: 2) {
-                Text("PLAYING FROM ALBUM")
+                Text(L("PLAYING FROM ALBUM"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundColor(.white.opacity(0.6))
                     .tracking(1.5)
@@ -207,11 +207,11 @@ struct NowPlayingView: View {
                     .fill(Color(hex: 0xFF3B6B))
                     .frame(width: 8, height: 8)
                     .opacity(audio.isPlaying ? 1 : 0.4)
-                Text("LIVE")
+                Text(L("LIVE"))
                     .font(.system(size: 13, weight: .heavy))
                     .tracking(2)
                 Spacer()
-                Text("Radio")
+                Text(L("Radio"))
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(.white.opacity(0.6))
             }

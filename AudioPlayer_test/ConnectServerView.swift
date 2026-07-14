@@ -52,8 +52,8 @@ struct ConnectServerView: View {
                     .font(.system(size: 24))
                     .foregroundColor(Color(hex: 0x38EF7D))
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Connected").font(.system(size: 16, weight: .bold))
-                    Text(serverStore.host ?? "Your server")
+                    Text(L("Connected")).font(.system(size: 16, weight: .bold))
+                    Text(serverStore.host ?? L("Your server"))
                         .font(.caption).foregroundColor(Theme.textSecondary)
                 }
                 Spacer()
@@ -61,7 +61,7 @@ struct ConnectServerView: View {
             Button(role: .destructive) {
                 serverStore.disconnect()
             } label: {
-                Text("Disconnect")
+                Text(L("Disconnect"))
                     .font(.subheadline.weight(.semibold))
                     .foregroundColor(Color(hex: 0xFF3B6B))
                     .frame(maxWidth: .infinity)
@@ -76,7 +76,7 @@ struct ConnectServerView: View {
     private var form: some View {
         VStack(spacing: 14) {
             field("Server URL", text: $urlString, placeholder: "https://music.example.com", keyboard: .URL)
-            field("Username", text: $username, placeholder: "username")
+            field("Username", text: $username, placeholder: L("Username"))
             secureField("Password", text: $password)
 
             if let error = serverStore.lastError {
@@ -89,7 +89,7 @@ struct ConnectServerView: View {
             Button(action: connect) {
                 HStack {
                     if isConnecting { ProgressView().tint(Theme.background) }
-                    Text(isConnecting ? "Connecting…" : "Connect")
+                    Text(L(isConnecting ? "Connecting…" : "Connect"))
                         .font(.headline)
                 }
                 .foregroundColor(Theme.background)
@@ -132,7 +132,7 @@ struct ConnectServerView: View {
 
     private func field(_ title: String, text: Binding<String>, placeholder: String, keyboard: UIKeyboardType = .default) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(title.uppercased())
+            Text(L(title).uppercased())
                 .font(.system(size: 11, weight: .bold)).tracking(1)
                 .foregroundColor(Theme.textTertiary)
             TextField(placeholder, text: text)
@@ -147,7 +147,7 @@ struct ConnectServerView: View {
 
     private func secureField(_ title: String, text: Binding<String>) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(title.uppercased())
+            Text(L(title).uppercased())
                 .font(.system(size: 11, weight: .bold)).tracking(1)
                 .foregroundColor(Theme.textTertiary)
             SecureField("••••••••", text: text)

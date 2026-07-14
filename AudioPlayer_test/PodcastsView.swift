@@ -145,7 +145,7 @@ struct PodcastsView: View {
     private func message(_ icon: String, _ text: String) -> some View {
         VStack(spacing: 12) {
             Image(systemName: icon).font(.system(size: 42)).foregroundColor(Theme.textTertiary)
-            Text(text).font(.subheadline).foregroundColor(Theme.textSecondary)
+            Text(L(text)).font(.subheadline).foregroundColor(Theme.textSecondary)
         }
         .frame(maxWidth: .infinity).padding(.top, 50)
     }

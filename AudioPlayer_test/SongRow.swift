@@ -71,22 +71,22 @@ struct SongRow: View {
         .contextMenu {
             Button {
                 audio.playNext(song)
-            } label: { Label("Play Next", systemImage: "text.insert") }
+            } label: { Label(L("Play Next"), systemImage: "text.insert") }
             Button {
                 audio.addToQueue(song)
-            } label: { Label("Add to Queue", systemImage: "text.append") }
+            } label: { Label(L("Add to Queue"), systemImage: "text.append") }
             Button {
                 let seed = song
                 Task {
                     let queue = await StationService.station(for: seed)
                     audio.play(seed, in: queue)
                 }
-            } label: { Label("Start Station", systemImage: "dot.radiowaves.left.and.right") }
+            } label: { Label(L("Start Station"), systemImage: "dot.radiowaves.left.and.right") }
             Divider()
             Button {
                 library.toggleFavorite(song)
             } label: {
-                Label(library.isFavorite(song) ? "Remove from Favorites" : "Favorite",
+                Label(L(library.isFavorite(song) ? "Remove from Favorites" : "Favorite"),
                       systemImage: library.isFavorite(song) ? "heart.slash" : "heart")
             }
         }
