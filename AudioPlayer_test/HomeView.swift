@@ -137,10 +137,10 @@ struct HomeView: View {
                     .font(.system(size: 26, weight: .bold))
                     .foregroundColor(.white)
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("Create an AI Mix")
+                    Text(L("Create an AI Mix"))
                         .font(.system(size: 17, weight: .bold))
                         .foregroundColor(.white)
-                    Text("Describe a vibe — get an instant mix")
+                    Text(L("Describe a vibe — get an instant mix"))
                         .font(.system(size: 12))
                         .foregroundColor(.white.opacity(0.85))
                 }
@@ -255,10 +255,10 @@ struct HomeView: View {
     private var header: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text(greeting)
+                Text(L(greeting))
                     .font(.system(.title, design: .rounded).weight(.heavy))
                     .foregroundColor(Theme.textPrimary)
-                Text("What do you feel like hearing?")
+                Text(L("What do you feel like hearing?"))
                     .font(.subheadline)
                     .foregroundColor(Theme.textSecondary)
             }

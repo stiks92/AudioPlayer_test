@@ -57,7 +57,7 @@ struct QueueView: View {
                 .environment(\.defaultMinListRowHeight, 10)
             }
             .foregroundColor(.white)
-            .navigationTitle("Queue")
+            .navigationTitle(L("Queue"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

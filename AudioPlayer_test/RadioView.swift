@@ -45,7 +45,7 @@ struct RadioView: View {
             Image(systemName: "dot.radiowaves.left.and.right")
                 .font(.system(size: 26, weight: .bold))
                 .foregroundColor(Theme.accentSoft)
-            Text("Radio")
+            Text(L("Radio"))
                 .font(.system(.largeTitle, design: .rounded).weight(.heavy))
                 .foregroundColor(Theme.textPrimary)
         }
@@ -56,7 +56,7 @@ struct RadioView: View {
             HStack(spacing: 10) {
                 ForEach(genres, id: \.0) { label, tag in
                     let isSelected = (selectedTag ?? "") == tag
-                    Text(label)
+                    Text(L(label))
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(isSelected ? Theme.background : Theme.textSecondary)
                         .padding(.horizontal, 14)

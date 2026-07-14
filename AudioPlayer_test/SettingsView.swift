@@ -42,7 +42,7 @@ struct SettingsView: View {
                 }
             }
             .foregroundColor(.white)
-            .navigationTitle("Settings")
+            .navigationTitle(L("Settings"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -172,7 +172,7 @@ struct SettingsView: View {
 
     private func section<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(title.uppercased())
+            Text(L(title).uppercased())
                 .font(.system(size: 12, weight: .bold))
                 .tracking(1)
                 .foregroundColor(Theme.textTertiary)
@@ -187,10 +187,10 @@ struct SettingsView: View {
         Button(action: action) {
             HStack(spacing: 14) {
                 Image(systemName: icon).frame(width: 24).foregroundColor(Theme.accentSoft)
-                Text(title).font(.system(size: 15))
+                Text(L(title)).font(.system(size: 15))
                 Spacer()
                 if !value.isEmpty {
-                    Text(value).font(.system(size: 14)).foregroundColor(Theme.textSecondary)
+                    Text(L(value)).font(.system(size: 14)).foregroundColor(Theme.textSecondary)
                 }
                 Image(systemName: "chevron.right").font(.system(size: 12)).foregroundColor(Theme.textTertiary)
             }
@@ -203,9 +203,9 @@ struct SettingsView: View {
     private func staticRow(icon: String, title: String, value: String, valueColor: Color) -> some View {
         HStack(spacing: 14) {
             Image(systemName: icon).frame(width: 24).foregroundColor(Theme.accentSoft)
-            Text(title).font(.system(size: 15))
+            Text(L(title)).font(.system(size: 15))
             Spacer()
-            Text(value).font(.system(size: 13, weight: .semibold)).foregroundColor(valueColor)
+            Text(L(value)).font(.system(size: 13, weight: .semibold)).foregroundColor(valueColor)
         }
         .padding(.vertical, 12)
     }

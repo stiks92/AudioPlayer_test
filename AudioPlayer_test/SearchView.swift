@@ -38,7 +38,7 @@ struct SearchView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 22) {
-                        Text("Search")
+                        Text(L("Search"))
                             .font(.system(.largeTitle, design: .rounded).weight(.heavy))
                             .foregroundColor(Theme.textPrimary)
 
@@ -82,7 +82,7 @@ struct SearchView: View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(Theme.textSecondary)
-            TextField("Songs, artists, stations…", text: $query)
+            TextField(L("Songs, artists, stations…"), text: $query)
                 .focused($focused)
                 .foregroundColor(.white)
                 .autocorrectionDisabled()
@@ -110,47 +110,16 @@ struct SearchView: View {
     @ViewBuilder
     private var resultsSections: some View {
         VStack(alignment: .leading, spacing: 22) {
+            // ── Full tracks first ──────────────────────────────
             if !localResults.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    SectionHeader(title: "In your library")
-                    songList(localResults)
-                }
+                sourceSection("In your library", songs: localResults)
             }
-
             if serverStore.isConnected, serverFeed.state == .loaded {
-                VStack(alignment: .leading, spacing: 8) {
-                    SectionHeader(title: "Your server")
-                    songList(serverFeed.songs)
-                }
+                sourceSection("Your server", songs: serverFeed.songs)
             }
-
-            if deezerFeed.state == .loaded {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack(spacing: 8) {
-                        SectionHeader(title: "Deezer")
-                        Text("previews")
-                            .font(.caption2)
-                            .foregroundColor(Theme.textTertiary)
-                    }
-                    songList(deezerFeed.songs)
-                }
-            }
-
-            if appleFeed.state == .loaded {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack(spacing: 8) {
-                        SectionHeader(title: "Apple Music")
-                        Text("previews")
-                            .font(.caption2)
-                            .foregroundColor(Theme.textTertiary)
-                    }
-                    songList(appleFeed.songs)
-                }
-            }
-
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 8) {
-                    SectionHeader(title: "Audius")
+                    SectionHeader(title: "Audius · full tracks")
                     if audiusFeed.state == .loading {
                         ProgressView().tint(Theme.accentSoft)
                     }
@@ -158,10 +127,32 @@ struct SearchView: View {
                 audiusResults
             }
 
+            // ── 30-second previews ─────────────────────────────
+            if deezerFeed.state == .loaded || appleFeed.state == .loaded {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("PREVIEWS · 30 SEC")
+                        .font(.system(size: 11, weight: .bold)).tracking(1)
+                        .foregroundColor(Theme.textTertiary)
+                    if deezerFeed.state == .loaded {
+                        sourceSection("Deezer", songs: deezerFeed.songs)
+                    }
+                    if appleFeed.state == .loaded {
+                        sourceSection("Apple Music", songs: appleFeed.songs)
+                    }
+                }
+            }
+
             if localResults.isEmpty && audiusFeed.state == .empty
                 && appleFeed.state == .empty && deezerFeed.state == .empty {
                 emptyState
             }
+        }
+    }
+
+    private func sourceSection(_ title: String, songs: [Song]) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SectionHeader(title: title)
+            songList(songs)
         }
     }
 
@@ -205,7 +196,7 @@ struct SearchView: View {
                 ForEach(moods, id: \.0) { mood in
                     ZStack(alignment: .topLeading) {
                         LinearGradient(colors: mood.1, startPoint: .topLeading, endPoint: .bottomTrailing)
-                        Text(mood.0)
+                        Text(L(mood.0))
                             .font(.system(size: 17, weight: .bold))
                             .foregroundColor(.white)
                             .padding(14)

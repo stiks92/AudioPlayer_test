@@ -52,7 +52,7 @@ struct LyricsView: View {
                 content
             }
             .foregroundColor(.white)
-            .navigationTitle("Lyrics")
+            .navigationTitle(L("Lyrics"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {

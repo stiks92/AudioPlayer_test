@@ -31,7 +31,7 @@ struct LibraryView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
-                        Text("Your Library")
+                        Text(L("Your Library"))
                             .font(.system(.largeTitle, design: .rounded).weight(.heavy))
                             .foregroundColor(Theme.textPrimary)
 
@@ -65,7 +65,7 @@ struct LibraryView: View {
         HStack(spacing: 8) {
             ForEach(Tab.allCases, id: \.self) { item in
                 let selected = tab == item
-                Text(item.rawValue)
+                Text(L(item.rawValue))
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(selected ? Theme.background : Theme.textSecondary)
                     .padding(.vertical, 9)

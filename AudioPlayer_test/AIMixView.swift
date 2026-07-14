@@ -39,7 +39,7 @@ struct AIMixView: View {
                 }
             }
             .foregroundColor(.white)
-            .navigationTitle("AI Mix")
+            .navigationTitle(L("AI Mix"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -58,7 +58,7 @@ struct AIMixView: View {
     private var generator: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text("Describe a vibe")
+                Text(L("Describe a vibe"))
                     .font(.system(.title2, design: .rounded).weight(.bold))
 
                 HStack(spacing: 10) {
@@ -88,7 +88,7 @@ struct AIMixView: View {
                 Button(action: generate) {
                     HStack {
                         if isGenerating { ProgressView().tint(Theme.background) }
-                        Text(isGenerating ? "Composing…" : "Generate mix")
+                        Text(L(isGenerating ? "Composing…" : "Generate mix"))
                             .font(.headline)
                     }
                     .foregroundColor(Theme.background)
@@ -176,7 +176,7 @@ struct AIMixView: View {
                 .font(.system(size: 54, weight: .bold))
                 .foregroundColor(.white)
                 .shadow(color: .white.opacity(0.5), radius: 18)
-            Text("AI Mix is a Pro feature")
+            Text(L("AI Mix is a Pro feature"))
                 .font(.system(.title2, design: .rounded).weight(.bold))
             Text("Describe any mood or moment and Aurora composes a\nmix for you — instantly, on your device.")
                 .font(.subheadline)
@@ -185,7 +185,7 @@ struct AIMixView: View {
             Button {
                 showPaywall = true
             } label: {
-                Text("Unlock with Aurora Pro")
+                Text(L("Unlock with Aurora Pro"))
                     .font(.headline)
                     .foregroundColor(Theme.background)
                     .padding(.horizontal, 26).padding(.vertical, 15)
