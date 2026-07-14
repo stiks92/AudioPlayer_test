@@ -49,14 +49,14 @@ struct LibraryView: View {
                 }
             }
             .navigationBarHidden(true)
-            .alert("New playlist", isPresented: $showNewPlaylist) {
-                TextField("Name", text: $newPlaylistName)
-                Button("Create") {
+            .alert(L("New playlist"), isPresented: $showNewPlaylist) {
+                TextField(L("Name"), text: $newPlaylistName)
+                Button(L("Create")) {
                     let name = newPlaylistName.trimmingCharacters(in: .whitespaces)
                     if !name.isEmpty { playlistStore.create(name) }
                     newPlaylistName = ""
                 }
-                Button("Cancel", role: .cancel) { newPlaylistName = "" }
+                Button(L("Cancel"), role: .cancel) { newPlaylistName = "" }
             }
         }
     }
@@ -99,7 +99,7 @@ struct LibraryView: View {
                         .fill(Color.white.opacity(0.08))
                         .frame(width: 60, height: 60)
                         .overlay(Image(systemName: "plus").font(.system(size: 22, weight: .semibold)).foregroundColor(Theme.accentSoft))
-                    Text("New Playlist")
+                    Text(L("New Playlist"))
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(Theme.textPrimary)
                     Spacer()
@@ -187,10 +187,10 @@ struct LibraryView: View {
                 Image(systemName: "heart.slash")
                     .font(.system(size: 46))
                     .foregroundColor(Theme.textTertiary)
-                Text("No favourites yet")
+                Text(L("No favourites yet"))
                     .font(.headline)
                     .foregroundColor(Theme.textSecondary)
-                Text("Tap the heart on any track to save it here.")
+                Text(L("Tap the heart on any track to save it here."))
                     .font(.subheadline)
                     .foregroundColor(Theme.textTertiary)
                     .multilineTextAlignment(.center)

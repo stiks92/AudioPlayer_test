@@ -57,10 +57,10 @@ struct SettingsView: View {
             }
             .confirmationDialog("Sleep timer", isPresented: $showSleepOptions, titleVisibility: .visible) {
                 ForEach([15, 30, 45, 60], id: \.self) { minutes in
-                    Button("\(minutes) minutes") { audio.setSleepTimer(minutes: minutes) }
+                    Button("\(minutes) \(L("min"))") { audio.setSleepTimer(minutes: minutes) }
                 }
-                Button("Turn off", role: .destructive) { audio.setSleepTimer(minutes: nil) }
-                Button("Cancel", role: .cancel) {}
+                Button(L("Turn off"), role: .destructive) { audio.setSleepTimer(minutes: nil) }
+                Button(L("Cancel"), role: .cancel) {}
             }
         }
         .preferredColorScheme(.dark)
@@ -77,7 +77,7 @@ struct SettingsView: View {
                     .foregroundColor(.white)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Aurora Pro").font(.system(size: 17, weight: .bold))
-                    Text("Active — thank you for your support!")
+                    Text(L("Active — thank you for your support!"))
                         .font(.caption).foregroundColor(.white.opacity(0.85))
                 }
                 Spacer()
@@ -94,8 +94,8 @@ struct SettingsView: View {
                         .font(.system(size: 26, weight: .bold))
                         .foregroundColor(.white)
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("Unlock Aurora Pro").font(.system(size: 17, weight: .bold))
-                        Text("AI Mix · all sources · EQ · offline")
+                        Text(L("Unlock Aurora Pro")).font(.system(size: 17, weight: .bold))
+                        Text(L("AI Mix · all sources · EQ · offline"))
                             .font(.caption).foregroundColor(.white.opacity(0.85))
                     }
                     Spacer()
@@ -117,7 +117,7 @@ struct SettingsView: View {
     private var playbackSection: some View {
         section("Playback") {
             row(icon: "moon.zzz.fill", title: "Sleep timer",
-                value: audio.sleepTimerMinutes.map { "\($0) min" } ?? "Off") {
+                value: audio.sleepTimerMinutes.map { "\($0) \(L("min"))" } ?? L("Off")) {
                 showSleepOptions = true
             }
         }

@@ -136,7 +136,7 @@ struct AIMixView: View {
             Button {
                 if let first = mix.songs.first { audio.play(first, in: mix.songs) }
             } label: {
-                Label("Play", systemImage: "play.fill")
+                Label(L("Play"), systemImage: "play.fill")
                     .font(.subheadline.weight(.bold))
                     .foregroundColor(Theme.background)
                     .padding(.horizontal, 18).padding(.vertical, 10)

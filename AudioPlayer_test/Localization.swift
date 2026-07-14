@@ -102,6 +102,8 @@ enum Localization {
         "Up Next": "Далее",
         "Done": "Готово",
         "Lyrics": "Текст",
+        "PLAYING FROM ALBUM": "ИГРАЕТ ИЗ АЛЬБОМА",
+        "LIVE": "ПРЯМОЙ ЭФИР",
         "No lyrics found for this track.": "Текст для этого трека не найден.",
         "Couldn't load lyrics.": "Не удалось загрузить текст.",
 
@@ -114,7 +116,11 @@ enum Localization {
         "Remove from playlist": "Убрать из плейлиста",
         "Add to Playlist": "Добавить в плейлист",
         "Rename": "Переименовать",
+        "Rename playlist": "Переименовать плейлист",
+        "Save": "Сохранить",
         "Delete playlist": "Удалить плейлист",
+        "This playlist is empty": "Плейлист пуст",
+        "Add tracks from the player or any track's menu.": "Добавляй треки из плеера или через меню трека.",
         "Play": "Слушать",
         "Shuffle": "Вперемешку",
 
@@ -122,6 +128,14 @@ enum Localization {
         "Sleep timer": "Таймер сна",
         "Turn off": "Выключить",
         "Off": "Выкл",
+        "min": "мин",
+
+        // Retry / empty messages
+        "Couldn't reach the radio directory.\nTap to retry.": "Не удалось связаться с каталогом радио.\nНажми, чтобы повторить.",
+        "Couldn't load podcasts.\nTap to retry.": "Не удалось загрузить подкасты.\nНажми, чтобы повторить.",
+        "Server URL": "Адрес сервера",
+        "New playlist name": "Название нового плейлиста",
+        "YOUR PLAYLISTS": "ТВОИ ПЛЕЙЛИСТЫ",
 
         // Settings
         "Settings": "Настройки",

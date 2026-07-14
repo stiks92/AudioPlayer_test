@@ -221,7 +221,7 @@ struct SearchView: View {
             Image(systemName: "waveform.slash")
                 .font(.system(size: 46))
                 .foregroundColor(Theme.textTertiary)
-            Text("No results for \u{201C}\(query)\u{201D}")
+            Text("\(L("No results")) \u{201C}\(query)\u{201D}")
                 .font(.headline)
                 .foregroundColor(Theme.textSecondary)
         }

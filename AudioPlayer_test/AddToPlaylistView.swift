@@ -23,7 +23,7 @@ struct AddToPlaylistView: View {
                         trackHeader
                         createRow
                         if !playlistStore.playlists.isEmpty {
-                            Text("YOUR PLAYLISTS")
+                            Text(L("YOUR PLAYLISTS"))
                                 .font(.system(size: 11, weight: .bold)).tracking(1)
                                 .foregroundColor(Theme.textTertiary)
                             VStack(spacing: 8) {
@@ -62,11 +62,11 @@ struct AddToPlaylistView: View {
     private var createRow: some View {
         HStack(spacing: 10) {
             Image(systemName: "plus.circle.fill").foregroundColor(Theme.accentSoft)
-            TextField("New playlist name", text: $newName)
+            TextField(L("New playlist name"), text: $newName)
                 .foregroundColor(.white)
                 .submitLabel(.done)
                 .onSubmit(createAndAdd)
-            Button("Create", action: createAndAdd)
+            Button(L("Create"), action: createAndAdd)
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(newName.trimmingCharacters(in: .whitespaces).isEmpty ? Theme.textTertiary : Theme.accentSoft)
                 .disabled(newName.trimmingCharacters(in: .whitespaces).isEmpty)

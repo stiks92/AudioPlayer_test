@@ -156,7 +156,7 @@ struct ShazamView: View {
                     HStack {
                         if isFindingOnAudius { ProgressView().tint(Theme.background) }
                         Image(systemName: "play.fill")
-                        Text(isFindingOnAudius ? "Searching…" : "Play on Aurora")
+                        Text(L(isFindingOnAudius ? "Searching…" : "Play on Aurora"))
                     }
                     .font(.headline)
                     .foregroundColor(Theme.background)
@@ -169,7 +169,7 @@ struct ShazamView: View {
 
                 if let appleURL = result.appleMusicURL {
                     Link(destination: appleURL) {
-                        Text("Open in Apple Music")
+                        Text(L("Open in Apple Music"))
                             .font(.subheadline.weight(.semibold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -178,7 +178,7 @@ struct ShazamView: View {
                     }
                 }
 
-                Button("Identify another") { shazam.reset() }
+                Button(L("Identify another")) { shazam.reset() }
                     .font(.footnote.weight(.semibold))
                     .foregroundColor(.white.opacity(0.8))
             }

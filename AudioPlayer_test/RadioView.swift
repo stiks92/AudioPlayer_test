@@ -103,7 +103,7 @@ struct RadioView: View {
         VStack(spacing: 14) {
             ProgressView()
                 .tint(Theme.accentSoft)
-            Text("Tuning in…")
+            Text(L("Tuning in…"))
                 .font(.subheadline)
                 .foregroundColor(Theme.textSecondary)
         }
@@ -116,7 +116,7 @@ struct RadioView: View {
             Image(systemName: icon)
                 .font(.system(size: 42))
                 .foregroundColor(Theme.textTertiary)
-            Text(text)
+            Text(L(text))
                 .font(.subheadline)
                 .foregroundColor(Theme.textSecondary)
                 .multilineTextAlignment(.center)
