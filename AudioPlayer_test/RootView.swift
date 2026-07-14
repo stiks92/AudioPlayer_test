@@ -63,6 +63,9 @@ struct RootView: View {
             visited.insert(newValue)
             Haptics.selection()
         }
+        .task {
+            audio.restoreLastSession()
+        }
     }
 
     /// All visited tabs stay in the hierarchy; only the selected one is shown.
