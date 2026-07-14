@@ -45,7 +45,7 @@ struct OnboardingView: View {
                 .animation(.easeInOut(duration: 0.6), value: page)
 
             VStack(spacing: 0) {
-                Button("Skip", action: onFinish)
+                Button(L("Skip"), action: onFinish)
                     .font(.subheadline.weight(.semibold))
                     .foregroundColor(.white.opacity(0.8))
                     .frame(maxWidth: .infinity, alignment: .trailing)
@@ -69,7 +69,7 @@ struct OnboardingView: View {
                         onFinish()
                     }
                 } label: {
-                    Text(page < slides.count - 1 ? "Continue" : "Start listening")
+                    Text(L(page < slides.count - 1 ? "Continue" : "Start listening"))
                         .font(.headline)
                         .foregroundColor(Theme.background)
                         .frame(maxWidth: .infinity)
@@ -92,10 +92,10 @@ struct OnboardingView: View {
                 .foregroundColor(.white)
                 .shadow(color: .white.opacity(0.4), radius: 20)
             VStack(spacing: 14) {
-                Text(slide.title)
+                Text(L(slide.title))
                     .font(.system(size: 30, weight: .heavy, design: .rounded))
                     .multilineTextAlignment(.center)
-                Text(slide.subtitle)
+                Text(L(slide.subtitle))
                     .font(.system(size: 16))
                     .foregroundColor(.white.opacity(0.85))
                     .multilineTextAlignment(.center)

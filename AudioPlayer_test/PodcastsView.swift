@@ -48,7 +48,7 @@ struct PodcastsView: View {
                 Theme.background.ignoresSafeArea()
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
-                        Text("Podcasts")
+                        Text(L("Podcasts"))
                             .font(.system(.largeTitle, design: .rounded).weight(.heavy))
                             .foregroundColor(Theme.textPrimary)
                         searchField
@@ -77,7 +77,7 @@ struct PodcastsView: View {
     private var searchField: some View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass").foregroundColor(Theme.textSecondary)
-            TextField("Search podcasts", text: $query)
+            TextField(L("Search podcasts"), text: $query)
                 .foregroundColor(.white)
                 .autocorrectionDisabled()
                 .submitLabel(.search)
@@ -96,7 +96,7 @@ struct PodcastsView: View {
             HStack(spacing: 8) {
                 ForEach(genres, id: \.self) { genre in
                     let isSelected = selectedGenre == genre
-                    Text(genre)
+                    Text(L(genre))
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(isSelected ? Theme.background : Theme.textSecondary)
                         .padding(.horizontal, 14).padding(.vertical, 8)

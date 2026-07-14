@@ -12,22 +12,42 @@ import Foundation
 final class AIMixService {
     static let shared = AIMixService()
 
-    /// Intent keywords → Audius search seeds.
+    /// Intent keywords (EN + RU) → search seeds (kept English — services match
+    /// them best) and a display label.
     private let intents: [(keys: [String], seeds: [String], label: String)] = [
-        (["focus", "study", "work", "concentrate", "deep"], ["ambient focus", "lofi", "instrumental"], "Focus"),
-        (["chill", "relax", "calm", "cozy", "mellow"], ["chillout", "lofi", "ambient"], "Chill"),
-        (["energy", "energetic", "workout", "gym", "run", "hype", "pump"], ["electronic", "edm", "workout"], "Energy"),
-        (["sad", "melancholy", "cry", "heartbreak", "emotional"], ["piano", "sad", "cinematic"], "Melancholy"),
-        (["happy", "party", "dance", "fun", "upbeat"], ["dance", "house", "feel good"], "Party"),
-        (["sleep", "night", "dream", "bedtime"], ["ambient", "sleep", "piano"], "Nightfall"),
-        (["epic", "cinematic", "film", "score", "trailer"], ["cinematic", "epic", "soundtrack"], "Cinematic"),
-        (["rain", "rainy", "storm"], ["lofi", "rain", "ambient"], "Rainy Day"),
-        (["drive", "road", "night drive", "synthwave"], ["synthwave", "electronic", "retro"], "Night Drive"),
-        (["jazz"], ["jazz"], "Jazz"),
-        (["rock"], ["rock"], "Rock"),
-        (["hip hop", "hip-hop", "rap", "beats"], ["hip hop", "beats"], "Beats"),
-        (["classical", "orchestra", "piano"], ["classical", "piano"], "Classical"),
-        (["electronic", "techno", "house"], ["electronic", "techno", "house"], "Electronic")
+        (["focus", "study", "work", "concentrate", "deep",
+          "фокус", "работа", "учеб", "концентрац", "сосредоточ", "продуктивн"],
+         ["lofi", "ambient", "instrumental focus"], "Focus"),
+        (["chill", "relax", "calm", "cozy", "mellow",
+          "чил", "релакс", "расслаб", "спокой", "уют", "отдых"],
+         ["chillout", "lofi", "ambient chill"], "Chill"),
+        (["energy", "energetic", "workout", "gym", "run", "hype", "pump",
+          "энерг", "качалк", "спорт", "бег", "тренировк", "бодр", "драйв"],
+         ["electronic", "edm", "workout"], "Energy"),
+        (["sad", "melancholy", "cry", "heartbreak", "emotional",
+          "груст", "печаль", "меланхол", "слез", "тоск"],
+         ["piano", "sad", "cinematic piano"], "Melancholy"),
+        (["happy", "party", "dance", "fun", "upbeat",
+          "вечеринк", "танц", "праздник", "радост", "весел", "туса"],
+         ["dance", "house", "feel good"], "Party"),
+        (["sleep", "night", "dream", "bedtime",
+          "сон", "ноч", "засыпа", "перед сном", "мечт"],
+         ["ambient", "sleep", "calm piano"], "Nightfall"),
+        (["epic", "cinematic", "film", "score", "trailer",
+          "эпичн", "кино", "саундтрек", "оркестр"],
+         ["cinematic", "epic", "soundtrack"], "Cinematic"),
+        (["rain", "rainy", "storm", "дожд", "гроза", "осен"],
+         ["lofi", "rain", "ambient"], "Rainy Day"),
+        (["drive", "road", "synthwave", "дорог", "поездк", "трасс", "синтвейв"],
+         ["synthwave", "electronic", "retrowave"], "Night Drive"),
+        (["jazz", "джаз"], ["jazz"], "Jazz"),
+        (["rock", "рок", "метал", "metal"], ["rock"], "Rock"),
+        (["hip hop", "hip-hop", "rap", "beats", "рэп", "реп", "хип-хоп", "бит"],
+         ["hip hop", "trap beats"], "Beats"),
+        (["classical", "orchestra", "piano", "классик", "классич", "пианино", "фортепиано"],
+         ["classical", "piano"], "Classical"),
+        (["electronic", "techno", "house", "электрон", "техно", "хаус"],
+         ["electronic", "techno", "house"], "Electronic")
     ]
 
     struct Mix {

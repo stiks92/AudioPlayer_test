@@ -25,7 +25,7 @@ struct ShazamView: View {
                 content
             }
             .foregroundColor(.white)
-            .navigationTitle("Discover")
+            .navigationTitle(L("Discover"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -87,7 +87,7 @@ struct ShazamView: View {
             }
             .frame(height: 250)
 
-            Text(statusText)
+            Text(L(statusText))
                 .font(.system(.title3, design: .rounded).weight(.semibold))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)

@@ -142,7 +142,7 @@ struct AppTabBar: View {
                                 .foregroundColor(selected ? Theme.accentSoft : Theme.textSecondary)
                         }
                         .frame(height: 32)
-                        Text(tab.title)
+                        Text(L(tab.title))
                             .font(.system(size: 10, weight: .semibold))
                             .foregroundColor(selected ? Theme.accentSoft : Theme.textTertiary)
                     }

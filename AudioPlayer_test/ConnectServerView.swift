@@ -34,7 +34,7 @@ struct ConnectServerView: View {
                 }
             }
             .foregroundColor(.white)
-            .navigationTitle("Self-hosted server")
+            .navigationTitle(L("Self-hosted server"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
