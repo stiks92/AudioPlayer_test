@@ -38,6 +38,8 @@ enum Localization {
         "Popular now": "Популярно сейчас",
         "Recently played": "Недавно играли",
         "Trending on Audius": "В тренде на Audius",
+        "Editor's picks": "Выбор редакции",
+        "tracks": "треков",
         "Featured": "Подборки",
         "Quick picks": "Быстрый выбор",
         "From your server": "С твоего сервера",
