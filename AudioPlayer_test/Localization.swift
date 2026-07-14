@@ -52,6 +52,7 @@ enum Localization {
         "Browse moods": "Настроения",
         "Couldn't reach Audius. Check your connection.": "Не удалось связаться с Audius. Проверь соединение.",
         "No Audius tracks matched.": "На Audius ничего не найдено.",
+        "No results": "Ничего не найдено",
         "Cinematic": "Кинематографично",
         "Dark": "Мрачно",
         "Tense": "Напряжённо",

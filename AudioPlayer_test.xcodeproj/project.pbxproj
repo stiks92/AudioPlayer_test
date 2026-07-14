@@ -61,6 +61,7 @@
 		AA000000000000000000B052 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F052 /* OnboardingView.swift */; };
 		AA000000000000000000B053 /* StationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F053 /* StationService.swift */; };
 		AA000000000000000000B054 /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F054 /* Localization.swift */; };
+		AA000000000000000000B055 /* ArtistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F055 /* ArtistView.swift */; };
 		7452B83527555A1400FA93A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7452B83427555A1400FA93A2 /* Assets.xcassets */; };
 		7452B83827555A1400FA93A2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7452B83627555A1400FA93A2 /* LaunchScreen.storyboard */; };
 		7452B84327555A1400FA93A2 /* AudioPlayer_testTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7452B84227555A1400FA93A2 /* AudioPlayer_testTests.swift */; };
@@ -157,6 +158,7 @@
 		AA000000000000000000F052 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		AA000000000000000000F053 /* StationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationService.swift; sourceTree = "<group>"; };
 		AA000000000000000000F054 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
+		AA000000000000000000F055 /* ArtistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistView.swift; sourceTree = "<group>"; };
 		7452B82827555A1100FA93A2 /* AudioPlayer_test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioPlayer_test.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7452B83427555A1400FA93A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7452B83727555A1400FA93A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -331,6 +333,7 @@
 				AA000000000000000000F048 /* AddToPlaylistView.swift */,
 				AA000000000000000000F049 /* UserPlaylistDetailView.swift */,
 				AA000000000000000000F052 /* OnboardingView.swift */,
+				AA000000000000000000F055 /* ArtistView.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -577,6 +580,7 @@
 				AA000000000000000000B052 /* OnboardingView.swift in Sources */,
 				AA000000000000000000B053 /* StationService.swift in Sources */,
 				AA000000000000000000B054 /* Localization.swift in Sources */,
+				AA000000000000000000B055 /* ArtistView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

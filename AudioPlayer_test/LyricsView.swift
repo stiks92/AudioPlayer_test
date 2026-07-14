@@ -56,7 +56,7 @@ struct LyricsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }.foregroundColor(.white)
+                    Button(L("Done")) { dismiss() }.foregroundColor(.white)
                 }
             }
             .task(id: audio.currentSong) { await loader.load(for: audio.currentSong) }
