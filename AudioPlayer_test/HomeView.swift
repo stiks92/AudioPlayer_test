@@ -17,6 +17,7 @@ struct HomeView: View {
     @StateObject private var trending = SongFeed()
     @StateObject private var charts = SongFeed()
     @StateObject private var serverFeed = SongFeed()
+    @State private var editorial: [RemotePlaylist] = []
     @State private var showSettings = false
     @State private var showAIMix = false
     @State private var showShazam = false
@@ -44,6 +45,7 @@ struct HomeView: View {
                         if !library.recentSongs.isEmpty {
                             recentlyPlayed
                         }
+                        editorialSection
                         serverSection
                         trendingSection
                         featured
@@ -58,6 +60,9 @@ struct HomeView: View {
             .task {
                 if charts.state == .idle {
                     await charts.load { try await DeezerService.shared.chartTracks() }
+                }
+                if editorial.isEmpty {
+                    editorial = (try? await DeezerService.shared.chartPlaylists()) ?? []
                 }
                 if trending.state == .idle {
                     await trending.load { try await AudiusService.shared.trending() }
@@ -163,6 +168,46 @@ struct HomeView: View {
             .shadow(color: Theme.accent.opacity(0.4), radius: 14, y: 8)
         }
         .buttonStyle(BouncyButtonStyle(scale: 0.98))
+    }
+
+    // MARK: - Editor's picks (curated playlists)
+
+    @ViewBuilder
+    private var editorialSection: some View {
+        if !editorial.isEmpty {
+            VStack(alignment: .leading, spacing: 14) {
+                SectionHeader(title: "Editor's picks")
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(editorial) { playlist in
+                            NavigationLink {
+                                RemotePlaylistView(playlist: playlist)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    AsyncImage(url: playlist.artworkURL) { image in
+                                        image.resizable().aspectRatio(contentMode: .fill)
+                                    } placeholder: {
+                                        ZStack {
+                                            LinearGradient(colors: playlist.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
+                                            Image(systemName: "music.note.list").font(.system(size: 34)).foregroundColor(.white.opacity(0.85))
+                                        }
+                                    }
+                                    .frame(width: 160, height: 160)
+                                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                                    .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
+                                    Text(playlist.title)
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundColor(Theme.textPrimary)
+                                        .lineLimit(1)
+                                        .frame(width: 160, alignment: .leading)
+                                }
+                            }
+                            .buttonStyle(BouncyButtonStyle(scale: 0.96))
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Popular now (Deezer charts)

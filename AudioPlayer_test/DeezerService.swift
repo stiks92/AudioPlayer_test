@@ -35,6 +35,29 @@ final class DeezerService: TrackProvider {
         return response.data.compactMap(map)
     }
 
+    /// Editorial / charting playlists for the browse experience.
+    func chartPlaylists() async throws -> [RemotePlaylist] {
+        let url = URL(string: "https://api.deezer.com/chart/0/playlists?limit=20")!
+        let response = try await Net.getJSON(url, as: DeezerPlaylistList.self)
+        return response.data.map { p in
+            RemotePlaylist(
+                id: "deezer-pl:\(p.id)",
+                title: p.title,
+                subtitle: "\(p.nbTracks ?? 0) \(L("tracks"))",
+                artworkURL: (p.pictureBig ?? p.pictureMedium).flatMap(URL.init(string:)),
+                gradientHex: Palette.hex(forSeed: "\(p.id)"),
+                fetchID: String(p.id)
+            )
+        }
+    }
+
+    /// Tracks inside a Deezer playlist.
+    func playlistTracks(_ id: String) async throws -> [Song] {
+        let url = URL(string: "https://api.deezer.com/playlist/\(id)/tracks?limit=60")!
+        let response = try await Net.getJSON(url, as: DeezerListResponse.self)
+        return response.data.compactMap(map)
+    }
+
     private func map(_ track: DeezerTrack) -> Song? {
         guard let preview = track.preview, !preview.isEmpty, let stream = URL(string: preview) else { return nil }
         let art = track.album?.coverBig ?? track.album?.coverMedium
@@ -51,10 +74,42 @@ final class DeezerService: TrackProvider {
     }
 }
 
+// MARK: - Curated playlist model
+
+struct RemotePlaylist: Identifiable, Equatable {
+    let id: String
+    let title: String
+    let subtitle: String
+    let artworkURL: URL?
+    let gradientHex: [UInt]
+    let fetchID: String            // provider-side id used to load tracks
+
+    var gradient: [Color] { gradientHex.colors }
+}
+
 // MARK: - DTOs
 
 private struct DeezerListResponse: Decodable {
     let data: [DeezerTrack]
+}
+
+private struct DeezerPlaylistList: Decodable {
+    let data: [DeezerPlaylist]
+}
+
+private struct DeezerPlaylist: Decodable {
+    let id: Int
+    let title: String
+    let nbTracks: Int?
+    let pictureMedium: String?
+    let pictureBig: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id, title
+        case nbTracks = "nb_tracks"
+        case pictureMedium = "picture_medium"
+        case pictureBig = "picture_big"
+    }
 }
 
 private struct DeezerTrack: Decodable {
