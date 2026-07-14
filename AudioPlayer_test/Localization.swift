@@ -140,6 +140,7 @@ enum Localization {
         // Settings
         "Settings": "Настройки",
         "Playback": "Воспроизведение",
+        "Endless playback": "Бесконечное воспроизведение",
         "Sources": "Источники",
         "Connected": "Подключено",
         "Self-hosted (Subsonic)": "Свой сервер (Subsonic)",

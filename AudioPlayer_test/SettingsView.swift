@@ -120,6 +120,13 @@ struct SettingsView: View {
                 value: audio.sleepTimerMinutes.map { "\($0) \(L("min"))" } ?? L("Off")) {
                 showSleepOptions = true
             }
+            divider
+            Toggle(isOn: $audio.autoExtendEnabled) {
+                Label(L("Endless playback"), systemImage: "infinity")
+                    .font(.system(size: 15))
+            }
+            .tint(Theme.accent)
+            .padding(.vertical, 6)
         }
     }
 

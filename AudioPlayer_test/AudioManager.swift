@@ -53,6 +53,18 @@ final class AudioManager: NSObject, ObservableObject {
     private var baseQueue: [Song] = []
     private var currentIndex = 0
 
+    // Endless autoplay — keep the music going by extending the queue with
+    // related tracks as it nears the end.
+    @Published var autoExtendEnabled: Bool = UserDefaults.standard.object(forKey: "autoextend.v1") as? Bool ?? true {
+        didSet { UserDefaults.standard.set(autoExtendEnabled, forKey: "autoextend.v1") }
+    }
+    private var isExtending = false
+
+    // Resume last session
+    private let resumeSongKey = "resume.song.v1"
+    private let resumePositionKey = "resume.position.v1"
+    private var lastPersist = Date.distantPast
+
     // Sleep timer
     @Published private(set) var sleepTimerMinutes: Int?
     private var sleepTimer: Timer?
@@ -241,6 +253,53 @@ final class AudioManager: NSObject, ObservableObject {
             stopTimer()
         }
         updateNowPlayingInfo()
+        persistNowPlaying(force: true)
+        maybeExtendQueue()
+    }
+
+    // MARK: - Endless autoplay
+
+    /// When the queue nears its end, append related tracks so playback
+    /// continues seamlessly. Skipped for radio/podcasts and repeat modes.
+    private func maybeExtendQueue() {
+        guard autoExtendEnabled, !isExtending,
+              repeatMode == .off,
+              let song = currentSong,
+              !song.isLive, song.source != .podcast,
+              currentIndex >= queue.count - 2 else { return }
+        isExtending = true
+        Task { @MainActor in
+            defer { isExtending = false }
+            let more = await StationService.station(for: song)
+            let existing = Set(queue.map(\.id))
+            let fresh = more.filter { !existing.contains($0.id) }
+            guard !fresh.isEmpty else { return }
+            queue.append(contentsOf: fresh)
+        }
+    }
+
+    // MARK: - Resume last session
+
+    private func persistNowPlaying(force: Bool) {
+        guard let song = currentSong, !song.isLive else { return }
+        if !force && Date().timeIntervalSince(lastPersist) < 5 { return }
+        lastPersist = Date()
+        if let data = try? JSONEncoder().encode(song) {
+            UserDefaults.standard.set(data, forKey: resumeSongKey)
+        }
+        UserDefaults.standard.set(clock.currentTime, forKey: resumePositionKey)
+    }
+
+    /// Reload the last played track (paused) so the mini player is ready on launch.
+    func restoreLastSession() {
+        guard currentSong == nil,
+              let data = UserDefaults.standard.data(forKey: resumeSongKey),
+              let song = try? JSONDecoder().decode(Song.self, from: data) else { return }
+        let position = UserDefaults.standard.double(forKey: resumePositionKey)
+        queue = [song]
+        currentIndex = 0
+        load(autoplay: false)
+        if position > 1 { seek(to: position) }
     }
 
     // MARK: - Sleep timer
@@ -350,5 +409,6 @@ final class AudioManager: NSObject, ObservableObject {
         let d = engine.duration
         clock.duration = (d.isFinite && d > 0) ? d : (isLive ? 0 : 1)
         clock.audioLevel = engine.level
+        persistNowPlaying(force: false)
     }
 }
