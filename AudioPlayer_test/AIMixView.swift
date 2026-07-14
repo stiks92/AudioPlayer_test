@@ -43,7 +43,7 @@ struct AIMixView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }.foregroundColor(.white)
+                    Button(L("Done")) { dismiss() }.foregroundColor(.white)
                 }
             }
             .sheet(isPresented: $showPaywall) {

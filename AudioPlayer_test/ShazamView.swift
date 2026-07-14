@@ -29,7 +29,7 @@ struct ShazamView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { shazam.stop(); dismiss() }.foregroundColor(.white)
+                    Button(L("Done")) { shazam.stop(); dismiss() }.foregroundColor(.white)
                 }
             }
             .onDisappear { shazam.stop() }

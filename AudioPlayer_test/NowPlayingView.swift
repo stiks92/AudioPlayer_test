@@ -24,6 +24,7 @@ struct NowPlayingView: View {
     @State private var showLyrics = false
     @State private var showSleepOptions = false
     @State private var showAddToPlaylist = false
+    @State private var showArtist = false
     @State private var shareItem: ShareableImage?
 
     private var song: Song? { audio.currentSong }
@@ -68,6 +69,12 @@ struct NowPlayingView: View {
         .sheet(isPresented: $showAddToPlaylist) {
             if let song {
                 AddToPlaylistView(song: song).environmentObject(playlistStore)
+            }
+        }
+        .sheet(isPresented: $showArtist) {
+            if let song {
+                ArtistView(artistName: song.artist, gradient: song.gradient)
+                    .environmentObject(audio)
             }
         }
         .sheet(item: $shareItem) { item in
@@ -132,9 +139,19 @@ struct NowPlayingView: View {
             VStack(alignment: .leading, spacing: 4) {
                 MarqueeText(text: song?.title ?? "", font: .system(size: 24, weight: .bold))
                     .frame(height: 30)
-                Text(song?.artist ?? "")
-                    .font(.system(size: 16, weight: .medium))
+                Button {
+                    if song != nil { showArtist = true }
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(song?.artist ?? "")
+                            .font(.system(size: 16, weight: .medium))
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 11, weight: .semibold))
+                            .opacity(0.6)
+                    }
                     .foregroundColor(.white.opacity(0.7))
+                }
+                .buttonStyle(.plain)
             }
             Spacer(minLength: 8)
             if audio.supportsPlaybackRate {

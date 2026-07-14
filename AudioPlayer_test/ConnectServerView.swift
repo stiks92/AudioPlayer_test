@@ -38,7 +38,7 @@ struct ConnectServerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }.foregroundColor(Theme.accentSoft)
+                    Button(L("Done")) { dismiss() }.foregroundColor(Theme.accentSoft)
                 }
             }
         }

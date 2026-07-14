@@ -64,7 +64,7 @@ struct QueueView: View {
                     EditButton().foregroundColor(Theme.accentSoft)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }.foregroundColor(Theme.accentSoft)
+                    Button(L("Done")) { dismiss() }.foregroundColor(Theme.accentSoft)
                 }
             }
         }
@@ -73,7 +73,7 @@ struct QueueView: View {
     }
 
     private func header(_ title: String) -> some View {
-        Text(title)
+        Text(L(title))
             .font(.system(size: 13, weight: .bold))
             .foregroundColor(Theme.textSecondary)
             .textCase(nil)
@@ -81,7 +81,7 @@ struct QueueView: View {
 
     private var upNextHeader: some View {
         HStack {
-            Text("Up Next")
+            Text(L("Up Next"))
                 .font(.system(size: 13, weight: .bold))
                 .foregroundColor(Theme.textSecondary)
             Spacer()
