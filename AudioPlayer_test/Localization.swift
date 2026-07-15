@@ -135,7 +135,6 @@ enum Localization {
         // Retry / empty messages
         "Couldn't reach the radio directory.\nTap to retry.": "Не удалось связаться с каталогом радио.\nНажми, чтобы повторить.",
         "Couldn't load podcasts.\nTap to retry.": "Не удалось загрузить подкасты.\nНажми, чтобы повторить.",
-        "Server URL": "Адрес сервера",
         "New playlist name": "Название нового плейлиста",
         "YOUR PLAYLISTS": "ТВОИ ПЛЕЙЛИСТЫ",
 
@@ -161,7 +160,6 @@ enum Localization {
         "AI Mix · all sources · EQ · offline": "AI-микс · все источники · EQ · офлайн",
         "Active — thank you for your support!": "Активна — спасибо за поддержку!",
         "Unlock Aurora Pro to the fullest.": "Открой Aurora Pro полностью.",
-        "Restore purchases": "Восстановить покупки",
         "Processing…": "Обработка…",
         "Plans will be available at launch.": "Тарифы появятся на релизе.",
         "Loading plans…": "Загрузка тарифов…",
