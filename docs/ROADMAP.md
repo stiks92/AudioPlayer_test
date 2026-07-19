@@ -11,11 +11,20 @@ Companion doc: [`INTEGRATIONS.md`](./INTEGRATIONS.md).
   **Podcasts** (iTunes discovery + RSS episodes, with 0.8×–2× speed),
   **Self-hosted Subsonic** (Navidrome/Airsonic; Keychain-stored credentials).
 - **Aurora Pro** (StoreKit 2) + paywall + settings + Pro gating.
-- **AI Mix** (on-device natural-language mix), synced **karaoke lyrics** (LRCLIB),
-  **ShazamKit** recognition, **sleep timer**, **share card**, haptics.
+- **AI Mix** (on-device natural-language mix, EN + RU intent), synced **karaoke
+  lyrics** (LRCLIB), **ShazamKit** recognition, **sleep timer**, **share card**,
+  haptics.
+- **Deezer** (search/charts/playlists, 30s previews) + **Apple/iTunes** previews;
+  **Editor's picks** curated shelves on Home; **Artist** screen.
+- **Bilingual EN/RU** localization (lightweight `L()` system).
+- **Endless autoplay** + **resume last session**; cross-source favorites, recents,
+  queue editing, and user playlists.
+- First-run **onboarding**; performance hardening (clock split, keep-alive tabs,
+  energy-aware visuals).
 
 Remaining big rocks are tracked below (EQ/audio quality, Apple Music/Spotify,
-platform extensions, scrobbling, offline).
+platform extensions, scrobbling, offline). **Engineering handoff / how to continue
+this project: [`HANDOFF.md`](./HANDOFF.md).**
 
 ## 1. Positioning (the one-liner)
 
