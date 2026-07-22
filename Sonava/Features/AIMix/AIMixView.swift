@@ -1,8 +1,8 @@
 //
 //  AIMixView.swift
-//  AudioPlayer_test
+//  Sonava
 //
-//  Natural-language mix creation. A flagship Aurora Pro feature.
+//  Natural-language mix creation. A flagship Sonava Pro feature.
 //
 
 import SwiftUI
@@ -28,7 +28,7 @@ struct AIMixView: View {
         NavigationStack {
             ZStack {
                 Theme.background.ignoresSafeArea()
-                AuroraBackground(colors: [Theme.accent, Color(hex: 0xFF6FD8), Color(hex: 0x4A00E0)],
+                AuroraBackground(colors: [Theme.accent, Theme.accentPink, Theme.accentDeep],
                                  animated: !proStore.isPro)
                     .opacity(proStore.isPro ? 0.25 : 0.6)
 
@@ -39,11 +39,11 @@ struct AIMixView: View {
                 }
             }
             .foregroundColor(.white)
-            .navigationTitle(L("AI Mix"))
+            .navigationTitle("AI Mix")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(L("Done")) { dismiss() }.foregroundColor(.white)
+                    Button("Done") { dismiss() }.foregroundColor(.white)
                 }
             }
             .sheet(isPresented: $showPaywall) {
@@ -58,7 +58,7 @@ struct AIMixView: View {
     private var generator: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text(L("Describe a vibe"))
+                Text("Describe a vibe")
                     .font(.system(.title2, design: .rounded).weight(.bold))
 
                 HStack(spacing: 10) {
@@ -88,7 +88,7 @@ struct AIMixView: View {
                 Button(action: generate) {
                     HStack {
                         if isGenerating { ProgressView().tint(Theme.background) }
-                        Text(L(isGenerating ? "Composing…" : "Generate mix"))
+                        Text(isGenerating ? "Composing…" : "Generate mix")
                             .font(.headline)
                     }
                     .foregroundColor(Theme.background)
@@ -136,7 +136,7 @@ struct AIMixView: View {
             Button {
                 if let first = mix.songs.first { audio.play(first, in: mix.songs) }
             } label: {
-                Label(L("Play"), systemImage: "play.fill")
+                Label("Play", systemImage: "play.fill")
                     .font(.subheadline.weight(.bold))
                     .foregroundColor(Theme.background)
                     .padding(.horizontal, 18).padding(.vertical, 10)
@@ -176,16 +176,16 @@ struct AIMixView: View {
                 .font(.system(size: 54, weight: .bold))
                 .foregroundColor(.white)
                 .shadow(color: .white.opacity(0.5), radius: 18)
-            Text(L("AI Mix is a Pro feature"))
+            Text("AI Mix is a Pro feature")
                 .font(.system(.title2, design: .rounded).weight(.bold))
-            Text("Describe any mood or moment and Aurora composes a\nmix for you — instantly, on your device.")
+            Text("Describe any mood or moment and Sonava composes a\nmix for you — instantly, on your device.")
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.8))
                 .multilineTextAlignment(.center)
             Button {
                 showPaywall = true
             } label: {
-                Text(L("Unlock with Aurora Pro"))
+                Text("Unlock with Sonava Pro")
                     .font(.headline)
                     .foregroundColor(Theme.background)
                     .padding(.horizontal, 26).padding(.vertical, 15)

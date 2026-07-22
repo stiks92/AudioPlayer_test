@@ -1,6 +1,6 @@
 //
 //  PodcastFeedService.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Fetches and parses a podcast RSS feed into playable episodes (`Song`s).
 //  Uses Foundation's XMLParser — no third-party dependencies.

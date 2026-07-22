@@ -1,6 +1,6 @@
 //
 //  PlaybackModels.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Small value types describing playback state.
 //

@@ -1,8 +1,8 @@
 //
 //  SettingsView.swift
-//  AudioPlayer_test
+//  Sonava
 //
-//  Settings: Aurora Pro, playback, sources and support.
+//  Settings: Sonava Pro, playback, sources and support.
 //
 
 import SwiftUI
@@ -18,8 +18,8 @@ struct SettingsView: View {
     @State private var showConnectServer = false
 
     private var version: String {
-        let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
-        return "Aurora \(v)"
+        let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        return "Sonava \(short)"
     }
 
     var body: some View {
@@ -42,11 +42,11 @@ struct SettingsView: View {
                 }
             }
             .foregroundColor(.white)
-            .navigationTitle(L("Settings"))
+            .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(L("Done")) { dismiss() }.foregroundColor(Theme.accentSoft)
+                    Button("Done") { dismiss() }.foregroundColor(Theme.accentSoft)
                 }
             }
             .sheet(isPresented: $showPaywall) {
@@ -56,15 +56,17 @@ struct SettingsView: View {
                 ConnectServerView().environmentObject(serverStore)
             }
             .confirmationDialog("Sleep timer", isPresented: $showSleepOptions, titleVisibility: .visible) {
-                ForEach([15, 30, 45, 60], id: \.self) { minutes in
-                    Button("\(minutes) \(L("min"))") { audio.setSleepTimer(minutes: minutes) }
+                ForEach(Self.sleepTimerChoices, id: \.self) { minutes in
+                    Button("\(minutes) min") { audio.setSleepTimer(minutes: minutes) }
                 }
-                Button(L("Turn off"), role: .destructive) { audio.setSleepTimer(minutes: nil) }
-                Button(L("Cancel"), role: .cancel) {}
+                Button("Turn off", role: .destructive) { audio.setSleepTimer(minutes: nil) }
+                Button("Cancel", role: .cancel) {}
             }
         }
         .preferredColorScheme(.dark)
     }
+
+    private static let sleepTimerChoices = [15, 30, 45, 60]
 
     // MARK: - Pro
 
@@ -76,16 +78,14 @@ struct SettingsView: View {
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(.white)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Aurora Pro").font(.system(size: 17, weight: .bold))
-                    Text(L("Active — thank you for your support!"))
+                    Text("Sonava Pro").font(.system(size: 17, weight: .bold))
+                    Text("Active — thank you for your support!")
                         .font(.caption).foregroundColor(.white.opacity(0.85))
                 }
                 Spacer()
             }
             .padding(18)
-            .background(
-                LinearGradient(colors: [Theme.accent, Color(hex: 0x4A00E0)], startPoint: .leading, endPoint: .trailing)
-            )
+            .background(Theme.brandGradient)
             .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         } else {
             Button { showPaywall = true } label: {
@@ -94,18 +94,15 @@ struct SettingsView: View {
                         .font(.system(size: 26, weight: .bold))
                         .foregroundColor(.white)
                     VStack(alignment: .leading, spacing: 3) {
-                        Text(L("Unlock Aurora Pro")).font(.system(size: 17, weight: .bold))
-                        Text(L("AI Mix · all sources · EQ · offline"))
+                        Text("Unlock Sonava Pro").font(.system(size: 17, weight: .bold))
+                        Text("AI Mix · all sources · EQ · offline")
                             .font(.caption).foregroundColor(.white.opacity(0.85))
                     }
                     Spacer()
                     Image(systemName: "chevron.right").foregroundColor(.white.opacity(0.8))
                 }
                 .padding(18)
-                .background(
-                    LinearGradient(colors: [Theme.accent, Color(hex: 0xFF6FD8), Color(hex: 0x4A00E0)],
-                                   startPoint: .topLeading, endPoint: .bottomTrailing)
-                )
+                .background(Theme.proGradient)
                 .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
             }
             .buttonStyle(BouncyButtonStyle(scale: 0.98))
@@ -114,15 +111,19 @@ struct SettingsView: View {
 
     // MARK: - Playback
 
+    private var sleepTimerValue: LocalizedStringKey {
+        guard let minutes = audio.sleepTimerMinutes else { return "Off" }
+        return "\(minutes) min"
+    }
+
     private var playbackSection: some View {
         section("Playback") {
-            row(icon: "moon.zzz.fill", title: "Sleep timer",
-                value: audio.sleepTimerMinutes.map { "\($0) \(L("min"))" } ?? L("Off")) {
+            row(icon: "moon.zzz.fill", title: "Sleep timer", value: sleepTimerValue) {
                 showSleepOptions = true
             }
             divider
             Toggle(isOn: $audio.autoExtendEnabled) {
-                Label(L("Endless playback"), systemImage: "infinity")
+                Label("Endless playback", systemImage: "infinity")
                     .font(.system(size: 15))
             }
             .tint(Theme.accent)
@@ -132,19 +133,30 @@ struct SettingsView: View {
 
     // MARK: - Sources
 
+    /// The self-hosted row shows the connected host verbatim when we have one.
+    /// Interpolating it keeps the parameter a `LocalizedStringKey` so the two
+    /// static states ("Connect" / "Connected") still translate.
+    private var selfHostedValue: LocalizedStringKey {
+        guard serverStore.isConnected else { return "Connect" }
+        guard let host = serverStore.host else { return "Connected" }
+        return "\(host)"
+    }
+
     private var sourcesSection: some View {
         section("Sources") {
             VStack(spacing: 0) {
-                staticRow(icon: "waveform", title: "Audius", value: "Connected", valueColor: Color(hex: 0x38EF7D))
+                staticRow(icon: "waveform", title: "Audius",
+                          value: "Connected", valueColor: Theme.positive)
                 divider
-                staticRow(icon: "dot.radiowaves.left.and.right", title: "Internet Radio", value: "Connected", valueColor: Color(hex: 0x38EF7D))
+                staticRow(icon: "dot.radiowaves.left.and.right", title: "Internet Radio",
+                          value: "Connected", valueColor: Theme.positive)
                 divider
-                row(icon: "server.rack", title: "Self-hosted (Subsonic)",
-                    value: serverStore.isConnected ? (serverStore.host ?? "Connected") : "Connect") {
+                row(icon: "server.rack", title: "Self-hosted (Subsonic)", value: selfHostedValue) {
                     showConnectServer = true
                 }
                 divider
-                staticRow(icon: "music.note.list", title: "Spotify / Apple Music", value: "Soon", valueColor: Theme.textTertiary)
+                staticRow(icon: "music.note.list", title: "Spotify / Apple Music",
+                          value: "Soon", valueColor: Theme.textTertiary)
             }
         }
     }
@@ -154,11 +166,12 @@ struct SettingsView: View {
     private var supportSection: some View {
         section("Support") {
             VStack(spacing: 0) {
-                row(icon: "arrow.clockwise", title: "Restore purchases", value: "") {
+                row(icon: "arrow.clockwise", title: "Restore purchases", value: nil) {
                     Task { await proStore.restore() }
                 }
                 divider
-                staticRow(icon: "lock.shield", title: "Privacy", value: "On-device", valueColor: Theme.textSecondary)
+                staticRow(icon: "lock.shield", title: "Privacy",
+                          value: "On-device", valueColor: Theme.textSecondary)
                 #if DEBUG
                 divider
                 Toggle(isOn: Binding(
@@ -177,9 +190,13 @@ struct SettingsView: View {
 
     // MARK: - Building blocks
 
-    private func section<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+    private func section<Content: View>(
+        _ title: LocalizedStringKey,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(L(title).uppercased())
+            Text(title)
+                .textCase(.uppercase)
                 .font(.system(size: 12, weight: .bold))
                 .tracking(1)
                 .foregroundColor(Theme.textTertiary)
@@ -190,14 +207,19 @@ struct SettingsView: View {
         }
     }
 
-    private func row(icon: String, title: String, value: String, action: @escaping () -> Void) -> some View {
+    private func row(
+        icon: String,
+        title: LocalizedStringKey,
+        value: LocalizedStringKey?,
+        action: @escaping () -> Void
+    ) -> some View {
         Button(action: action) {
             HStack(spacing: 14) {
                 Image(systemName: icon).frame(width: 24).foregroundColor(Theme.accentSoft)
-                Text(L(title)).font(.system(size: 15))
+                Text(title).font(.system(size: 15))
                 Spacer()
-                if !value.isEmpty {
-                    Text(L(value)).font(.system(size: 14)).foregroundColor(Theme.textSecondary)
+                if let value {
+                    Text(value).font(.system(size: 14)).foregroundColor(Theme.textSecondary)
                 }
                 Image(systemName: "chevron.right").font(.system(size: 12)).foregroundColor(Theme.textTertiary)
             }
@@ -207,12 +229,17 @@ struct SettingsView: View {
         .buttonStyle(.plain)
     }
 
-    private func staticRow(icon: String, title: String, value: String, valueColor: Color) -> some View {
+    private func staticRow(
+        icon: String,
+        title: LocalizedStringKey,
+        value: LocalizedStringKey,
+        valueColor: Color
+    ) -> some View {
         HStack(spacing: 14) {
             Image(systemName: icon).frame(width: 24).foregroundColor(Theme.accentSoft)
-            Text(L(title)).font(.system(size: 15))
+            Text(title).font(.system(size: 15))
             Spacer()
-            Text(L(value)).font(.system(size: 13, weight: .semibold)).foregroundColor(valueColor)
+            Text(value).font(.system(size: 13, weight: .semibold)).foregroundColor(valueColor)
         }
         .padding(.vertical, 12)
     }

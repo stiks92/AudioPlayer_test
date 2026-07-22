@@ -1,6 +1,6 @@
 //
 //  SubsonicService.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Client for the Subsonic API — the de-facto standard spoken by Navidrome,
 //  Airsonic, Gonic and friends. Lets a user stream their own self-hosted
@@ -18,7 +18,7 @@ struct SubsonicService {
     let username: String
     let password: String
 
-    private let clientName = "Aurora"
+    private let clientName = "Sonava"
     private let apiVersion = "1.16.1"
 
     // MARK: - Requests

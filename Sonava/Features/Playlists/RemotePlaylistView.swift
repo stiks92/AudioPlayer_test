@@ -1,6 +1,6 @@
 //
 //  RemotePlaylistView.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Tracks of a curated (Deezer) playlist.
 //
@@ -63,7 +63,7 @@ struct RemotePlaylistView: View {
                         if audio.isShuffling { audio.toggleShuffle() }
                         audio.play(first, in: feed.songs)
                     } label: {
-                        Label(L("Play"), systemImage: "play.fill")
+                        Label("Play", systemImage: "play.fill")
                             .font(.headline).foregroundColor(Theme.background)
                             .frame(maxWidth: .infinity).padding(.vertical, 14)
                             .background(Capsule().fill(Color.white))
@@ -74,7 +74,7 @@ struct RemotePlaylistView: View {
                         if !audio.isShuffling { audio.toggleShuffle() }
                         audio.play(feed.songs.randomElement() ?? first, in: feed.songs)
                     } label: {
-                        Label(L("Shuffle"), systemImage: "shuffle")
+                        Label("Shuffle", systemImage: "shuffle")
                             .font(.headline).foregroundColor(.white)
                             .frame(maxWidth: .infinity).padding(.vertical, 14)
                             .glass(cornerRadius: 30)
@@ -93,10 +93,10 @@ struct RemotePlaylistView: View {
         case .idle, .loading:
             ProgressView().tint(Theme.accentSoft).padding(.top, 40)
         case .failed:
-            Text(L("Couldn't reach Audius. Check your connection."))
+            Text("Couldn't reach Audius. Check your connection.")
                 .font(.subheadline).foregroundColor(Theme.textSecondary).padding(.top, 40)
         case .empty:
-            Text(L("No results")).font(.subheadline).foregroundColor(Theme.textSecondary).padding(.top, 40)
+            Text("No results").font(.subheadline).foregroundColor(Theme.textSecondary).padding(.top, 40)
         case .loaded:
             LazyVStack(spacing: 2) {
                 ForEach(feed.songs) { song in

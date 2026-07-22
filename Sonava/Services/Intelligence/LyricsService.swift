@@ -1,6 +1,6 @@
 //
 //  LyricsService.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Synced (karaoke) lyrics from LRCLIB — a free, open lyrics database.
 //  https://lrclib.net/docs

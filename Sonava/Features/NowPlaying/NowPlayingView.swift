@@ -1,6 +1,6 @@
 //
 //  NowPlayingView.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  The full-screen "hero" player: animated aurora background driven by
 //  the track palette, a breathing artwork, a live visualizer, a custom
@@ -82,12 +82,12 @@ struct NowPlayingView: View {
         }
         .confirmationDialog("Sleep timer", isPresented: $showSleepOptions, titleVisibility: .visible) {
             ForEach([15, 30, 45, 60], id: \.self) { minutes in
-                Button("\(minutes) \(L("min"))") { audio.setSleepTimer(minutes: minutes) }
+                Button("\(minutes) min") { audio.setSleepTimer(minutes: minutes) }
             }
             if audio.sleepTimerMinutes != nil {
-                Button(L("Turn off"), role: .destructive) { audio.setSleepTimer(minutes: nil) }
+                Button("Turn off", role: .destructive) { audio.setSleepTimer(minutes: nil) }
             }
-            Button(L("Cancel"), role: .cancel) {}
+            Button("Cancel", role: .cancel) {}
         }
         .onAppear { scrubValue = clock.progress }
     }
@@ -101,7 +101,7 @@ struct NowPlayingView: View {
             }
             Spacer()
             VStack(spacing: 2) {
-                Text(L("PLAYING FROM ALBUM"))
+                Text("PLAYING FROM ALBUM")
                     .font(.system(size: 10, weight: .bold))
                     .foregroundColor(.white.opacity(0.6))
                     .tracking(1.5)
@@ -204,14 +204,14 @@ struct NowPlayingView: View {
         if audio.isLive {
             HStack(spacing: 8) {
                 Circle()
-                    .fill(Color(hex: 0xFF3B6B))
+                    .fill(Theme.destructive)
                     .frame(width: 8, height: 8)
                     .opacity(audio.isPlaying ? 1 : 0.4)
-                Text(L("LIVE"))
+                Text("LIVE")
                     .font(.system(size: 13, weight: .heavy))
                     .tracking(2)
                 Spacer()
-                Text(L("Radio"))
+                Text("Radio")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(.white.opacity(0.6))
             }

@@ -1,6 +1,6 @@
 //
 //  MiniPlayerView.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Compact transport that lives above the tab bar and expands into the
 //  full Now Playing scene when tapped.

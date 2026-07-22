@@ -1,6 +1,6 @@
 //
 //  SongRow.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  A reusable list row for a single track.
 //
@@ -63,7 +63,7 @@ struct SongRow: View {
             } else if library.isFavorite(song) {
                 Image(systemName: "heart.fill")
                     .font(.system(size: 13))
-                    .foregroundColor(Color(hex: 0xFF3B6B))
+                    .foregroundColor(Theme.destructive)
             }
         }
         .padding(.vertical, 6)
@@ -71,22 +71,22 @@ struct SongRow: View {
         .contextMenu {
             Button {
                 audio.playNext(song)
-            } label: { Label(L("Play Next"), systemImage: "text.insert") }
+            } label: { Label("Play Next", systemImage: "text.insert") }
             Button {
                 audio.addToQueue(song)
-            } label: { Label(L("Add to Queue"), systemImage: "text.append") }
+            } label: { Label("Add to Queue", systemImage: "text.append") }
             Button {
                 let seed = song
                 Task {
                     let queue = await StationService.station(for: seed)
                     audio.play(seed, in: queue)
                 }
-            } label: { Label(L("Start Station"), systemImage: "dot.radiowaves.left.and.right") }
+            } label: { Label("Start Station", systemImage: "dot.radiowaves.left.and.right") }
             Divider()
             Button {
                 library.toggleFavorite(song)
             } label: {
-                Label(L(library.isFavorite(song) ? "Remove from Favorites" : "Favorite"),
+                Label(library.isFavorite(song) ? "Remove from Favorites" : "Favorite",
                       systemImage: library.isFavorite(song) ? "heart.slash" : "heart")
             }
         }

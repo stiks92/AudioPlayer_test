@@ -1,9 +1,9 @@
 //
 //  ShazamView.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  "What's playing?" — listen, identify, and jump straight into the track on
-//  Aurora's own catalogue.
+//  Sonava's own catalogue.
 //
 
 import SwiftUI
@@ -25,11 +25,11 @@ struct ShazamView: View {
                 content
             }
             .foregroundColor(.white)
-            .navigationTitle(L("Discover"))
+            .navigationTitle("Discover")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(L("Done")) { shazam.stop(); dismiss() }.foregroundColor(.white)
+                    Button("Done") { shazam.stop(); dismiss() }.foregroundColor(.white)
                 }
             }
             .onDisappear { shazam.stop() }
@@ -87,7 +87,7 @@ struct ShazamView: View {
             }
             .frame(height: 250)
 
-            Text(L(statusText))
+            Text(statusText)
                 .font(.system(.title3, design: .rounded).weight(.semibold))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
@@ -112,7 +112,7 @@ struct ShazamView: View {
         }
     }
 
-    private var statusText: String {
+    private var statusText: LocalizedStringKey {
         switch shazam.state {
         case .idle:      return "Tap to identify the music around you"
         case .listening: return "Listening…"
@@ -156,7 +156,7 @@ struct ShazamView: View {
                     HStack {
                         if isFindingOnAudius { ProgressView().tint(Theme.background) }
                         Image(systemName: "play.fill")
-                        Text(L(isFindingOnAudius ? "Searching…" : "Play on Aurora"))
+                        Text(isFindingOnAudius ? "Searching…" : "Play on Sonava")
                     }
                     .font(.headline)
                     .foregroundColor(Theme.background)
@@ -169,7 +169,7 @@ struct ShazamView: View {
 
                 if let appleURL = result.appleMusicURL {
                     Link(destination: appleURL) {
-                        Text(L("Open in Apple Music"))
+                        Text("Open in Apple Music")
                             .font(.subheadline.weight(.semibold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -178,7 +178,7 @@ struct ShazamView: View {
                     }
                 }
 
-                Button(L("Identify another")) { shazam.reset() }
+                Button("Identify another") { shazam.reset() }
                     .font(.footnote.weight(.semibold))
                     .foregroundColor(.white.opacity(0.8))
             }

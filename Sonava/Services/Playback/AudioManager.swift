@@ -1,6 +1,6 @@
 //
 //  AudioManager.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  The playback engine orchestrator. Manages the queue / shuffle / repeat,
 //  delegates actual audio to a LocalAudioEngine (bundled files) or a

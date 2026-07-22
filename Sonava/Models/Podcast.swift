@@ -1,6 +1,6 @@
 //
 //  Podcast.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  A podcast show. Episodes are represented as universal `Song` values
 //  (source `.podcast`) so they play through the same engine and UI.

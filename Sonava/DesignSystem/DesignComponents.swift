@@ -1,6 +1,6 @@
 //
 //  DesignComponents.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Reusable, animated UI primitives shared across screens.
 //
@@ -98,13 +98,13 @@ struct HeartButton: View {
             ZStack {
                 Image(systemName: isOn ? "heart.fill" : "heart")
                     .font(.system(size: size, weight: .semibold))
-                    .foregroundColor(isOn ? Color(hex: 0xFF3B6B) : Theme.textSecondary)
+                    .foregroundColor(isOn ? Theme.destructive : Theme.textSecondary)
                     .symbolEffectBounce(trigger: isOn)
 
                 if burst {
                     ForEach(0..<6, id: \.self) { i in
                         Circle()
-                            .fill(Color(hex: 0xFF3B6B))
+                            .fill(Theme.destructive)
                             .frame(width: 4, height: 4)
                             .offset(y: -size)
                             .rotationEffect(.degrees(Double(i) / 6 * 360))
@@ -166,18 +166,18 @@ struct ScrubberView: View {
 // MARK: - Section header
 
 struct SectionHeader: View {
-    let title: String
-    var actionTitle: String? = nil
+    let title: LocalizedStringKey
+    var actionTitle: LocalizedStringKey? = nil
     var action: (() -> Void)? = nil
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
-            Text(L(title))
+            Text(title)
                 .font(.system(.title3, design: .rounded).weight(.bold))
                 .foregroundColor(Theme.textPrimary)
             Spacer()
             if let actionTitle, let action {
-                Button(L(actionTitle), action: action)
+                Button(actionTitle, action: action)
                     .font(.subheadline.weight(.semibold))
                     .foregroundColor(Theme.accentSoft)
             }

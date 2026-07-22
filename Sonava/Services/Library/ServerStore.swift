@@ -1,6 +1,6 @@
 //
 //  ServerStore.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Owns the user's self-hosted (Subsonic) connection: persistence, connect /
 //  disconnect, and typed fetchers. Non-secret config lives in UserDefaults;

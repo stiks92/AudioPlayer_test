@@ -1,6 +1,6 @@
 //
 //  RadioView.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Internet radio, powered by the free Radio Browser directory.
 //
@@ -13,10 +13,13 @@ struct RadioView: View {
     @StateObject private var feed = SongFeed()
     @State private var selectedTag: String? = nil
 
-    private let genres: [(String, String)] = [
-        ("Top", ""), ("Lo-fi", "lofi"), ("Jazz", "jazz"), ("Chillout", "chillout"),
-        ("Classical", "classical"), ("Electronic", "electronic"), ("News", "news"),
-        ("Rock", "rock"), ("Ambient", "ambient"), ("Hip-Hop", "hip-hop")
+    /// Radio Browser is queried by English tag; only the label translates.
+    private let genres: [FilterChip<String>] = [
+        FilterChip("Top", ""), FilterChip("Lo-fi", "lofi"), FilterChip("Jazz", "jazz"),
+        FilterChip("Chillout", "chillout"), FilterChip("Classical", "classical"),
+        FilterChip("Electronic", "electronic"), FilterChip("News", "news"),
+        FilterChip("Rock", "rock"), FilterChip("Ambient", "ambient"),
+        FilterChip("Hip-Hop", "hip-hop")
     ]
 
     var body: some View {
@@ -45,7 +48,7 @@ struct RadioView: View {
             Image(systemName: "dot.radiowaves.left.and.right")
                 .font(.system(size: 26, weight: .bold))
                 .foregroundColor(Theme.accentSoft)
-            Text(L("Radio"))
+            Text("Radio")
                 .font(.system(.largeTitle, design: .rounded).weight(.heavy))
                 .foregroundColor(Theme.textPrimary)
         }
@@ -54,9 +57,9 @@ struct RadioView: View {
     private var genreChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
-                ForEach(genres, id: \.0) { label, tag in
-                    let isSelected = (selectedTag ?? "") == tag
-                    Text(L(label))
+                ForEach(genres) { genre in
+                    let isSelected = (selectedTag ?? "") == genre.value
+                    Text(genre.title)
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(isSelected ? Theme.background : Theme.textSecondary)
                         .padding(.horizontal, 14)
@@ -65,7 +68,7 @@ struct RadioView: View {
                             Capsule().fill(isSelected ? Color.white : Color.white.opacity(0.08))
                         )
                         .onTapGesture {
-                            selectedTag = tag.isEmpty ? nil : tag
+                            selectedTag = genre.value.isEmpty ? nil : genre.value
                             Task { await reload() }
                         }
                 }
@@ -103,7 +106,7 @@ struct RadioView: View {
         VStack(spacing: 14) {
             ProgressView()
                 .tint(Theme.accentSoft)
-            Text(L("Tuning in…"))
+            Text("Tuning in…")
                 .font(.subheadline)
                 .foregroundColor(Theme.textSecondary)
         }
@@ -111,12 +114,12 @@ struct RadioView: View {
         .padding(.top, 60)
     }
 
-    private func message(icon: String, text: String) -> some View {
+    private func message(icon: String, text: LocalizedStringKey) -> some View {
         VStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 42))
                 .foregroundColor(Theme.textTertiary)
-            Text(L(text))
+            Text(text)
                 .font(.subheadline)
                 .foregroundColor(Theme.textSecondary)
                 .multilineTextAlignment(.center)

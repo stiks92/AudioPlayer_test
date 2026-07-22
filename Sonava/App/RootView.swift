@@ -1,6 +1,6 @@
 //
 //  RootView.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Hosts the tab scenes, the docked mini player and the expanding
 //  Now Playing overlay.
@@ -98,7 +98,7 @@ struct RootView: View {
 enum AppTab: String, CaseIterable {
     case home, search, radio, podcasts, library
 
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
         case .home: return "Home"
         case .search: return "Search"
@@ -145,7 +145,7 @@ struct AppTabBar: View {
                                 .foregroundColor(selected ? Theme.accentSoft : Theme.textSecondary)
                         }
                         .frame(height: 32)
-                        Text(L(tab.title))
+                        Text(tab.title)
                             .font(.system(size: 10, weight: .semibold))
                             .foregroundColor(selected ? Theme.accentSoft : Theme.textTertiary)
                     }

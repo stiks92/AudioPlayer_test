@@ -1,6 +1,6 @@
 //
 //  Song.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Universal track model. A track can be a bundled file, a remote
 //  streaming track (e.g. Audius), or a live radio station — all screens

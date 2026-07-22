@@ -1,8 +1,8 @@
 //
 //  ProStore.swift
-//  AudioPlayer_test
+//  Sonava
 //
-//  Aurora Pro entitlement + purchasing via StoreKit 2. Degrades gracefully
+//  Sonava Pro entitlement + purchasing via StoreKit 2. Degrades gracefully
 //  when products aren't configured yet in App Store Connect (the UI still
 //  renders; purchase is simply unavailable). Configure the product IDs below
 //  and add a StoreKit configuration file to test purchases locally.

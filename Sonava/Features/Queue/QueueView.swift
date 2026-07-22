@@ -1,6 +1,6 @@
 //
 //  QueueView.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  The playing queue: jump to any track, reorder Up Next, and swipe to
 //  remove. Now Playing is pinned on top.
@@ -57,14 +57,14 @@ struct QueueView: View {
                 .environment(\.defaultMinListRowHeight, 10)
             }
             .foregroundColor(.white)
-            .navigationTitle(L("Queue"))
+            .navigationTitle("Queue")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     EditButton().foregroundColor(Theme.accentSoft)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(L("Done")) { dismiss() }.foregroundColor(Theme.accentSoft)
+                    Button("Done") { dismiss() }.foregroundColor(Theme.accentSoft)
                 }
             }
         }
@@ -72,8 +72,8 @@ struct QueueView: View {
         .preferredColorScheme(.dark)
     }
 
-    private func header(_ title: String) -> some View {
-        Text(L(title))
+    private func header(_ title: LocalizedStringKey) -> some View {
+        Text(title)
             .font(.system(size: 13, weight: .bold))
             .foregroundColor(Theme.textSecondary)
             .textCase(nil)
@@ -81,7 +81,7 @@ struct QueueView: View {
 
     private var upNextHeader: some View {
         HStack {
-            Text(L("Up Next"))
+            Text("Up Next")
                 .font(.system(size: 13, weight: .bold))
                 .foregroundColor(Theme.textSecondary)
             Spacer()

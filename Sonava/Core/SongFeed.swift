@@ -1,6 +1,6 @@
 //
 //  SongFeed.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  A tiny reusable loader for asynchronous lists of songs (trending,
 //  radio stations, online search …) with clean loading / empty / error

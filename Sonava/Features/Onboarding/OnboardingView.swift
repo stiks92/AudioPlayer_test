@@ -1,8 +1,8 @@
 //
 //  OnboardingView.swift
-//  AudioPlayer_test
+//  Sonava
 //
-//  First-run welcome. Highlights what makes Aurora different.
+//  First-run welcome. Highlights what makes Sonava different.
 //
 
 import SwiftUI
@@ -15,8 +15,8 @@ struct OnboardingView: View {
     private struct Slide: Identifiable {
         let id = UUID()
         let icon: String
-        let title: String
-        let subtitle: String
+        let title: LocalizedStringKey
+        let subtitle: LocalizedStringKey
         let colors: [Color]
     }
 
@@ -24,7 +24,7 @@ struct OnboardingView: View {
         Slide(icon: "square.stack.3d.up.fill",
               title: "All your music, one player",
               subtitle: "Streaming, internet radio, podcasts and your own server — unified in one beautiful place.",
-              colors: [Color(hex: 0x7C5CFF), Color(hex: 0x4A00E0)]),
+              colors: [Theme.accent, Theme.accentDeep]),
         Slide(icon: "magnifyingglass",
               title: "Search everything at once",
               subtitle: "One query fans out across Audius, Apple, Deezer and your library — full tracks and previews together.",
@@ -32,11 +32,11 @@ struct OnboardingView: View {
         Slide(icon: "sparkles",
               title: "AI Mix & Shazam",
               subtitle: "Describe a vibe and get an instant mix. Identify what's playing around you in a tap.",
-              colors: [Color(hex: 0xFF6FD8), Color(hex: 0x8E2DE2)]),
+              colors: [Theme.accentPink, Color(hex: 0x8E2DE2)]),
         Slide(icon: "lock.shield.fill",
               title: "Private by design",
               subtitle: "On-device intelligence, no tracking, no ads. Your taste stays yours.",
-              colors: [Color(hex: 0x11998E), Color(hex: 0x38EF7D)])
+              colors: [Color(hex: 0x11998E), Theme.positive])
     ]
 
     var body: some View {
@@ -45,7 +45,7 @@ struct OnboardingView: View {
                 .animation(.easeInOut(duration: 0.6), value: page)
 
             VStack(spacing: 0) {
-                Button(L("Skip"), action: onFinish)
+                Button("Skip", action: onFinish)
                     .font(.subheadline.weight(.semibold))
                     .foregroundColor(.white.opacity(0.8))
                     .frame(maxWidth: .infinity, alignment: .trailing)
@@ -69,7 +69,7 @@ struct OnboardingView: View {
                         onFinish()
                     }
                 } label: {
-                    Text(L(page < slides.count - 1 ? "Continue" : "Start listening"))
+                    Text(page < slides.count - 1 ? "Continue" : "Start listening")
                         .font(.headline)
                         .foregroundColor(Theme.background)
                         .frame(maxWidth: .infinity)
@@ -92,10 +92,10 @@ struct OnboardingView: View {
                 .foregroundColor(.white)
                 .shadow(color: .white.opacity(0.4), radius: 20)
             VStack(spacing: 14) {
-                Text(L(slide.title))
+                Text(slide.title)
                     .font(.system(size: 30, weight: .heavy, design: .rounded))
                     .multilineTextAlignment(.center)
-                Text(L(slide.subtitle))
+                Text(slide.subtitle)
                     .font(.system(size: 16))
                     .foregroundColor(.white.opacity(0.85))
                     .multilineTextAlignment(.center)

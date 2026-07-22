@@ -1,6 +1,6 @@
 //
 //  iTunesService.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Podcast discovery via the free, keyless iTunes Search API.
 //  https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI/

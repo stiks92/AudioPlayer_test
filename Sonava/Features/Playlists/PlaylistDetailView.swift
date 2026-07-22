@@ -1,6 +1,6 @@
 //
 //  PlaylistDetailView.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  A playlist header with a stretchy gradient hero and the track list.
 //
@@ -76,7 +76,7 @@ struct PlaylistDetailView: View {
                     audio.play(first, in: songs)
                 }
             } label: {
-                Label(L("Play"), systemImage: "play.fill")
+                Label("Play", systemImage: "play.fill")
                     .font(.headline)
                     .foregroundColor(Theme.background)
                     .frame(maxWidth: .infinity)
@@ -90,7 +90,7 @@ struct PlaylistDetailView: View {
                 if !audio.isShuffling { audio.toggleShuffle() }
                 audio.play(songs.randomElement()!, in: songs)
             } label: {
-                Label(L("Shuffle"), systemImage: "shuffle")
+                Label("Shuffle", systemImage: "shuffle")
                     .font(.headline)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)

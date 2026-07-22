@@ -1,6 +1,6 @@
 //
 //  Haptics.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Lightweight haptic feedback helpers for a premium, tactile feel.
 //

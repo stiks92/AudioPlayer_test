@@ -1,6 +1,6 @@
 //
 //  MusicLibrary.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Owns the bundled catalogue + curated playlists plus the user's favorites
 //  and recently-played. Favorites/recents store full `Song` snapshots (JSON
@@ -109,7 +109,7 @@ final class MusicLibrary: ObservableObject {
                 title: "Joker — Original Score",
                 subtitle: "\(songs.count) songs · Hildur Guðnadóttir",
                 systemImage: "theatermasks.fill",
-                gradient: [Color(hex: 0x8E2DE2), Color(hex: 0x4A00E0)],
+                gradient: [Color(hex: 0x8E2DE2), Theme.accentDeep],
                 songIDs: all
             ),
             Playlist(
@@ -130,7 +130,7 @@ final class MusicLibrary: ObservableObject {
                 title: "On Repeat",
                 subtitle: "Your most-played",
                 systemImage: "arrow.triangle.2.circlepath",
-                gradient: [Color(hex: 0x11998E), Color(hex: 0x38EF7D)],
+                gradient: [Color(hex: 0x11998E), Theme.positive],
                 songIDs: Array(all.shuffled().prefix(6))
             )
         ]

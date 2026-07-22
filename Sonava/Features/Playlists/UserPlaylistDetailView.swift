@@ -1,6 +1,6 @@
 //
 //  UserPlaylistDetailView.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Detail for a user-created playlist: play, shuffle, reorder-free editing,
 //  rename and delete. Reads live from the store via id so edits reflect
@@ -48,20 +48,20 @@ struct UserPlaylistDetailView: View {
                     Button {
                         renameText = playlist?.name ?? ""
                         showRename = true
-                    } label: { Label(L("Rename"), systemImage: "pencil") }
+                    } label: { Label("Rename", systemImage: "pencil") }
                     Button(role: .destructive) {
                         playlistStore.delete(playlistID)
                         dismiss()
-                    } label: { Label(L("Delete playlist"), systemImage: "trash") }
+                    } label: { Label("Delete playlist", systemImage: "trash") }
                 } label: {
                     Image(systemName: "ellipsis.circle").foregroundColor(.white)
                 }
             }
         }
-        .alert(L("Rename playlist"), isPresented: $showRename) {
-            TextField(L("Name"), text: $renameText)
-            Button(L("Save")) { playlistStore.rename(playlistID, to: renameText) }
-            Button(L("Cancel"), role: .cancel) {}
+        .alert("Rename playlist", isPresented: $showRename) {
+            TextField("Name", text: $renameText)
+            Button("Save") { playlistStore.rename(playlistID, to: renameText) }
+            Button("Cancel", role: .cancel) {}
         }
     }
 
@@ -91,7 +91,7 @@ struct UserPlaylistDetailView: View {
                     audio.play(first, in: playlist.tracks)
                 }
             } label: {
-                Label(L("Play"), systemImage: "play.fill")
+                Label("Play", systemImage: "play.fill")
                     .font(.headline).foregroundColor(Theme.background)
                     .frame(maxWidth: .infinity).padding(.vertical, 14)
                     .background(Capsule().fill(Color.white))
@@ -103,7 +103,7 @@ struct UserPlaylistDetailView: View {
                 if !audio.isShuffling { audio.toggleShuffle() }
                 audio.play(random, in: playlist.tracks)
             } label: {
-                Label(L("Shuffle"), systemImage: "shuffle")
+                Label("Shuffle", systemImage: "shuffle")
                     .font(.headline).foregroundColor(.white)
                     .frame(maxWidth: .infinity).padding(.vertical, 14)
                     .glass(cornerRadius: 30)
@@ -125,7 +125,7 @@ struct UserPlaylistDetailView: View {
                 .contextMenu {
                     Button(role: .destructive) {
                         playlistStore.removeTrack(song, from: playlistID)
-                    } label: { Label(L("Remove from playlist"), systemImage: "minus.circle") }
+                    } label: { Label("Remove from playlist", systemImage: "minus.circle") }
                 }
             }
         }
@@ -136,9 +136,9 @@ struct UserPlaylistDetailView: View {
         VStack(spacing: 12) {
             Image(systemName: "music.note.list")
                 .font(.system(size: 46)).foregroundColor(Theme.textTertiary)
-            Text(L("This playlist is empty"))
+            Text("This playlist is empty")
                 .font(.headline).foregroundColor(Theme.textSecondary)
-            Text(L("Add tracks from the player or any track's menu."))
+            Text("Add tracks from the player or any track's menu.")
                 .font(.subheadline).foregroundColor(Theme.textTertiary)
                 .multilineTextAlignment(.center)
         }

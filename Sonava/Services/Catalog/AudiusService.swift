@@ -1,6 +1,6 @@
 //
 //  AudiusService.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Audius — an open, decentralized music catalogue that allows full-track
 //  streaming with no user auth. This is the core free/legal source.
@@ -18,7 +18,7 @@ final class AudiusService: TrackProvider {
     let id = "audius"
     let displayName = "Audius"
 
-    private let appName = "Aurora"
+    private let appName = "Sonava"
     private var cachedHost: String?
 
     // MARK: TrackProvider

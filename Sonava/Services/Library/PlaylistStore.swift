@@ -1,6 +1,6 @@
 //
 //  PlaylistStore.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  User-created, cross-source playlists. Because tracks can come from any
 //  source (local, Audius, radio, server, podcast), full `Song` snapshots are

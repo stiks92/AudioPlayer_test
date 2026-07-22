@@ -1,6 +1,6 @@
 //
 //  RadioBrowserService.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Radio Browser — a free, community-run directory of 40k+ internet radio
 //  stations with direct stream URLs. Powers the Radio tab.

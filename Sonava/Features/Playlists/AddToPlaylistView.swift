@@ -1,6 +1,6 @@
 //
 //  AddToPlaylistView.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Add any track (from any source) to one or more user playlists.
 //
@@ -23,7 +23,7 @@ struct AddToPlaylistView: View {
                         trackHeader
                         createRow
                         if !playlistStore.playlists.isEmpty {
-                            Text(L("YOUR PLAYLISTS"))
+                            Text("YOUR PLAYLISTS")
                                 .font(.system(size: 11, weight: .bold)).tracking(1)
                                 .foregroundColor(Theme.textTertiary)
                             VStack(spacing: 8) {
@@ -37,11 +37,11 @@ struct AddToPlaylistView: View {
                 }
             }
             .foregroundColor(.white)
-            .navigationTitle(L("Add to Playlist"))
+            .navigationTitle("Add to Playlist")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(L("Done")) { dismiss() }.foregroundColor(Theme.accentSoft)
+                    Button("Done") { dismiss() }.foregroundColor(Theme.accentSoft)
                 }
             }
         }
@@ -62,11 +62,11 @@ struct AddToPlaylistView: View {
     private var createRow: some View {
         HStack(spacing: 10) {
             Image(systemName: "plus.circle.fill").foregroundColor(Theme.accentSoft)
-            TextField(L("New playlist name"), text: $newName)
+            TextField("New playlist name", text: $newName)
                 .foregroundColor(.white)
                 .submitLabel(.done)
                 .onSubmit(createAndAdd)
-            Button(L("Create"), action: createAndAdd)
+            Button("Create", action: createAndAdd)
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(newName.trimmingCharacters(in: .whitespaces).isEmpty ? Theme.textTertiary : Theme.accentSoft)
                 .disabled(newName.trimmingCharacters(in: .whitespaces).isEmpty)
@@ -96,7 +96,7 @@ struct AddToPlaylistView: View {
                 Spacer()
                 Image(systemName: added ? "checkmark.circle.fill" : "plus.circle")
                     .font(.system(size: 22))
-                    .foregroundColor(added ? Color(hex: 0x38EF7D) : Theme.textSecondary)
+                    .foregroundColor(added ? Theme.positive : Theme.textSecondary)
             }
             .contentShape(Rectangle())
         }

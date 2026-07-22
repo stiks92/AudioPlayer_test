@@ -1,6 +1,6 @@
 //
 //  Theme.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Design tokens + shared visual building blocks.
 //
@@ -49,12 +49,47 @@ extension Array where Element == UInt {
     var colors: [Color] { map { Color(hex: $0) } }
 }
 
+/// Semantic design tokens. Views name the *role* of a colour, never its hex —
+/// so a palette change happens here and nowhere else. Decorative per-track
+/// gradients live in `Palette` instead, because they carry no meaning.
 enum Theme {
+
+    // MARK: Surfaces
     static let background = Color(hex: 0x08080C)
     static let surface = Color(hex: 0x15151F)
     static let surfaceElevated = Color(hex: 0x1E1E2A)
+
+    // MARK: Brand
     static let accent = Color(hex: 0x7C5CFF)
     static let accentSoft = Color(hex: 0xB9A8FF)
+    static let accentDeep = Color(hex: 0x4A00E0)
+    static let accentPink = Color(hex: 0xFF6FD8)
+
+    /// The two-stop brand gradient used by Pro surfaces and primary actions.
+    static let brandGradient = LinearGradient(
+        colors: [accent, accentDeep],
+        startPoint: .leading,
+        endPoint: .trailing
+    )
+
+    /// The richer three-stop gradient reserved for the paywall and Pro upsells.
+    static let proGradient = LinearGradient(
+        colors: [accent, accentPink, accentDeep],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    // MARK: Semantic state
+    /// Success / connected.
+    static let positive = Color(hex: 0x38EF7D)
+    /// Favourites and destructive actions.
+    static let destructive = Color(hex: 0xFF3B6B)
+    /// Inline error copy — softer than `destructive` so it reads as text.
+    static let error = Color(hex: 0xFF6B8A)
+    /// Live radio indicator.
+    static let live = Color(hex: 0xFF3B6B)
+
+    // MARK: Text
     static let textPrimary = Color.white
     static let textSecondary = Color.white.opacity(0.62)
     static let textTertiary = Color.white.opacity(0.38)

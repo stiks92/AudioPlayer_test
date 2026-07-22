@@ -1,6 +1,6 @@
 //
 //  Visualizer.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Live audio-reactive visualizer + a compact "now playing" equaliser
 //  indicator used inside list rows.

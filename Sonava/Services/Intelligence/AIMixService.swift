@@ -1,6 +1,6 @@
 //
 //  AIMixService.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  On-device "AI Mix": turns a natural-language prompt into a playlist by
 //  mapping intent → musical seeds and assembling a mix from the free Audius

@@ -1,6 +1,6 @@
 //
 //  ShazamService.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  "What's playing?" recognition via ShazamKit. Captures the mic, matches
 //  against the Shazam catalogue, and restores the playback session when done.

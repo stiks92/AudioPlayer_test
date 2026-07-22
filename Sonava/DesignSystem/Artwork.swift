@@ -1,6 +1,6 @@
 //
 //  Artwork.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Renders a track's artwork: remote image (AsyncImage) when available,
 //  falling back to the bundled asset for local tracks or a tasteful glyph
@@ -62,7 +62,7 @@ struct SourceBadge: View {
                 .padding(.horizontal, 5)
                 .padding(.vertical, 2)
                 .background(
-                    Capsule().fill(source == .radio ? Color(hex: 0xFF3B6B) : Color.black.opacity(0.55))
+                    Capsule().fill(source == .radio ? Theme.destructive : Color.black.opacity(0.55))
                 )
         }
     }

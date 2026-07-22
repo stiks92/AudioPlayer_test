@@ -1,6 +1,6 @@
 //
 //  HomeView.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  The landing tab: greeting, recently played, featured playlists and
 //  quick picks.
@@ -22,7 +22,7 @@ struct HomeView: View {
     @State private var showAIMix = false
     @State private var showShazam = false
 
-    private var greeting: String {
+    private var greeting: LocalizedStringKey {
         let hour = Calendar.current.component(.hour, from: Date())
         switch hour {
         case 5..<12:  return "Good morning"
@@ -142,10 +142,10 @@ struct HomeView: View {
                     .font(.system(size: 26, weight: .bold))
                     .foregroundColor(.white)
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(L("Create an AI Mix"))
+                    Text("Create an AI Mix")
                         .font(.system(size: 17, weight: .bold))
                         .foregroundColor(.white)
-                    Text(L("Describe a vibe — get an instant mix"))
+                    Text("Describe a vibe — get an instant mix")
                         .font(.system(size: 12))
                         .foregroundColor(.white.opacity(0.85))
                 }
@@ -161,7 +161,7 @@ struct HomeView: View {
             }
             .padding(16)
             .background(
-                LinearGradient(colors: [Theme.accent, Color(hex: 0xFF6FD8), Color(hex: 0x4A00E0)],
+                LinearGradient(colors: [Theme.accent, Theme.accentPink, Theme.accentDeep],
                                startPoint: .topLeading, endPoint: .bottomTrailing)
             )
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
@@ -300,10 +300,10 @@ struct HomeView: View {
     private var header: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text(L(greeting))
+                Text(greeting)
                     .font(.system(.title, design: .rounded).weight(.heavy))
                     .foregroundColor(Theme.textPrimary)
-                Text(L("What do you feel like hearing?"))
+                Text("What do you feel like hearing?")
                     .font(.subheadline)
                     .foregroundColor(Theme.textSecondary)
             }

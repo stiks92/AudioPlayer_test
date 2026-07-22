@@ -1,6 +1,6 @@
 //
 //  LibraryView.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  The user's library: playlists, all songs, and favourites, behind a
 //  custom animated segmented control.
@@ -14,9 +14,15 @@ struct LibraryView: View {
     @EnvironmentObject private var playlistStore: PlaylistStore
 
     enum Tab: String, CaseIterable {
-        case playlists = "Playlists"
-        case songs = "Songs"
-        case favorites = "Favorites"
+        case playlists, songs, favorites
+
+        var title: LocalizedStringKey {
+            switch self {
+            case .playlists: return "Playlists"
+            case .songs: return "Songs"
+            case .favorites: return "Favorites"
+            }
+        }
     }
 
     @State private var tab: Tab = .playlists
@@ -31,7 +37,7 @@ struct LibraryView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
-                        Text(L("Your Library"))
+                        Text("Your Library")
                             .font(.system(.largeTitle, design: .rounded).weight(.heavy))
                             .foregroundColor(Theme.textPrimary)
 
@@ -49,14 +55,14 @@ struct LibraryView: View {
                 }
             }
             .navigationBarHidden(true)
-            .alert(L("New playlist"), isPresented: $showNewPlaylist) {
-                TextField(L("Name"), text: $newPlaylistName)
-                Button(L("Create")) {
+            .alert("New playlist", isPresented: $showNewPlaylist) {
+                TextField("Name", text: $newPlaylistName)
+                Button("Create") {
                     let name = newPlaylistName.trimmingCharacters(in: .whitespaces)
                     if !name.isEmpty { playlistStore.create(name) }
                     newPlaylistName = ""
                 }
-                Button(L("Cancel"), role: .cancel) { newPlaylistName = "" }
+                Button("Cancel", role: .cancel) { newPlaylistName = "" }
             }
         }
     }
@@ -65,7 +71,7 @@ struct LibraryView: View {
         HStack(spacing: 8) {
             ForEach(Tab.allCases, id: \.self) { item in
                 let selected = tab == item
-                Text(L(item.rawValue))
+                Text(item.title)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(selected ? Theme.background : Theme.textSecondary)
                     .padding(.vertical, 9)
@@ -99,7 +105,7 @@ struct LibraryView: View {
                         .fill(Color.white.opacity(0.08))
                         .frame(width: 60, height: 60)
                         .overlay(Image(systemName: "plus").font(.system(size: 22, weight: .semibold)).foregroundColor(Theme.accentSoft))
-                    Text(L("New Playlist"))
+                    Text("New Playlist")
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(Theme.textPrimary)
                     Spacer()
@@ -187,10 +193,10 @@ struct LibraryView: View {
                 Image(systemName: "heart.slash")
                     .font(.system(size: 46))
                     .foregroundColor(Theme.textTertiary)
-                Text(L("No favourites yet"))
+                Text("No favourites yet")
                     .font(.headline)
                     .foregroundColor(Theme.textSecondary)
-                Text(L("Tap the heart on any track to save it here."))
+                Text("Tap the heart on any track to save it here.")
                     .font(.subheadline)
                     .foregroundColor(Theme.textTertiary)
                     .multilineTextAlignment(.center)

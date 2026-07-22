@@ -1,6 +1,6 @@
 //
 //  LyricsView.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Karaoke-style synced lyrics with tap-to-seek, plus a graceful plain-text
 //  and empty state.
@@ -52,11 +52,11 @@ struct LyricsView: View {
                 content
             }
             .foregroundColor(.white)
-            .navigationTitle(L("Lyrics"))
+            .navigationTitle("Lyrics")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(L("Done")) { dismiss() }.foregroundColor(.white)
+                    Button("Done") { dismiss() }.foregroundColor(.white)
                 }
             }
             .task(id: audio.currentSong) { await loader.load(for: audio.currentSong) }

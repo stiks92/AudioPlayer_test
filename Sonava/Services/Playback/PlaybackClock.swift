@@ -1,6 +1,6 @@
 //
 //  PlaybackClock.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  High-frequency playback values (updated ~30×/sec) live here, separate
 //  from AudioManager, so only the few views that show live time/level

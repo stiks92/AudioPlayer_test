@@ -1,8 +1,8 @@
 //
 //  PaywallView.swift
-//  AudioPlayer_test
+//  Sonava
 //
-//  Aurora Pro upsell. Designed to feel like a premium product worth paying
+//  Sonava Pro upsell. Designed to feel like a premium product worth paying
 //  for — clear value, beautiful presentation, honest copy.
 //
 
@@ -26,7 +26,7 @@ struct PaywallView: View {
 
     var body: some View {
         ZStack {
-            AuroraBackground(colors: [Theme.accent, Color(hex: 0xFF6FD8), Color(hex: 0x4A00E0)])
+            AuroraBackground(colors: [Theme.accent, Theme.accentPink, Theme.accentDeep])
 
             ScrollView {
                 VStack(spacing: 22) {
@@ -71,7 +71,7 @@ struct PaywallView: View {
                 .font(.system(size: 44, weight: .bold))
                 .foregroundColor(.white)
                 .shadow(color: .white.opacity(0.5), radius: 16)
-            Text("Aurora Pro")
+            Text("Sonava Pro")
                 .font(.system(size: 34, design: .rounded).weight(.heavy))
             Text("The one player for all your music —\nunlocked to the fullest.")
                 .font(.subheadline)
@@ -163,7 +163,7 @@ struct PaywallView: View {
         } label: {
             HStack {
                 if isPurchasing { ProgressView().tint(Theme.background) }
-                Text(isPurchasing ? "Processing…" : "Unlock Aurora Pro")
+                Text(isPurchasing ? "Processing…" : "Unlock Sonava Pro")
                     .font(.headline)
             }
             .foregroundColor(Theme.background)

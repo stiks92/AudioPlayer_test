@@ -1,0 +1,1658 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "%@": {
+      "shouldTranslate": false
+    },
+    "%lld min": {
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld минута"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld минуты"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld минут"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld минуты"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld tracks": {
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld трек"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld трека"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld треков"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld трека"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld tracks · on-device AI": {
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld трек · ИИ на устройстве"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld трека · ИИ на устройстве"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld треков · ИИ на устройстве"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld трека · ИИ на устройстве"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "AI Mix": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI-микс"
+          }
+        }
+      }
+    },
+    "AI Mix & Shazam": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI-микс и распознавание"
+          }
+        }
+      }
+    },
+    "AI Mix is a Pro feature": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI-микс — функция Pro"
+          }
+        }
+      }
+    },
+    "AI Mix · all sources · EQ · offline": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI-микс · все источники · EQ · офлайн"
+          }
+        }
+      }
+    },
+    "Active — thank you for your support!": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Активна — спасибо за поддержку!"
+          }
+        }
+      }
+    },
+    "Add to Playlist": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавить в плейлист"
+          }
+        }
+      }
+    },
+    "Add to Queue": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В очередь"
+          }
+        }
+      }
+    },
+    "Add tracks from the player or any track's menu.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавляй треки из плеера или через меню трека."
+          }
+        }
+      }
+    },
+    "All your music, one player": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вся музыка в одном плеере"
+          }
+        }
+      }
+    },
+    "Ambient": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эмбиент"
+          }
+        }
+      }
+    },
+    "Apple Music": {
+      "shouldTranslate": false
+    },
+    "Audius": {
+      "shouldTranslate": false
+    },
+    "Audius · full tracks": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audius · полные треки"
+          }
+        }
+      }
+    },
+    "Browse moods": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настроения"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отмена"
+          }
+        }
+      }
+    },
+    "Chillout": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Чиллаут"
+          }
+        }
+      }
+    },
+    "Cinematic": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Кинематографично"
+          }
+        }
+      }
+    },
+    "Classical": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Классика"
+          }
+        }
+      }
+    },
+    "Composing…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Собираем…"
+          }
+        }
+      }
+    },
+    "Connect": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключить"
+          }
+        }
+      }
+    },
+    "Connected": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключено"
+          }
+        }
+      }
+    },
+    "Connecting…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключение…"
+          }
+        }
+      }
+    },
+    "Continue": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Далее"
+          }
+        }
+      }
+    },
+    "Couldn't build a mix. Try another vibe or check your connection.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось собрать микс. Попробуй другое настроение или проверь соединение."
+          }
+        }
+      }
+    },
+    "Couldn't load episodes.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось загрузить эпизоды."
+          }
+        }
+      }
+    },
+    "Couldn't load podcasts.\nTap to retry.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось загрузить подкасты.\nНажми, чтобы повторить."
+          }
+        }
+      }
+    },
+    "Couldn't reach Audius. Check your connection.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось связаться с Audius. Проверь соединение."
+          }
+        }
+      }
+    },
+    "Couldn't reach the radio directory.\nTap to retry.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось связаться с каталогом радио.\nНажми, чтобы повторить."
+          }
+        }
+      }
+    },
+    "Create": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Создать"
+          }
+        }
+      }
+    },
+    "Create an AI Mix": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Собрать AI-микс"
+          }
+        }
+      }
+    },
+    "Dark": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Мрачно"
+          }
+        }
+      }
+    },
+    "Deezer": {
+      "shouldTranslate": false
+    },
+    "Delete playlist": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить плейлист"
+          }
+        }
+      }
+    },
+    "Describe a vibe": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Опиши настроение"
+          }
+        }
+      }
+    },
+    "Describe a vibe and get an instant mix. Identify what's playing around you in a tap.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Опиши настроение — и получи готовый микс. Узнавай, что играет вокруг, одним касанием."
+          }
+        }
+      }
+    },
+    "Describe a vibe — get an instant mix": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Опиши настроение — получи микс"
+          }
+        }
+      }
+    },
+    "Describe any mood or moment and Sonava composes a\nmix for you — instantly, on your device.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Опиши любое настроение или момент — Sonava соберёт\nмикс мгновенно, прямо на твоём устройстве."
+          }
+        }
+      }
+    },
+    "Developer: unlock Pro": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Разработчик: открыть Pro"
+          }
+        }
+      }
+    },
+    "Disconnect": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отключить"
+          }
+        }
+      }
+    },
+    "Discover": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Распознать"
+          }
+        }
+      }
+    },
+    "Done": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Готово"
+          }
+        }
+      }
+    },
+    "Editor's picks": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выбор редакции"
+          }
+        }
+      }
+    },
+    "Electronic": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Электроника"
+          }
+        }
+      }
+    },
+    "Endless playback": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Бесконечное воспроизведение"
+          }
+        }
+      }
+    },
+    "Epic": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эпично"
+          }
+        }
+      }
+    },
+    "Favorite": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В избранное"
+          }
+        }
+      }
+    },
+    "Favorites": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Избранное"
+          }
+        }
+      }
+    },
+    "Featured": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подборки"
+          }
+        }
+      }
+    },
+    "From your server": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "С твоего сервера"
+          }
+        }
+      }
+    },
+    "Generate mix": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Собрать микс"
+          }
+        }
+      }
+    },
+    "Good afternoon": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добрый день"
+          }
+        }
+      }
+    },
+    "Good evening": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добрый вечер"
+          }
+        }
+      }
+    },
+    "Good morning": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Доброе утро"
+          }
+        }
+      }
+    },
+    "Hip-Hop": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Хип-хоп"
+          }
+        }
+      }
+    },
+    "Home": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Главная"
+          }
+        }
+      }
+    },
+    "Identify another": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Распознать ещё"
+          }
+        }
+      }
+    },
+    "In your library": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В медиатеке"
+          }
+        }
+      }
+    },
+    "Internet Radio": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Интернет-радио"
+          }
+        }
+      }
+    },
+    "Jazz": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Джаз"
+          }
+        }
+      }
+    },
+    "LIVE": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ПРЯМОЙ ЭФИР"
+          }
+        }
+      }
+    },
+    "Late night vibes": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ночной вайб"
+          }
+        }
+      }
+    },
+    "Library": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Медиатека"
+          }
+        }
+      }
+    },
+    "Listening…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Слушаем…"
+          }
+        }
+      }
+    },
+    "Lo-fi": {
+      "shouldTranslate": false
+    },
+    "Loading plans…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Загрузка тарифов…"
+          }
+        }
+      }
+    },
+    "Lyrics": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Текст"
+          }
+        }
+      }
+    },
+    "Melancholy": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Меланхолия"
+          }
+        }
+      }
+    },
+    "Music recognition needs a physical device.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Распознавание работает только на реальном устройстве."
+          }
+        }
+      }
+    },
+    "Name": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Название"
+          }
+        }
+      }
+    },
+    "New Playlist": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Новый плейлист"
+          }
+        }
+      }
+    },
+    "New playlist": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Новый плейлист"
+          }
+        }
+      }
+    },
+    "New playlist name": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Название нового плейлиста"
+          }
+        }
+      }
+    },
+    "News": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Новости"
+          }
+        }
+      }
+    },
+    "No Audius tracks matched.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На Audius ничего не найдено."
+          }
+        }
+      }
+    },
+    "No episodes found.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эпизоды не найдены."
+          }
+        }
+      }
+    },
+    "No favourites yet": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пока нет избранного"
+          }
+        }
+      }
+    },
+    "No match — try again": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не найдено — попробуй ещё"
+          }
+        }
+      }
+    },
+    "No podcasts found.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подкасты не найдены."
+          }
+        }
+      }
+    },
+    "No results": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ничего не найдено"
+          }
+        }
+      }
+    },
+    "No results for “%@”": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ничего не найдено по запросу «%@»"
+          }
+        }
+      }
+    },
+    "No stations found for this genre.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Станций в этом жанре не найдено."
+          }
+        }
+      }
+    },
+    "Now Playing": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сейчас играет"
+          }
+        }
+      }
+    },
+    "Now playing on Sonava": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сейчас играет в Sonava"
+          }
+        }
+      }
+    },
+    "Off": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выкл"
+          }
+        }
+      }
+    },
+    "On-device": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На устройстве"
+          }
+        }
+      }
+    },
+    "On-device intelligence, no tracking, no ads. Your taste stays yours.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Интеллект на устройстве, без слежки и рекламы. Твой вкус остаётся твоим."
+          }
+        }
+      }
+    },
+    "One query fans out across Audius, Apple, Deezer and your library — full tracks and previews together.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Один запрос ищет сразу в Audius, Apple, Deezer и твоей медиатеке — полные треки и превью вместе."
+          }
+        }
+      }
+    },
+    "Open in Apple Music": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Открыть в Apple Music"
+          }
+        }
+      }
+    },
+    "PLAYING FROM ALBUM": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ИГРАЕТ ИЗ АЛЬБОМА"
+          }
+        }
+      }
+    },
+    "PREVIEWS · 30 SEC": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ПРЕВЬЮ · 30 СЕК"
+          }
+        }
+      }
+    },
+    "PRO": {
+      "shouldTranslate": false
+    },
+    "Password": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пароль"
+          }
+        }
+      }
+    },
+    "Payment is charged to your Apple ID. Subscriptions renew automatically unless cancelled at least 24h before the period ends. Manage in Settings.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Оплата списывается с Apple ID. Подписка продлевается автоматически, если не отменить её не позднее чем за 24 часа до конца периода. Управление — в Настройках."
+          }
+        }
+      }
+    },
+    "Plans will be available at launch.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тарифы появятся на релизе."
+          }
+        }
+      }
+    },
+    "Play": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Слушать"
+          }
+        }
+      }
+    },
+    "Play Next": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Играть следующим"
+          }
+        }
+      }
+    },
+    "Play latest": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Слушать свежий"
+          }
+        }
+      }
+    },
+    "Play on Sonava": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Слушать в Sonava"
+          }
+        }
+      }
+    },
+    "Playback": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Воспроизведение"
+          }
+        }
+      }
+    },
+    "Playlists": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Плейлисты"
+          }
+        }
+      }
+    },
+    "Podcasts": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подкасты"
+          }
+        }
+      }
+    },
+    "Popular now": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Популярно сейчас"
+          }
+        }
+      }
+    },
+    "Privacy": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Приватность"
+          }
+        }
+      }
+    },
+    "Private by design": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Приватно по умолчанию"
+          }
+        }
+      }
+    },
+    "Processing…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Обработка…"
+          }
+        }
+      }
+    },
+    "Queue": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Очередь"
+          }
+        }
+      }
+    },
+    "Quick picks": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Быстрый выбор"
+          }
+        }
+      }
+    },
+    "Radio": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Радио"
+          }
+        }
+      }
+    },
+    "Recently played": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Недавно играли"
+          }
+        }
+      }
+    },
+    "Remove from Favorites": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Убрать из избранного"
+          }
+        }
+      }
+    },
+    "Remove from playlist": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Убрать из плейлиста"
+          }
+        }
+      }
+    },
+    "Rename": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переименовать"
+          }
+        }
+      }
+    },
+    "Rename playlist": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переименовать плейлист"
+          }
+        }
+      }
+    },
+    "Restore purchases": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Восстановить покупки"
+          }
+        }
+      }
+    },
+    "Rock": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Рок"
+          }
+        }
+      }
+    },
+    "Save": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сохранить"
+          }
+        }
+      }
+    },
+    "Search": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поиск"
+          }
+        }
+      }
+    },
+    "Search everything at once": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ищи везде сразу"
+          }
+        }
+      }
+    },
+    "Search podcasts": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Искать подкасты"
+          }
+        }
+      }
+    },
+    "Searching…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ищем…"
+          }
+        }
+      }
+    },
+    "Self-hosted (Subsonic)": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Свой сервер (Subsonic)"
+          }
+        }
+      }
+    },
+    "Self-hosted server": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Свой сервер"
+          }
+        }
+      }
+    },
+    "Server URL": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Адрес сервера"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настройки"
+          }
+        }
+      }
+    },
+    "Shuffle": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вперемешку"
+          }
+        }
+      }
+    },
+    "Skip": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пропустить"
+          }
+        }
+      }
+    },
+    "Sleep timer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Таймер сна"
+          }
+        }
+      }
+    },
+    "Something went wrong": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Что-то пошло не так"
+          }
+        }
+      }
+    },
+    "Sonava Pro": {
+      "shouldTranslate": false
+    },
+    "Songs": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Песни"
+          }
+        }
+      }
+    },
+    "Songs, artists, stations…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Песни, артисты, станции…"
+          }
+        }
+      }
+    },
+    "Soon": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скоро"
+          }
+        }
+      }
+    },
+    "Sources": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Источники"
+          }
+        }
+      }
+    },
+    "Spotify / Apple Music": {
+      "shouldTranslate": false
+    },
+    "Start Station": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Запустить станцию"
+          }
+        }
+      }
+    },
+    "Start listening": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Начать слушать"
+          }
+        }
+      }
+    },
+    "Streaming, internet radio, podcasts and your own server — unified in one beautiful place.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Стриминг, интернет-радио, подкасты и твой сервер — вместе в одном красивом плеере."
+          }
+        }
+      }
+    },
+    "Support": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поддержка"
+          }
+        }
+      }
+    },
+    "Tap the heart on any track to save it here.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нажми на сердечко у трека, чтобы добавить его сюда."
+          }
+        }
+      }
+    },
+    "Tap to identify the music around you": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нажми, чтобы распознать музыку вокруг"
+          }
+        }
+      }
+    },
+    "Tense": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Напряжённо"
+          }
+        }
+      }
+    },
+    "The one player for all your music —\nunlocked to the fullest.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Единственный плеер для всей твоей музыки —\nоткрытый полностью."
+          }
+        }
+      }
+    },
+    "This playlist is empty": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Плейлист пуст"
+          }
+        }
+      }
+    },
+    "Top": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Топ"
+          }
+        }
+      }
+    },
+    "Trending on Audius": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В тренде на Audius"
+          }
+        }
+      }
+    },
+    "Tuning in…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настраиваемся…"
+          }
+        }
+      }
+    },
+    "Turn off": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выключить"
+          }
+        }
+      }
+    },
+    "Unlock Sonava Pro": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Открыть Sonava Pro"
+          }
+        }
+      }
+    },
+    "Unlock with Sonava Pro": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Открыть в Sonava Pro"
+          }
+        }
+      }
+    },
+    "Up Next": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Далее"
+          }
+        }
+      }
+    },
+    "Uplifting": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Воодушевляюще"
+          }
+        }
+      }
+    },
+    "Username": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Имя пользователя"
+          }
+        }
+      }
+    },
+    "What do you feel like hearing?": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Что хочется послушать?"
+          }
+        }
+      }
+    },
+    "Works with Navidrome, Airsonic, Gonic and any Subsonic-compatible server.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Работает с Navidrome, Airsonic, Gonic и любым Subsonic-совместимым сервером."
+          }
+        }
+      }
+    },
+    "YOUR PLAYLISTS": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ТВОИ ПЛЕЙЛИСТЫ"
+          }
+        }
+      }
+    },
+    "Your Library": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Твоя медиатека"
+          }
+        }
+      }
+    },
+    "Your password is stored securely in the Keychain and only used to sign requests to your server.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пароль надёжно хранится в Keychain и используется только для подписи запросов к твоему серверу."
+          }
+        }
+      }
+    },
+    "Your server": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Твой сервер"
+          }
+        }
+      }
+    },
+    "e.g. rainy Sunday focus, no vocals": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "напр. дождливое воскресенье, фокус, без вокала"
+          }
+        }
+      }
+    },
+    "https://music.example.com": {
+      "shouldTranslate": false
+    },
+    "••••••••": {
+      "shouldTranslate": false
+    }
+  },
+  "version": "1.0"
+}

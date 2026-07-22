@@ -1,6 +1,6 @@
 //
 //  PodcastsView.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Browse & search podcasts (keyless, via iTunes Search).
 //
@@ -37,8 +37,11 @@ struct PodcastsView: View {
     @State private var query = ""
     @State private var selectedGenre = "Technology"
 
-    private let genres = ["Technology", "News", "Comedy", "True Crime", "Business",
-                          "Science", "Health", "Sports", "History", "Education"]
+    /// iTunes search takes the English term; the chip label translates.
+    private let genres: [FilterChip<String>] = [
+        "Technology", "News", "Comedy", "True Crime", "Business",
+        "Science", "Health", "Sports", "History", "Education"
+    ].map(FilterChip.init)
 
     private let columns = [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)]
 
@@ -48,7 +51,7 @@ struct PodcastsView: View {
                 Theme.background.ignoresSafeArea()
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
-                        Text(L("Podcasts"))
+                        Text("Podcasts")
                             .font(.system(.largeTitle, design: .rounded).weight(.heavy))
                             .foregroundColor(Theme.textPrimary)
                         searchField
@@ -77,7 +80,7 @@ struct PodcastsView: View {
     private var searchField: some View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass").foregroundColor(Theme.textSecondary)
-            TextField(L("Search podcasts"), text: $query)
+            TextField("Search podcasts", text: $query)
                 .foregroundColor(.white)
                 .autocorrectionDisabled()
                 .submitLabel(.search)
@@ -94,17 +97,17 @@ struct PodcastsView: View {
     private var genreChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                ForEach(genres, id: \.self) { genre in
-                    let isSelected = selectedGenre == genre
-                    Text(L(genre))
+                ForEach(genres) { genre in
+                    let isSelected = selectedGenre == genre.value
+                    Text(genre.title)
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(isSelected ? Theme.background : Theme.textSecondary)
                         .padding(.horizontal, 14).padding(.vertical, 8)
                         .background(Capsule().fill(isSelected ? Color.white : Color.white.opacity(0.08)))
                         .onTapGesture {
-                            selectedGenre = genre
+                            selectedGenre = genre.value
                             Haptics.selection()
-                            Task { await feed.load { try await iTunesService.shared.podcasts(genre: genre) } }
+                            Task { await feed.load { try await iTunesService.shared.podcasts(genre: genre.value) } }
                         }
                 }
             }
@@ -142,10 +145,10 @@ struct PodcastsView: View {
         }
     }
 
-    private func message(_ icon: String, _ text: String) -> some View {
+    private func message(_ icon: String, _ text: LocalizedStringKey) -> some View {
         VStack(spacing: 12) {
             Image(systemName: icon).font(.system(size: 42)).foregroundColor(Theme.textTertiary)
-            Text(L(text)).font(.subheadline).foregroundColor(Theme.textSecondary)
+            Text(text).font(.subheadline).foregroundColor(Theme.textSecondary)
         }
         .frame(maxWidth: .infinity).padding(.top, 50)
     }

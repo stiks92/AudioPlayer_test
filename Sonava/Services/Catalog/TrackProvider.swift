@@ -1,6 +1,6 @@
 //
 //  TrackProvider.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  The `MusicSource` abstraction (Phase 1: direct-stream providers) plus a
 //  tiny async networking helper shared by all providers.
@@ -21,7 +21,7 @@ protocol TrackProvider {
 
 /// Minimal JSON-over-HTTPS helper with sane timeouts and a User-Agent.
 enum Net {
-    static let userAgent = "Aurora/1.0 (iOS music aggregator)"
+    static let userAgent = "Sonava/1.0 (iOS music aggregator)"
 
     private static let session: URLSession = {
         let config = URLSessionConfiguration.default

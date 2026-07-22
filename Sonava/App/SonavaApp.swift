@@ -1,6 +1,6 @@
 //
 //  AudioPlayerApp.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  SwiftUI entry point.
 //

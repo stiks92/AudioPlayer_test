@@ -1,6 +1,6 @@
 //
 //  Playlist.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  A curated collection of songs.
 //

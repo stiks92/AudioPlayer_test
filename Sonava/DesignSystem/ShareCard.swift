@@ -1,6 +1,6 @@
 //
 //  ShareCard.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  A beautiful, shareable "now playing" card rendered to an image — every
 //  share is a tiny advert for the app.
@@ -51,7 +51,7 @@ struct NowPlayingShareCard: View {
                 HStack(spacing: 14) {
                     Image(systemName: "sparkles")
                         .font(.system(size: 34, weight: .bold))
-                    Text("Now playing on Aurora")
+                    Text("Now playing on Sonava")
                         .font(.system(size: 36, weight: .semibold, design: .rounded))
                 }
                 .foregroundColor(.white.opacity(0.95))

@@ -1,6 +1,6 @@
 //
 //  MarqueeText.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Text that gently scrolls when it is wider than its container.
 //

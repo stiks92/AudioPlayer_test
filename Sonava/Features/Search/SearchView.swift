@@ -1,6 +1,6 @@
 //
 //  SearchView.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Unified search: the local library + live results from Audius, with a
 //  mood grid shown when idle.
@@ -22,13 +22,22 @@ struct SearchView: View {
 
     private var localResults: [Song] { library.search(query) }
 
-    private let moods: [(String, [Color])] = [
-        ("Cinematic", [Color(hex: 0x654EA3), Color(hex: 0xEAAFC8)]),
-        ("Dark", [Color(hex: 0x232526), Color(hex: 0x414345)]),
-        ("Tense", [Color(hex: 0xC33764), Color(hex: 0x1D2671)]),
-        ("Uplifting", [Color(hex: 0x11998E), Color(hex: 0x38EF7D)]),
-        ("Melancholy", [Color(hex: 0x355C7D), Color(hex: 0x6C5B7B)]),
-        ("Epic", [Color(hex: 0xFF512F), Color(hex: 0xDD2476)])
+    /// A mood tile: a translated label, the term we actually search for, and
+    /// the gradient that gives the tile its character.
+    private struct Mood: Identifiable {
+        let title: LocalizedStringKey
+        let term: String
+        let gradient: [Color]
+        var id: String { term }
+    }
+
+    private let moods: [Mood] = [
+        Mood(title: "Cinematic",  term: "Cinematic",  gradient: [Color(hex: 0x654EA3), Color(hex: 0xEAAFC8)]),
+        Mood(title: "Dark",       term: "Dark",       gradient: [Color(hex: 0x232526), Color(hex: 0x414345)]),
+        Mood(title: "Tense",      term: "Tense",      gradient: [Color(hex: 0xC33764), Color(hex: 0x1D2671)]),
+        Mood(title: "Uplifting",  term: "Uplifting",  gradient: [Color(hex: 0x11998E), Theme.positive]),
+        Mood(title: "Melancholy", term: "Melancholy", gradient: [Color(hex: 0x355C7D), Color(hex: 0x6C5B7B)]),
+        Mood(title: "Epic",       term: "Epic",       gradient: [Color(hex: 0xFF512F), Color(hex: 0xDD2476)])
     ]
 
     var body: some View {
@@ -38,7 +47,7 @@ struct SearchView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 22) {
-                        Text(L("Search"))
+                        Text("Search")
                             .font(.system(.largeTitle, design: .rounded).weight(.heavy))
                             .foregroundColor(Theme.textPrimary)
 
@@ -82,7 +91,7 @@ struct SearchView: View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(Theme.textSecondary)
-            TextField(L("Songs, artists, stations…"), text: $query)
+            TextField("Songs, artists, stations…", text: $query)
                 .focused($focused)
                 .foregroundColor(.white)
                 .autocorrectionDisabled()
@@ -149,7 +158,7 @@ struct SearchView: View {
         }
     }
 
-    private func sourceSection(_ title: String, songs: [Song]) -> some View {
+    private func sourceSection(_ title: LocalizedStringKey, songs: [Song]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             SectionHeader(title: title)
             songList(songs)
@@ -193,10 +202,10 @@ struct SearchView: View {
         VStack(alignment: .leading, spacing: 14) {
             SectionHeader(title: "Browse moods")
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], spacing: 14) {
-                ForEach(moods, id: \.0) { mood in
+                ForEach(moods) { mood in
                     ZStack(alignment: .topLeading) {
-                        LinearGradient(colors: mood.1, startPoint: .topLeading, endPoint: .bottomTrailing)
-                        Text(L(mood.0))
+                        LinearGradient(colors: mood.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
+                        Text(mood.title)
                             .font(.system(size: 17, weight: .bold))
                             .foregroundColor(.white)
                             .padding(14)
@@ -209,7 +218,7 @@ struct SearchView: View {
                     .frame(height: 96)
                     .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                     .onTapGesture {
-                        query = mood.0
+                        query = mood.term
                     }
                 }
             }
@@ -221,7 +230,7 @@ struct SearchView: View {
             Image(systemName: "waveform.slash")
                 .font(.system(size: 46))
                 .foregroundColor(Theme.textTertiary)
-            Text("\(L("No results")) \u{201C}\(query)\u{201D}")
+            Text("No results for \u{201C}\(query)\u{201D}")
                 .font(.headline)
                 .foregroundColor(Theme.textSecondary)
         }

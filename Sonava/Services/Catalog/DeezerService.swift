@@ -1,6 +1,6 @@
 //
 //  DeezerService.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  Deezer — a huge mainstream catalogue. Its public search & chart endpoints
 //  are keyless and return 30-second preview streams + high-res artwork.
@@ -43,7 +43,7 @@ final class DeezerService: TrackProvider {
             RemotePlaylist(
                 id: "deezer-pl:\(p.id)",
                 title: p.title,
-                subtitle: "\(p.nbTracks ?? 0) \(L("tracks"))",
+                subtitle: String(localized: "\(p.nbTracks ?? 0) tracks"),
                 artworkURL: (p.pictureBig ?? p.pictureMedium).flatMap(URL.init(string:)),
                 gradientHex: Palette.hex(forSeed: "\(p.id)"),
                 fetchID: String(p.id)

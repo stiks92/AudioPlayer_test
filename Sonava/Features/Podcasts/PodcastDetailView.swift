@@ -1,6 +1,6 @@
 //
 //  PodcastDetailView.swift
-//  AudioPlayer_test
+//  Sonava
 //
 //  A podcast's episodes, streamed through the shared playback engine.
 //
@@ -62,7 +62,7 @@ struct PodcastDetailView: View {
                 Button {
                     audio.play(latest, in: episodes.songs)
                 } label: {
-                    Label(L("Play latest"), systemImage: "play.fill")
+                    Label("Play latest", systemImage: "play.fill")
                         .font(.headline)
                         .foregroundColor(Theme.background)
                         .frame(maxWidth: .infinity)
@@ -100,8 +100,8 @@ struct PodcastDetailView: View {
         }
     }
 
-    private func infoText(_ text: String) -> some View {
-        Text(L(text))
+    private func infoText(_ text: LocalizedStringKey) -> some View {
+        Text(text)
             .font(.subheadline)
             .foregroundColor(Theme.textSecondary)
             .padding(.top, 40)
