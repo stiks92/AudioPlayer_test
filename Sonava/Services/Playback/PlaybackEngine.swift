@@ -11,6 +11,11 @@ import Foundation
 import AVFoundation
 import QuartzCore
 
+/// Playback is driven entirely from `AudioManager`, which is main-actor
+/// isolated, and both backends touch UIKit-adjacent AVFoundation state.
+/// Pinning the protocol to the main actor makes that contract explicit
+/// rather than something every call site has to remember.
+@MainActor
 protocol PlaybackEngine: AnyObject {
     var onFinish: (() -> Void)? { get set }
     var isPlaying: Bool { get }
@@ -91,8 +96,11 @@ final class LocalAudioEngine: NSObject, PlaybackEngine, AVAudioPlayerDelegate {
         level = 0
     }
 
-    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        onFinish?()
+    // AVAudioPlayer calls its delegate on the run loop that started playback —
+    // always the main one here — but the protocol itself is not isolated, so
+    // the conformance has to be `nonisolated` and assert the actor.
+    nonisolated func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        MainActor.assumeIsolated { onFinish?() }
     }
 }
 
@@ -137,8 +145,13 @@ final class RemoteAudioEngine: NSObject, PlaybackEngine {
             object: item,
             queue: .main
         ) { [weak self] _ in
-            self?.playing = false
-            self?.onFinish?()
+            // Posted on .main by the queue above, so this is already the
+            // main actor — assert it instead of hopping and losing ordering.
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                self.playing = false
+                self.onFinish?()
+            }
         }
         if autoplay { play() }
         return true

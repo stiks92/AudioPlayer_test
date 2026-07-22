@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-final class PodcastFeedService {
+final class PodcastFeedService: Sendable {
     static let shared = PodcastFeedService()
 
     private let session = URLSession(configuration: .default)

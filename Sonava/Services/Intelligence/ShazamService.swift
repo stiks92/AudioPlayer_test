@@ -56,7 +56,7 @@ final class ShazamService: NSObject, ObservableObject {
     }
 
     private func requestPermissionAndListen() {
-        AVAudioSession.sharedInstance().requestRecordPermission { [weak self] granted in
+        AVAudioApplication.requestRecordPermission { [weak self] granted in
             Task { @MainActor in
                 guard let self else { return }
                 if granted {
@@ -72,7 +72,7 @@ final class ShazamService: NSObject, ObservableObject {
         do {
             try AVAudioSession.sharedInstance().setCategory(
                 .playAndRecord,
-                options: [.defaultToSpeaker, .allowBluetooth, .mixWithOthers]
+                options: [.defaultToSpeaker, .allowBluetoothHFP, .mixWithOthers]
             )
             try AVAudioSession.sharedInstance().setActive(true)
 

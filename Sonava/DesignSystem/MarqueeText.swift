@@ -28,8 +28,8 @@ struct MarqueeText: View {
                     }
                     .offset(x: offset)
                     .onAppear { startAnimation() }
-                    .onChange(of: text) { _ in restart() }
-                    .onChange(of: textWidth) { _ in restart() }
+                    .onChange(of: text) { restart() }
+                    .onChange(of: textWidth) { restart() }
                 } else {
                     label
                         .frame(width: geo.size.width, alignment: .leading)
@@ -81,7 +81,7 @@ struct MarqueeText: View {
     }
 
     private struct WidthKey: PreferenceKey {
-        static var defaultValue: CGFloat = 0
+        static let defaultValue: CGFloat = 0
         static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
             value = max(value, nextValue())
         }

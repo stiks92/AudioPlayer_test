@@ -11,12 +11,12 @@
 import Foundation
 import SwiftUI
 
-final class AudiusService: TrackProvider {
+actor AudiusService: TrackProvider {
 
     static let shared = AudiusService()
 
-    let id = "audius"
-    let displayName = "Audius"
+    nonisolated let id = "audius"
+    nonisolated let displayName = "Audius"
 
     private let appName = "Sonava"
     private var cachedHost: String?

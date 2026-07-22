@@ -9,7 +9,7 @@
 
 import Foundation
 
-final class AIMixService {
+final class AIMixService: Sendable {
     static let shared = AIMixService()
 
     /// Intent keywords (EN + RU) → search seeds (kept English — services match

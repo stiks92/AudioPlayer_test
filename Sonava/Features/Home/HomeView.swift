@@ -69,7 +69,7 @@ struct HomeView: View {
                 }
                 await loadServerIfNeeded()
             }
-            .onChange(of: serverStore.isConnected) { _ in
+            .onChange(of: serverStore.isConnected) {
                 Task { await loadServerIfNeeded(force: true) }
             }
             .sheet(isPresented: $showSettings) {

@@ -136,7 +136,7 @@ private struct SyncedLyricsList: View {
                 }
                 .padding(.horizontal, 24)
             }
-            .onChange(of: activeIndex) { newValue in
+            .onChange(of: activeIndex) { _, newValue in
                 guard let newValue, lines.indices.contains(newValue) else { return }
                 withAnimation(.easeInOut(duration: 0.4)) {
                     proxy.scrollTo(lines[newValue].id, anchor: .center)

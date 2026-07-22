@@ -416,7 +416,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sonava.player;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -446,7 +446,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sonava.player;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -465,7 +465,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sonava.player.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Sonava.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Sonava";
 			};
@@ -485,7 +485,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sonava.player.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Sonava.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Sonava";
 			};
@@ -504,7 +504,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sonava.player.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Sonava;
 			};
@@ -523,7 +523,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sonava.player.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Sonava;
 			};

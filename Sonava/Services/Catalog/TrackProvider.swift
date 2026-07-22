@@ -9,7 +9,7 @@
 import Foundation
 
 /// A remote catalogue that yields universal `Song` values.
-protocol TrackProvider {
+protocol TrackProvider: Sendable {
     var id: String { get }
     var displayName: String { get }
 

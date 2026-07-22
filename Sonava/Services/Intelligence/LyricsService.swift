@@ -21,7 +21,7 @@ struct Lyrics: Equatable {
     var isEmpty: Bool { synced.isEmpty && (plain?.isEmpty ?? true) }
 }
 
-final class LyricsService {
+final class LyricsService: Sendable {
     static let shared = LyricsService()
 
     private let session = URLSession(configuration: .default)

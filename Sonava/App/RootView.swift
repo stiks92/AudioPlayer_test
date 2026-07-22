@@ -56,10 +56,10 @@ struct RootView: View {
         .fullScreenCover(isPresented: Binding(get: { !hasOnboarded }, set: { hasOnboarded = !$0 })) {
             OnboardingView { hasOnboarded = true }
         }
-        .onChange(of: audio.currentSong) { song in
+        .onChange(of: audio.currentSong) { _, song in
             if let song { library.markPlayed(song) }
         }
-        .onChange(of: selection) { newValue in
+        .onChange(of: selection) { _, newValue in
             visited.insert(newValue)
             Haptics.selection()
         }

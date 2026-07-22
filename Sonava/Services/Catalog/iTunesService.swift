@@ -8,7 +8,7 @@
 
 import Foundation
 
-final class iTunesService {
+final class iTunesService: Sendable {
     static let shared = iTunesService()
 
     /// Search podcasts by free text.

@@ -46,7 +46,7 @@ struct PaywallView: View {
             if proStore.products.isEmpty { await proStore.loadProducts() }
             selectedID = selectedID ?? proStore.products.first?.id
         }
-        .onChange(of: proStore.isPro) { pro in
+        .onChange(of: proStore.isPro) { _, pro in
             if pro { dismiss() }
         }
     }

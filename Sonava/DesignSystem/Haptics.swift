@@ -7,6 +7,7 @@
 
 import UIKit
 
+@MainActor
 enum Haptics {
     static func impact(_ style: UIImpactFeedbackGenerator.FeedbackStyle = .light) {
         let generator = UIImpactFeedbackGenerator(style: style)
