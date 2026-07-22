@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct LibraryView: View {
     @EnvironmentObject private var audio: AudioManager
@@ -28,6 +29,8 @@ struct LibraryView: View {
     @State private var tab: Tab = .playlists
     @State private var showNewPlaylist = false
     @State private var newPlaylistName = ""
+    @State private var showImporter = false
+    @State private var importError: String?
     @Namespace private var seg
 
     var body: some View {
@@ -55,6 +58,26 @@ struct LibraryView: View {
                 }
             }
             .navigationBarHidden(true)
+            .fileImporter(
+                isPresented: $showImporter,
+                allowedContentTypes: [.audio],
+                allowsMultipleSelection: true
+            ) { result in
+                switch result {
+                case .success(let urls):
+                    Task { await library.importFiles(at: urls) }
+                case .failure(let error):
+                    importError = error.localizedDescription
+                }
+            }
+            .alert(
+                "Import failed",
+                isPresented: Binding(get: { importError != nil }, set: { if !$0 { importError = nil } })
+            ) {
+                Button("OK", role: .cancel) { importError = nil }
+            } message: {
+                Text(importError ?? "")
+            }
             .alert("New playlist", isPresented: $showNewPlaylist) {
                 TextField("Name", text: $newPlaylistName)
                 Button("Create") {
@@ -142,48 +165,92 @@ struct LibraryView: View {
                 .buttonStyle(.plain)
             }
 
-            ForEach(library.playlists) { playlist in
-                NavigationLink {
-                    PlaylistDetailView(playlist: playlist)
-                } label: {
-                    HStack(spacing: 14) {
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .fill(LinearGradient(colors: playlist.gradient, startPoint: .topLeading, endPoint: .bottomTrailing))
-                            .frame(width: 60, height: 60)
-                            .overlay(Image(systemName: playlist.systemImage).foregroundColor(.white))
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(playlist.title)
-                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundColor(Theme.textPrimary)
-                                .lineLimit(1)
-                            Text(playlist.subtitle)
-                                .font(.caption)
-                                .foregroundColor(Theme.textSecondary)
-                                .lineLimit(1)
-                        }
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundColor(Theme.textTertiary)
+        }
+    }
+
+    @ViewBuilder
+    private var songsSection: some View {
+        if library.songs.isEmpty {
+            emptyLibrary
+        } else {
+            LazyVStack(spacing: 2) {
+                importButton
+                ForEach(library.songs) { song in
+                    Button {
+                        audio.play(song, in: library.songs)
+                    } label: {
+                        SongRow(song: song)
                     }
-                    .padding(.vertical, 4)
+                    .buttonStyle(.plain)
+                    .contextMenu {
+                        Button(role: .destructive) {
+                            library.remove(song)
+                        } label: {
+                            Label("Remove from library", systemImage: "trash")
+                        }
+                    }
                 }
-                .buttonStyle(.plain)
             }
         }
     }
 
-    private var songsSection: some View {
-        LazyVStack(spacing: 2) {
-            ForEach(library.songs) { song in
-                Button {
-                    audio.play(song, in: library.songs)
-                } label: {
-                    SongRow(song: song)
-                }
-                .buttonStyle(.plain)
+    private var importButton: some View {
+        Button {
+            Haptics.impact()
+            showImporter = true
+        } label: {
+            HStack(spacing: 14) {
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Color.white.opacity(0.08))
+                    .frame(width: 44, height: 44)
+                    .overlay(
+                        Image(systemName: "square.and.arrow.down")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(Theme.accentSoft)
+                    )
+                Text("Import from Files")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(Theme.textPrimary)
+                Spacer()
             }
+            .padding(.vertical, 6)
         }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(AccessibilityID.importButton)
+    }
+
+    /// Sonava bundles no music of its own, so an empty Songs tab is the normal
+    /// first-run state — it has to explain itself and offer the way forward.
+    private var emptyLibrary: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "folder.badge.plus")
+                .font(.system(size: 46))
+                .foregroundColor(Theme.textTertiary)
+            Text("No files yet")
+                .font(.headline)
+                .foregroundColor(Theme.textSecondary)
+            Text("Import your own audio from Files or iCloud Drive. It stays on your device and plays offline.")
+                .font(.subheadline)
+                .foregroundColor(Theme.textTertiary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+            Button {
+                Haptics.impact()
+                showImporter = true
+            } label: {
+                Text("Import from Files")
+                    .font(.headline)
+                    .foregroundColor(Theme.background)
+                    .padding(.horizontal, 22)
+                    .padding(.vertical, 12)
+                    .background(Capsule().fill(Color.white))
+            }
+            .buttonStyle(BouncyButtonStyle(scale: 0.96))
+            .accessibilityIdentifier(AccessibilityID.importButton)
+            .padding(.top, 4)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 50)
     }
 
     @ViewBuilder

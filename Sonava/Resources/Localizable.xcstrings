@@ -372,6 +372,16 @@
         }
       }
     },
+    "Couldn't read %@.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось прочитать %@."
+          }
+        }
+      }
+    },
     "Create": {
       "localizations": {
         "ru": {
@@ -555,16 +565,6 @@
         }
       }
     },
-    "Featured": {
-      "localizations": {
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Подборки"
-          }
-        }
-      }
-    },
     "From your server": {
       "localizations": {
         "ru": {
@@ -641,6 +641,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Распознать ещё"
+          }
+        }
+      }
+    },
+    "Import failed": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Импорт не удался"
+          }
+        }
+      }
+    },
+    "Import from Files": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Импортировать из Файлов"
+          }
+        }
+      }
+    },
+    "Import your own audio from Files or iCloud Drive. It stays on your device and plays offline.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Импортируй свои аудиофайлы из Файлов или iCloud Drive. Они останутся на устройстве и будут играть офлайн."
           }
         }
       }
@@ -758,6 +788,16 @@
         }
       }
     },
+    "My files": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Мои файлы"
+          }
+        }
+      }
+    },
     "Name": {
       "localizations": {
         "ru": {
@@ -838,6 +878,16 @@
         }
       }
     },
+    "No files yet": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пока нет файлов"
+          }
+        }
+      }
+    },
     "No match — try again": {
       "localizations": {
         "ru": {
@@ -904,6 +954,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Сейчас играет в Sonava"
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
           }
         }
       }
@@ -1167,6 +1227,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Убрать из избранного"
+          }
+        }
+      }
+    },
+    "Remove from library": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Убрать из медиатеки"
           }
         }
       }
@@ -1523,6 +1593,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Выключить"
+          }
+        }
+      }
+    },
+    "Unknown artist": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Неизвестный исполнитель"
           }
         }
       }

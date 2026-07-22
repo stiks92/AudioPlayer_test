@@ -48,7 +48,6 @@ struct HomeView: View {
                         editorialSection
                         serverSection
                         trendingSection
-                        featured
                         quickPicks
                     }
                     .padding(.horizontal, 20)
@@ -318,6 +317,7 @@ struct HomeView: View {
                     .frame(width: 40, height: 40)
             }
             .buttonStyle(BouncyButtonStyle())
+            .identified(AccessibilityID.shazamButton, label: "Discover")
 
             Button {
                 showSettings = true
@@ -331,6 +331,7 @@ struct HomeView: View {
                     )
             }
             .buttonStyle(BouncyButtonStyle())
+            .identified(AccessibilityID.settingsButton, label: "Settings")
         }
     }
 
@@ -361,26 +362,6 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Featured playlists
-
-    private var featured: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            SectionHeader(title: "Featured")
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    ForEach(library.playlists) { playlist in
-                        NavigationLink {
-                            PlaylistDetailView(playlist: playlist)
-                        } label: {
-                            PlaylistHeroCard(playlist: playlist)
-                        }
-                        .buttonStyle(BouncyButtonStyle(scale: 0.96))
-                    }
-                }
-            }
-        }
-    }
-
     // MARK: - Quick picks
 
     private var quickPicks: some View {
@@ -397,34 +378,5 @@ struct HomeView: View {
                 }
             }
         }
-    }
-}
-
-struct PlaylistHeroCard: View {
-    let playlist: Playlist
-
-    var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            LinearGradient(colors: playlist.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
-            Image(systemName: playlist.systemImage)
-                .font(.system(size: 60, weight: .bold))
-                .foregroundColor(.white.opacity(0.22))
-                .offset(x: 90, y: -40)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(playlist.title)
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundColor(.white)
-                    .lineLimit(2)
-                Text(playlist.subtitle)
-                    .font(.system(size: 12))
-                    .foregroundColor(.white.opacity(0.8))
-                    .lineLimit(1)
-            }
-            .padding(16)
-        }
-        .frame(width: 220, height: 150)
-        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .shadow(color: playlist.gradient.first?.opacity(0.5) ?? .clear, radius: 16, y: 10)
     }
 }

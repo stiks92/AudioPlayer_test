@@ -88,11 +88,12 @@ struct Song: Identifiable, Equatable, Hashable, Codable {
         self.gradientHex = gradientHex
     }
 
-    /// Playable URL, resolving bundled resources for local tracks.
+    /// Playable URL. Local tracks are files the user imported, which live in
+    /// the app's Media directory — Sonava bundles no audio of its own.
     var url: URL? {
         switch source {
         case .local:
-            return fileName.flatMap { Bundle.main.url(forResource: $0, withExtension: fileExtension) }
+            return fileName.map { LocalFileStore.mediaDirectory.appendingPathComponent($0) }
         default:
             return streamURL
         }

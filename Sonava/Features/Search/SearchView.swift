@@ -92,6 +92,7 @@ struct SearchView: View {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(Theme.textSecondary)
             TextField("Songs, artists, stations…", text: $query)
+                .accessibilityIdentifier(AccessibilityID.searchField)
                 .focused($focused)
                 .foregroundColor(.white)
                 .autocorrectionDisabled()
