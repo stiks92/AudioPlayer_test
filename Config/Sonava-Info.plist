@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
+
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Sonava uses the microphone to recognize music playing around you.</string>
+
+	<!-- Lets the user import their own audio files from Files / iCloud Drive
+	     and re-open them on later launches via security-scoped bookmarks. -->
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>UISupportsDocumentBrowser</key>
+	<false/>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Audio</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.audio</string>
+			</array>
+		</dict>
+	</array>
+
+	<!-- Many internet radio streams are still delivered over plain HTTP.
+	     This exception relaxes ATS only for media loaded through AVFoundation,
+	     never for general networking (all our APIs are HTTPS). -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoadsForMedia</key>
+		<true/>
+	</dict>
+
+	<!-- App Store: we use no non-exempt encryption, so review never asks. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+</dict>
+</plist>

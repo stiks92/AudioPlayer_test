@@ -1,0 +1,44 @@
+{
+  "configurations" : [
+    {
+      "id" : "5A000000-0000-0000-0000-0000000000E1",
+      "name" : "English",
+      "options" : {
+        "language" : "en",
+        "region" : "US"
+      }
+    },
+    {
+      "id" : "5A000000-0000-0000-0000-0000000000E2",
+      "name" : "Russian",
+      "options" : {
+        "language" : "ru",
+        "region" : "RU"
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Sonava.xcodeproj",
+      "identifier" : "5A0000000000000000000010",
+      "name" : "Sonava"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Sonava.xcodeproj",
+        "identifier" : "5A0000000000000000000011",
+        "name" : "SonavaTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Sonava.xcodeproj",
+        "identifier" : "5A0000000000000000000012",
+        "name" : "SonavaUITests"
+      }
+    }
+  ],
+  "version" : 1
+}
