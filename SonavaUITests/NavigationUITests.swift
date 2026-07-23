@@ -8,6 +8,7 @@
 
 import XCTest
 
+@MainActor
 final class NavigationUITests: XCTestCase {
 
     override func setUp() {

@@ -38,6 +38,10 @@ final class AudioManager: NSObject, ObservableObject {
     /// pushed to whichever engine is active.
     let effects = AudioEffects()
 
+    /// Optional taste bias for endless autoplay. Set by the app so extending
+    /// the queue drifts toward what the listener likes.
+    var tasteProfile: TasteProfile = .init(topArtists: [])
+
     var isLive: Bool { currentSong?.isLive ?? false }
 
     /// Speed control is only meaningful for spoken-word content (podcasts).
@@ -286,7 +290,7 @@ final class AudioManager: NSObject, ObservableObject {
         isExtending = true
         Task { @MainActor in
             defer { isExtending = false }
-            let more = await StationService.station(for: song)
+            let more = await StationService.station(for: song, taste: tasteProfile)
             let existing = Set(queue.map(\.id))
             let fresh = more.filter { !existing.contains($0.id) }
             guard !fresh.isEmpty else { return }

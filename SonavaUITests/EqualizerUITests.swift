@@ -8,6 +8,7 @@
 
 import XCTest
 
+@MainActor
 final class EqualizerUITests: XCTestCase {
 
     override func setUp() {

@@ -52,6 +52,17 @@ final class MusicLibrary: ObservableObject {
     var favoriteSongs: [Song] { favorites }
     var recentSongs: [Song] { recents }
 
+    /// On-device model of the listener's taste, from favourites + recents.
+    var tasteProfile: TasteProfile {
+        TasteProfile.build(favorites: favorites, recents: recents)
+    }
+
+    /// Everything the listener already has — so recommendations don't suggest
+    /// tracks back at them.
+    var knownTrackIDs: Set<String> {
+        Set(favorites.map(\.id) + recents.map(\.id) + songs.map(\.id))
+    }
+
     /// Searches the user's own files. Remote catalogues are searched by their
     /// own services; `SearchView` merges the results.
     func search(_ query: String) -> [Song] {

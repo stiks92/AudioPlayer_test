@@ -87,6 +87,7 @@ struct RootView: View {
             if let song {
                 library.markPlayed(song)
                 reviewPrompt.record(.trackFinished)   // active listening is a good signal
+                audio.tasteProfile = library.tasteProfile   // keep endless radio on-taste
             }
         }
         .onChange(of: playlistStore.playlists.count) { old, new in

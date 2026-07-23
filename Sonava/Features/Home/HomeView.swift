@@ -17,7 +17,9 @@ struct HomeView: View {
     @StateObject private var trending = SongFeed()
     @StateObject private var charts = SongFeed()
     @StateObject private var serverFeed = SongFeed()
+    @StateObject private var madeForYou = SongFeed()
     @State private var editorial: [RemotePlaylist] = []
+    @State private var tasteSeed: [String] = []
     @State private var showSettings = false
     @State private var showAIMix = false
     @State private var showShazam = false
@@ -41,6 +43,7 @@ struct HomeView: View {
                     VStack(alignment: .leading, spacing: 28) {
                         header
                         aiMixCard
+                        madeForYouSection
                         popularSection
                         if !library.recentSongs.isEmpty {
                             recentlyPlayed
@@ -67,9 +70,13 @@ struct HomeView: View {
                     await trending.load { try await AudiusService.shared.trending() }
                 }
                 await loadServerIfNeeded()
+                await loadMadeForYou()
             }
             .onChange(of: serverStore.isConnected) {
                 Task { await loadServerIfNeeded(force: true) }
+            }
+            .onChange(of: library.favoriteSongs.count) {
+                Task { await loadMadeForYou(force: true) }
             }
             .sheet(isPresented: $showSettings) {
                 SettingsView()
@@ -100,6 +107,49 @@ struct HomeView: View {
     }
 
     // MARK: - From your server
+
+    // MARK: - Made for you (taste-based)
+
+    /// Loads recommendations from the on-device taste profile. Only refetches
+    /// when the taste actually changed, so it doesn't hammer the network.
+    private func loadMadeForYou(force: Bool = false) async {
+        let profile = library.tasteProfile
+        guard !profile.isEmpty else { madeForYou.clear(); return }
+        guard force || profile.seedQueries != tasteSeed else { return }
+        tasteSeed = profile.seedQueries
+        let known = library.knownTrackIDs
+        await madeForYou.load {
+            Array(await StationService.recommendations(for: profile, excluding: known).prefix(20))
+        }
+    }
+
+    @ViewBuilder
+    private var madeForYouSection: some View {
+        if madeForYou.state == .loaded, !madeForYou.songs.isEmpty {
+            VStack(alignment: .leading, spacing: 14) {
+                SectionHeader(title: "Made for you")
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 14) {
+                        ForEach(madeForYou.songs) { song in
+                            Button {
+                                audio.play(song, in: madeForYou.songs)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    ArtworkThumbnail(song: song, size: 130, cornerRadius: 16, showBadge: true)
+                                    Text(song.title)
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundColor(Theme.textPrimary)
+                                        .lineLimit(1)
+                                        .frame(width: 130, alignment: .leading)
+                                }
+                            }
+                            .buttonStyle(BouncyButtonStyle(scale: 0.95))
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @ViewBuilder
     private var serverSection: some View {

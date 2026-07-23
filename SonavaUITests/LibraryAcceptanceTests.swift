@@ -9,6 +9,7 @@
 
 import XCTest
 
+@MainActor
 final class LibraryAcceptanceTests: XCTestCase {
 
     override func setUp() {
@@ -86,6 +87,7 @@ final class LibraryAcceptanceTests: XCTestCase {
     }
 }
 
+@MainActor
 final class PaywallAcceptanceTests: XCTestCase {
 
     override func setUp() {
