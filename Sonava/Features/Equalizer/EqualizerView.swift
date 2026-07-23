@@ -68,6 +68,7 @@ struct EqualizerView: View {
                 Text("Equalizer").font(.system(size: 17, weight: .bold))
                 Text(effects.selectedPreset.map { LocalizedStringKey($0.name) } ?? "Custom")
                     .font(.caption).foregroundColor(Theme.textSecondary)
+                    .accessibilityIdentifier("eq.selectedPreset")
             }
         }
         .tint(Theme.accent)
@@ -134,6 +135,8 @@ struct EqualizerView: View {
                                 .background(Capsule().fill(selected ? Color.white : Color.white.opacity(0.08)))
                         }
                         .buttonStyle(.plain)
+                        // Identify by preset id so UI tests are language-agnostic.
+                        .accessibilityIdentifier("eq.preset.\(preset.id)")
                     }
                 }
             }

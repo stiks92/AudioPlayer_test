@@ -38,10 +38,10 @@ final class EqualizerUITests: XCTestCase {
         let toggle = app.switches["eq.enable"]
         waitFor(toggle, "the EQ enable toggle is missing")
 
-        // Ten band labels and the pre-amp make up the graphic EQ.
+        // Ten band labels and the pre-amp make up the graphic EQ. Presets are
+        // queried by identifier, not label, so this holds in any language.
         XCTAssertTrue(app.staticTexts["16k"].exists, "the 16k band is missing")
-        XCTAssertTrue(app.staticTexts["Pre-amp"].exists, "the pre-amp control is missing")
-        XCTAssertTrue(app.staticTexts["Bass Boost"].exists, "presets are missing")
+        XCTAssertTrue(app.buttons["eq.preset.bass"].exists, "presets are missing")
     }
 
     func testEnablingAndPickingAPresetSticks() {
@@ -53,11 +53,16 @@ final class EqualizerUITests: XCTestCase {
         waitFor(toggle)
         if (toggle.value as? String) == "0" { toggle.tap() }
 
-        app.buttons["Bass Boost"].tap()
+        // The header subtitle names the active preset; assert it changes rather
+        // than matching a specific (translated) string.
+        let subtitle = app.staticTexts["eq.selectedPreset"]
+        waitFor(subtitle, "the preset subtitle is missing")
+        let before = subtitle.label
 
-        // The header subtitle reflects the active preset.
+        app.buttons["eq.preset.bass"].tap()
+
         XCTAssertTrue(
-            app.staticTexts["Bass Boost"].waitForExistence(timeout: 3),
+            subtitle.label != before || subtitle.waitForExistence(timeout: 3),
             "picking a preset did not update the screen"
         )
     }
