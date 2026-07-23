@@ -1,284 +1,206 @@
-# Aurora — Engineering Handoff
+# Sonava — Engineering Handoff
 
-This document is the single source of truth for **continuing development of this
-app in a fresh session (new account, same model, same repo)**. Read it fully
-before making changes. Companion docs: [`ROADMAP.md`](./ROADMAP.md) (product /
-growth), [`INTEGRATIONS.md`](./INTEGRATIONS.md) (source connectors),
-[`SETUP.md`](./SETUP.md) (build / capabilities / QA).
+Single source of truth for continuing this app in a fresh session. Read it
+fully before making changes. The [`README`](../README.md) covers build/test
+mechanics in depth; this document covers *how the project got here and what to
+watch out for*. Companion docs: [`ROADMAP.md`](./ROADMAP.md) (product / growth),
+[`INTEGRATIONS.md`](./INTEGRATIONS.md) (source connectors),
+[`SETUP.md`](./SETUP.md) (capabilities / QA).
 
 ---
 
 ## 1. What this project is
 
-**Aurora** is a complete SwiftUI rewrite of a UIKit/Storyboard demo audio player.
-The goal is an "ultimate", beautiful, cross-service music **aggregator**: one
-gorgeous player that unifies local files, free legal streaming catalogs, internet
-radio, podcasts, and self-hosted servers, with on-device AI touches and a
-subscription (Aurora Pro). Full positioning and monetization are in `ROADMAP.md`.
+**Sonava** is a SwiftUI music **aggregator**: one player over the user's own
+files, free legal streaming catalogues, internet radio, podcasts and self-hosted
+servers, with on-device intelligence and a subscription (Sonava Pro). Positioning
+and monetization are in `ROADMAP.md`.
 
-- **Platform:** iOS 16.0+, Xcode 15+. **Zero third-party dependencies** — only
-  SwiftUI, AVFoundation, MediaPlayer, ShazamKit, StoreKit 2, CryptoKit, Security.
-- **Language:** the product ships **bilingual EN/RU** (see §7). The user (project
-  owner) communicates in **Russian**; mirror that in chat.
-- **56 Swift files**, MVVM-ish, `@MainActor` services published into the SwiftUI
-  environment.
+- **Platform:** iOS 18.0+, Xcode 26+, **Swift 6 language mode, zero warnings**.
+  **Zero third-party dependencies** — SwiftUI, AVFoundation, MediaPlayer,
+  ShazamKit, StoreKit 2, CryptoKit, Security.
+- **Bilingual EN/RU.** The owner communicates in **Russian**; mirror that.
+- ~60 Swift files, MVVM-ish, `@MainActor` services in the SwiftUI environment.
+
+> **Renamed from "Aurora".** That name is taken in the App Store by a direct
+> competitor. "Sonava" was cleared against the store and trademark registries.
+> Don't reintroduce "Aurora" as product copy. The `AuroraBackground` view keeps
+> its name on purpose — the aurora visual is the motif, not the brand.
 
 ---
 
-## 2. Repo & branch mechanics (read first — this is how you continue seamlessly)
+## 2. Repo & branch mechanics
 
-- **Repo:** `stiks92/audioplayer_test`.
-- **Working branch:** `claude/player-redesign-swiftui-1c0c2x`. All work happens
-  here. The owner has authorized **merging finished work to `main`** via PR.
-- **Default flow for every change:**
-  1. Make edits on the working branch.
-  2. Commit with a clear message.
-  3. `git push -u origin claude/player-redesign-swiftui-1c0c2x`.
-  4. Open a PR to `main` and merge it (owner has standing authorization).
-- **Before starting, always sync to remote** — a local checkout can be behind:
+- **Repo:** `stiks92/AudioPlayer_test`. **Working branch:**
+  `claude/player-redesign-swiftui-1c0c2x`. Finished work merges to `main` via PR.
+- **Always sync first** — the local checkout can be behind:
   ```
   git fetch origin main claude/player-redesign-swiftui-1c0c2x
   git checkout -B claude/player-redesign-swiftui-1c0c2x origin/claude/player-redesign-swiftui-1c0c2x
   ```
-  (This exact "stale local checkout" issue caused a near-miss once — the crash fix
-  had to be re-applied against the real remote HEAD. Always fetch first.)
-- **If the working branch's PR was already merged and you're starting fresh work**,
-  keep the same branch name but rebase/restart from the latest `origin/main`.
-
-Merged so far: **PRs #1–#14** (full history in `git log origin/main`). Current
-`main` HEAD after the handoff: `7a71fd2` (startup-crash fix).
+- **Git auth gotcha:** the SSH key has a non-default filename. If pushes fail
+  with `Permission denied (publickey)` or a 403, it is key discovery, not access:
+  ```
+  git config core.sshCommand "ssh -i ~/.ssh/github -o IdentitiesOnly=yes"
+  ```
+  Keep `origin` on SSH — switching to HTTPS makes the `gh` token take over as the
+  **wrong** GitHub identity, which fetches fine but cannot push or open PRs.
+  Opening the PR itself may need the owner (the CLI's `gh` account may lack write).
 
 ---
 
-## 3. The hard environment constraint: you cannot compile
+## 3. You CAN build and run
 
-There is **no Swift/Xcode toolchain in this Linux environment**, so you cannot
-build or run the app. This shapes everything:
+The Mac has the full toolchain (Xcode 26, simulators). This is a change from
+earlier sessions, which ran on Linux with no compiler.
 
-- **You write and review code by hand.** The owner's Xcode build is the source of
-  truth. Expect to iterate on compile errors reported (often as screenshots).
-- **Be conservative with SDK/API usage** — prefer APIs you're certain exist on the
-  iOS 16 SDK. Availability mistakes are the most common build breaks.
-- **Validate what you can statically:** for any dictionary literal, JSON decoding
-  shape, or `project.pbxproj` edit, run a quick script to check invariants (e.g.
-  duplicate keys, undefined UUID refs). A `static let` dictionary literal with
-  **duplicate keys traps at launch** — that exact bug shipped once (see §7).
-- After a batch of non-trivial changes, **explicitly recommend the owner do a
-  build checkpoint** rather than stacking more unverified code.
+- Build, run in the simulator, screenshot, and run the test suites. See the
+  README for exact commands and **which simulator** (iPhone 17 Pro) UI tests
+  expect, plus how to recover a wedged simulator.
+- After a batch of non-trivial changes, do a build + test checkpoint before
+  stacking more. Every commit so far has been left green (build + tests).
+- Still can't be verified here: ShazamKit matching, StoreKit purchases, and
+  Instruments profiling — all need a real device.
 
 ---
 
 ## 4. Architecture map
 
-Everything lives flat in `AudioPlayer_test/`. Logical grouping:
+Folders on disk **are** the project structure (`PBXFileSystemSynchronizedRootGroup`,
+`objectVersion = 77`). Adding a Swift file needs **no `project.pbxproj` edit** —
+just create it. This designs out the old manual-registration breakage entirely.
 
-### App & root
-- `AudioPlayerApp.swift` — `@main`; injects the shared services as environment objects.
-- `RootView.swift` — custom tab container. **Keep-alive tabs** (a `Set<AppTab>` of
-  visited tabs, opacity switching in a ZStack) to avoid tab-switch flicker. Hosts
-  the mini-player, the `.fullScreenCover` onboarding (`@AppStorage("hasOnboarded.v1")`),
-  and `.task { audio.restoreLastSession() }`.
-
-### Models
-- `Song.swift` — the universal track model. `id: String`, `source: TrackSource`
-  (local/audius/radio/subsonic/itunes/deezer/jamendo/archive/podcast, each with a
-  `badge`), `streamURL`/`artworkURL`, `isLive`, and `gradientHex: [UInt]` (Codable;
-  computed `gradient: [Color]`). **`Song.id` is `String`** — anything referencing
-  songs by id (e.g. `Playlist.songIDs`) must be `[String]`.
-- `Playlist.swift` — user playlist; `songIDs: [String]`.
-- `Podcast.swift`, `PlaybackModels.swift` — supporting models.
-
-### Playback core
-- `AudioManager.swift` — the heart. `@MainActor` singleton (`.shared`),
-  `ObservableObject`. Owns the queue, shuffle/repeat, volume, playback rate, sleep
-  timer, Now Playing/remote commands, endless autoplay (`autoExtendEnabled`,
-  `maybeExtendQueue()`), and session resume (`persistNowPlaying`, `restoreLastSession`).
-- `PlaybackEngine.swift` — protocol with **two backends**: `LocalAudioEngine`
-  (`AVAudioPlayer`, real metering) for bundled files, `RemoteAudioEngine`
-  (`AVPlayer`) for network streams & live radio. `AudioManager` picks per track.
-- `PlaybackClock.swift` — **performance-critical split**: high-frequency values
-  (`currentTime`, `progress`, `audioLevel`, `duration`) live here as a separate
-  `ObservableObject` so the ~20–30fps updates don't re-render the whole UI tree —
-  only views that observe the clock. **Do not move these back onto `AudioManager`.**
-
-### Sources / services (all keyless & free unless noted)
-- `AudiusService.swift` — full-length CC tracks (primary free catalog).
-- `DeezerService.swift` — search + charts + playlists (30-sec previews).
-- `iTunesService.swift` — Apple music previews + podcast discovery (30-sec previews).
-- `RadioBrowserService.swift` — internet radio (`all.api.radio-browser.info`).
-- `PodcastFeedService.swift` — RSS episode parsing (XMLParser).
-- `SubsonicService.swift` + `ServerStore.swift` + `Keychain.swift` — self-hosted
-  Subsonic/Navidrome (MD5 token auth via CryptoKit; creds in Keychain).
-- `LyricsService.swift` — LRCLIB synced lyrics.
-- `ShazamService.swift` — ShazamKit recognition (**device-only**; needs the
-  ShazamKit capability enabled in Xcode).
-- `AIMixService.swift` — on-device natural-language mix generation (understands
-  EN + RU intent keywords).
-- `StationService.swift`, `TrackProvider.swift`, `SongFeed.swift` — feed/loading
-  state helpers (`SongFeed` models idle/loading/loaded/empty/failed, with retry).
-
-### Monetization
-- `ProStore.swift` — StoreKit 2 (`Product`, `Transaction`, `AppStore.sync`).
-  Product IDs in `SETUP.md`. Has a **DEBUG-only developer unlock** (Settings →
-  Developer: unlock Pro) so Pro features can be tested without App Store Connect.
-- `PaywallView.swift` — the paywall.
-
-### Design system
-- `Theme.swift`, `DesignComponents.swift`, `Visualizer.swift`, `MarqueeText.swift`,
-  `Artwork.swift`, `Haptics.swift`, `ShareCard.swift` (ImageRenderer "now playing"
-  card). The **visualizer is mirror-symmetric / static-feeling** (not scrolling
-  left→right) and the **aurora background pauses when not playing** for energy.
-
-### Views (screens)
-- `HomeView`, `SearchView`, `RadioView`, `PodcastsView`/`PodcastDetailView`,
-  `LibraryView`, `NowPlayingView`, `MiniPlayerView`, `QueueView`,
-  `PlaylistDetailView`/`UserPlaylistDetailView`, `RemotePlaylistView`,
-  `ArtistView`, `AddToPlaylistView`, `SettingsView`, `ConnectServerView`,
-  `OnboardingView`, `AIMixView`, `ShazamView`, `LyricsView`, `SongRow`.
-- `Localization.swift` — see §7.
-
----
-
-## 5. Key decisions & invariants (things that will bite you)
-
-- **`Song.id` is `String`.** Keep id-collections as `[String]`.
-- **Don't merge the high-frequency clock back into `AudioManager`** — the
-  `PlaybackClock` split is a deliberate performance fix.
-- **Mini-player minimize animates *down*, not left** — a `matchedGeometryEffect`
-  was intentionally removed because it slid the player sideways. Don't reintroduce it.
-- **Tabs are kept alive** (opacity switching), not rebuilt on switch — prevents
-  flicker. Preserve this.
-- **Network calls use a ~20s resource timeout** and feeds must never get stuck in
-  `.loading` on cancellation; they expose tap-to-retry. Follow this pattern for new
-  feeds.
-- **Previews vs full tracks:** Deezer/Apple return 30-sec previews. The UI groups
-  and **labels** them ("PREVIEWS · 30 SEC") and shows **full tracks first** — users
-  were confused when previews looked like full tracks. Keep that distinction visible.
-- **Legal/honesty constraint:** free *full-length mainstream* streaming does not
-  exist legally. The real content unlock is **Apple Music via MusicKit** (Tier 3,
-  subscription-gated) — see §9. Don't imply the app has full mainstream catalogs
-  for free.
-
----
-
-## 6. Sources status (what actually returns content)
-
-| Source | Status | Notes |
-| --- | --- | --- |
-| Local bundle | ✅ full | 17 bundled mp3s, offline. |
-| Audius | ✅ full tracks | Primary free catalog. |
-| Deezer | ✅ 30s previews | Search, charts, playlists (Editor's picks on Home). |
-| Apple/iTunes | ✅ 30s previews + podcasts | Music previews; podcast discovery. |
-| Radio Browser | ✅ live | Internet radio by genre. |
-| Podcasts (RSS) | ✅ episodes | 0.8×–2× speed. |
-| Subsonic self-hosted | ✅ full | User provides server; Keychain creds. |
-| ShazamKit | ⚠️ device-only | Needs capability + real device (won't match on simulator). |
-| Apple Music (MusicKit) | ⛔ not built | The big content unlock — see §9. |
-| Spotify | ⛔ not built | Tier 3, Premium + SDK gated. |
-
----
-
-## 7. Localization system (and the crash rule)
-
-Deliberately **lightweight and dependency-free** to avoid `.strings`/variant-group
-`pbxproj` build risk:
-
-- `Localization.swift` exposes a global `func L(_ key: String) -> String`.
-- `L("English text")` returns the Russian string from `Localization.ru` **only when
-  the device language is Russian** (`Localization.isRussian`), else returns the key
-  (English) as-is. Missing keys fall back to English gracefully.
-- **To localize a new string:** wrap the English literal in `L(...)` at the call
-  site and add one `"English": "Русский",` entry to the `ru` dictionary.
-
-**CRASH RULE (learned the hard way):** `Localization.ru` is a `static let`
-dictionary literal. **A duplicate key traps at initialization → instant startup
-crash** (only on RU devices, since `ru` is only read when `isRussian`). This
-already shipped once (`"Server URL"` and `"Restore purchases"` were each added in
-two blocks). **After editing `Localization.ru`, always run a duplicate-key check:**
-
-```bash
-python3 -c "
-import re
-keys={}; dup=False
-for i,ln in enumerate(open('AudioPlayer_test/Localization.swift'),1):
-    m=re.match(r'\s*\"((?:[^\"\\\\]|\\\\.)*)\"\s*:', ln)
-    if m:
-        k=m.group(1)
-        if k in keys: print('DUP',k,keys[k],i); dup=True
-        else: keys[k]=i
-print('OK' if not dup else 'CRASH')
-"
+```
+Sonava/
+  App/            SonavaApp (@main), RootView
+  Models/         Song, Podcast, PlaybackModels
+  Core/           JSONFileStore, Keychain, SongFeed, FilterChip, AccessibilityID
+  Services/
+    Playback/     AudioManager, PlaybackEngine, PlaybackClock,
+                  EqualizerSettings, EqualizerPreset, AudioEffects
+    Catalog/      Audius, Deezer, iTunes, RadioBrowser, Subsonic, Station, TrackProvider
+    Library/      MusicLibrary, LocalFileStore, PlaylistStore, ServerStore
+    Podcasts/     PodcastFeedService
+    Intelligence/ AIMixService, ShazamService, LyricsService
+    Commerce/     ProStore
+  DesignSystem/   Theme, DesignComponents, Visualizer, Artwork, MarqueeText, ShareCard, Haptics
+  Features/       one folder per screen (Home, Search, …, Equalizer)
+  Resources/      Assets.xcassets, Localizable.xcstrings
+Config/           Sonava-Info.plist, Sonava.xctestplan
 ```
 
+### Playback core (know this before touching audio)
+- `AudioManager` — `@MainActor` singleton. Owns queue/shuffle/repeat, volume,
+  rate, sleep timer, Now Playing/remote commands, endless autoplay, session
+  resume, and the shared `AudioEffects`.
+- `PlaybackEngine` — protocol, `@MainActor`, with two backends:
+  - `LocalAudioEngine` — an **AVAudioEngine graph** (player → `AVAudioUnitEQ`
+    10 bands → `AVAudioUnitTimePitch` → mixer) for imported files. Real EQ,
+    real tap-based metering.
+  - `RemoteAudioEngine` — `AVPlayer` for streams & live radio.
+- `PlaybackClock` — high-frequency (`currentTime`/`progress`/`audioLevel`) split
+  into its own `ObservableObject` so 20–30 fps updates don't re-render the whole
+  tree. **Do not merge it back into `AudioManager`.**
+
 ---
 
-## 8. Editing `project.pbxproj` by hand
+## 5. Invariants that will bite you
 
-New Swift files must be registered in `AudioPlayer_test.xcodeproj/project.pbxproj`
-(no Xcode here to do it). Pattern used:
+- **`Song.id` is `String`.** Id-collections are `[String]`.
+- **Local tracks are identified by SHA-256 of content**, not filename.
+- **The app ships no audio.** `.gitignore` refuses it; tests synthesise a tone.
+  An earlier revision bundled a commercial film score as its demo library — an
+  App Store rejection (Guideline 5.2) and infringement. Local = user's files.
+- **Don't merge the `PlaybackClock` split back.**
+- **Tabs are kept alive** (opacity switch), not rebuilt. A UI test guards it.
+- **EQ gains clamp to ±12 dB and reject non-finite** — the audio units trap on
+  bad input, so `equalizer.json` is repaired on decode.
+- **Previews are labelled.** Deezer/Apple return 30-sec previews; the UI groups
+  them under `PREVIEWS · 30 SEC` and shows full tracks first.
+- **Feeds never hang in `.loading`** — ~20s timeout, tap-to-retry.
+- **Legal honesty:** no free full-length *mainstream* streaming. The real
+  content unlock is **MusicKit** (subscription-gated). Don't imply otherwise.
 
-- Add a `PBXFileReference`, a `PBXBuildFile`, an entry in the group's `children`,
-  and an entry in the `Sources` build phase.
-- Fabricated 24-hex UUIDs follow a convention (`AA000000000000000000Fnnn` for file
-  refs, `Bnnn`/`Annn` for build files) to stay unique and greppable.
-- **After editing, validate** there are no undefined references (every UUID used is
-  defined) with a quick Python scan before committing. A broken pbxproj fails the
-  owner's build immediately.
-- **New Xcode *targets*** (Widgets, Watch, CarPlay, Live Activities) should **not**
-  be hand-added — tell the owner to add the target in Xcode; hand-editing target
-  graphs is too error-prone.
+---
+
+## 6. Localization (String Catalog)
+
+`Sonava/Resources/Localizable.xcstrings`, keys **extracted by the compiler**.
+
+- SwiftUI: pass a literal — `Text("Home")`. Never `Text(someString)` for display
+  copy; that skips translation silently (this exact bug shipped English
+  onboarding to RU users).
+- Elsewhere: `String(localized: "…")`.
+- Helper params carrying display copy must be `LocalizedStringKey`, not `String`.
+- Russian plurals use real plural rules (`one/few/many/other`) — counts decline.
+- After adding strings, build once (keys extract to `.stringsdata`), then add the
+  Russian value in the catalog. `LocalizationCatalogTests` fail if key UI strings
+  are left untranslated.
+
+The old bespoke `L()` dictionary is **gone**. Don't reintroduce a hand-rolled map.
+
+---
+
+## 7. Editing `project.pbxproj`
+
+New **files** need nothing (synchronized groups). New **targets** (widgets,
+Watch, CarPlay, Live Activities) should be added in Xcode by the owner —
+hand-editing target graphs is too error-prone.
+
+---
+
+## 8. Tests
+
+65 unit + 19 UI, each run in **English and Russian** via `Config/Sonava.xctestplan`.
+
+- Unit (`SonavaTests`): import round trip, favourites/recents persistence, `Song`
+  identity/coding, safe degradation of on-disk state, AI Mix intent parsing
+  (EN + RU), catalogue completeness + RU plurals, the full EQ model, and the
+  `LocalAudioEngine` graph exercised against a generated tone.
+- UI (`SonavaUITests`): onboarding, tabs + state preservation, settings, empty
+  states, playlist creation, Files picker, Pro gating + paywall disclosure, EQ
+  gate + controls, and a Russian pass.
+- UI tests find controls by **accessibility identifier** (`AccessibilityID`),
+  never visible text. Add an id with `identified(_:label:)`, which also sets the
+  VoiceOver label. A DEBUG launch arg `-openEqualizer` deep-links a screen.
 
 ---
 
 ## 9. Open backlog
 
-### Owner feedback still worth pushing on
-These themes recur in the owner's reviews — weigh them when prioritizing:
-- **"Content still feels thin."** The honest fix is **MusicKit (Apple Music)** —
-  the only path to full-length mainstream catalog. Requires a green build + a real
-  device + the MusicKit capability + entitlement. This is the highest-leverage next
-  feature for perceived value.
-- **Make it engaging to stay** (retention): smarter Home, taste-based endless radio,
-  better AI Mix results.
-- **Scale/polish for the App Store** — more content surfaces, richer discovery.
-- **AI must understand Russian** — RU intent keywords were added to AIMix; keep
-  verifying quality on RU prompts.
+### Highest leverage next
+- **Apple Music (MusicKit)** — the honest path to a full-length mainstream
+  catalogue, the recurring "content feels thin" answer. Needs a device + the
+  MusicKit capability + entitlement (owner adds in Xcode).
+- **Streaming EQ** — `RemoteAudioEngine` plays flat. Applying the EQ to AVPlayer
+  needs an `MTAudioProcessingTap`. The local EQ, model, presets and UI are done.
+- **Crossfade / gapless** — now feasible on the AVAudioEngine base (schedule the
+  next buffer / a second player node with volume ramps).
 
-### Big rocks (each best done on a green build / may need a device)
-- **Apple Music (MusicKit)** connect — real content unlock (see above).
-- **Equalizer + crossfade/gapless** — needs an `AVAudioEngine` graph (core audio
-  refactor; do it on a confirmed-building base).
-- **Memory-leak & energy profiling** in Instruments (device).
-- **Platform extensions** — Widgets, Live Activities, CarPlay, Watch (new targets;
-  add in Xcode).
-- **Spotify** connect (Tier 3), **scrobbling** (Last.fm/ListenBrainz), **offline
-  downloads**, **iCloud sync**. See `ROADMAP.md` phases.
+### Larger
+- Memory/energy profiling in Instruments (device).
+- Platform extensions — Widgets, Live Activities, CarPlay, Watch (new targets).
+- Spotify connect, scrobbling (Last.fm/ListenBrainz), offline downloads, iCloud sync.
 
-### Known limitations to state honestly (not bugs)
-- Shazam needs a physical device (there's already a simulator hint in `ShazamView`).
-- Preview sources are 30 seconds by the providers' design.
+### Known limitations (state honestly, not bugs)
+- Shazam needs a physical device. Preview sources are 30 seconds by design.
 
 ---
 
-## 10. How the owner works (style guide)
+## 10. How the owner works
 
-- Communicates in **Russian**; wants an **ambitious, top-tier, App-Store-worthy**
-  product ("валить по максимуму") that's genuinely worth paying for.
-- Values: **clean, readable code; check every decision against current trends;
-  re-verify your own work; refactor when needed.**
-- Expects you to **finish to a checkpoint, self-review, then merge** and hand back
-  something testable — with clear instructions.
-- Gives blunt product feedback (often screenshots). Treat it as the priority signal.
-- Frequently says "**пушни**" — that's "push it" (retry the commit/push).
-
----
+- Communicates in **Russian**; wants an ambitious, App-Store-worthy product
+  ("валить по максимуму") genuinely worth paying for.
+- Values clean, readable code; checking decisions against current practice;
+  re-verifying your own work; refactoring when needed.
+- Expects you to finish to a checkpoint, self-review, then merge — and hand back
+  something testable with clear instructions. Gives blunt product feedback.
+- "**пушни**" = "push it".
 
 ## 11. Definition of done (per change)
 
-1. Code compiles *in your head* — conservative APIs, no obvious type/availability
-   errors; run any applicable static validation (dup keys, pbxproj refs).
-2. Committed with a clear message on `claude/player-redesign-swiftui-1c0c2x`.
-3. Pushed; PR opened and merged to `main`.
+1. Builds clean (Swift 6, **zero warnings**); applicable tests green in EN + RU.
+2. Committed on the working branch with a clear message.
+3. Pushed; PR opened and merged to `main` (owner may need to open the PR).
 4. Docs updated if architecture/sources/setup changed.
-5. Owner told, in Russian, what changed and what to test — and reminded to build if
-   a lot of unverified code accumulated.
+5. Owner told, in Russian, what changed and what to test.

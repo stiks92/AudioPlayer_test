@@ -172,7 +172,7 @@ implies otherwise; the honest path to a mainstream catalogue is MusicKit.
 
 ## Tests
 
-57 tests, all green.
+65 unit + 19 UI tests, all green.
 
 | Target | What it covers |
 | --- | --- |
