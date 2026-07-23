@@ -23,6 +23,8 @@ struct RootView: View {
     @State private var visited: Set<AppTab> = [.home]
     #if DEBUG
     @State private var debugShowEqualizer = false
+    @State private var debugShowPaywall = false
+    @State private var debugShowAIMix = false
     #endif
 
     private let playerSpring = Animation.spring(response: 0.45, dampingFraction: 0.86)
@@ -64,6 +66,15 @@ struct RootView: View {
         // view can be driven or screenshotted without walking the UI.
         .sheet(isPresented: $debugShowEqualizer) {
             EqualizerView(effects: audio.effects).environmentObject(proStore)
+        }
+        .sheet(isPresented: $debugShowPaywall) {
+            PaywallView().environmentObject(proStore)
+        }
+        .sheet(isPresented: $debugShowAIMix) {
+            AIMixView()
+                .environmentObject(audio)
+                .environmentObject(library)
+                .environmentObject(proStore)
         }
         .task { applyDebugLaunchRoute() }
         #endif
@@ -125,9 +136,9 @@ struct RootView: View {
             showNowPlaying = true
         }
 
-        if arguments.contains("-openEqualizer") {
-            debugShowEqualizer = true
-        }
+        if arguments.contains("-openEqualizer") { debugShowEqualizer = true }
+        if arguments.contains("-openPaywall") { debugShowPaywall = true }
+        if arguments.contains("-openAIMix") { debugShowAIMix = true }
     }
     #endif
 }

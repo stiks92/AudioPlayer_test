@@ -43,6 +43,10 @@ struct LocalizationCatalogTests {
             "Technology", "Comedy", "True Crime", "Business", "Science",
             "Health", "Sports", "History", "Education",
             "Jazz", "Classical", "Electronic", "Ambient",
+            // Paywall perks and AI Mix suggestion chips were both runtime
+            // strings that shipped in English on a Russian device.
+            "Every source, unified", "Studio EQ & spatial", "Support indie dev",
+            "Offline & lossless", "Rainy day focus", "Cozy jazz", "Sad piano",
         ]
     )
     func stringsAreTranslatedToRussian(key: String) throws {

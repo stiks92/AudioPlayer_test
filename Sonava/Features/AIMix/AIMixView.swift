@@ -19,10 +19,17 @@ struct AIMixView: View {
     @State private var showPaywall = false
     @FocusState private var focused: Bool
 
+    /// Example prompts. The English string is the catalog key; the chip shows
+    /// its translation and, when tapped, fills the field with that same
+    /// translation — which `AIMixService` understands in either language.
     private let suggestions = [
         "Rainy day focus", "Late night drive", "Morning energy",
         "Deep work, no vocals", "Sad piano", "Epic cinematic", "Cozy jazz"
     ]
+
+    private func localized(_ key: String) -> String {
+        String(localized: String.LocalizationValue(key))
+    }
 
     var body: some View {
         NavigationStack {
@@ -75,12 +82,12 @@ struct AIMixView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         ForEach(suggestions, id: \.self) { s in
-                            Text(s)
+                            Text(LocalizedStringKey(s))
                                 .font(.system(size: 13, weight: .semibold))
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 14).padding(.vertical, 8)
                                 .background(Capsule().fill(Color.white.opacity(0.12)))
-                                .onTapGesture { prompt = s; generate() }
+                                .onTapGesture { prompt = localized(s); generate() }
                         }
                     }
                 }

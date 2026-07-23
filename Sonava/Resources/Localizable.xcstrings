@@ -422,6 +422,16 @@
         }
       }
     },
+    "Cozy jazz": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Уютный джаз"
+          }
+        }
+      }
+    },
     "Create": {
       "localizations": {
         "ru": {
@@ -458,6 +468,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Мрачно"
+          }
+        }
+      }
+    },
+    "Deep work, no vocals": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Глубокая работа, без вокала"
           }
         }
       }
@@ -501,6 +521,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Опиши настроение — получи микс"
+          }
+        }
+      }
+    },
+    "Describe a vibe — get an instant, on-device mix.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Опиши настроение — получи мгновенный микс прямо на устройстве."
           }
         }
       }
@@ -555,6 +585,16 @@
         }
       }
     },
+    "Download free-licensed tracks in top quality.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скачивай свободно лицензированные треки в топовом качестве."
+          }
+        }
+      }
+    },
     "Editor's picks": {
       "localizations": {
         "ru": {
@@ -605,12 +645,32 @@
         }
       }
     },
+    "Epic cinematic": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эпичное кино"
+          }
+        }
+      }
+    },
     "Equalizer": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Эквалайзер"
+          }
+        }
+      }
+    },
+    "Every source, unified": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Все источники вместе"
           }
         }
       }
@@ -815,6 +875,16 @@
         }
       }
     },
+    "Late night drive": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ночная поездка"
+          }
+        }
+      }
+    },
     "Late night vibes": {
       "localizations": {
         "ru": {
@@ -884,6 +954,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Меланхолия"
+          }
+        }
+      }
+    },
+    "Morning energy": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Утренняя энергия"
           }
         }
       }
@@ -964,6 +1044,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "На Audius ничего не найдено."
+          }
+        }
+      }
+    },
+    "No ads. No tracking. Ever.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Без рекламы. Без слежки. Никогда."
           }
         }
       }
@@ -1084,6 +1174,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Выкл"
+          }
+        }
+      }
+    },
+    "Offline & lossless": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Офлайн и без потерь"
           }
         }
       }
@@ -1351,6 +1451,16 @@
         }
       }
     },
+    "Rainy day focus": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Дождливый фокус"
+          }
+        }
+      }
+    },
     "Recently played": {
       "localizations": {
         "ru": {
@@ -1427,6 +1537,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Рок"
+          }
+        }
+      }
+    },
+    "Sad piano": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Грустное пианино"
           }
         }
       }
@@ -1527,6 +1647,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Настройки"
+          }
+        }
+      }
+    },
+    "Shape your sound with pro presets.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настрой звук профессиональными пресетами."
           }
         }
       }
@@ -1667,12 +1797,42 @@
         }
       }
     },
+    "Streaming, radio, podcasts & your own servers.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Стриминг, радио, подкасты и твои серверы."
+          }
+        }
+      }
+    },
+    "Studio EQ & spatial": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Студийный EQ и объёмный звук"
+          }
+        }
+      }
+    },
     "Support": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Поддержка"
+          }
+        }
+      }
+    },
+    "Support indie dev": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поддержи инди-разработку"
           }
         }
       }

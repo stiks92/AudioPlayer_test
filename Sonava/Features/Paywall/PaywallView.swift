@@ -16,12 +16,27 @@ struct PaywallView: View {
     @State private var selectedID: String?
     @State private var isPurchasing = false
 
-    private let perks: [(String, String, String)] = [
-        ("sparkles", "AI Mix", "Describe a vibe — get an instant, on-device mix."),
-        ("dot.radiowaves.left.and.right", "Every source, unified", "Streaming, radio, podcasts & your own servers."),
-        ("waveform.path.ecg", "Studio EQ & spatial", "Shape your sound with pro presets."),
-        ("arrow.down.circle", "Offline & lossless", "Download free-licensed tracks in top quality."),
-        ("heart.fill", "Support indie dev", "No ads. No tracking. Ever.")
+    /// A Pro selling point. Typing the copy as `LocalizedStringKey` is what
+    /// makes the literals below both translatable and extractable — passing
+    /// plain strings to `Text` silently skips translation.
+    private struct Perk: Identifiable {
+        let icon: String
+        let title: LocalizedStringKey
+        let subtitle: LocalizedStringKey
+        var id: String { icon }
+    }
+
+    private let perks: [Perk] = [
+        Perk(icon: "sparkles", title: "AI Mix",
+             subtitle: "Describe a vibe — get an instant, on-device mix."),
+        Perk(icon: "dot.radiowaves.left.and.right", title: "Every source, unified",
+             subtitle: "Streaming, radio, podcasts & your own servers."),
+        Perk(icon: "waveform.path.ecg", title: "Studio EQ & spatial",
+             subtitle: "Shape your sound with pro presets."),
+        Perk(icon: "arrow.down.circle", title: "Offline & lossless",
+             subtitle: "Download free-licensed tracks in top quality."),
+        Perk(icon: "heart.fill", title: "Support indie dev",
+             subtitle: "No ads. No tracking. Ever.")
     ]
 
     var body: some View {
@@ -82,16 +97,16 @@ struct PaywallView: View {
 
     private var perksList: some View {
         VStack(spacing: 14) {
-            ForEach(perks, id: \.1) { icon, title, subtitle in
+            ForEach(perks) { perk in
                 HStack(spacing: 14) {
-                    Image(systemName: icon)
+                    Image(systemName: perk.icon)
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(.white)
                         .frame(width: 40, height: 40)
                         .background(Circle().fill(.ultraThinMaterial))
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(title).font(.system(size: 15, weight: .semibold))
-                        Text(subtitle).font(.system(size: 12)).foregroundColor(.white.opacity(0.75))
+                        Text(perk.title).font(.system(size: 15, weight: .semibold))
+                        Text(perk.subtitle).font(.system(size: 12)).foregroundColor(.white.opacity(0.75))
                     }
                     Spacer()
                 }
