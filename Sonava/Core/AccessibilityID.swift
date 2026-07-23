@@ -25,6 +25,8 @@ enum AccessibilityID {
 
     static let miniPlayer = "player.mini"
     static let playPauseButton = "player.playPause"
+
+    static let eqEnable = "eq.enable"
 }
 
 extension View {

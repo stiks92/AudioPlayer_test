@@ -18,7 +18,8 @@ extension XCUIApplication {
 
     static func launched(
         onboarding: Onboarding = .completed,
-        language: String = "en"
+        language: String = "en",
+        pro: Bool = false
     ) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments += [
@@ -27,6 +28,11 @@ extension XCUIApplication {
             "-AppleLanguages", "(\(language))",
             "-AppleLocale", language == "ru" ? "ru_RU" : "en_US",
         ]
+        if pro {
+            // The DEBUG developer unlock is a plain default, so a launch
+            // argument flips it without needing App Store products.
+            app.launchArguments += ["-pro.dev.override.v1", "YES"]
+        }
         app.launch()
         return app
     }

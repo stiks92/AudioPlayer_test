@@ -222,6 +222,26 @@
         }
       }
     },
+    "Bass Boost": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Усиление баса"
+          }
+        }
+      }
+    },
+    "Bass Reducer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Меньше баса"
+          }
+        }
+      }
+    },
     "Browse moods": {
       "localizations": {
         "ru": {
@@ -402,6 +422,16 @@
         }
       }
     },
+    "Custom": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Свой"
+          }
+        }
+      }
+    },
     "Dark": {
       "localizations": {
         "ru": {
@@ -545,6 +575,16 @@
         }
       }
     },
+    "Equalizer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эквалайзер"
+          }
+        }
+      }
+    },
     "Favorite": {
       "localizations": {
         "ru": {
@@ -561,6 +601,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Избранное"
+          }
+        }
+      }
+    },
+    "Flat": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ровный"
           }
         }
       }
@@ -754,6 +804,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Загрузка тарифов…"
+          }
+        }
+      }
+    },
+    "Lounge": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Лаунж"
           }
         }
       }
@@ -1141,12 +1201,42 @@
         }
       }
     },
+    "Pop": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поп"
+          }
+        }
+      }
+    },
     "Popular now": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Популярно сейчас"
+          }
+        }
+      }
+    },
+    "Pre-amp": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Предусиление"
+          }
+        }
+      }
+    },
+    "Presets": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пресеты"
           }
         }
       }
@@ -1464,6 +1554,16 @@
         }
       }
     },
+    "Spoken Word": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Речь"
+          }
+        }
+      }
+    },
     "Spotify / Apple Music": {
       "shouldTranslate": false
     },
@@ -1527,12 +1627,42 @@
         }
       }
     },
+    "Ten bands, a pre-amp and a dozen presets to shape your sound exactly the way you like it.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Десять полос, предусиление и дюжина пресетов, чтобы настроить звук именно так, как нравится тебе."
+          }
+        }
+      }
+    },
     "Tense": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Напряжённо"
+          }
+        }
+      }
+    },
+    "The equalizer is a Pro feature": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эквалайзер — функция Pro"
+          }
+        }
+      }
+    },
+    "The equalizer shapes playback of your imported files. Streaming sources play flat.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эквалайзер влияет на воспроизведение импортированных файлов. Стриминговые источники играют без обработки."
           }
         }
       }
@@ -1563,6 +1693,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Топ"
+          }
+        }
+      }
+    },
+    "Treble Boost": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Усиление верхов"
           }
         }
       }
@@ -1653,6 +1793,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Имя пользователя"
+          }
+        }
+      }
+    },
+    "Vocal Boost": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Усиление вокала"
           }
         }
       }

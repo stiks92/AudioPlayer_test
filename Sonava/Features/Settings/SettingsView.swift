@@ -16,6 +16,7 @@ struct SettingsView: View {
     @State private var showPaywall = false
     @State private var showSleepOptions = false
     @State private var showConnectServer = false
+    @State private var showEqualizer = false
 
     private var version: String {
         let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -54,6 +55,10 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $showConnectServer) {
                 ConnectServerView().environmentObject(serverStore)
+            }
+            .sheet(isPresented: $showEqualizer) {
+                EqualizerView(effects: audio.effects)
+                    .environmentObject(proStore)
             }
             .confirmationDialog("Sleep timer", isPresented: $showSleepOptions, titleVisibility: .visible) {
                 ForEach(Self.sleepTimerChoices, id: \.self) { minutes in
@@ -118,6 +123,10 @@ struct SettingsView: View {
 
     private var playbackSection: some View {
         section("Playback") {
+            row(icon: "slider.vertical.3", title: "Equalizer", value: equalizerValue) {
+                showEqualizer = true
+            }
+            divider
             row(icon: "moon.zzz.fill", title: "Sleep timer", value: sleepTimerValue) {
                 showSleepOptions = true
             }
@@ -129,6 +138,11 @@ struct SettingsView: View {
             .tint(Theme.accent)
             .padding(.vertical, 6)
         }
+    }
+
+    private var equalizerValue: LocalizedStringKey {
+        guard audio.effects.equalizer.isEnabled else { return "Off" }
+        return audio.effects.selectedPreset.map { LocalizedStringKey($0.name) } ?? "Custom"
     }
 
     // MARK: - Sources

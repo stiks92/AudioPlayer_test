@@ -34,6 +34,10 @@ final class AudioManager: NSObject, ObservableObject {
     /// Live time/level updates — observed only by Now Playing / mini / lyrics.
     let clock = PlaybackClock()
 
+    /// The equalizer, shared with the EQ screen. Owned here so its curve is
+    /// pushed to whichever engine is active.
+    let effects = AudioEffects()
+
     var isLive: Bool { currentSong?.isLive ?? false }
 
     /// Speed control is only meaningful for spoken-word content (podcasts).
@@ -59,6 +63,7 @@ final class AudioManager: NSObject, ObservableObject {
         didSet { UserDefaults.standard.set(autoExtendEnabled, forKey: "autoextend.v1") }
     }
     private var isExtending = false
+    private var effectsCancellable: AnyCancellable?
 
     // Resume last session
     private let resumeSongKey = "resume.song.v1"
@@ -79,6 +84,10 @@ final class AudioManager: NSObject, ObservableObject {
         super.init()
         configureSession()
         setupRemoteCommands()
+
+        // Reshape the live engine whenever the EQ curve changes.
+        effectsCancellable = effects.$equalizer
+            .sink { [weak self] settings in self?.activeEngine?.apply(settings) }
     }
 
     // MARK: - Public transport
@@ -237,6 +246,7 @@ final class AudioManager: NSObject, ObservableObject {
             Task { @MainActor in self?.advance(auto: true) }
         }
         engine.setVolume(volume)
+        engine.apply(effects.equalizer)
 
         clock.reset(duration: song.isLive ? 0 : 1)
 

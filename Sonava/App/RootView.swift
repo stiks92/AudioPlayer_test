@@ -21,6 +21,9 @@ struct RootView: View {
     /// Tabs that have been opened at least once — kept alive so switching
     /// back is instant (no reload flicker).
     @State private var visited: Set<AppTab> = [.home]
+    #if DEBUG
+    @State private var debugShowEqualizer = false
+    #endif
 
     private let playerSpring = Animation.spring(response: 0.45, dampingFraction: 0.86)
 
@@ -56,6 +59,16 @@ struct RootView: View {
         .fullScreenCover(isPresented: Binding(get: { !hasOnboarded }, set: { hasOnboarded = !$0 })) {
             OnboardingView { hasOnboarded = true }
         }
+        #if DEBUG
+        // Lets a launch argument deep-link straight to a screen, so a specific
+        // view can be driven or screenshotted without walking the UI.
+        .sheet(isPresented: $debugShowEqualizer) {
+            EqualizerView(effects: audio.effects).environmentObject(proStore)
+        }
+        .task {
+            if CommandLine.arguments.contains("-openEqualizer") { debugShowEqualizer = true }
+        }
+        #endif
         .onChange(of: audio.currentSong) { _, song in
             if let song { library.markPlayed(song) }
         }
