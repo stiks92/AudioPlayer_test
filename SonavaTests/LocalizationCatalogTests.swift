@@ -37,6 +37,12 @@ struct LocalizationCatalogTests {
             // untranslated, so they are named explicitly here.
             "Streaming, internet radio, podcasts and your own server — unified in one beautiful place.",
             "On-device intelligence, no tracking, no ads. Your taste stays yours.",
+            // Genre chips are runtime FilterChip labels, not compiler-visible
+            // literals, so they must be added to the catalog by hand — the
+            // podcast genres shipped half-translated once because they weren't.
+            "Technology", "Comedy", "True Crime", "Business", "Science",
+            "Health", "Sports", "History", "Education",
+            "Jazz", "Classical", "Electronic", "Ambient",
         ]
     )
     func stringsAreTranslatedToRussian(key: String) throws {

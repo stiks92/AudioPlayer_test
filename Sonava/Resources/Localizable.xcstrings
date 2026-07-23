@@ -252,6 +252,16 @@
         }
       }
     },
+    "Business": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Бизнес"
+          }
+        }
+      }
+    },
     "Cancel": {
       "localizations": {
         "ru": {
@@ -288,6 +298,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Классика"
+          }
+        }
+      }
+    },
+    "Comedy": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Юмор"
           }
         }
       }
@@ -545,6 +565,16 @@
         }
       }
     },
+    "Education": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Образование"
+          }
+        }
+      }
+    },
     "Electronic": {
       "localizations": {
         "ru": {
@@ -665,12 +695,32 @@
         }
       }
     },
+    "Health": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Здоровье"
+          }
+        }
+      }
+    },
     "Hip-Hop": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Хип-хоп"
+          }
+        }
+      }
+    },
+    "History": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "История"
           }
         }
       }
@@ -1391,6 +1441,16 @@
         }
       }
     },
+    "Science": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Наука"
+          }
+        }
+      }
+    },
     "Search": {
       "localizations": {
         "ru": {
@@ -1564,6 +1624,16 @@
         }
       }
     },
+    "Sports": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Спорт"
+          }
+        }
+      }
+    },
     "Spotify / Apple Music": {
       "shouldTranslate": false
     },
@@ -1623,6 +1693,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Нажми, чтобы распознать музыку вокруг"
+          }
+        }
+      }
+    },
+    "Technology": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Технологии"
           }
         }
       }
@@ -1713,6 +1793,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "В тренде на Audius"
+          }
+        }
+      }
+    },
+    "True Crime": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тру-крайм"
           }
         }
       }
