@@ -4,6 +4,16 @@
     "%@": {
       "shouldTranslate": false
     },
+    "%@, then %@ %@. Cancel anytime.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, затем %2$@ %3$@. Отмена в любой момент."
+          }
+        }
+      }
+    },
     "%lld min": {
       "localizations": {
         "ru": {
@@ -948,6 +958,16 @@
         }
       }
     },
+    "Maybe later": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Позже"
+          }
+        }
+      }
+    },
     "Melancholy": {
       "localizations": {
         "ru": {
@@ -1766,6 +1786,16 @@
     },
     "Spotify / Apple Music": {
       "shouldTranslate": false
+    },
+    "Start Free Trial": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Начать бесплатный период"
+          }
+        }
+      }
     },
     "Start Station": {
       "localizations": {

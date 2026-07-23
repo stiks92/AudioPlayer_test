@@ -63,7 +63,8 @@ struct RootView: View {
         .environmentObject(playlistStore)
         .preferredColorScheme(.dark)
         .fullScreenCover(isPresented: Binding(get: { !hasOnboarded }, set: { hasOnboarded = !$0 })) {
-            OnboardingView { hasOnboarded = true }
+            WelcomeFlow { hasOnboarded = true }
+                .environmentObject(proStore)
         }
         #if DEBUG
         // Lets a launch argument deep-link straight to a screen, so a specific

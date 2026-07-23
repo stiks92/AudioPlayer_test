@@ -20,10 +20,12 @@ final class ProStore: ObservableObject {
     @Published var lastError: String?
 
     /// Configure these to match your App Store Connect subscription group.
+    /// The monthly and yearly products should carry a 7-day free-trial
+    /// introductory offer — the onboarding paywall surfaces it automatically.
     let productIDs = [
-        "com.aurora.pro.monthly",
-        "com.aurora.pro.yearly",
-        "com.aurora.pro.lifetime"
+        "com.sonava.pro.monthly",
+        "com.sonava.pro.yearly",
+        "com.sonava.pro.lifetime"
     ]
 
     private let overrideKey = "pro.dev.override.v1"
@@ -129,15 +131,38 @@ final class ProStore: ObservableObject {
 
     func period(for product: Product) -> String {
         guard let sub = product.subscription else { return "one-time" }
-        let unit: String
-        switch sub.subscriptionPeriod.unit {
-        case .day: unit = "day"
-        case .week: unit = "week"
-        case .month: unit = "month"
-        case .year: unit = "year"
-        @unknown default: unit = "period"
+        return "per \(unitName(sub.subscriptionPeriod))"
+    }
+
+    /// The product whose trial the onboarding CTA should offer — the yearly
+    /// plan if it has one, else any plan with a free trial.
+    var trialProduct: Product? {
+        products.first { $0.id.contains("yearly") && hasFreeTrial($0) }
+            ?? products.first { hasFreeTrial($0) }
+    }
+
+    func hasFreeTrial(_ product: Product) -> Bool {
+        product.subscription?.introductoryOffer?.paymentMode == .freeTrial
+    }
+
+    /// e.g. "7-day free trial" — nil when the product has no trial offer.
+    func trialText(for product: Product) -> String? {
+        guard let offer = product.subscription?.introductoryOffer,
+              offer.paymentMode == .freeTrial else { return nil }
+        let period = offer.period
+        let unit = unitName(period, plural: period.value > 1)
+        return "\(period.value)-\(unit) free trial"
+    }
+
+    private func unitName(_ period: Product.SubscriptionPeriod, plural: Bool = false) -> String {
+        let base: String
+        switch period.unit {
+        case .day: base = "day"
+        case .week: base = "week"
+        case .month: base = "month"
+        case .year: base = "year"
+        @unknown default: base = "period"
         }
-        let value = sub.subscriptionPeriod.value
-        return value > 1 ? "every \(value) \(unit)s" : "per \(unit)"
+        return plural ? "\(base)s" : base
     }
 }

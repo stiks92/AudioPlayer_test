@@ -19,10 +19,12 @@ final class NavigationUITests: XCTestCase {
 
         waitFor(app.staticTexts["All your music, one player"], "onboarding did not appear")
 
+        // Skipping the tour still surfaces the soft paywall — the offer is the
+        // point — but "Maybe later" always lets a free user in.
         app.buttons["Skip"].tap()
-
-        // Skipping lands on Home, not a blank screen.
-        waitFor(app.tab("Home"), "tab bar did not appear after skipping onboarding")
+        waitFor(app.staticTexts["Sonava Pro"], "the soft paywall did not appear after the tour")
+        app.buttons["paywall.skip"].tap()
+        waitFor(app.tab("Home"), "'Maybe later' did not lead into the app")
     }
 
     func testOnboardingCanBePagedThrough() {
@@ -38,9 +40,21 @@ final class NavigationUITests: XCTestCase {
         app.buttons["Continue"].tap()
         waitFor(app.staticTexts["Private by design"])
 
-        // The last slide commits instead of continuing.
+        // The last slide leads to the soft paywall (the Day-0 trial moment).
         app.buttons["Start listening"].tap()
+        waitFor(app.staticTexts["Sonava Pro"], "the paywall did not follow the last slide")
+        app.buttons["paywall.skip"].tap()
         waitFor(app.tab("Home"))
+    }
+
+    func testSubscriberSkipsThePaywallOnFirstRun() {
+        // A user who already has Pro (here via the DEBUG unlock) shouldn't be
+        // pitched during onboarding — the last slide goes straight in.
+        let app = XCUIApplication.launched(onboarding: .shown, pro: true)
+        waitFor(app.staticTexts["All your music, one player"])
+        app.buttons["Skip"].tap()
+        waitFor(app.tab("Home"), "a subscriber was shown the paywall on first run")
+        XCTAssertFalse(app.staticTexts["Sonava Pro"].exists, "paywall shown to an existing subscriber")
     }
 
     func testEveryTabOpens() {

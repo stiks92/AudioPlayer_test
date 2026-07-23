@@ -10,6 +10,12 @@ import SwiftUI
 import StoreKit
 
 struct PaywallView: View {
+    /// When presented as the last step of onboarding it becomes a *soft*
+    /// paywall: a skip appears and finishing (purchase or skip) calls
+    /// `onContinue` instead of dismissing a sheet.
+    var isOnboarding = false
+    var onContinue: (() -> Void)? = nil
+
     @EnvironmentObject private var proStore: ProStore
     @Environment(\.dismiss) private var dismiss
 
@@ -50,6 +56,7 @@ struct PaywallView: View {
                     perksList
                     plans
                     subscribeButton
+                    if isOnboarding { maybeLater }
                     footer
                 }
                 .padding(.horizontal, 22)
@@ -59,25 +66,44 @@ struct PaywallView: View {
         .foregroundColor(.white)
         .task {
             if proStore.products.isEmpty { await proStore.loadProducts() }
-            selectedID = selectedID ?? proStore.products.first?.id
+            selectedID = selectedID ?? proStore.trialProduct?.id ?? proStore.products.first?.id
         }
         .onChange(of: proStore.isPro) { _, pro in
-            if pro { dismiss() }
+            if pro { finish() }
         }
+    }
+
+    /// Purchase succeeded or the user skipped: advance onboarding, or dismiss
+    /// the sheet in the normal (Settings / feature-gate) presentation.
+    private func finish() {
+        if let onContinue { onContinue() } else { dismiss() }
     }
 
     private var closeRow: some View {
         HStack {
             Spacer()
-            Button { dismiss() } label: {
-                Image(systemName: "xmark")
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(.white.opacity(0.8))
-                    .frame(width: 34, height: 34)
-                    .background(Circle().fill(.ultraThinMaterial))
+            // In onboarding the escape hatch is the "Maybe later" button at the
+            // bottom, so the top corner stays clean.
+            if !isOnboarding {
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundColor(.white.opacity(0.8))
+                        .frame(width: 34, height: 34)
+                        .background(Circle().fill(.ultraThinMaterial))
+                }
             }
         }
+        .frame(height: 34)
         .padding(.top, 8)
+    }
+
+    private var maybeLater: some View {
+        Button("Maybe later") { finish() }
+            .font(.subheadline.weight(.semibold))
+            .foregroundColor(.white.opacity(0.8))
+            .padding(.top, 2)
+            .accessibilityIdentifier("paywall.skip")
     }
 
     private var hero: some View {
@@ -166,29 +192,50 @@ struct PaywallView: View {
         .buttonStyle(.plain)
     }
 
+    private var selectedProduct: Product? {
+        proStore.products.first { $0.id == selectedID }
+    }
+
+    /// Benefit-driven CTA: lead with the free trial when the chosen plan has
+    /// one — "Start Free Trial" converts better than "Subscribe".
+    private var ctaTitle: LocalizedStringKey {
+        if isPurchasing { return "Processing…" }
+        if let product = selectedProduct, proStore.hasFreeTrial(product) { return "Start Free Trial" }
+        return "Unlock Sonava Pro"
+    }
+
     private var subscribeButton: some View {
-        Button {
-            guard let id = selectedID,
-                  let product = proStore.products.first(where: { $0.id == id }) else { return }
-            isPurchasing = true
-            Task {
-                await proStore.purchase(product)
-                isPurchasing = false
+        VStack(spacing: 8) {
+            Button {
+                guard let product = selectedProduct else { return }
+                isPurchasing = true
+                Task {
+                    await proStore.purchase(product)
+                    isPurchasing = false
+                }
+            } label: {
+                HStack {
+                    if isPurchasing { ProgressView().tint(Theme.background) }
+                    Text(ctaTitle).font(.headline)
+                }
+                .foregroundColor(Theme.background)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(Capsule().fill(Color.white))
             }
-        } label: {
-            HStack {
-                if isPurchasing { ProgressView().tint(Theme.background) }
-                Text(isPurchasing ? "Processing…" : "Unlock Sonava Pro")
-                    .font(.headline)
+            .buttonStyle(BouncyButtonStyle(scale: 0.97))
+            .disabled(proStore.products.isEmpty || selectedID == nil || isPurchasing)
+            .opacity(proStore.products.isEmpty ? 0.5 : 1)
+            .accessibilityIdentifier("paywall.subscribe")
+
+            // Reassurance under the trial CTA.
+            if let product = selectedProduct, let trial = proStore.trialText(for: product) {
+                Text("\(trial), then \(product.displayPrice) \(proStore.period(for: product)). Cancel anytime.")
+                    .font(.system(size: 11))
+                    .foregroundColor(.white.opacity(0.7))
+                    .multilineTextAlignment(.center)
             }
-            .foregroundColor(Theme.background)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .background(Capsule().fill(Color.white))
         }
-        .buttonStyle(BouncyButtonStyle(scale: 0.97))
-        .disabled(proStore.products.isEmpty || selectedID == nil || isPurchasing)
-        .opacity(proStore.products.isEmpty ? 0.5 : 1)
     }
 
     private var footer: some View {
