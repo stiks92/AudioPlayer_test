@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import StoreKit
 
 struct RootView: View {
     @StateObject private var audio = AudioManager.shared
@@ -14,6 +15,9 @@ struct RootView: View {
     @StateObject private var proStore = ProStore()
     @StateObject private var serverStore = ServerStore()
     @StateObject private var playlistStore = PlaylistStore()
+    @StateObject private var reviewPrompt = ReviewPrompt()
+
+    @Environment(\.requestReview) private var requestReview
 
     @AppStorage("hasOnboarded.v1") private var hasOnboarded = false
     @State private var selection: AppTab = .home
@@ -79,7 +83,18 @@ struct RootView: View {
         .task { applyDebugLaunchRoute() }
         #endif
         .onChange(of: audio.currentSong) { _, song in
-            if let song { library.markPlayed(song) }
+            if let song {
+                library.markPlayed(song)
+                reviewPrompt.record(.trackFinished)   // active listening is a good signal
+            }
+        }
+        .onChange(of: playlistStore.playlists.count) { old, new in
+            if new > old { reviewPrompt.record(.playlistCreated) }
+        }
+        .onChange(of: reviewPrompt.shouldPresent) { _, ready in
+            guard ready else { return }
+            requestReview()
+            reviewPrompt.markPresented()
         }
         .onChange(of: selection) { _, newValue in
             visited.insert(newValue)
