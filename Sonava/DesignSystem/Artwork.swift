@@ -2,9 +2,9 @@
 //  Artwork.swift
 //  Sonava
 //
-//  Renders a track's artwork: remote image (AsyncImage) when available,
-//  falling back to the bundled asset for local tracks or a tasteful glyph
-//  over the track's gradient for remote tracks.
+//  Renders a track's artwork: the cover image (AsyncImage — works for both
+//  remote URLs and local file URLs) when there is one, falling back to a glyph
+//  over the track's gradient. The app bundles no artwork of its own.
 //
 
 import SwiftUI
@@ -35,17 +35,12 @@ struct ArtworkImage: View {
         }
     }
 
-    @ViewBuilder
+    /// No cover art (or it failed to load): the track's gradient carries a
+    /// glyph. Sonava bundles no artwork, so there is nothing else to show.
     private var fallback: some View {
-        if song.source == .local {
-            Image(song.artworkName)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-        } else {
-            Image(systemName: song.isLive ? "dot.radiowaves.left.and.right" : "music.note")
-                .font(.system(size: glyphSize, weight: .bold))
-                .foregroundColor(.white.opacity(0.9))
-        }
+        Image(systemName: song.isLive ? "dot.radiowaves.left.and.right" : "music.note")
+            .font(.system(size: glyphSize, weight: .bold))
+            .foregroundColor(.white.opacity(0.9))
     }
 }
 

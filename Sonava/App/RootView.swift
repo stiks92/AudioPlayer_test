@@ -65,9 +65,7 @@ struct RootView: View {
         .sheet(isPresented: $debugShowEqualizer) {
             EqualizerView(effects: audio.effects).environmentObject(proStore)
         }
-        .task {
-            if CommandLine.arguments.contains("-openEqualizer") { debugShowEqualizer = true }
-        }
+        .task { applyDebugLaunchRoute() }
         #endif
         .onChange(of: audio.currentSong) { _, song in
             if let song { library.markPlayed(song) }
@@ -104,6 +102,34 @@ struct RootView: View {
         case .library:  LibraryView()
         }
     }
+
+    #if DEBUG
+    /// Honours launch arguments used only to drive screens for screenshots and
+    /// UI tests: `-openTab <name>`, `-demoPlay`, `-openNowPlaying`,
+    /// `-openEqualizer`. No effect in a normal run.
+    private func applyDebugLaunchRoute() {
+        let arguments = CommandLine.arguments
+
+        if let index = arguments.firstIndex(of: "-openTab"),
+           index + 1 < arguments.count,
+           let tab = AppTab(rawValue: arguments[index + 1]) {
+            visited.insert(tab)
+            selection = tab
+        }
+
+        if arguments.contains("-demoPlay"), let first = library.songs.first {
+            audio.play(first, in: library.songs)
+        }
+
+        if arguments.contains("-openNowPlaying"), audio.currentSong != nil {
+            showNowPlaying = true
+        }
+
+        if arguments.contains("-openEqualizer") {
+            debugShowEqualizer = true
+        }
+    }
+    #endif
 }
 
 // MARK: - Tabs

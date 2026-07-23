@@ -88,6 +88,25 @@ struct LocalAudioEngineTests {
         #expect(engine.currentTime >= 0)
     }
 
+    @Test("Playing a file for real runs the metering tap without trapping")
+    func sustainedPlaybackDrivesMetering() async throws {
+        let file = try TestAudioFile.makeTone(named: "play.m4a", seconds: 2.0)
+        defer { TestAudioFile.cleanUp(file) }
+
+        let engine = LocalAudioEngine()
+        defer { engine.teardown() }
+        #expect(engine.prepare(url: file, isLive: false, autoplay: true))
+
+        // Let the realtime render thread actually run. The metering tap fires
+        // there; a main-actor-isolated tap closure would trap Swift 6's
+        // executor check the moment audio flows — this is the regression guard.
+        try? await Task.sleep(for: .milliseconds(300))
+
+        engine.refresh()
+        #expect(engine.currentTime > 0, "playback did not advance")
+        #expect(engine.isPlaying)
+    }
+
     @Test("Podcast speed is clamped to a sane range")
     func rateIsClamped() throws {
         let file = try TestAudioFile.makeTone(named: "rate.m4a", seconds: 1.0)

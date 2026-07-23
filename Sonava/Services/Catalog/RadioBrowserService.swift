@@ -59,7 +59,6 @@ final class RadioBrowserService: TrackProvider {
             artist: subtitle,
             album: "Radio",
             source: .radio,
-            artworkName: "Cover",
             artworkURL: station.favicon.flatMap { $0.isEmpty ? nil : URL(string: $0) },
             streamURL: stream,
             isLive: true,

@@ -66,7 +66,6 @@ actor AudiusService: TrackProvider {
             artist: track.user.name,
             album: "Audius",
             source: .audius,
-            artworkName: "Cover",
             artworkURL: art.flatMap(URL.init(string:)),
             streamURL: stream,
             gradientHex: Palette.hex(forSeed: track.id)

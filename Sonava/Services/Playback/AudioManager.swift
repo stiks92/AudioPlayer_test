@@ -257,6 +257,12 @@ final class AudioManager: NSObject, ObservableObject {
         if ok {
             engine.setRate(playbackRate)
             isPlaying = autoplay
+            // Publish the real duration immediately — the scrubber shouldn't wait
+            // for the first timer tick, and a paused track never ticks at all.
+            if !song.isLive {
+                let d = engine.duration
+                if d.isFinite, d > 0 { clock.duration = d }
+            }
             if autoplay { startTimer() } else { stopTimer() }
         } else {
             isPlaying = false
@@ -390,10 +396,21 @@ final class AudioManager: NSObject, ObservableObject {
         if !song.isLive {
             info[MPMediaItemPropertyPlaybackDuration] = clock.duration
         }
-        if !song.isRemote, let image = UIImage(named: song.artworkName) {
-            info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
+        // Lock-screen art comes from the track's extracted cover file, if it
+        // has one. Remote covers aren't fetched synchronously here.
+        if let cover = song.artworkURL, cover.isFileURL,
+           let image = UIImage(contentsOfFile: cover.path) {
+            info[MPMediaItemPropertyArtwork] = Self.artwork(for: image)
         }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+    }
+
+    /// MediaPlayer invokes the artwork request handler on an arbitrary thread.
+    /// Building it here — outside the main actor — keeps the closure
+    /// non-isolated, so Swift 6's executor check doesn't trap when the lock
+    /// screen asks for the image off the main thread.
+    private nonisolated static func artwork(for image: UIImage) -> MPMediaItemArtwork {
+        MPMediaItemArtwork(boundsSize: image.size) { _ in image }
     }
 
     // MARK: - Sampling timer

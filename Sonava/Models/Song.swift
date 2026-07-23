@@ -46,9 +46,8 @@ struct Song: Identifiable, Equatable, Hashable, Codable {
     /// Bundled resource name (nil for remote tracks).
     let fileName: String?
     let fileExtension: String
-    /// Local asset used as artwork fallback.
-    let artworkName: String
-    /// Remote artwork, if any.
+    /// Cover art, if any: a remote URL, or a file URL for a local track whose
+    /// embedded artwork we extracted on import. Absent → the gradient shows.
     let artworkURL: URL?
     /// Remote audio stream, if any.
     let streamURL: URL?
@@ -68,7 +67,6 @@ struct Song: Identifiable, Equatable, Hashable, Codable {
         source: TrackSource = .local,
         fileName: String? = nil,
         fileExtension: String = "mp3",
-        artworkName: String = "Cover",
         artworkURL: URL? = nil,
         streamURL: URL? = nil,
         isLive: Bool = false,
@@ -81,7 +79,6 @@ struct Song: Identifiable, Equatable, Hashable, Codable {
         self.source = source
         self.fileName = fileName
         self.fileExtension = fileExtension
-        self.artworkName = artworkName
         self.artworkURL = artworkURL
         self.streamURL = streamURL
         self.isLive = isLive

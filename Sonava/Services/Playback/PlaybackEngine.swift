@@ -236,8 +236,18 @@ final class LocalAudioEngine: PlaybackEngine {
         mixer.removeTap(onBus: 0)
         let format = mixer.outputFormat(forBus: 0)
         guard format.channelCount > 0 else { return }
+        // Install from a nonisolated context: AVAudioEngine invokes the tap on
+        // its realtime render thread, and a closure built here in @MainActor
+        // scope would trap Swift 6's executor check the instant audio flows.
+        Self.installMeterTap(on: mixer, format: format, into: levelBox)
+    }
 
-        mixer.installTap(onBus: 0, bufferSize: 1_024, format: format) { [levelBox] buffer, _ in
+    nonisolated private static func installMeterTap(
+        on mixer: AVAudioMixerNode,
+        format: AVAudioFormat,
+        into levelBox: OSAllocatedUnfairLock<Float>
+    ) {
+        mixer.installTap(onBus: 0, bufferSize: 1_024, format: format) { buffer, _ in
             guard let channels = buffer.floatChannelData else { return }
             let frames = Int(buffer.frameLength)
             guard frames > 0 else { return }
