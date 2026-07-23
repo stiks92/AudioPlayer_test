@@ -101,6 +101,14 @@ struct RootView: View {
             visited.insert(newValue)
             Haptics.selection()
         }
+        .onOpenURL { url in
+            // A shared playlist link: import it and take the user to Library.
+            if let shared = PlaylistSharing.playlist(from: url) {
+                playlistStore.importShared(shared)
+                visited.insert(.library)
+                selection = .library
+            }
+        }
         .task {
             audio.restoreLastSession()
         }

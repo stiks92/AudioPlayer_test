@@ -82,6 +82,22 @@ final class PlaylistStore: ObservableObject {
         playlists.first { $0.id == id }
     }
 
+    /// Adds a playlist that arrived via a shared link. Returns it so the caller
+    /// can navigate to it. Re-importing the same link twice is idempotent —
+    /// matched by name + track set rather than id (the id is always fresh).
+    @discardableResult
+    func importShared(_ playlist: UserPlaylist) -> UserPlaylist {
+        if let existing = playlists.first(where: {
+            $0.name == playlist.name && $0.tracks == playlist.tracks
+        }) {
+            return existing
+        }
+        playlists.insert(playlist, at: 0)
+        persist()
+        Haptics.success()
+        return playlist
+    }
+
     // MARK: - Persistence
 
     private var fileURL: URL? {

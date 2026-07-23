@@ -46,5 +46,18 @@
 	<!-- App Store: we use no non-exempt encryption, so review never asks. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+
+	<!-- sonava:// links carry a shared playlist so it imports on open. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.sonava.player.playlist</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>sonava</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

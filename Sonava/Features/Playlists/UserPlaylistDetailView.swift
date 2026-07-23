@@ -18,8 +18,15 @@ struct UserPlaylistDetailView: View {
 
     @State private var showRename = false
     @State private var renameText = ""
+    @State private var shareItems: SharePayload?
 
     private var playlist: UserPlaylist? { playlistStore.playlist(playlistID) }
+
+    /// Wraps the share items so `.sheet(item:)` can present them.
+    private struct SharePayload: Identifiable {
+        let id = UUID()
+        let items: [Any]
+    }
 
     var body: some View {
         ZStack {
@@ -45,6 +52,11 @@ struct UserPlaylistDetailView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
+                    if let playlist, !playlist.tracks.isEmpty {
+                        Button {
+                            share(playlist)
+                        } label: { Label("Share playlist", systemImage: "square.and.arrow.up") }
+                    }
                     Button {
                         renameText = playlist?.name ?? ""
                         showRename = true
@@ -63,6 +75,17 @@ struct UserPlaylistDetailView: View {
             Button("Save") { playlistStore.rename(playlistID, to: renameText) }
             Button("Cancel", role: .cancel) {}
         }
+        .sheet(item: $shareItems) { payload in
+            ShareSheet(items: payload.items)
+        }
+    }
+
+    /// Shares the playlist as a `sonava://` link plus a friendly line. Opening
+    /// the link in Sonava re-imports the whole playlist — the viral loop.
+    private func share(_ playlist: UserPlaylist) {
+        guard let link = PlaylistSharing.link(for: playlist) else { return }
+        Haptics.selection()
+        shareItems = SharePayload(items: [PlaylistSharing.message(for: playlist), link])
     }
 
     private func hero(_ playlist: UserPlaylist) -> some View {

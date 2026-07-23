@@ -4,6 +4,16 @@
     "%@": {
       "shouldTranslate": false
     },
+    "%@ — a playlist on Sonava": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ — плейлист в Sonava"
+          }
+        }
+      }
+    },
     "%@, then %@ %@. Cancel anytime.": {
       "localizations": {
         "ru": {
@@ -1677,6 +1687,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Настрой звук профессиональными пресетами."
+          }
+        }
+      }
+    },
+    "Share playlist": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поделиться плейлистом"
           }
         }
       }
