@@ -126,6 +126,16 @@
         }
       }
     },
+    "10-band equalizer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10-полосный эквалайзер"
+          }
+        }
+      }
+    },
     "AI Mix": {
       "localizations": {
         "ru": {
@@ -1278,6 +1288,16 @@
         }
       }
     },
+    "Offline downloads": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Офлайн-загрузки"
+          }
+        }
+      }
+    },
     "On-device": {
       "localizations": {
         "ru": {
@@ -1661,6 +1681,16 @@
         }
       }
     },
+    "Save full tracks and listen with no signal.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сохраняй полные треки и слушай без сети."
+          }
+        }
+      }
+    },
     "Science": {
       "localizations": {
         "ru": {
@@ -1933,6 +1963,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Студийный EQ и объёмный звук"
+          }
+        }
+      }
+    },
+    "Studio presets and per-band control.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Студийные пресеты и настройка по полосам."
           }
         }
       }

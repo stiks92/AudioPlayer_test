@@ -47,6 +47,7 @@ extension XCUIApplication {
 extension XCTestCase {
 
     /// Fails with a useful message instead of hanging for the default timeout.
+    @MainActor
     @discardableResult
     func waitFor(
         _ element: XCUIElement,

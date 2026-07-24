@@ -32,15 +32,15 @@ struct PaywallView: View {
         var id: String { icon }
     }
 
+    // Every perk here is a real, Pro-gated feature — no promises the app can't
+    // keep. App Review checks this, and so do users.
     private let perks: [Perk] = [
+        Perk(icon: "arrow.down.circle", title: "Offline downloads",
+             subtitle: "Save full tracks and listen with no signal."),
+        Perk(icon: "slider.vertical.3", title: "10-band equalizer",
+             subtitle: "Studio presets and per-band control."),
         Perk(icon: "sparkles", title: "AI Mix",
              subtitle: "Describe a vibe — get an instant, on-device mix."),
-        Perk(icon: "dot.radiowaves.left.and.right", title: "Every source, unified",
-             subtitle: "Streaming, radio, podcasts & your own servers."),
-        Perk(icon: "waveform.path.ecg", title: "Studio EQ & spatial",
-             subtitle: "Shape your sound with pro presets."),
-        Perk(icon: "arrow.down.circle", title: "Offline & lossless",
-             subtitle: "Download free-licensed tracks in top quality."),
         Perk(icon: "heart.fill", title: "Support indie dev",
              subtitle: "No ads. No tracking. Ever.")
     ]
