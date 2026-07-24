@@ -42,6 +42,10 @@ final class AudioManager: NSObject, ObservableObject {
     /// the queue drifts toward what the listener likes.
     var tasteProfile: TasteProfile = .init(topArtists: [])
 
+    /// Offline downloads, shared with the UI. Resolved ahead of the stream URL
+    /// so a saved track plays with no network.
+    let downloads = DownloadStore()
+
     var isLive: Bool { currentSong?.isLive ?? false }
 
     /// Speed control is only meaningful for spoken-word content (podcasts).
@@ -237,13 +241,16 @@ final class AudioManager: NSObject, ObservableObject {
         let song = queue[currentIndex]
         currentSong = song
 
-        guard let url = song.url else {
+        // Prefer an offline copy — it plays with no network and, being a file,
+        // runs through the local engine (so it gets the equalizer too).
+        guard let url = downloads.localURL(for: song) ?? song.url else {
             print("AudioManager: missing URL for \(song.id)")
             return
         }
 
-        // Swap to the correct backend for this track.
-        let engine: PlaybackEngine = song.isRemote ? remoteEngine : localEngine
+        // Local files and downloaded tracks use the AVAudioEngine backend;
+        // live streams use AVPlayer.
+        let engine: PlaybackEngine = url.isFileURL ? localEngine : remoteEngine
         if activeEngine !== engine { activeEngine?.teardown() }
         activeEngine = engine
         engine.onFinish = { [weak self] in

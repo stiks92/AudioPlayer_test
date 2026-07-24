@@ -19,6 +19,15 @@ final class ProStore: ObservableObject {
     @Published private(set) var isLoadingProducts = false
     @Published var lastError: String?
 
+    /// A global paywall trigger any view can raise (e.g. a Pro-gated action deep
+    /// in a list). RootView presents the sheet.
+    @Published var isShowingPaywall = false
+
+    func presentPaywall() {
+        Haptics.warning()
+        isShowingPaywall = true
+    }
+
     /// Configure these to match your App Store Connect subscription group.
     /// The monthly and yearly products should carry a 7-day free-trial
     /// introductory offer — the onboarding paywall surfaces it automatically.

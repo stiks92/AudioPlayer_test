@@ -15,12 +15,13 @@ struct LibraryView: View {
     @EnvironmentObject private var playlistStore: PlaylistStore
 
     enum Tab: String, CaseIterable {
-        case playlists, songs, favorites
+        case playlists, songs, downloads, favorites
 
         var title: LocalizedStringKey {
             switch self {
             case .playlists: return "Playlists"
             case .songs: return "Songs"
+            case .downloads: return "Offline"
             case .favorites: return "Favorites"
             }
         }
@@ -49,6 +50,7 @@ struct LibraryView: View {
                         switch tab {
                         case .playlists: playlistsSection
                         case .songs:     songsSection
+                        case .downloads: downloadsSection
                         case .favorites: favoritesSection
                         }
                     }
@@ -251,6 +253,39 @@ struct LibraryView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 50)
+    }
+
+    @ViewBuilder
+    private var downloadsSection: some View {
+        let downloads = audio.downloads.downloads
+        if downloads.isEmpty {
+            VStack(spacing: 12) {
+                Image(systemName: "arrow.down.circle")
+                    .font(.system(size: 46))
+                    .foregroundColor(Theme.textTertiary)
+                Text("Nothing downloaded yet")
+                    .font(.headline)
+                    .foregroundColor(Theme.textSecondary)
+                Text("Download full tracks from Audius or your server to play them offline. Look for the download action on any track.")
+                    .font(.subheadline)
+                    .foregroundColor(Theme.textTertiary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, 50)
+        } else {
+            LazyVStack(spacing: 2) {
+                ForEach(downloads) { song in
+                    Button {
+                        audio.play(song, in: downloads)
+                    } label: {
+                        SongRow(song: song, showBadge: true)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
     }
 
     @ViewBuilder

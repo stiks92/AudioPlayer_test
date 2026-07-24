@@ -34,6 +34,16 @@ enum TrackSource: String, Codable {
         case .podcast:  return "PODCAST"
         }
     }
+
+    /// Whether a track from this source may be saved for offline listening.
+    /// Only full-length, rights-clean sources qualify: never 30-second
+    /// previews, never live radio, and local files are already offline.
+    var isDownloadable: Bool {
+        switch self {
+        case .audius, .subsonic, .jamendo, .archive: return true
+        case .local, .radio, .itunes, .deezer, .podcast: return false
+        }
+    }
 }
 
 struct Song: Identifiable, Equatable, Hashable, Codable {
@@ -97,6 +107,15 @@ struct Song: Identifiable, Equatable, Hashable, Codable {
     }
 
     var isRemote: Bool { source != .local }
+
+    /// Full-length streaming track (not a 30-second preview) — the ones worth
+    /// downloading and the ones the UI must not disguise as previews.
+    var isFullLength: Bool { source != .itunes && source != .deezer }
+
+    /// Whether this track may be saved for offline listening, and has a stream
+    /// to save. Local tracks are already offline; previews and radio never
+    /// qualify.
+    var isDownloadable: Bool { source.isDownloadable && streamURL != nil }
 
     static func == (lhs: Song, rhs: Song) -> Bool { lhs.id == rhs.id }
     func hash(into hasher: inout Hasher) { hasher.combine(id) }

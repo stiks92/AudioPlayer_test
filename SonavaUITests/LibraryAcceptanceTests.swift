@@ -55,10 +55,18 @@ final class LibraryAcceptanceTests: XCTestCase {
         app.tab("Library").tap()
         waitFor(app.staticTexts["Your Library"])
 
-        for section in ["Songs", "Favorites", "Playlists"] {
+        for section in ["Songs", "Offline", "Favorites", "Playlists"] {
             app.staticTexts[section].tap()
             XCTAssertTrue(app.staticTexts[section].exists, "the \(section) segment disappeared")
         }
+    }
+
+    func testEmptyOfflineExplainsHowToDownload() {
+        let app = XCUIApplication.launched()
+        app.tab("Library").tap()
+        app.staticTexts["Offline"].tap()
+
+        waitFor(app.staticTexts["Nothing downloaded yet"], "the empty Offline tab gives no guidance")
     }
 
     func testEmptyFavouritesTellsTheUserHowToFillIt() {

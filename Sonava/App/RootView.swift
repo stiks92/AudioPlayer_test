@@ -66,6 +66,9 @@ struct RootView: View {
             WelcomeFlow { hasOnboarded = true }
                 .environmentObject(proStore)
         }
+        .sheet(isPresented: $proStore.isShowingPaywall) {
+            PaywallView().environmentObject(proStore)
+        }
         #if DEBUG
         // Lets a launch argument deep-link straight to a screen, so a specific
         // view can be driven or screenshotted without walking the UI.

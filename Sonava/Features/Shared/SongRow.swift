@@ -38,8 +38,10 @@ struct SongRow: View {
 
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var library: MusicLibrary
+    @EnvironmentObject private var proStore: ProStore
 
     private var isCurrent: Bool { audio.currentSong == song }
+    private var downloadState: DownloadStore.DownloadState { audio.downloads.state(for: song) }
 
     var body: some View {
         HStack(spacing: 14) {
@@ -57,6 +59,8 @@ struct SongRow: View {
             }
 
             Spacer(minLength: 8)
+
+            downloadIndicator
 
             if isCurrent {
                 NowPlayingBars(isAnimating: audio.isPlaying)
@@ -89,6 +93,46 @@ struct SongRow: View {
                 Label(library.isFavorite(song) ? "Remove from Favorites" : "Favorite",
                       systemImage: library.isFavorite(song) ? "heart.slash" : "heart")
             }
+            downloadButton
+        }
+    }
+
+    // MARK: - Offline downloads (Pro)
+
+    @ViewBuilder
+    private var downloadButton: some View {
+        if song.isDownloadable {
+            switch downloadState {
+            case .downloaded:
+                Button(role: .destructive) {
+                    audio.downloads.remove(song)
+                } label: { Label("Remove download", systemImage: "trash") }
+            case .downloading:
+                Button {} label: { Label("Downloading…", systemImage: "arrow.down.circle") }
+                    .disabled(true)
+            case .none, .failed:
+                Button {
+                    if proStore.isPro {
+                        audio.downloads.download(song)
+                    } else {
+                        proStore.presentPaywall()
+                    }
+                } label: { Label("Download", systemImage: "arrow.down.circle") }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var downloadIndicator: some View {
+        switch downloadState {
+        case .downloaded:
+            Image(systemName: "arrow.down.circle.fill")
+                .font(.system(size: 13))
+                .foregroundColor(Theme.accentSoft)
+        case .downloading:
+            ProgressView().scaleEffect(0.7)
+        case .none, .failed:
+            EmptyView()
         }
     }
 }

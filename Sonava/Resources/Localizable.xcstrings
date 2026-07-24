@@ -605,12 +605,42 @@
         }
       }
     },
+    "Download": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скачать"
+          }
+        }
+      }
+    },
     "Download free-licensed tracks in top quality.": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Скачивай свободно лицензированные треки в топовом качестве."
+          }
+        }
+      }
+    },
+    "Download full tracks from Audius or your server to play them offline. Look for the download action on any track.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скачивай полные треки с Audius или своего сервера, чтобы слушать офлайн. Действие «Скачать» есть в меню любого трека."
+          }
+        }
+      }
+    },
+    "Downloading…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Загрузка…"
           }
         }
       }
@@ -968,6 +998,16 @@
         }
       }
     },
+    "Made for you": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Для тебя"
+          }
+        }
+      }
+    },
     "Maybe later": {
       "localizations": {
         "ru": {
@@ -1168,6 +1208,16 @@
         }
       }
     },
+    "Nothing downloaded yet": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пока ничего не загружено"
+          }
+        }
+      }
+    },
     "Now Playing": {
       "localizations": {
         "ru": {
@@ -1204,6 +1254,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Выкл"
+          }
+        }
+      }
+    },
+    "Offline": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Офлайн"
           }
         }
       }
@@ -1497,6 +1557,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Недавно играли"
+          }
+        }
+      }
+    },
+    "Remove download": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить загрузку"
           }
         }
       }
