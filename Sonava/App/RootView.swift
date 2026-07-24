@@ -16,6 +16,7 @@ struct RootView: View {
     @StateObject private var serverStore = ServerStore()
     @StateObject private var playlistStore = PlaylistStore()
     @StateObject private var reviewPrompt = ReviewPrompt()
+    @StateObject private var scrobbleStore = ScrobbleStore()
 
     @Environment(\.requestReview) private var requestReview
 
@@ -29,6 +30,7 @@ struct RootView: View {
     @State private var debugShowEqualizer = false
     @State private var debugShowPaywall = false
     @State private var debugShowAIMix = false
+    @State private var debugShowScrobble = false
     #endif
 
     private let playerSpring = Animation.spring(response: 0.45, dampingFraction: 0.86)
@@ -61,6 +63,7 @@ struct RootView: View {
         .environmentObject(proStore)
         .environmentObject(serverStore)
         .environmentObject(playlistStore)
+        .environmentObject(scrobbleStore)
         .preferredColorScheme(.dark)
         .fullScreenCover(isPresented: Binding(get: { !hasOnboarded }, set: { hasOnboarded = !$0 })) {
             WelcomeFlow { hasOnboarded = true }
@@ -84,6 +87,9 @@ struct RootView: View {
                 .environmentObject(library)
                 .environmentObject(proStore)
         }
+        .sheet(isPresented: $debugShowScrobble) {
+            ConnectScrobbleView().environmentObject(scrobbleStore)
+        }
         .task { applyDebugLaunchRoute() }
         #endif
         .onChange(of: audio.currentSong) { _, song in
@@ -91,7 +97,12 @@ struct RootView: View {
                 library.markPlayed(song)
                 reviewPrompt.record(.trackFinished)   // active listening is a good signal
                 audio.tasteProfile = library.tasteProfile   // keep endless radio on-taste
+                scrobbleStore.scrobbleNowPlaying(song)
             }
+        }
+        .task {
+            // Scrobble a completed listen on natural track end (not on skips).
+            audio.onTrackCompleted = { scrobbleStore.scrobbleListen($0) }
         }
         .onChange(of: playlistStore.playlists.count) { old, new in
             if new > old { reviewPrompt.record(.playlistCreated) }
@@ -167,6 +178,7 @@ struct RootView: View {
         if arguments.contains("-openEqualizer") { debugShowEqualizer = true }
         if arguments.contains("-openPaywall") { debugShowPaywall = true }
         if arguments.contains("-openAIMix") { debugShowAIMix = true }
+        if arguments.contains("-openScrobble") { debugShowScrobble = true }
     }
     #endif
 }

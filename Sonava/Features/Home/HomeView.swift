@@ -13,6 +13,7 @@ struct HomeView: View {
     @EnvironmentObject private var library: MusicLibrary
     @EnvironmentObject private var proStore: ProStore
     @EnvironmentObject private var serverStore: ServerStore
+    @EnvironmentObject private var scrobble: ScrobbleStore
 
     @StateObject private var trending = SongFeed()
     @StateObject private var charts = SongFeed()
@@ -83,6 +84,7 @@ struct HomeView: View {
                     .environmentObject(audio)
                     .environmentObject(proStore)
                     .environmentObject(serverStore)
+                    .environmentObject(scrobble)
             }
             .sheet(isPresented: $showAIMix) {
                 AIMixView()

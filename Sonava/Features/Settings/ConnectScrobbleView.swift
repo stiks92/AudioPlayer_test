@@ -1,0 +1,137 @@
+//
+//  ConnectScrobbleView.swift
+//  Sonava
+//
+//  Connects a ListenBrainz account so plays are scrobbled. Users paste the
+//  token from their ListenBrainz profile; it's validated and stored in the
+//  Keychain.
+//
+
+import SwiftUI
+
+struct ConnectScrobbleView: View {
+    @EnvironmentObject private var scrobble: ScrobbleStore
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var token = ""
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Theme.background.ignoresSafeArea()
+                ScrollView {
+                    VStack(spacing: 18) {
+                        header
+                        if scrobble.isConnected {
+                            connectedCard
+                        } else {
+                            form
+                        }
+                    }
+                    .padding(20)
+                }
+            }
+            .foregroundColor(.white)
+            .navigationTitle("Scrobbling")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") { dismiss() }.foregroundColor(Theme.accentSoft)
+                }
+            }
+        }
+        .preferredColorScheme(.dark)
+    }
+
+    private var header: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "waveform.badge.magnifyingglass")
+                .font(.system(size: 40, weight: .bold))
+                .foregroundColor(Theme.accentSoft)
+            Text("ListenBrainz")
+                .font(.system(.title2, design: .rounded).weight(.bold))
+            Text("Scrobble every play to your ListenBrainz history — the open, private alternative to Last.fm.")
+                .font(.subheadline)
+                .foregroundColor(Theme.textSecondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding(.top, 8)
+    }
+
+    @ViewBuilder
+    private var connectedCard: some View {
+        HStack(spacing: 14) {
+            Image(systemName: "checkmark.seal.fill")
+                .font(.system(size: 24)).foregroundColor(Theme.positive)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Connected").font(.system(size: 16, weight: .bold))
+                Text("Plays are being scrobbled.")
+                    .font(.caption).foregroundColor(Theme.textSecondary)
+            }
+            Spacer()
+        }
+        .padding(16)
+        .glass(cornerRadius: 16)
+
+        Toggle(isOn: $scrobble.isEnabled) {
+            Label("Scrobble my plays", systemImage: "dot.radiowaves.up.forward")
+                .font(.system(size: 15))
+        }
+        .tint(Theme.accent)
+        .padding(16)
+        .glass(cornerRadius: 16)
+
+        Button(role: .destructive) {
+            scrobble.disconnect()
+        } label: {
+            Text("Disconnect")
+                .font(.headline).foregroundColor(Theme.destructive)
+                .frame(maxWidth: .infinity).padding(.vertical, 14)
+                .glass(cornerRadius: 26)
+        }
+        .buttonStyle(BouncyButtonStyle(scale: 0.97))
+    }
+
+    private var form: some View {
+        VStack(spacing: 14) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("User token")
+                    .textCase(.uppercase)
+                    .font(.system(size: 11, weight: .bold)).tracking(1)
+                    .foregroundColor(Theme.textTertiary)
+                SecureField("Paste your ListenBrainz token", text: $token)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 14).padding(.vertical, 12)
+                    .glass(cornerRadius: 12)
+            }
+
+            if let error = scrobble.lastError {
+                Text(error)
+                    .font(.footnote).foregroundColor(Theme.error)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            Button {
+                Task { _ = await scrobble.connect(token: token) }
+            } label: {
+                HStack {
+                    if scrobble.isConnecting { ProgressView().tint(Theme.background) }
+                    Text(scrobble.isConnecting ? "Connecting…" : "Connect")
+                        .font(.headline)
+                }
+                .foregroundColor(Theme.background)
+                .frame(maxWidth: .infinity).padding(.vertical, 15)
+                .background(Capsule().fill(Color.white))
+            }
+            .buttonStyle(BouncyButtonStyle(scale: 0.97))
+            .disabled(token.trimmingCharacters(in: .whitespaces).isEmpty || scrobble.isConnecting)
+
+            Text("Find your token on listenbrainz.org → Settings. It's stored only in your device's Keychain.")
+                .font(.system(size: 11))
+                .foregroundColor(Theme.textTertiary)
+                .multilineTextAlignment(.center)
+        }
+    }
+}

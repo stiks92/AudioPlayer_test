@@ -755,6 +755,16 @@
         }
       }
     },
+    "Find your token on listenbrainz.org → Settings. It's stored only in your device's Keychain.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Токен — на listenbrainz.org → Settings. Хранится только в Keychain твоего устройства."
+          }
+        }
+      }
+    },
     "Flat": {
       "localizations": {
         "ru": {
@@ -964,6 +974,9 @@
           }
         }
       }
+    },
+    "ListenBrainz": {
+      "shouldTranslate": false
     },
     "Listening…": {
       "localizations": {
@@ -1298,6 +1311,16 @@
         }
       }
     },
+    "On": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вкл"
+          }
+        }
+      }
+    },
     "On-device": {
       "localizations": {
         "ru": {
@@ -1367,6 +1390,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Пароль"
+          }
+        }
+      }
+    },
+    "Paste your ListenBrainz token": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вставь токен ListenBrainz"
+          }
+        }
+      }
+    },
+    "Paused": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пауза"
           }
         }
       }
@@ -1447,6 +1490,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Плейлисты"
+          }
+        }
+      }
+    },
+    "Plays are being scrobbled.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Прослушивания скробблятся."
           }
         }
       }
@@ -1697,6 +1750,46 @@
           "stringUnit": {
             "state": "translated",
             "value": "Наука"
+          }
+        }
+      }
+    },
+    "Scrobble every play to your ListenBrainz history — the open, private alternative to Last.fm.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправляй каждое прослушивание в историю ListenBrainz — открытую приватную альтернативу Last.fm."
+          }
+        }
+      }
+    },
+    "Scrobble my plays": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скробблить прослушивания"
+          }
+        }
+      }
+    },
+    "Scrobble to ListenBrainz": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скробблинг в ListenBrainz"
+          }
+        }
+      }
+    },
+    "Scrobbling": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скробблинг"
           }
         }
       }
@@ -2047,6 +2140,16 @@
         }
       }
     },
+    "That token wasn't accepted. Check it and try again.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Токен не принят. Проверь и попробуй снова."
+          }
+        }
+      }
+    },
     "The equalizer is a Pro feature": {
       "localizations": {
         "ru": {
@@ -2193,6 +2296,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Воодушевляюще"
+          }
+        }
+      }
+    },
+    "User token": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Токен пользователя"
           }
         }
       }

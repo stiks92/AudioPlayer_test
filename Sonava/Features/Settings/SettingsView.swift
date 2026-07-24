@@ -11,12 +11,14 @@ struct SettingsView: View {
     @EnvironmentObject private var proStore: ProStore
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var serverStore: ServerStore
+    @EnvironmentObject private var scrobble: ScrobbleStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var showPaywall = false
     @State private var showSleepOptions = false
     @State private var showConnectServer = false
     @State private var showEqualizer = false
+    @State private var showScrobble = false
 
     private var version: String {
         let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -59,6 +61,9 @@ struct SettingsView: View {
             .sheet(isPresented: $showEqualizer) {
                 EqualizerView(effects: audio.effects)
                     .environmentObject(proStore)
+            }
+            .sheet(isPresented: $showScrobble) {
+                ConnectScrobbleView().environmentObject(scrobble)
             }
             .confirmationDialog("Sleep timer", isPresented: $showSleepOptions, titleVisibility: .visible) {
                 ForEach(Self.sleepTimerChoices, id: \.self) { minutes in
@@ -169,10 +174,19 @@ struct SettingsView: View {
                     showConnectServer = true
                 }
                 divider
+                row(icon: "waveform.badge.magnifyingglass", title: "Scrobble to ListenBrainz",
+                    value: scrobbleValue) {
+                    if proStore.isPro { showScrobble = true } else { showPaywall = true }
+                }
+                divider
                 staticRow(icon: "music.note.list", title: "Spotify / Apple Music",
                           value: "Soon", valueColor: Theme.textTertiary)
             }
         }
+    }
+
+    private var scrobbleValue: LocalizedStringKey {
+        scrobble.isConnected ? (scrobble.isEnabled ? "On" : "Paused") : "Connect"
     }
 
     // MARK: - Support

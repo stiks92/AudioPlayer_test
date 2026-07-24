@@ -217,8 +217,15 @@ final class AudioManager: NSObject, ObservableObject {
 
     // MARK: - Loading
 
+    /// Called when a track finishes playing naturally — the signal for
+    /// scrobbling a completed listen. Not fired on manual skips.
+    var onTrackCompleted: ((Song) -> Void)?
+
     private func advance(auto: Bool) {
         guard !queue.isEmpty else { return }
+        if auto, let finished = currentSong {
+            onTrackCompleted?(finished)
+        }
         if auto && repeatMode == .one {
             seek(to: 0)
             play()
