@@ -59,25 +59,22 @@ enum Theme {
     static let surface = Color(hex: 0x15151F)
     static let surfaceElevated = Color(hex: 0x1E1E2A)
 
-    // MARK: Brand
-    static let accent = Color(hex: 0x7C5CFF)
-    static let accentSoft = Color(hex: 0xB9A8FF)
-    static let accentDeep = Color(hex: 0x4A00E0)
-    static let accentPink = Color(hex: 0xFF6FD8)
+    // MARK: Brand — driven by the selected palette (see ThemePalette)
+    @MainActor static var accent: Color { Color(hex: ThemeManager.shared.palette.accent) }
+    @MainActor static var accentSoft: Color { Color(hex: ThemeManager.shared.palette.accentSoft) }
+    @MainActor static var accentDeep: Color { Color(hex: ThemeManager.shared.palette.accentDeep) }
+    @MainActor static var accentPink: Color { Color(hex: ThemeManager.shared.palette.accentPink) }
 
     /// The two-stop brand gradient used by Pro surfaces and primary actions.
-    static let brandGradient = LinearGradient(
-        colors: [accent, accentDeep],
-        startPoint: .leading,
-        endPoint: .trailing
-    )
+    @MainActor static var brandGradient: LinearGradient {
+        LinearGradient(colors: [accent, accentDeep], startPoint: .leading, endPoint: .trailing)
+    }
 
     /// The richer three-stop gradient reserved for the paywall and Pro upsells.
-    static let proGradient = LinearGradient(
-        colors: [accent, accentPink, accentDeep],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-    )
+    @MainActor static var proGradient: LinearGradient {
+        LinearGradient(colors: [accent, accentPink, accentDeep],
+                       startPoint: .topLeading, endPoint: .bottomTrailing)
+    }
 
     // MARK: Semantic state
     /// Success / connected.

@@ -18,6 +18,10 @@ struct RootView: View {
     @StateObject private var reviewPrompt = ReviewPrompt()
     @StateObject private var scrobbleStore = ScrobbleStore()
 
+    /// Observed so the whole tree re-renders (and re-reads Theme.accent) when
+    /// the palette changes.
+    @ObservedObject private var theme = ThemeManager.shared
+
     @Environment(\.requestReview) private var requestReview
 
     @AppStorage("hasOnboarded.v1") private var hasOnboarded = false
@@ -126,6 +130,9 @@ struct RootView: View {
         }
         .task {
             audio.restoreLastSession()
+        }
+        .onChange(of: proStore.isPro) { _, pro in
+            theme.enforceFreeIfNeeded(isPro: pro)   // don't keep a paid palette if Pro lapses
         }
     }
 

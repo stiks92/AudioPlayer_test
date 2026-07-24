@@ -12,6 +12,7 @@ struct SettingsView: View {
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var serverStore: ServerStore
     @EnvironmentObject private var scrobble: ScrobbleStore
+    @ObservedObject private var theme = ThemeManager.shared
     @Environment(\.dismiss) private var dismiss
 
     @State private var showPaywall = false
@@ -32,6 +33,7 @@ struct SettingsView: View {
                 ScrollView {
                     VStack(spacing: 22) {
                         proCard
+                        appearanceSection
                         playbackSection
                         sourcesSection
                         supportSection
@@ -117,6 +119,66 @@ struct SettingsView: View {
             }
             .buttonStyle(BouncyButtonStyle(scale: 0.98))
         }
+    }
+
+    // MARK: - Appearance (theme palettes)
+
+    private var appearanceSection: some View {
+        section("Appearance") {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Accent")
+                    .font(.system(size: 14, weight: .semibold))
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 14) {
+                        ForEach(ThemePalette.all) { palette in
+                            paletteSwatch(palette)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+            .padding(.vertical, 6)
+        }
+    }
+
+    private func paletteSwatch(_ palette: ThemePalette) -> some View {
+        let selected = theme.palette.id == palette.id
+        let locked = palette.isPro && !proStore.isPro
+        return Button {
+            if locked {
+                showPaywall = true
+            } else {
+                theme.select(palette)
+                Haptics.selection()
+            }
+        } label: {
+            VStack(spacing: 6) {
+                ZStack {
+                    Circle()
+                        .fill(LinearGradient(colors: palette.swatch, startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .frame(width: 52, height: 52)
+                        .overlay(
+                            Circle().strokeBorder(selected ? Color.white : Color.white.opacity(0.15),
+                                                  lineWidth: selected ? 3 : 1)
+                        )
+                    if locked {
+                        Image(systemName: "lock.fill")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(.white)
+                            .shadow(radius: 2)
+                    } else if selected {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white)
+                            .shadow(radius: 2)
+                    }
+                }
+                Text(LocalizedStringKey(palette.name))
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(selected ? Theme.textPrimary : Theme.textSecondary)
+            }
+        }
+        .buttonStyle(BouncyButtonStyle(scale: 0.9))
     }
 
     // MARK: - Playback

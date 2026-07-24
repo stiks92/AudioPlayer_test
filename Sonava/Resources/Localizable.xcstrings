@@ -176,6 +176,16 @@
         }
       }
     },
+    "Accent": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Акцент"
+          }
+        }
+      }
+    },
     "Active — thank you for your support!": {
       "localizations": {
         "ru": {
@@ -236,6 +246,16 @@
         }
       }
     },
+    "Appearance": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Оформление"
+          }
+        }
+      }
+    },
     "Apple Music": {
       "shouldTranslate": false
     },
@@ -248,6 +268,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Audius · полные треки"
+          }
+        }
+      }
+    },
+    "Aurora": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Аврора"
           }
         }
       }
@@ -775,6 +805,16 @@
         }
       }
     },
+    "Forest": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Лес"
+          }
+        }
+      }
+    },
     "From your server": {
       "localizations": {
         "ru": {
@@ -1051,6 +1091,16 @@
         }
       }
     },
+    "Mono": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Моно"
+          }
+        }
+      }
+    },
     "Morning energy": {
       "localizations": {
         "ru": {
@@ -1267,6 +1317,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "OK"
+          }
+        }
+      }
+    },
+    "Ocean": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Океан"
           }
         }
       }
@@ -1714,6 +1774,16 @@
         }
       }
     },
+    "Rose": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Роза"
+          }
+        }
+      }
+    },
     "Sad piano": {
       "localizations": {
         "ru": {
@@ -2066,6 +2136,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Студийные пресеты и настройка по полосам."
+          }
+        }
+      }
+    },
+    "Sunset": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Закат"
           }
         }
       }
