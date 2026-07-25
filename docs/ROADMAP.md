@@ -1,7 +1,14 @@
-# Aurora — Product Roadmap & Growth Plan
+# Sonava — Product Roadmap & Growth Plan
 
 Turning the redesigned SwiftUI player into an "ultimate" cross-service music app.
 Companion doc: [`INTEGRATIONS.md`](./INTEGRATIONS.md).
+
+> **This document is the long-range product plan.** Positioning, App Store
+> metadata and the conversion funnel were reworked later by a dedicated ASO
+> study, which supersedes sections 1, 5 and 6 where the two disagree — the
+> short version is: sell *"the player for the music you already control"*, not
+> a free Spotify. Renamed from "Aurora" (taken in the App Store); don't
+> reintroduce that name as product copy.
 
 ## Shipped so far
 
@@ -9,31 +16,43 @@ Companion doc: [`INTEGRATIONS.md`](./INTEGRATIONS.md).
 - Provider abstraction + dual playback engine (local metering / remote streaming).
 - Sources: **Audius** (streaming), **Internet Radio** (Radio Browser),
   **Podcasts** (iTunes discovery + RSS episodes, with 0.8×–2× speed),
-  **Self-hosted Subsonic** (Navidrome/Airsonic; Keychain-stored credentials).
-- **Aurora Pro** (StoreKit 2) + paywall + settings + Pro gating.
+  **Self-hosted Subsonic** (Navidrome/Airsonic; Keychain-stored credentials) —
+  now **several servers at once**, searched together.
+- **Sonava Pro** (StoreKit 2) + paywall + settings + Pro gating, with a 7-day
+  trial reached from the end of onboarding.
 - **AI Mix** (on-device natural-language mix, EN + RU intent), synced **karaoke
   lyrics** (LRCLIB), **ShazamKit** recognition, **sleep timer**, **share card**,
   haptics.
 - **Deezer** (search/charts/playlists, 30s previews) + **Apple/iTunes** previews;
   **Editor's picks** curated shelves on Home; **Artist** screen.
-- **Bilingual EN/RU** localization (lightweight `L()` system).
+- **10-band equalizer** with presets (local + downloaded audio).
+- **Offline downloads** of full-length, rights-clean tracks.
+- **Scrobbling to ListenBrainz**; **taste profile** driving "Made for you" and
+  on-taste endless radio.
+- **Personalisation:** six accent palettes and six matching app icons.
+- **"Your Sound"** on-device listening stats — top artists/tracks, day streak,
+  shareable card.
+- **Siri / Shortcuts / Spotlight** intents: favourites, my radio, resume.
+- **Playlist sharing** via `sonava://` links.
+- **Bilingual EN/RU** localization — a standard **String Catalog**, with the
+  Russian pass run as its own test configuration.
 - **Endless autoplay** + **resume last session**; cross-source favorites, recents,
   queue editing, and user playlists.
-- First-run **onboarding**; performance hardening (clock split, keep-alive tabs,
-  energy-aware visuals).
+- First-run **onboarding**; rating prompt at a happy moment; performance
+  hardening (clock split, keep-alive tabs, energy-aware visuals).
 
-Remaining big rocks are tracked below (EQ/audio quality, Apple Music/Spotify,
-platform extensions, scrobbling, offline). **Engineering handoff / how to continue
+Remaining big rocks are tracked below (crossfade/gapless, Apple Music/Spotify,
+platform extensions, iCloud sync). **Engineering handoff / how to continue
 this project: [`HANDOFF.md`](./HANDOFF.md).**
 
 ## 1. Positioning (the one-liner)
 
-> **Aurora — one beautiful player for *all* your music.**
+> **Sonava — one beautiful player for *all* your music.**
 > Your files, your server, free streaming catalogs, your podcasts and radio, and
 > your Spotify/Apple accounts — unified, with an on-device AI DJ. Private by design.
 
 Why this wins: Spotify/Apple lock you into *their* catalog. Self-hosted clients
-(Navidrome, Plex) are powerful but ugly. Aurora is the only one that is **gorgeous
+(Navidrome, Plex) are powerful but ugly. Sonava is the only one that is **gorgeous
 + universal + private + AI-native**, and it's useful for free on day one via
 legal open catalogs.
 
@@ -111,19 +130,19 @@ for richer "AI DJ banter" and semantic search — cost falls on the user, not us
 - **Free forever:** open catalogs (Audius/Jamendo/Archive), radio, podcasts,
   local files, basic playback, ShazamKit, basic lyrics. This alone is a complete,
   useful app — great for word of mouth.
-- **Aurora Pro** (subscription ~$3–5/mo or ~$25/yr):
-  - Connect unlimited streaming accounts + self-hosted servers
-  - On-device **AI DJ**, natural-language playlists, endless smart radio
-  - Karaoke lyrics + transcripts, advanced EQ/spatial, gapless/crossfade
-  - CarPlay, Watch, Widgets, offline downloads (for permitted content)
-  - iCloud library backup + cross-service playlist transfer
+- **Sonava Pro** (subscription, 7-day trial). Gated **today**: offline
+  downloads, the 10-band equalizer, AI Mix, ListenBrainz scrobbling, accent
+  palettes, alternate app icons, unlimited self-hosted servers (searched
+  together), and the month/all-time stats views.
+  Still on the list: gapless/crossfade, CarPlay, Watch, Widgets, iCloud backup
+  and cross-service playlist transfer.
 - **Lifetime unlock** (~$60–80 one-time) — converts the "I hate subscriptions"
   crowd (this segment overlaps heavily with the self-hosted audience).
 - **BYO-AI-key** tier — advanced AI at zero cost to us.
 - Principled stance: **no ads, no tracking** — itself a marketing message.
 
 Secondary: affiliate/licensing upsell for Jamendo royalty-free music (creators),
-and a possible "Aurora for creators/labels" angle later.
+and a possible "Sonava for creators/labels" angle later.
 
 ## 6. Go-to-market & growth
 
@@ -170,8 +189,17 @@ and a possible "Aurora for creators/labels" angle later.
 
 ## 9. Recommended immediate next step
 
-Ship **Phase 1** on top of the existing beautiful UI: the `MusicSource`
-abstraction + **Audius** streaming + **Radio Browser** + **LRCLIB lyrics** +
-**ShazamKit**. That single milestone converts the demo into a real, legal,
-free streaming app with two headline "wow" features — the strongest possible
-foundation to build the rest on.
+Phases 1–3 are largely shipped. What is left, in order of value:
+
+1. **Owner, not code:** create the `com.sonava.pro.*` products with the 7-day
+   trial in App Store Connect, paste the name/subtitle/keywords, upload the
+   screenshots, and add the RU + second English store localizations. None of
+   the monetization above earns anything until this is done.
+2. **Crossfade / gapless.** High value and the most-requested audio feature,
+   but the DSP is not ear-verifiable in a simulator and it is a real
+   dual-playback refactor of `LocalAudioEngine`. Do it *with* device listening.
+3. **A home-screen widget / Live Activity.** Strong retention and a good store
+   screenshot, but it needs a new Xcode target — add it in Xcode, never by
+   hand-editing the project file.
+4. **iCloud sync** of favourites, playlists and settings.
+5. **MusicKit (Apple Music)** — needs a device and an entitlement.

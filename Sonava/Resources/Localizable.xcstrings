@@ -1373,6 +1373,16 @@
         }
       }
     },
+    "Make it yours": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сделай своим"
+          }
+        }
+      }
+    },
     "Maybe later": {
       "localizations": {
         "ru": {
@@ -1743,6 +1753,16 @@
         }
       }
     },
+    "Offline · EQ · AI Mix · themes": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Офлайн · эквалайзер · AI-микс · темы"
+          }
+        }
+      }
+    },
     "On": {
       "localizations": {
         "ru": {
@@ -2002,6 +2022,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Прослушивания скробблятся."
+          }
+        }
+      }
+    },
+    "Plus unlimited self-hosted servers searched together, scrobbling to ListenBrainz, and your full listening history.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "А ещё — сколько угодно своих серверов с поиском сразу по всем, скробблинг в ListenBrainz и вся история прослушиваний."
           }
         }
       }
@@ -2512,6 +2542,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Перемешивает треки из избранного."
+          }
+        }
+      }
+    },
+    "Six accent themes and six app icons.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Шесть цветовых тем и шесть иконок приложения."
           }
         }
       }

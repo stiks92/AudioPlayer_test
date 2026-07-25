@@ -20,7 +20,7 @@ and monetization are in `ROADMAP.md`.
   **Zero third-party dependencies** — SwiftUI, AVFoundation, MediaPlayer,
   ShazamKit, StoreKit 2, CryptoKit, Security.
 - **Bilingual EN/RU.** The owner communicates in **Russian**; mirror that.
-- ~60 Swift files, MVVM-ish, `@MainActor` services in the SwiftUI environment.
+- ~75 Swift files, MVVM-ish, `@MainActor` services in the SwiftUI environment.
 
 > **Renamed from "Aurora".** That name is taken in the App Store by a direct
 > competitor. "Sonava" was cleared against the store and trademark registries.
@@ -151,18 +151,29 @@ hand-editing target graphs is too error-prone.
 
 ## 8. Tests
 
-65 unit + 19 UI, each run in **English and Russian** via `Config/Sonava.xctestplan`.
+155 unit + 37 UI, each run in **English and Russian** via `Config/Sonava.xctestplan`.
 
 - Unit (`SonavaTests`): import round trip, favourites/recents persistence, `Song`
   identity/coding, safe degradation of on-disk state, AI Mix intent parsing
-  (EN + RU), catalogue completeness + RU plurals, the full EQ model, and the
-  `LocalAudioEngine` graph exercised against a generated tone.
+  (EN + RU), catalogue completeness + RU plurals, the full EQ model, the
+  `LocalAudioEngine` graph exercised against a generated tone, offline
+  downloads, scrobble payloads, the taste profile, theme palettes, listening
+  stats (windowing, ranking, streaks, localized durations), multi-server rules
+  and the single-server migration, the Siri intents, and alternate-icon
+  bundling asserted against the built `Info.plist`.
 - UI (`SonavaUITests`): onboarding, tabs + state preservation, settings, empty
   states, playlist creation, Files picker, Pro gating + paywall disclosure, EQ
-  gate + controls, and a Russian pass.
+  gate + controls, the stats screen (share, clear, Pro-gated ranges), server
+  switching and its gate, accent + app-icon personalisation including a
+  relaunch round trip, and a Russian pass.
 - UI tests find controls by **accessibility identifier** (`AccessibilityID`),
   never visible text. Add an id with `identified(_:label:)`, which also sets the
-  VoiceOver label. A DEBUG launch arg `-openEqualizer` deep-links a screen.
+  VoiceOver label. Careful: putting an identifier on a *container* makes it one
+  accessibility element and hides the controls inside it — from VoiceOver as
+  well as from the tests.
+- DEBUG launch arguments deep-link a screen and seed the state it needs
+  (`-openStats -seedStats`, `-openServers -seedServers 3`, `-openSettings`,
+  `-resetAppIcon`, …). The full list is in the README.
 
 ---
 

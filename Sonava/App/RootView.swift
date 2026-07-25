@@ -39,6 +39,7 @@ struct RootView: View {
     @State private var debugShowScrobble = false
     @State private var debugShowStats = false
     @State private var debugShowServers = false
+    @State private var debugShowSettings = false
     #endif
 
     private let playerSpring = Animation.spring(response: 0.45, dampingFraction: 0.86)
@@ -109,6 +110,13 @@ struct RootView: View {
                 .environmentObject(serverStore)
                 .environmentObject(proStore)
         }
+        .sheet(isPresented: $debugShowSettings) {
+            SettingsView()
+                .environmentObject(audio)
+                .environmentObject(proStore)
+                .environmentObject(serverStore)
+                .environmentObject(scrobbleStore)
+        }
         .task { applyDebugLaunchRoute() }
         #endif
         .onChange(of: audio.currentSong) { _, song in
@@ -130,8 +138,12 @@ struct RootView: View {
         }
         .onChange(of: scenePhase) { _, phase in
             // Leaving the foreground may mean suspension without another tick,
-            // so bank the in-flight listen now.
-            if phase != .active { audio.flushListeningTime() }
+            // so bank the in-flight listen and get it onto disk — writes while
+            // playing are batched and one may still be pending.
+            if phase != .active {
+                audio.flushListeningTime()
+                history.save()
+            }
         }
         .onChange(of: playlistStore.playlists.count) { old, new in
             if new > old { reviewPrompt.record(.playlistCreated) }
@@ -159,6 +171,7 @@ struct RootView: View {
         .onChange(of: proStore.isPro, initial: true) { _, pro in
             theme.enforceFreeIfNeeded(isPro: pro)   // don't keep a paid palette if Pro lapses
             serverStore.isPro = pro                 // extra servers stay saved, just unreachable
+            AppIconManager.shared.enforceFreeIfNeeded(isPro: pro)
         }
     }
 
@@ -222,6 +235,12 @@ struct RootView: View {
             serverStore.seedDemoServers(count: count)
         }
         if arguments.contains("-openServers") { debugShowServers = true }
+        if arguments.contains("-openSettings") { debugShowSettings = true }
+        // The chosen home-screen icon is system state that outlives the app, so
+        // a test that changes it would otherwise poison the next one.
+        if arguments.contains("-resetAppIcon") {
+            AppIconManager.shared.select(.aurora)
+        }
     }
     #endif
 }

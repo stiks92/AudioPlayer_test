@@ -25,11 +25,17 @@ final class ListeningHistory: ObservableObject {
     static let minimumListen: Double = 20
     private static let maxEvents = 4_000
     private static let retentionDays = 400
+    /// How often an in-progress listen is flushed to disk.
+    private static let writeInterval: TimeInterval = 120
+
+    private var isDirty = false
+    private var lastWrite = Date.distantPast
 
     init(store: JSONFileStore<[PlayEvent]> = JSONFileStore("listening.json", default: [])) {
         self.store = store
         events = store.read()
         prune(now: Date())
+        save()
     }
 
     // MARK: - Recording
@@ -45,6 +51,11 @@ final class ListeningHistory: ObservableObject {
 
         if let index = events.lastIndex(where: { $0.session == session }) {
             events[index].seconds = seconds
+            isDirty = true
+            // Extending the current listen happens on a timer. Rewriting the
+            // whole log each time would mean tens of megabytes of writes over an
+            // evening of listening, so those updates are batched.
+            if now.timeIntervalSince(lastWrite) >= Self.writeInterval { save(now: now) }
         } else {
             events.append(
                 PlayEvent(
@@ -57,9 +68,19 @@ final class ListeningHistory: ObservableObject {
                     seconds: seconds
                 )
             )
+            isDirty = true
             prune(now: now)
+            save(now: now)          // a new track is worth writing immediately
         }
+    }
+
+    /// Writes pending changes. Called when the app leaves the foreground, where
+    /// it may be suspended before the next batched write would have happened.
+    func save(now: Date = Date()) {
+        guard isDirty else { return }
         store.write(events)
+        isDirty = false
+        lastWrite = now
     }
 
     // MARK: - Reading
@@ -73,7 +94,8 @@ final class ListeningHistory: ObservableObject {
 
     func clear() {
         events = []
-        store.write(events)
+        isDirty = true
+        save()
     }
 
     // MARK: - Housekeeping
@@ -105,7 +127,8 @@ final class ListeningHistory: ObservableObject {
             }
         }
         events = seeded.sorted { $0.date < $1.date }
-        store.write(events)
+        isDirty = true
+        save()
     }
     #endif
 
@@ -119,6 +142,8 @@ final class ListeningHistory: ObservableObject {
         if events.count > Self.maxEvents {
             events = Array(events.suffix(Self.maxEvents))
         }
-        if events.count != before { store.write(events) }
+        // Marks only — every caller saves straight afterwards, and writing here
+        // too would mean two writes for one change.
+        if events.count != before { isDirty = true }
     }
 }

@@ -83,6 +83,22 @@ struct ListeningHistoryTests {
         #expect(reopened.hasHistory)
     }
 
+    @Test("Extending a listen is batched, and saving flushes it")
+    func inProgressWritesAreBatched() {
+        let history = makeHistory()
+        let session = UUID()
+        history.record(song: song(), seconds: 60, session: session)   // new event: written at once
+
+        history.record(song: song(), seconds: 900, session: session)  // same listen, batched
+        var onDisk = ListeningHistory(store: JSONFileStore(Self.filename, default: []))
+        #expect(onDisk.events.first?.seconds == 60,
+                "an in-progress listen was written to disk on every tick")
+
+        history.save()
+        onDisk = ListeningHistory(store: JSONFileStore(Self.filename, default: []))
+        #expect(onDisk.events.first?.seconds == 900, "saving did not flush the pending listen")
+    }
+
     @Test("Clearing wipes both memory and disk")
     func clearing() {
         let history = makeHistory()

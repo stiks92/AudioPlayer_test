@@ -64,6 +64,28 @@ Run a single configuration:
 xcodebuild test … -only-test-configuration Russian
 ```
 
+### Debug launch arguments
+
+DEBUG builds honour launch arguments that jump straight to a screen or seed the
+state it needs. They exist for UI tests and for taking App Store screenshots
+without walking the UI by hand; they do nothing in a Release build.
+
+| Argument | Effect |
+| --- | --- |
+| `-openTab <home\|search\|radio\|podcasts\|library>` | Select a tab |
+| `-openNowPlaying`, `-demoPlay` | Start a track / expand the player |
+| `-openSettings`, `-openEqualizer`, `-openPaywall`, `-openAIMix` | Present that screen |
+| `-openStats` + `-seedStats` | Stats screen, with a plausible fortnight of history |
+| `-openServers` + `-seedServers <n>` | Servers screen, with *n* saved connections |
+| `-openScrobble` | ListenBrainz connection screen |
+| `-resetAppIcon` | Put the home-screen icon back to the default |
+| `-hasOnboarded.v1 YES`, `-pro.dev.override.v1 YES` | Skip onboarding / unlock Pro |
+
+```bash
+xcrun simctl launch <udid> com.sonava.player \
+  -hasOnboarded.v1 YES -pro.dev.override.v1 YES -seedStats -openStats
+```
+
 ### Device-only features
 
 Some things cannot be verified in a simulator, by design of the frameworks:
@@ -73,6 +95,12 @@ Some things cannot be verified in a simulator, by design of the frameworks:
 | **ShazamKit recognition** | Needs a real microphone; never matches on a simulator. `ShazamView` says so in-app. |
 | **StoreKit purchases** | Need App Store Connect products. Settings → Developer → *unlock Pro* is a **DEBUG-only** override for testing Pro-gated UI. |
 | **Instruments profiling** | Energy and memory figures from a simulator are meaningless. |
+| **Siri voice invocation** | The App Intents themselves are unit-tested and their registration is asserted against the built `Metadata.appintents`, but speaking a phrase needs a device. |
+
+One simulator quirk worth knowing: `setAlternateIconName` applies the icon but
+**never calls its completion handler**, so `AppIconManager` uses the callback
+API optimistically and only reverts on a real error. Awaiting the bridged
+`async` version would leave the picker frozen.
 
 ---
 
@@ -172,12 +200,12 @@ implies otherwise; the honest path to a mainstream catalogue is MusicKit.
 
 ## Tests
 
-65 unit + 19 UI tests, all green.
+155 unit + 37 UI tests, all green, each run in both languages.
 
 | Target | What it covers |
 | --- | --- |
-| `SonavaTests` | Import round trip (copy, metadata, dedupe, prune, delete), favourites/recents persistence and capping, `Song` identity and coding, safe degradation of on-disk state, AI Mix intent parsing in **English and Russian**, catalogue completeness and Russian plural rules. |
-| `SonavaUITests` | Onboarding, all five tabs, tab-state preservation, settings, empty-library and empty-favourites states, playlist creation, the Files picker, Pro gating and paywall disclosure, and a Russian-locale pass over the same screens. |
+| `SonavaTests` | Import round trip (copy, metadata, dedupe, prune, delete), favourites/recents persistence and capping, `Song` identity and coding, safe degradation of on-disk state, AI Mix intent parsing in **English and Russian**, offline downloads, scrobble payloads, taste profile, theme palettes, listening stats (windowing, ranking, streaks, localized durations), multi-server rules and legacy migration, Siri intents, alternate-icon bundling, catalogue completeness and Russian plural rules. |
+| `SonavaUITests` | Onboarding, all five tabs, tab-state preservation, settings, empty states, playlist creation, the Files picker, Pro gating and paywall disclosure, the stats screen and its share/clear paths, multi-server switching and its Pro gate, accent + app-icon personalisation (including a relaunch round trip), and a Russian-locale pass over the same screens. |
 
 UI tests find controls by **accessibility identifier** (`AccessibilityID`), never
 by visible text — text changes with the display language. Identifiers are added

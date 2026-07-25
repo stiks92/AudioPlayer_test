@@ -13,6 +13,7 @@ struct SettingsView: View {
     @EnvironmentObject private var serverStore: ServerStore
     @EnvironmentObject private var scrobble: ScrobbleStore
     @ObservedObject private var theme = ThemeManager.shared
+    @ObservedObject private var appIcon = AppIconManager.shared
     @Environment(\.dismiss) private var dismiss
 
     @State private var showPaywall = false
@@ -109,7 +110,7 @@ struct SettingsView: View {
                         .foregroundColor(.white)
                     VStack(alignment: .leading, spacing: 3) {
                         Text("Unlock Sonava Pro").font(.system(size: 17, weight: .bold))
-                        Text("AI Mix · all sources · EQ · offline")
+                        Text("Offline · EQ · AI Mix · themes")
                             .font(.caption).foregroundColor(.white.opacity(0.85))
                     }
                     Spacer()
@@ -127,20 +128,91 @@ struct SettingsView: View {
 
     private var appearanceSection: some View {
         section("Appearance") {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Accent")
-                    .font(.system(size: 14, weight: .semibold))
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 14) {
-                        ForEach(ThemePalette.all) { palette in
-                            paletteSwatch(palette)
+            VStack(alignment: .leading, spacing: 18) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Accent")
+                        .font(.system(size: 14, weight: .semibold))
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 14) {
+                            ForEach(ThemePalette.all) { palette in
+                                paletteSwatch(palette)
+                            }
+                        }
+                        .padding(.vertical, 2)
+                    }
+                }
+
+                if appIcon.supportsAlternateIcons {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("App icon")
+                            .font(.system(size: 14, weight: .semibold))
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 14) {
+                                ForEach(AppIconOption.all) { option in
+                                    iconSwatch(option)
+                                }
+                            }
+                            .padding(.vertical, 2)
+                        }
+                        if let error = appIcon.lastError {
+                            Text(error).font(.footnote).foregroundColor(Theme.error)
                         }
                     }
-                    .padding(.vertical, 2)
                 }
             }
             .padding(.vertical, 6)
         }
+    }
+
+    private func iconSwatch(_ option: AppIconOption) -> some View {
+        let selected = appIcon.current.id == option.id
+        let locked = option.isPro && !proStore.isPro
+        return Button {
+            if locked {
+                showPaywall = true
+            } else {
+                appIcon.select(option)
+                Haptics.selection()
+            }
+        } label: {
+            VStack(spacing: 6) {
+                ZStack {
+                    // A miniature of the real icon: same gradient, same mark.
+                    RoundedRectangle(cornerRadius: 13, style: .continuous)
+                        .fill(LinearGradient(colors: option.gradientHex.colors,
+                                             startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .frame(width: 56, height: 56)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                                .strokeBorder(selected ? Color.white : Color.white.opacity(0.15),
+                                              lineWidth: selected ? 3 : 1)
+                        )
+                    HStack(spacing: 2.5) {
+                        ForEach([0.34, 0.62, 1.0, 0.70, 0.44], id: \.self) { height in
+                            Capsule()
+                                .fill(Color.white.opacity(0.92))
+                                .frame(width: 5, height: 30 * height)
+                        }
+                    }
+                    if locked {
+                        RoundedRectangle(cornerRadius: 13, style: .continuous)
+                            .fill(Color.black.opacity(0.45))
+                            .frame(width: 56, height: 56)
+                        Image(systemName: "lock.fill")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(.white)
+                    }
+                }
+                Text(LocalizedStringKey(option.name))
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(selected ? Theme.textPrimary : Theme.textSecondary)
+            }
+        }
+        .buttonStyle(BouncyButtonStyle(scale: 0.9))
+        .accessibilityIdentifier("icon.\(option.id)")
+        // The active choice is shown only by a border, which says nothing to
+        // VoiceOver — and nothing to a test either.
+        .accessibilityAddTraits(selected ? [.isSelected] : [])
     }
 
     private func paletteSwatch(_ palette: ThemePalette) -> some View {
@@ -181,6 +253,8 @@ struct SettingsView: View {
             }
         }
         .buttonStyle(BouncyButtonStyle(scale: 0.9))
+        .accessibilityIdentifier("palette.\(palette.id)")
+        .accessibilityAddTraits(selected ? [.isSelected] : [])
     }
 
     // MARK: - Playback
