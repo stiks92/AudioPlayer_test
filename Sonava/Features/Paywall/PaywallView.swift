@@ -34,6 +34,9 @@ struct PaywallView: View {
 
     // Every perk here is a real, Pro-gated feature — no promises the app can't
     // keep. App Review checks this, and so do users.
+    /// The five broadest reasons to subscribe, in the order they persuade.
+    /// Everything else that is gated is listed underneath rather than given a
+    /// row of its own — a paywall that lists everything persuades of nothing.
     private let perks: [Perk] = [
         Perk(icon: "arrow.down.circle", title: "Offline downloads",
              subtitle: "Save full tracks and listen with no signal."),
@@ -41,6 +44,8 @@ struct PaywallView: View {
              subtitle: "Studio presets and per-band control."),
         Perk(icon: "sparkles", title: "AI Mix",
              subtitle: "Describe a vibe — get an instant, on-device mix."),
+        Perk(icon: "paintpalette.fill", title: "Make it yours",
+             subtitle: "Six accent themes and six app icons."),
         Perk(icon: "heart.fill", title: "Support indie dev",
              subtitle: "No ads. No tracking. Ever.")
     ]
@@ -138,6 +143,11 @@ struct PaywallView: View {
                     Spacer()
                 }
             }
+            Text("Plus unlimited self-hosted servers searched together, scrobbling to ListenBrainz, and your full listening history.")
+                .font(.system(size: 12))
+                .foregroundColor(.white.opacity(0.7))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 2)
         }
         .padding(18)
         .glass(cornerRadius: 22)

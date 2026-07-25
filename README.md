@@ -43,6 +43,13 @@ simulator bug, not a test failure:
 xcrun simctl shutdown all && xcrun simctl boot 'iPhone 17 Pro'
 ```
 
+**Never build while tests are running.** Any `xcodebuild build` or
+`build-for-testing` started between a `build-for-testing` and its
+`test-without-building` rewrites the products underneath the running session.
+The symptom is `TEST EXECUTE FAILED`, or — worse — a green result you cannot
+trust because the run executed a mix of two builds. Let the run finish, or stop
+it and start over.
+
 Pinning by UDID is more reliable than by name when several runtimes are
 installed:
 
