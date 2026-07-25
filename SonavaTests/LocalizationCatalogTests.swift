@@ -58,6 +58,10 @@ struct LocalizationCatalogTests {
             "No server connected", "Remove this server?",
             "Invalid server URL.", "Server rejected the credentials.",
             "Connecting more than one server needs Sonava Pro.",
+            // Siri phrases and the replies it speaks back.
+            "Play my favorites", "Start my radio", "Resume listening",
+            "Playing your favorites.", "Starting your radio.",
+            "Play my favorites in ${applicationName}",
         ]
     )
     func stringsAreTranslatedToRussian(key: String) throws {

@@ -398,6 +398,16 @@
         }
       }
     },
+    "App icon": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Иконка приложения"
+          }
+        }
+      }
+    },
     "Appearance": {
       "localizations": {
         "ru": {
@@ -640,6 +650,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Не удалось собрать микс. Попробуй другое настроение или проверь соединение."
+          }
+        }
+      }
+    },
+    "Couldn't change the app icon.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось сменить иконку."
           }
         }
       }
@@ -953,6 +973,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Электроника"
+          }
+        }
+      }
+    },
+    "Endless listening built from your own taste.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Бесконечный поток по твоему вкусу."
           }
         }
       }
@@ -1433,6 +1463,16 @@
         }
       }
     },
+    "My radio": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Моё радио"
+          }
+        }
+      }
+    },
     "Name": {
       "localizations": {
         "ru": {
@@ -1816,6 +1856,26 @@
         }
       }
     },
+    "Picking up where you left off.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продолжаю с места остановки."
+          }
+        }
+      }
+    },
+    "Picks up wherever you stopped.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продолжает с места остановки."
+          }
+        }
+      }
+    },
     "Plans will be available at launch.": {
       "localizations": {
         "ru": {
@@ -1856,6 +1916,26 @@
         }
       }
     },
+    "Play my favorites": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Включить избранное"
+          }
+        }
+      }
+    },
+    "Play my favorites in ${applicationName}": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Включи избранное в ${applicationName}"
+          }
+        }
+      }
+    },
     "Play on Sonava": {
       "localizations": {
         "ru": {
@@ -1876,12 +1956,32 @@
         }
       }
     },
+    "Play something first — your radio is built from what you listen to.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сначала послушай что-нибудь — радио строится по твоим трекам."
+          }
+        }
+      }
+    },
     "Playback": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Воспроизведение"
+          }
+        }
+      }
+    },
+    "Playing your favorites.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Включаю избранное."
           }
         }
       }
@@ -2136,6 +2236,36 @@
         }
       }
     },
+    "Resume": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продолжить"
+          }
+        }
+      }
+    },
+    "Resume listening": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продолжить прослушивание"
+          }
+        }
+      }
+    },
+    "Resume listening in ${applicationName}": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продолжи слушать в ${applicationName}"
+          }
+        }
+      }
+    },
     "Rock": {
       "localizations": {
         "ru": {
@@ -2376,6 +2506,16 @@
         }
       }
     },
+    "Shuffles the tracks you've hearted.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перемешивает треки из избранного."
+          }
+        }
+      }
+    },
     "Skip": {
       "localizations": {
         "ru": {
@@ -2511,6 +2651,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Начать слушать"
+          }
+        }
+      }
+    },
+    "Start my radio": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Включить моё радио"
+          }
+        }
+      }
+    },
+    "Start my radio in ${applicationName}": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Включи моё радио в ${applicationName}"
+          }
+        }
+      }
+    },
+    "Starting your radio.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Включаю твоё радио."
           }
         }
       }
@@ -2681,6 +2851,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Единственный плеер для всей твоей музыки —\nоткрытый полностью."
+          }
+        }
+      }
+    },
+    "There's nothing to resume yet.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продолжать пока нечего."
+          }
+        }
+      }
+    },
+    "This device doesn't support alternate icons.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Это устройство не поддерживает альтернативные иконки."
           }
         }
       }
@@ -2891,6 +3081,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "ТВОИ ПЛЕЙЛИСТЫ"
+          }
+        }
+      }
+    },
+    "You haven't hearted any tracks yet.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В избранном пока пусто."
           }
         }
       }

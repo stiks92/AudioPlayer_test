@@ -145,6 +145,26 @@ final class AudioManager: NSObject, ObservableObject {
         updateNowPlayingInfo()
     }
 
+    /// Stops playback and clears the queue.
+    ///
+    /// Used when the current track stops being available — deleting a file the
+    /// player is still playing would otherwise leave the mini player advertising
+    /// something that no longer exists.
+    func stop() {
+        accrueListenTime()
+        stopTimer()
+        reportListen()
+        activeEngine?.teardown()
+        activeEngine = nil
+        isPlaying = false
+        currentSong = nil
+        queue = []
+        baseQueue = []
+        currentIndex = 0
+        clock.reset(duration: 1)
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+    }
+
     func next() {
         advance(auto: false)
     }

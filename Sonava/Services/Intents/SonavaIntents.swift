@@ -27,7 +27,7 @@ private enum IntentLibrary {
 // MARK: - Play favourites
 
 struct PlayFavoritesIntent: AppIntent {
-    static let title: LocalizedStringResource = "Play my favourites"
+    static let title: LocalizedStringResource = "Play my favorites"
     static let description = IntentDescription("Shuffles the tracks you've hearted.")
     static let openAppWhenRun = true
 
@@ -39,7 +39,7 @@ struct PlayFavoritesIntent: AppIntent {
         }
         let shuffled = [first] + favorites.filter { $0.id != first.id }.shuffled()
         AudioManager.shared.play(first, in: shuffled)
-        return .result(dialog: "Playing your favourites.")
+        return .result(dialog: "Playing your favorites.")
     }
 }
 
@@ -99,11 +99,11 @@ struct SonavaShortcuts: AppShortcutsProvider {
         AppShortcut(
             intent: PlayFavoritesIntent(),
             phrases: [
-                "Play my favourites in \(.applicationName)",
                 "Play my favorites in \(.applicationName)",
+                "Play my favourites in \(.applicationName)",
                 "Play my liked songs in \(.applicationName)"
             ],
-            shortTitle: "Favourites",
+            shortTitle: "Favorites",
             systemImageName: "heart.fill"
         )
         AppShortcut(

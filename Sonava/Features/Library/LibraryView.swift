@@ -186,6 +186,10 @@ struct LibraryView: View {
                     .buttonStyle(.plain)
                     .contextMenu {
                         Button(role: .destructive) {
+                            // Deleting the file out from under the player would
+                            // leave the mini player advertising a track that no
+                            // longer exists.
+                            if audio.currentSong == song { audio.stop() }
                             library.remove(song)
                         } label: {
                             Label("Remove from library", systemImage: "trash")
