@@ -27,6 +27,12 @@ enum AccessibilityID {
     static let playPauseButton = "player.playPause"
 
     static let eqEnable = "eq.enable"
+
+    static let paywallClose = "paywall.close"
+
+    static let statsCard = "home.stats"
+    static let statsMenu = "stats.menu"
+    static let statsTotal = "stats.total"
 }
 
 extension View {

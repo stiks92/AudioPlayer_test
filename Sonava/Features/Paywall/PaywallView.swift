@@ -92,6 +92,7 @@ struct PaywallView: View {
                         .frame(width: 34, height: 34)
                         .background(Circle().fill(.ultraThinMaterial))
                 }
+                .identified(AccessibilityID.paywallClose, label: "Close")
             }
         }
         .frame(height: 34)

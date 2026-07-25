@@ -14,6 +14,7 @@ struct HomeView: View {
     @EnvironmentObject private var proStore: ProStore
     @EnvironmentObject private var serverStore: ServerStore
     @EnvironmentObject private var scrobble: ScrobbleStore
+    @EnvironmentObject private var history: ListeningHistory
 
     @StateObject private var trending = SongFeed()
     @StateObject private var charts = SongFeed()
@@ -24,6 +25,7 @@ struct HomeView: View {
     @State private var showSettings = false
     @State private var showAIMix = false
     @State private var showShazam = false
+    @State private var showStats = false
 
     private var greeting: LocalizedStringKey {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -44,6 +46,7 @@ struct HomeView: View {
                     VStack(alignment: .leading, spacing: 28) {
                         header
                         aiMixCard
+                        statsCard
                         madeForYouSection
                         popularSection
                         if !library.recentSongs.isEmpty {
@@ -94,6 +97,11 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showShazam) {
                 ShazamView().environmentObject(audio)
+            }
+            .sheet(isPresented: $showStats) {
+                StatsView()
+                    .environmentObject(history)
+                    .environmentObject(proStore)
             }
         }
     }
@@ -384,6 +392,20 @@ struct HomeView: View {
             }
             .buttonStyle(BouncyButtonStyle())
             .identified(AccessibilityID.settingsButton, label: "Settings")
+        }
+    }
+
+    // MARK: - Your Sound
+
+    /// Hidden until there is something to show — an empty stats card on a fresh
+    /// install is noise, not a feature.
+    @ViewBuilder
+    private var statsCard: some View {
+        if history.hasHistory {
+            StatsTeaserCard(stats: history.stats(range: .week)) {
+                Haptics.impact()
+                showStats = true
+            }
         }
     }
 

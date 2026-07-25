@@ -12,6 +12,7 @@ import SwiftUI
 import UIKit
 import AVFoundation
 import MediaPlayer
+import QuartzCore
 import Combine
 
 @MainActor
@@ -78,6 +79,15 @@ final class AudioManager: NSObject, ObservableObject {
     private let resumePositionKey = "resume.position.v1"
     private var lastPersist = Date.distantPast
 
+    // Listening time accounting (feeds the stats screen)
+    private var listenSession = UUID()
+    private var listenSeconds: Double = 0
+    /// Timestamp of the last accrual, or `nil` while paused — so time spent
+    /// paused is never counted as time listened.
+    private var listenReference: CFTimeInterval?
+    private var lastListenReport: Double = 0
+    private static let listenReportInterval: Double = 15
+
     // Sleep timer
     @Published private(set) var sleepTimerMinutes: Int?
     private var sleepTimer: Timer?
@@ -129,7 +139,9 @@ final class AudioManager: NSObject, ObservableObject {
     func pause() {
         activeEngine?.pause()
         isPlaying = false
+        accrueListenTime()      // bank the final slice before the clock stops
         stopTimer()
+        reportListen()
         updateNowPlayingInfo()
     }
 
@@ -221,6 +233,47 @@ final class AudioManager: NSObject, ObservableObject {
     /// scrobbling a completed listen. Not fired on manual skips.
     var onTrackCompleted: ((Song) -> Void)?
 
+    // MARK: - Listening time
+
+    /// Reports how long the current track has actually been heard, paused time
+    /// excluded. Called on a slow cadence and again when the track changes,
+    /// always with the same `session` for one continuous listen — so the
+    /// receiver updates that listen in place instead of double-counting it.
+    var onListenProgress: ((Song, Double, UUID) -> Void)?
+
+    /// Banks the elapsed slice since the last accrual and reports it if enough
+    /// time has passed. Cheap, so it can run on the sampling timer.
+    private func accrueListenTime() {
+        let now = CACurrentMediaTime()
+        defer { listenReference = now }
+        guard let reference = listenReference else { return }
+        // Clamp the slice: a suspended app or a stalled stream must not credit
+        // the listener with hours they never heard.
+        listenSeconds += min(max(0, now - reference), 1)
+        if listenSeconds - lastListenReport >= Self.listenReportInterval { reportListen() }
+    }
+
+    private func reportListen() {
+        guard let song = currentSong, listenSeconds > lastListenReport else { return }
+        lastListenReport = listenSeconds
+        onListenProgress?(song, listenSeconds, listenSession)
+    }
+
+    /// Persists the in-flight listen. Called when the app leaves the foreground,
+    /// where it may be suspended without another timer tick.
+    func flushListeningTime() {
+        accrueListenTime()
+        reportListen()
+    }
+
+    private func beginListenSession() {
+        reportListen()          // close out the outgoing track first
+        listenSession = UUID()
+        listenSeconds = 0
+        lastListenReport = 0
+        listenReference = nil
+    }
+
     private func advance(auto: Bool) {
         guard !queue.isEmpty else { return }
         if auto, let finished = currentSong {
@@ -246,6 +299,7 @@ final class AudioManager: NSObject, ObservableObject {
     private func load(autoplay: Bool) {
         guard queue.indices.contains(currentIndex) else { return }
         let song = queue[currentIndex]
+        beginListenSession()        // closes out the outgoing track's listen
         currentSong = song
 
         // Prefer an offline copy — it plays with no network and, being a file,
@@ -435,6 +489,7 @@ final class AudioManager: NSObject, ObservableObject {
 
     private func startTimer() {
         stopTimer()
+        listenReference = CACurrentMediaTime()
         let timer = Timer(timeInterval: 0.03, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.tick() }
         }
@@ -445,10 +500,12 @@ final class AudioManager: NSObject, ObservableObject {
     private func stopTimer() {
         timer?.invalidate()
         timer = nil
+        listenReference = nil       // paused time is not listening time
     }
 
     private func tick() {
         guard let engine = activeEngine else { return }
+        accrueListenTime()
         engine.refresh()
         clock.currentTime = engine.currentTime
         let d = engine.duration

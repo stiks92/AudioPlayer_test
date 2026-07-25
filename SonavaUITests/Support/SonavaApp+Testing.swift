@@ -19,7 +19,8 @@ extension XCUIApplication {
     static func launched(
         onboarding: Onboarding = .completed,
         language: String = "en",
-        pro: Bool = false
+        pro: Bool = false,
+        extraArguments: [String] = []
     ) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments += [
@@ -33,6 +34,8 @@ extension XCUIApplication {
             // argument flips it without needing App Store products.
             app.launchArguments += ["-pro.dev.override.v1", "YES"]
         }
+        // Debug-only routes: seeding data, deep-linking to a screen.
+        app.launchArguments += extraArguments
         app.launch()
         return app
     }

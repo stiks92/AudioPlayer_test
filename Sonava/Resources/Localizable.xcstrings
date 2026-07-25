@@ -4,6 +4,16 @@
     "%@": {
       "shouldTranslate": false
     },
+    "%@ this week": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ за неделю"
+          }
+        }
+      }
+    },
     "%@ — a playlist on Sonava": {
       "localizations": {
         "ru": {
@@ -20,6 +30,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@, затем %2$@ %3$@. Отмена в любой момент."
+          }
+        }
+      }
+    },
+    "%lld artists": {
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld артист"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld артиста"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld артистов"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld артиста"
+                }
+              }
+            }
           }
         }
       }
@@ -126,6 +170,50 @@
         }
       }
     },
+    "%lld-day streak": {
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld день подряд"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld дня подряд"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld дней подряд"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld дня подряд"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lldm": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldм"
+          }
+        }
+      }
+    },
     "10-band equalizer": {
       "localizations": {
         "ru": {
@@ -222,6 +310,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Добавляй треки из плеера или через меню трека."
+          }
+        }
+      }
+    },
+    "All time": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Всё время"
           }
         }
       }
@@ -358,6 +456,46 @@
           "stringUnit": {
             "state": "translated",
             "value": "Классика"
+          }
+        }
+      }
+    },
+    "Clear": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Очистить"
+          }
+        }
+      }
+    },
+    "Clear history": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Очистить историю"
+          }
+        }
+      }
+    },
+    "Clear listening history?": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Очистить историю прослушиваний?"
+          }
+        }
+      }
+    },
+    "Close": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Закрыть"
           }
         }
       }
@@ -528,6 +666,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Мрачно"
+          }
+        }
+      }
+    },
+    "Day": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "День"
           }
         }
       }
@@ -1061,6 +1209,16 @@
         }
       }
     },
+    "MY SOUND": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "МОЙ ЗВУК"
+          }
+        }
+      }
+    },
     "Made for you": {
       "localizations": {
         "ru": {
@@ -1091,12 +1249,42 @@
         }
       }
     },
+    "Minutes": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Минуты"
+          }
+        }
+      }
+    },
     "Mono": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Моно"
+          }
+        }
+      }
+    },
+    "Month": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Месяц"
+          }
+        }
+      }
+    },
+    "More": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ещё"
           }
         }
       }
@@ -1287,6 +1475,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Пока ничего не загружено"
+          }
+        }
+      }
+    },
+    "Nothing here yet": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пока пусто"
           }
         }
       }
@@ -1530,6 +1728,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Слушать в Sonava"
+          }
+        }
+      }
+    },
+    "Play something and your stats will start building — privately, on this device.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Включи что-нибудь — статистика начнёт собираться прямо здесь, на устройстве."
           }
         }
       }
@@ -1954,6 +2162,16 @@
         }
       }
     },
+    "Share": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поделиться"
+          }
+        }
+      }
+    },
     "Share playlist": {
       "localizations": {
         "ru": {
@@ -2003,6 +2221,9 @@
           }
         }
       }
+    },
+    "Sonava": {
+      "shouldTranslate": false
     },
     "Sonava Pro": {
       "shouldTranslate": false
@@ -2280,6 +2501,26 @@
         }
       }
     },
+    "Top artists": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Топ артистов"
+          }
+        }
+      }
+    },
+    "Top tracks": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Топ треков"
+          }
+        }
+      }
+    },
     "Treble Boost": {
       "localizations": {
         "ru": {
@@ -2410,6 +2651,16 @@
         }
       }
     },
+    "Week": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Неделя"
+          }
+        }
+      }
+    },
     "What do you feel like hearing?": {
       "localizations": {
         "ru": {
@@ -2440,12 +2691,32 @@
         }
       }
     },
+    "You listened for": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Прослушано"
+          }
+        }
+      }
+    },
     "Your Library": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Твоя медиатека"
+          }
+        }
+      }
+    },
+    "Your Sound": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Твой звук"
           }
         }
       }
@@ -2470,6 +2741,36 @@
         }
       }
     },
+    "Your stats are stored only on this device. This can't be undone.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Статистика хранится только на этом устройстве. Отменить будет нельзя."
+          }
+        }
+      }
+    },
+    "all time": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "за всё время"
+          }
+        }
+      }
+    },
+    "day streak": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "дней подряд"
+          }
+        }
+      }
+    },
     "e.g. rainy Sunday focus, no vocals": {
       "localizations": {
         "ru": {
@@ -2482,6 +2783,36 @@
     },
     "https://music.example.com": {
       "shouldTranslate": false
+    },
+    "peak hour": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "час пик"
+          }
+        }
+      }
+    },
+    "this month": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "за месяц"
+          }
+        }
+      }
+    },
+    "this week": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "за неделю"
+          }
+        }
+      }
     },
     "••••••••": {
       "shouldTranslate": false

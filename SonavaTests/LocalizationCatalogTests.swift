@@ -47,6 +47,11 @@ struct LocalizationCatalogTests {
             // strings that shipped in English on a Russian device.
             "Every source, unified", "Studio EQ & spatial", "Support indie dev",
             "Offline & lossless", "Rainy day focus", "Cozy jazz", "Sad piano",
+            // The stats screen — including the share card, which is the string
+            // most likely to be seen by people who don't have the app yet.
+            "Your Sound", "You listened for", "Top artists", "Top tracks",
+            "Week", "Month", "All time", "day streak", "peak hour",
+            "MY SOUND", "this week", "Clear history",
         ]
     )
     func stringsAreTranslatedToRussian(key: String) throws {

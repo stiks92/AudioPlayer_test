@@ -17,12 +17,14 @@ struct RootView: View {
     @StateObject private var playlistStore = PlaylistStore()
     @StateObject private var reviewPrompt = ReviewPrompt()
     @StateObject private var scrobbleStore = ScrobbleStore()
+    @StateObject private var history = ListeningHistory()
 
     /// Observed so the whole tree re-renders (and re-reads Theme.accent) when
     /// the palette changes.
     @ObservedObject private var theme = ThemeManager.shared
 
     @Environment(\.requestReview) private var requestReview
+    @Environment(\.scenePhase) private var scenePhase
 
     @AppStorage("hasOnboarded.v1") private var hasOnboarded = false
     @State private var selection: AppTab = .home
@@ -35,6 +37,7 @@ struct RootView: View {
     @State private var debugShowPaywall = false
     @State private var debugShowAIMix = false
     @State private var debugShowScrobble = false
+    @State private var debugShowStats = false
     #endif
 
     private let playerSpring = Animation.spring(response: 0.45, dampingFraction: 0.86)
@@ -68,6 +71,7 @@ struct RootView: View {
         .environmentObject(serverStore)
         .environmentObject(playlistStore)
         .environmentObject(scrobbleStore)
+        .environmentObject(history)
         .preferredColorScheme(.dark)
         .fullScreenCover(isPresented: Binding(get: { !hasOnboarded }, set: { hasOnboarded = !$0 })) {
             WelcomeFlow { hasOnboarded = true }
@@ -94,6 +98,11 @@ struct RootView: View {
         .sheet(isPresented: $debugShowScrobble) {
             ConnectScrobbleView().environmentObject(scrobbleStore)
         }
+        .sheet(isPresented: $debugShowStats) {
+            StatsView()
+                .environmentObject(history)
+                .environmentObject(proStore)
+        }
         .task { applyDebugLaunchRoute() }
         #endif
         .onChange(of: audio.currentSong) { _, song in
@@ -107,6 +116,16 @@ struct RootView: View {
         .task {
             // Scrobble a completed listen on natural track end (not on skips).
             audio.onTrackCompleted = { scrobbleStore.scrobbleListen($0) }
+            // Log listening time for the stats screen. Repeated calls carry the
+            // same session id, so the store updates that listen in place.
+            audio.onListenProgress = { song, seconds, session in
+                history.record(song: song, seconds: seconds, session: session)
+            }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            // Leaving the foreground may mean suspension without another tick,
+            // so bank the in-flight listen now.
+            if phase != .active { audio.flushListeningTime() }
         }
         .onChange(of: playlistStore.playlists.count) { old, new in
             if new > old { reviewPrompt.record(.playlistCreated) }
@@ -186,6 +205,9 @@ struct RootView: View {
         if arguments.contains("-openPaywall") { debugShowPaywall = true }
         if arguments.contains("-openAIMix") { debugShowAIMix = true }
         if arguments.contains("-openScrobble") { debugShowScrobble = true }
+        // Stats need a history to show, so seeding is offered alongside.
+        if arguments.contains("-seedStats") { history.seedDemoData() }
+        if arguments.contains("-openStats") { debugShowStats = true }
     }
     #endif
 }
