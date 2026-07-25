@@ -102,6 +102,40 @@
         }
       }
     },
+    "%lld servers": {
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld сервер"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld сервера"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld серверов"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld сервера"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld tracks": {
       "localizations": {
         "ru": {
@@ -280,6 +314,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Активна — спасибо за поддержку!"
+          }
+        }
+      }
+    },
+    "Add another server": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавить ещё сервер"
+          }
+        }
+      }
+    },
+    "Add server": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавить сервер"
           }
         }
       }
@@ -530,12 +584,32 @@
         }
       }
     },
+    "Connect a server": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключить сервер"
+          }
+        }
+      }
+    },
     "Connected": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Подключено"
+          }
+        }
+      }
+    },
+    "Connecting more than one server needs Sonava Pro.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Больше одного сервера — только с Sonava Pro."
           }
         }
       }
@@ -610,12 +684,32 @@
         }
       }
     },
+    "Couldn't reach the server. Check the URL and your network.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось связаться с сервером. Проверь адрес и сеть."
+          }
+        }
+      }
+    },
     "Couldn't read %@.": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Не удалось прочитать %@."
+          }
+        }
+      }
+    },
+    "Couldn't save the password securely.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось надёжно сохранить пароль."
           }
         }
       }
@@ -1053,6 +1147,16 @@
         }
       }
     },
+    "Home server": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Домашний сервер"
+          }
+        }
+      }
+    },
     "Identify another": {
       "localizations": {
         "ru": {
@@ -1109,6 +1213,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Интернет-радио"
+          }
+        }
+      }
+    },
+    "Invalid server URL.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Некорректный адрес сервера."
           }
         }
       }
@@ -1329,6 +1443,16 @@
         }
       }
     },
+    "Name (optional)": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Название (необязательно)"
+          }
+        }
+      }
+    },
     "New Playlist": {
       "localizations": {
         "ru": {
@@ -1455,6 +1579,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ничего не найдено по запросу «%@»"
+          }
+        }
+      }
+    },
+    "No server connected": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сервер не подключён"
           }
         }
       }
@@ -1902,6 +2036,16 @@
         }
       }
     },
+    "Remove": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить"
+          }
+        }
+      }
+    },
     "Remove download": {
       "localizations": {
         "ru": {
@@ -1938,6 +2082,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Убрать из плейлиста"
+          }
+        }
+      }
+    },
+    "Remove server": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить сервер"
+          }
+        }
+      }
+    },
+    "Remove this server?": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить этот сервер?"
           }
         }
       }
@@ -2132,12 +2296,32 @@
         }
       }
     },
+    "Self-hosted servers": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Свои серверы"
+          }
+        }
+      }
+    },
     "Server URL": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Адрес сервера"
+          }
+        }
+      }
+    },
+    "Server rejected the credentials.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сервер отклонил логин или пароль."
           }
         }
       }
@@ -2228,6 +2412,16 @@
     "Sonava Pro": {
       "shouldTranslate": false
     },
+    "Sonava Pro connects unlimited servers and searches them all at once.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sonava Pro подключает сколько угодно серверов и ищет сразу по всем."
+          }
+        }
+      }
+    },
     "Songs": {
       "localizations": {
         "ru": {
@@ -2317,6 +2511,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Начать слушать"
+          }
+        }
+      }
+    },
+    "Stream your own library straight from Navidrome, Airsonic or any Subsonic-compatible server.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Слушай свою библиотеку напрямую из Navidrome, Airsonic или любого Subsonic-совместимого сервера."
           }
         }
       }
@@ -2717,6 +2921,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Твой звук"
+          }
+        }
+      }
+    },
+    "Your music stays on your server. Only this connection is forgotten.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Музыка останется на сервере — забудется только подключение."
           }
         }
       }

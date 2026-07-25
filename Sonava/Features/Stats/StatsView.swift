@@ -73,8 +73,10 @@ struct StatsView: View {
             }
             .sheet(isPresented: $showPaywall) { PaywallView().environmentObject(proStore) }
             .sheet(item: $shareItem) { ShareSheet(items: [$0.image]) }
-            .confirmationDialog("Clear listening history?",
-                                isPresented: $confirmClear, titleVisibility: .visible) {
+            // An alert, not a confirmation dialog: from inside a sheet the
+            // latter becomes a popover with no visible Cancel, and this
+            // destroys data that cannot be recovered.
+            .alert("Clear listening history?", isPresented: $confirmClear) {
                 Button("Clear", role: .destructive) { history.clear() }
                 Button("Cancel", role: .cancel) {}
             } message: {

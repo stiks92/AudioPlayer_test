@@ -17,6 +17,10 @@ struct SubsonicService {
     let baseURL: URL
     let username: String
     let password: String
+    /// Namespaces track ids. Two servers can hand out the same internal id, so
+    /// without this a track from one library could shadow a different track
+    /// from another in favourites, downloads and merged search results.
+    let libraryID: String
 
     private let clientName = "Sonava"
     private let apiVersion = "1.16.1"
@@ -93,7 +97,7 @@ struct SubsonicService {
 
     private func map(_ song: SubsonicSong) -> Song {
         Song(
-            id: "subsonic:\(song.id)",
+            id: "subsonic:\(libraryID):\(song.id)",
             title: song.title ?? "Untitled",
             artist: song.artist ?? "Unknown artist",
             album: song.album ?? "Library",

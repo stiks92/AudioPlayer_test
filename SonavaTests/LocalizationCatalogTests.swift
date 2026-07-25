@@ -52,6 +52,12 @@ struct LocalizationCatalogTests {
             "Your Sound", "You listened for", "Top artists", "Top tracks",
             "Week", "Month", "All time", "day streak", "peak hour",
             "MY SOUND", "this week", "Clear history",
+            // Self-hosting is the differentiator, and its errors are the
+            // strings a user sees at their most frustrated.
+            "Self-hosted servers", "Add server", "Connect a server",
+            "No server connected", "Remove this server?",
+            "Invalid server URL.", "Server rejected the credentials.",
+            "Connecting more than one server needs Sonava Pro.",
         ]
     )
     func stringsAreTranslatedToRussian(key: String) throws {

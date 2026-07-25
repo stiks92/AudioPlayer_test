@@ -38,6 +38,7 @@ struct RootView: View {
     @State private var debugShowAIMix = false
     @State private var debugShowScrobble = false
     @State private var debugShowStats = false
+    @State private var debugShowServers = false
     #endif
 
     private let playerSpring = Animation.spring(response: 0.45, dampingFraction: 0.86)
@@ -103,6 +104,11 @@ struct RootView: View {
                 .environmentObject(history)
                 .environmentObject(proStore)
         }
+        .sheet(isPresented: $debugShowServers) {
+            ConnectServerView()
+                .environmentObject(serverStore)
+                .environmentObject(proStore)
+        }
         .task { applyDebugLaunchRoute() }
         #endif
         .onChange(of: audio.currentSong) { _, song in
@@ -150,8 +156,9 @@ struct RootView: View {
         .task {
             audio.restoreLastSession()
         }
-        .onChange(of: proStore.isPro) { _, pro in
+        .onChange(of: proStore.isPro, initial: true) { _, pro in
             theme.enforceFreeIfNeeded(isPro: pro)   // don't keep a paid palette if Pro lapses
+            serverStore.isPro = pro                 // extra servers stay saved, just unreachable
         }
     }
 
@@ -208,6 +215,13 @@ struct RootView: View {
         // Stats need a history to show, so seeding is offered alongside.
         if arguments.contains("-seedStats") { history.seedDemoData() }
         if arguments.contains("-openStats") { debugShowStats = true }
+
+        if let index = arguments.firstIndex(of: "-seedServers"),
+           index + 1 < arguments.count,
+           let count = Int(arguments[index + 1]) {
+            serverStore.seedDemoServers(count: count)
+        }
+        if arguments.contains("-openServers") { debugShowServers = true }
     }
     #endif
 }

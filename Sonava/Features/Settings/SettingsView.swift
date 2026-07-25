@@ -58,7 +58,9 @@ struct SettingsView: View {
                 PaywallView().environmentObject(proStore)
             }
             .sheet(isPresented: $showConnectServer) {
-                ConnectServerView().environmentObject(serverStore)
+                ConnectServerView()
+                    .environmentObject(serverStore)
+                    .environmentObject(proStore)
             }
             .sheet(isPresented: $showEqualizer) {
                 EqualizerView(effects: audio.effects)
@@ -214,11 +216,12 @@ struct SettingsView: View {
 
     // MARK: - Sources
 
-    /// The self-hosted row shows the connected host verbatim when we have one.
-    /// Interpolating it keeps the parameter a `LocalizedStringKey` so the two
-    /// static states ("Connect" / "Connected") still translate.
+    /// The self-hosted row shows the active host verbatim when we have one, and
+    /// the count once several are connected. Interpolating keeps the parameter a
+    /// `LocalizedStringKey`, so the static states still translate.
     private var selfHostedValue: LocalizedStringKey {
         guard serverStore.isConnected else { return "Connect" }
+        if serverStore.servers.count > 1 { return "\(serverStore.servers.count) servers" }
         guard let host = serverStore.host else { return "Connected" }
         return "\(host)"
     }
