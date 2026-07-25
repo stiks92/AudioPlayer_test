@@ -227,6 +227,11 @@ together with a VoiceOver label via the `identified(_:label:)` modifier.
   `brandGradient`). Raw `Color(hex:)` belongs in `Theme` or `Palette` only.
 - New Xcode **targets** (widgets, Watch, CarPlay) should be added in Xcode, not
   by hand-editing the project file. New *files* need nothing.
+- App icons are **generated**, not drawn: edit
+  [`scripts/make_app_icons.py`](scripts/make_app_icons.py) and re-run it rather
+  than editing the PNGs. Adding a palette needs a matching entry in
+  `AppIconOption` and in `ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES`, or the
+  picker offers an icon iOS cannot apply — `AppIconOptionTests` catches that.
 - Companion docs: [`docs/HANDOFF.md`](docs/HANDOFF.md),
   [`docs/ROADMAP.md`](docs/ROADMAP.md),
   [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md),
