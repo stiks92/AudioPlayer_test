@@ -23,6 +23,11 @@ struct StatsView: View {
     @State private var shareItem: ShareableImage?
     @State private var confirmClear = false
 
+    /// The hero number is text people read, so it has to scale — but no text
+    /// style is anywhere near 52pt. `@ScaledMetric` scales the measurement
+    /// itself, which is the only way to keep a display size and Dynamic Type.
+    @ScaledMetric(relativeTo: .largeTitle) private var heroSize: CGFloat = 52
+
     private var stats: ListeningStats {
         history.stats(range: range)
     }
@@ -132,7 +137,7 @@ struct StatsView: View {
                 .font(.system(.footnote).weight(.medium))
                 .foregroundColor(Theme.textSecondary)
             Text(ListeningStats.duration(stats.totalSeconds))
-                .font(.system(size: 52, weight: .heavy, design: .rounded))
+                .font(.system(size: heroSize, weight: .heavy, design: .rounded))
                 // Not `brandGradient`: it ends on accentDeep, which measures
                 // 2.25:1 on this ground, so the minutes half of the number
                 // dissolved into the background.
