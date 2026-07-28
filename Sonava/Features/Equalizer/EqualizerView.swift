@@ -47,14 +47,26 @@ struct EqualizerView: View {
         ScrollView {
             VStack(spacing: 24) {
                 enableRow
-                bands
-                preampRow
-                presetPicker
-                footnote
+                // The switch must stay *outside* this group. `disabled` is
+                // additive down the hierarchy — a control inside a disabled
+                // subtree cannot re-enable itself — so with the switch inside
+                // it, an off equalizer could never be switched back on.
+                //
+                // Dimming by opacity rather than `.disabled()` is also the only
+                // way the off state reads honestly: `.disabled()` greys system
+                // controls but leaves hand-drawn shapes like the band knobs at
+                // full brightness, so the screen looked half-on, half-off.
+                VStack(spacing: 24) {
+                    bands
+                    preampRow
+                    presetPicker
+                    footnote
+                }
+                .opacity(effects.equalizer.isEnabled ? 1 : 0.35)
+                .allowsHitTesting(effects.equalizer.isEnabled)
             }
             .padding(20)
             .padding(.bottom, 40)
-            .disabled(!effects.equalizer.isEnabled)
             .animation(.easeInOut(duration: 0.2), value: effects.equalizer.isEnabled)
         }
     }
@@ -73,7 +85,6 @@ struct EqualizerView: View {
         }
         .tint(Theme.accent)
         .accessibilityIdentifier(AccessibilityID.eqEnable)
-        .disabled(false)
     }
 
     private var bands: some View {
