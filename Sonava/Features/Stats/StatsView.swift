@@ -94,39 +94,18 @@ struct StatsView: View {
     // MARK: - Range
 
     private var rangePicker: some View {
-        HStack(spacing: 8) {
-            ForEach(StatsRange.allCases) { option in
-                let locked = option.isPro && !proStore.isPro
-                let selected = range == option
-                Button {
-                    if locked {
-                        showPaywall = true
-                    } else {
-                        withAnimation(.snappy) { range = option }
-                        Haptics.selection()
-                    }
-                } label: {
-                    HStack(spacing: 4) {
-                        Text(option.title)
-                        if locked {
-                            Image(systemName: "lock.fill").font(.system(.caption2).weight(.bold))
-                        }
-                    }
-                    .font(.sonavaRowMeta.weight(.semibold))
-                    .foregroundColor(selected ? .white : Theme.textSecondary)
-                    .frame(maxWidth: .infinity, minHeight: Space.hitTarget)
-                    .background {
-                        if selected {
-                            Capsule().fill(Theme.accent.opacity(0.9))
-                        } else {
-                            Capsule().fill(Color.white.opacity(0.06))
-                        }
-                    }
-                }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("stats.range.\(option.rawValue)")
-            }
-        }
+        SegmentedControl(
+            segments: StatsRange.allCases.map {
+                .init(value: $0, title: $0.title,
+                      isLocked: $0.isPro && !proStore.isPro,
+                      identifier: "stats.range.\($0.rawValue)")
+            },
+            selection: $range,
+            onLocked: { showPaywall = true }
+        )
+        // No identifier on the container: giving one to a container makes it a
+        // single accessibility element, which swallows the segments inside it
+        // — for VoiceOver as much as for the tests.
     }
 
     // MARK: - Hero

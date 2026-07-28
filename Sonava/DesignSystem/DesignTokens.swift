@@ -123,6 +123,20 @@ extension View {
             .contentMargins(.horizontal, margin, for: .scrollContent)
     }
 
+    /// Centres a zero state in the space the screen actually has.
+    ///
+    /// The four empty states used three different top paddings and sat in the
+    /// upper third with the bottom half of the screen empty — a 5:1 imbalance.
+    /// `containerRelativeFrame` measures the scroll view rather than guessing.
+    func centredEmptyState() -> some View {
+        frame(maxWidth: .infinity)
+            .containerRelativeFrame(.vertical, alignment: .center) { height, _ in
+                // Leaves room for the title and any control above it, so the
+                // block lands optically centred rather than mathematically.
+                height * 0.72
+            }
+    }
+
     /// Gives content passing under the floating tab bar a solid backdrop.
     ///
     /// The soft default lets saturated artwork read straight through the

@@ -56,7 +56,7 @@ final class LocalizationUITests: XCTestCase {
         app.buttons["Медиатека"].tap()
         waitFor(app.staticTexts["Твоя медиатека"])
 
-        app.staticTexts["Песни"].tap()
+        app.buttons["library.segment.songs"].tap()
         waitFor(app.buttons["library.import"], "the import affordance is missing")
         XCTAssertTrue(app.staticTexts["Пока нет файлов"].exists, "the empty library is not translated")
     }

@@ -25,7 +25,7 @@ final class LibraryAcceptanceTests: XCTestCase {
         app.tab("Library").tap()
         waitFor(app.staticTexts["Your Library"], "library did not open")
 
-        app.staticTexts["Songs"].tap()
+        app.buttons["library.segment.songs"].tap()
 
         waitFor(app.staticTexts["No files yet"], "the empty library gives the user no explanation")
         XCTAssertTrue(
@@ -38,7 +38,7 @@ final class LibraryAcceptanceTests: XCTestCase {
         let app = XCUIApplication.launched()
 
         app.tab("Library").tap()
-        app.staticTexts["Songs"].tap()
+        app.buttons["library.segment.songs"].tap()
         waitFor(app.buttons["library.import"])
         app.buttons["library.import"].tap()
 
@@ -55,16 +55,20 @@ final class LibraryAcceptanceTests: XCTestCase {
         app.tab("Library").tap()
         waitFor(app.staticTexts["Your Library"])
 
-        for section in ["Songs", "Offline", "Favorites", "Playlists"] {
-            app.staticTexts[section].tap()
-            XCTAssertTrue(app.staticTexts[section].exists, "the \(section) segment disappeared")
+        // By identifier, not by label: these are the same four segments in any
+        // language, and asserting on `isSelected` proves the tap did something
+        // rather than merely that the label still exists.
+        for section in ["songs", "downloads", "favorites", "playlists"] {
+            let segment = app.buttons["library.segment.\(section)"]
+            segment.tap()
+            XCTAssertTrue(segment.isSelected, "the \(section) segment did not become selected")
         }
     }
 
     func testEmptyOfflineExplainsHowToDownload() {
         let app = XCUIApplication.launched()
         app.tab("Library").tap()
-        app.staticTexts["Offline"].tap()
+        app.buttons["library.segment.downloads"].tap()
 
         waitFor(app.staticTexts["Nothing downloaded yet"], "the empty Offline tab gives no guidance")
     }
@@ -72,7 +76,7 @@ final class LibraryAcceptanceTests: XCTestCase {
     func testEmptyFavouritesTellsTheUserHowToFillIt() {
         let app = XCUIApplication.launched()
         app.tab("Library").tap()
-        app.staticTexts["Favorites"].tap()
+        app.buttons["library.segment.favorites"].tap()
 
         waitFor(app.staticTexts["No favourites yet"])
         XCTAssertTrue(app.staticTexts["Tap the heart on any track to save it here."].exists)
@@ -81,7 +85,7 @@ final class LibraryAcceptanceTests: XCTestCase {
     func testCreatingAPlaylistFromTheLibrary() {
         let app = XCUIApplication.launched()
         app.tab("Library").tap()
-        app.staticTexts["Playlists"].tap()
+        app.buttons["library.segment.playlists"].tap()
 
         waitFor(app.buttons["New Playlist"])
         app.buttons["New Playlist"].tap()

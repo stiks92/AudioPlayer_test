@@ -93,30 +93,13 @@ struct LibraryView: View {
     }
 
     private var segmentedControl: some View {
-        HStack(spacing: 8) {
-            ForEach(Tab.allCases, id: \.self) { item in
-                let selected = tab == item
-                Text(item.title)
-                    .font(.system(.footnote).weight(.semibold))
-                    .foregroundColor(selected ? Theme.background : Theme.textSecondary)
-                    .frame(maxWidth: .infinity, minHeight: Space.hitTarget)
-                    .background(
-                        ZStack {
-                            if selected {
-                                Capsule()
-                                    .fill(Color.white)
-                                    .matchedGeometryEffect(id: "seg", in: seg)
-                            }
-                        }
-                    )
-                    .contentShape(Capsule())
-                    .onTapGesture {
-                        withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) { tab = item }
-                    }
-            }
-        }
-        .padding(5)
-        .card(cornerRadius: Radius.hero)
+        SegmentedControl(
+            segments: Tab.allCases.map {
+                .init(value: $0, title: $0.title,
+                      identifier: "\(AccessibilityID.librarySegment).\($0.rawValue)")
+            },
+            selection: $tab
+        )
     }
 
     @ViewBuilder
@@ -158,7 +141,7 @@ struct LibraryView: View {
             .buttonStyle(BouncyButtonStyle(scale: 0.96))
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, Space.xxl)
+        .centredEmptyState()
     }
 
     private var playlistRows: some View {
@@ -297,7 +280,7 @@ struct LibraryView: View {
             .padding(.top, 4)
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, 50)
+        .centredEmptyState()
     }
 
     @ViewBuilder
@@ -318,7 +301,7 @@ struct LibraryView: View {
                     .padding(.horizontal, Space.xl)
             }
             .frame(maxWidth: .infinity)
-            .padding(.top, 50)
+            .centredEmptyState()
         } else {
             LazyVStack(spacing: 2) {
                 ForEach(downloads) { song in
@@ -349,7 +332,7 @@ struct LibraryView: View {
                     .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity)
-            .padding(.top, 60)
+            .centredEmptyState()
         } else {
             LazyVStack(spacing: 2) {
                 ForEach(library.favoriteSongs) { song in
