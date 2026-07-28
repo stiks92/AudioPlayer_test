@@ -16,6 +16,11 @@ struct EqualizerView: View {
 
     @State private var showPaywall = false
 
+    /// Which band the finger is on, and which one is currently resting in the
+    /// 0 dB detent — so the detent taps once on arrival instead of buzzing.
+    @State private var draggingBand: Int?
+    @State private var snappedBand: Int?
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -96,19 +101,80 @@ struct EqualizerView: View {
     }
 
     private var bands: some View {
-        HStack(alignment: .bottom, spacing: 6) {
-            ForEach(Array(EqualizerBand.frequencies.enumerated()), id: \.offset) { index, frequency in
-                BandSlider(
-                    gain: Binding(
-                        get: { effects.equalizer.gains[index] },
-                        set: { effects.setGain($0, at: index) }
-                    ),
-                    label: EqualizerBand.label(for: frequency)
+        VStack(spacing: Space.s) {
+            GeometryReader { geo in
+                let columnWidth = geo.size.width / CGFloat(EqualizerBand.count)
+
+                ZStack {
+                    // The response the ten bands actually produce, behind them.
+                    ResponseGraph(gains: effects.equalizer.gains,
+                                  limit: EqualizerSettings.gainLimit)
+
+                    ForEach(0..<EqualizerBand.count, id: \.self) { index in
+                        BandHandle(gain: effects.equalizer.gains[index],
+                                   isActive: draggingBand == index,
+                                   height: geo.size.height,
+                                   width: columnWidth)
+                            .frame(width: columnWidth)
+                            .position(x: columnWidth * (CGFloat(index) + 0.5),
+                                      y: geo.size.height / 2)
+                    }
+                }
+                .contentShape(Rectangle())
+                // One surface, not ten. Ten separate columns would each be
+                // ~33pt wide — under Apple's 44pt minimum, and impossible to
+                // fit at 44. Resolving to the nearest band instead makes the
+                // whole graph the target, and lets a single sweep draw a curve
+                // the way a desk does.
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            handleDrag(at: value.location, in: geo.size, columnWidth: columnWidth)
+                        }
+                        .onEnded { _ in
+                            withAnimation(Motion.press) { draggingBand = nil }
+                            snappedBand = nil
+                        }
                 )
             }
+            .frame(height: 240)
+
+            // Frequency scale, outside the graph so the curve owns its full
+            // height and the labels keep a stable baseline.
+            HStack(spacing: 0) {
+                ForEach(EqualizerBand.frequencies, id: \.self) { frequency in
+                    Text(EqualizerBand.label(for: frequency))
+                        .font(.system(.caption2).weight(.medium).monospacedDigit())
+                        .foregroundColor(Theme.textTertiary)
+                        .frame(maxWidth: .infinity)
+                }
+            }
         }
-        .frame(height: 220)
-        .padding(.vertical, 8)
+    }
+
+    /// Resolves a touch anywhere in the graph to a band and a gain.
+    private func handleDrag(at point: CGPoint, in size: CGSize, columnWidth: CGFloat) {
+        let index = min(max(Int(point.x / columnWidth), 0), EqualizerBand.count - 1)
+        if draggingBand != index {
+            withAnimation(Motion.press) { draggingBand = index }
+            Haptics.selection()          // a tick per band the finger crosses
+            snappedBand = nil
+        }
+
+        let limit = EqualizerSettings.gainLimit
+        let clampedY = min(max(0, point.y), size.height)
+        let raw = limit - Float(clampedY / size.height) * (limit * 2)
+
+        // A detent at 0 dB: "back to flat" is the one value anyone ever wants
+        // to hit exactly, and it should be findable without looking.
+        if abs(raw) < 0.9 {
+            if snappedBand != index { Haptics.impact(.light) }
+            snappedBand = index
+            effects.setGain(0, at: index)
+        } else {
+            snappedBand = nil
+            effects.setGain(raw, at: index)
+        }
     }
 
     private var preampRow: some View {
@@ -213,57 +279,54 @@ struct EqualizerView: View {
     }
 }
 
-// MARK: - One vertical band
+// MARK: - One band's handle
 
-private struct BandSlider: View {
-    @Binding var gain: Float
-    let label: String
+/// Purely presentational: the gesture lives on the graph, not here.
+private struct BandHandle: View {
+    let gain: Float
+    let isActive: Bool
+    let height: CGFloat
+    /// The column this handle occupies, so it can centre itself in it.
+    let width: CGFloat
 
-    private let range: ClosedRange<Float> = -EqualizerSettings.gainLimit...EqualizerSettings.gainLimit
+    private var fraction: CGFloat {
+        let limit = CGFloat(EqualizerSettings.gainLimit)
+        return (CGFloat(gain) + limit) / (limit * 2)
+    }
+
+    private var text: String {
+        String(format: gain > 0 ? "+%.1f" : "%.1f", gain)
+    }
 
     var body: some View {
-        GeometryReader { geo in
-            let height = geo.size.height
-            let fraction = CGFloat((gain - range.lowerBound) / (range.upperBound - range.lowerBound))
-            let knobY = height * (1 - fraction)
+        let knobY = height * (1 - fraction)
+        ZStack {
+            Capsule()
+                .fill(Theme.hairline)
+                .frame(width: 4)
 
-            ZStack(alignment: .bottom) {
-                Capsule()
-                    .fill(Color.white.opacity(0.10))
-                    .frame(width: 5)
+            Circle()
+                .fill(Color.white)
+                .frame(width: isActive ? 30 : 24, height: isActive ? 30 : 24)
+                .shadow(color: .black.opacity(0.45), radius: isActive ? 8 : 4, y: 2)
+                .position(x: width / 2, y: knobY)
 
-                // Fill from the centre (0 dB) toward the knob, so cut and boost
-                // read differently at a glance.
-                Capsule()
-                    .fill(Theme.accent)
-                    .frame(width: 5,
-                           height: max(3, abs(knobY - height / 2)))
-                    .offset(y: -(height - max(knobY, height / 2)))
-
-                Circle()
-                    .fill(Color.white)
-                    .frame(width: 18, height: 18)
-                    .shadow(color: .black.opacity(0.3), radius: 3, y: 1)
-                    .position(x: geo.size.width / 2, y: knobY)
+            // The value exists only while you are changing it: ten idle
+            // readouts are noise, and its absence while dragging meant you
+            // could not tell what you had just done.
+            if isActive {
+                Text(text)
+                    .font(.system(.caption2).weight(.bold).monospacedDigit())
+                    .foregroundColor(Theme.background)
+                    .padding(.horizontal, Space.s)
+                    .padding(.vertical, 3)
+                    .background(Capsule().fill(Color.white))
+                    .fixedSize()
+                    .position(x: width / 2, y: max(16, knobY - 28))
+                    .transition(.opacity.combined(with: .scale(scale: 0.8)))
             }
-            .frame(width: geo.size.width, height: height)
-            .contentShape(Rectangle())
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { value in
-                        let clampedY = min(max(0, value.location.y), height)
-                        let newFraction = Float(1 - clampedY / height)
-                        gain = range.lowerBound + newFraction * (range.upperBound - range.lowerBound)
-                    }
-            )
         }
-        .overlay(alignment: .bottom) {
-            Text(label)
-                .font(.system(.caption2).weight(.medium).monospacedDigit())
-                .foregroundColor(Theme.textTertiary)
-                .fixedSize()
-                .offset(y: 16)
-        }
-        .padding(.bottom, 18)
+        .frame(height: height)
+        .accessibilityHidden(true)
     }
 }

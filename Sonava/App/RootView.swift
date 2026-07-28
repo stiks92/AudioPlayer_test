@@ -211,6 +211,12 @@ struct RootView: View {
         }
 
         if arguments.contains("-openEqualizer") { debugShowEqualizer = true }
+        // Lets a screenshot show a real curve instead of a flat line.
+        if let index = arguments.firstIndex(of: "-eqPreset"),
+           index + 1 < arguments.count,
+           let preset = EqualizerPreset.preset(id: arguments[index + 1]) {
+            audio.effects.apply(preset)
+        }
         if arguments.contains("-openPaywall") { debugShowPaywall = true }
         if arguments.contains("-openAIMix") { debugShowAIMix = true }
         if arguments.contains("-openScrobble") { debugShowScrobble = true }
