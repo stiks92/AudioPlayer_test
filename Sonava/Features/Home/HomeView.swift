@@ -40,6 +40,7 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
+                AppBackground()
                 ScrollView {
                     VStack(alignment: .leading, spacing: 28) {
                         header
@@ -60,7 +61,6 @@ struct HomeView: View {
                     .padding(.bottom, 140)
                 }
             }
-            .nowPlayingTint(audio.currentSong)
             .navigationBarHidden(true)
             .task {
                 if charts.state == .idle {
@@ -220,12 +220,9 @@ struct HomeView: View {
                 Image(systemName: "chevron.right").foregroundColor(.white.opacity(0.8))
             }
             .padding(16)
-            .background(
-                LinearGradient(colors: [Theme.accent, Theme.accentPink, Theme.accentDeep],
-                               startPoint: .topLeading, endPoint: .bottomTrailing)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .shadow(color: Theme.accent.opacity(0.4), radius: 14, y: 8)
+            .background(Theme.proGradient)
+            .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
+            .shadow(color: .black.opacity(0.5), radius: 20, y: 10)
         }
         .buttonStyle(BouncyButtonStyle(scale: 0.98))
     }

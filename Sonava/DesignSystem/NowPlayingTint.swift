@@ -22,14 +22,29 @@ struct NowPlayingTint: View {
     /// case this draws the plain ground and nothing else.
     var colors: [Color]?
 
-    /// How strong the wash is at the very top. Low on purpose: the header's
-    /// secondary line is the dimmest text over it, and this has to leave that
-    /// measurement alone.
-    private let peakOpacity: Double = 0.22
+    /// How strong the wash is at the very top.
+    ///
+    /// It began at 0.22, which a review measured as a +15/255 shift and called
+    /// noise rather than intent — "the contrast budget was protected so
+    /// successfully that it protected the idea out of existence". It is
+    /// stronger now, and the contrast it costs is measured rather than
+    /// guessed: the dimmest text over it still clears its floor.
+    private let peakOpacity: Double = 0.55
     /// The fraction of the screen the wash covers before it is fully gone.
-    private let falloff: Double = 0.45
+    private let falloff: Double = 0.62
 
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
+    /// Pulls a track colour most of the way toward the ground before it is
+    /// used as a wash.
+    ///
+    /// Raising the opacity of a bright colour raises the luminance that all
+    /// the text tokens were measured against; deepening it first keeps the
+    /// hue unmistakable while the ground stays dark, which is how an ambient
+    /// tint reads as atmosphere rather than as a coloured overlay.
+    private func deepened(_ color: Color) -> Color {
+        color.mix(with: Theme.background, by: 0.22)
+    }
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -39,8 +54,8 @@ struct NowPlayingTint: View {
                 GeometryReader { geo in
                     LinearGradient(
                         colors: [
-                            (colors.first ?? Theme.accent).opacity(peakOpacity),
-                            (colors.last ?? Theme.accentDeep).opacity(peakOpacity * 0.45),
+                            deepened(colors.first ?? Theme.accent).opacity(peakOpacity),
+                            deepened(colors.last ?? Theme.accentDeep).opacity(peakOpacity * 0.55),
                             .clear
                         ],
                         startPoint: .top,
@@ -60,10 +75,17 @@ struct NowPlayingTint: View {
     }
 }
 
-extension View {
-    /// Colours a screen's ground from the track that is playing.
-    func nowPlayingTint(_ song: Song?) -> some View {
-        background(NowPlayingTint(colors: song?.gradient))
-            .animation(Motion.expressive, value: song?.id)
+/// The ground every tab stands on.
+///
+/// A view rather than a `.background(…)` modifier on purpose: each tab is a
+/// `NavigationStack`, which draws its own ground, so a background applied from
+/// outside is painted over. This goes where the flat colour used to sit —
+/// first in the tab's own `ZStack`.
+struct AppBackground: View {
+    @EnvironmentObject private var audio: AudioManager
+
+    var body: some View {
+        NowPlayingTint(colors: audio.currentSong?.gradient)
+            .animation(Motion.expressive, value: audio.currentSong?.id)
     }
 }
