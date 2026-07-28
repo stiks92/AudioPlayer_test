@@ -40,7 +40,7 @@ struct LibraryView: View {
                 AppBackground()
 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: Space.screenMargin) {
                         Text("Your Library")
                             .font(.system(.largeTitle, design: .rounded).weight(.heavy))
                             .foregroundColor(Theme.textPrimary)
@@ -54,7 +54,7 @@ struct LibraryView: View {
                         case .favorites: favoritesSection
                         }
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, Space.screenMargin)
                     .padding(.top, 8)
                     .padding(.bottom, 140)
                 }
@@ -162,12 +162,12 @@ struct LibraryView: View {
     }
 
     private var playlistRows: some View {
-        LazyVStack(spacing: 12) {
+        LazyVStack(spacing: Space.m) {
             Button {
                 showNewPlaylist = true
             } label: {
-                HStack(spacing: 14) {
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                HStack(spacing: Space.l) {
+                    RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
                         .fill(Color.white.opacity(0.08))
                         .frame(width: 60, height: 60)
                         .overlay(Image(systemName: "plus").font(.system(.title2).weight(.semibold)).foregroundColor(Theme.accentSoft))
@@ -184,8 +184,8 @@ struct LibraryView: View {
                 NavigationLink {
                     UserPlaylistDetailView(playlistID: playlist.id)
                 } label: {
-                    HStack(spacing: 14) {
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    HStack(spacing: Space.l) {
+                        RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
                             .fill(LinearGradient(colors: playlist.gradient, startPoint: .topLeading, endPoint: .bottomTrailing))
                             .frame(width: 60, height: 60)
                             .overlay(Image(systemName: "music.note.list").foregroundColor(.white))
@@ -246,8 +246,8 @@ struct LibraryView: View {
             Haptics.impact()
             showImporter = true
         } label: {
-            HStack(spacing: 14) {
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+            HStack(spacing: Space.l) {
+                RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
                     .fill(Color.white.opacity(0.08))
                     .frame(width: 44, height: 44)
                     .overlay(
@@ -269,7 +269,7 @@ struct LibraryView: View {
     /// Sonava bundles no music of its own, so an empty Songs tab is the normal
     /// first-run state — it has to explain itself and offer the way forward.
     private var emptyLibrary: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: Space.l) {
             Image(systemName: "folder.badge.plus")
                 .font(.system(size: 46))
                 .foregroundColor(Theme.textTertiary)
@@ -280,7 +280,7 @@ struct LibraryView: View {
                 .font(.subheadline)
                 .foregroundColor(Theme.textTertiary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 24)
+                .padding(.horizontal, Space.xl)
             Button {
                 Haptics.impact()
                 showImporter = true
@@ -288,8 +288,8 @@ struct LibraryView: View {
                 Text("Import from Files")
                     .font(.headline)
                     .foregroundColor(Theme.background)
-                    .padding(.horizontal, 22)
-                    .padding(.vertical, 12)
+                    .padding(.horizontal, Space.xl)
+                    .padding(.vertical, Space.m)
                     .background(Capsule().fill(Color.white))
             }
             .buttonStyle(BouncyButtonStyle(scale: 0.96))
@@ -304,7 +304,7 @@ struct LibraryView: View {
     private var downloadsSection: some View {
         let downloads = audio.downloads.downloads
         if downloads.isEmpty {
-            VStack(spacing: 12) {
+            VStack(spacing: Space.m) {
                 Image(systemName: "arrow.down.circle")
                     .font(.system(size: 46))
                     .foregroundColor(Theme.textTertiary)
@@ -315,7 +315,7 @@ struct LibraryView: View {
                     .font(.subheadline)
                     .foregroundColor(Theme.textTertiary)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, Space.xl)
             }
             .frame(maxWidth: .infinity)
             .padding(.top, 50)
@@ -336,7 +336,7 @@ struct LibraryView: View {
     @ViewBuilder
     private var favoritesSection: some View {
         if library.favoriteSongs.isEmpty {
-            VStack(spacing: 12) {
+            VStack(spacing: Space.m) {
                 Image(systemName: "heart.slash")
                     .font(.system(size: 46))
                     .foregroundColor(Theme.textTertiary)

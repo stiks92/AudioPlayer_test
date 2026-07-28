@@ -55,7 +55,7 @@ struct PaywallView: View {
             AuroraBackground(colors: [Theme.accent, Theme.accentPink, Theme.accentDeep])
 
             ScrollView {
-                VStack(spacing: 22) {
+                VStack(spacing: Space.xl) {
                     closeRow
                     hero
                     perksList
@@ -65,7 +65,7 @@ struct PaywallView: View {
                     footer
                 }
                 .padding(.horizontal, Space.screenMargin)
-                .padding(.bottom, 30)
+                .padding(.bottom, Space.xxl)
             }
         }
         .foregroundColor(.white)
@@ -114,7 +114,7 @@ struct PaywallView: View {
     }
 
     private var hero: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: Space.m) {
             Image(systemName: "sparkles")
                 .font(.system(size: 44, weight: .bold))
                 .foregroundColor(.white)
@@ -129,9 +129,9 @@ struct PaywallView: View {
     }
 
     private var perksList: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: Space.l) {
             ForEach(perks) { perk in
-                HStack(alignment: .top, spacing: 14) {
+                HStack(alignment: .top, spacing: Space.l) {
                     Image(systemName: perk.icon)
                         .font(.system(.body).weight(.semibold))
                         .foregroundColor(Theme.accentSoft)
@@ -150,7 +150,7 @@ struct PaywallView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, 2)
         }
-        .padding(18)
+        .padding(Space.l)
         .card(cornerRadius: Radius.card)
     }
 
@@ -161,9 +161,9 @@ struct PaywallView: View {
                 .font(.footnote)
                 .foregroundColor(.white.opacity(0.75))
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 18)
+                .padding(.vertical, Space.l)
         } else {
-            VStack(spacing: 12) {
+            VStack(spacing: Space.m) {
                 ForEach(proStore.products, id: \.id) { product in
                     planCard(product)
                 }
@@ -177,7 +177,7 @@ struct PaywallView: View {
             Haptics.selection()
             selectedID = product.id
         } label: {
-            HStack(spacing: 12) {
+            HStack(spacing: Space.m) {
                 Image(systemName: isSelected ? "largecircle.fill.circle" : "circle")
                     .foregroundColor(isSelected ? .white : .white.opacity(0.5))
                 VStack(alignment: .leading, spacing: 2) {
@@ -191,13 +191,13 @@ struct PaywallView: View {
                 Text(product.displayPrice)
                     .font(.system(.callout).weight(.bold))
             }
-            .padding(16)
+            .padding(Space.l)
             .background(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
                     .fill(Color.white.opacity(isSelected ? 0.18 : 0.06))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
                     .strokeBorder(Color.white.opacity(isSelected ? 0.6 : 0.12), lineWidth: 1.5)
             )
         }
@@ -245,7 +245,7 @@ struct PaywallView: View {
                 }
                 .foregroundColor(Theme.background)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
+                .padding(.vertical, Space.l)
                 .background(Capsule().fill(Color.white))
             }
             .buttonStyle(BouncyButtonStyle(scale: 0.97))
@@ -263,7 +263,7 @@ struct PaywallView: View {
     }
 
     private var footer: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: Space.m) {
             Button("Restore purchases") {
                 Task { await proStore.restore() }
             }

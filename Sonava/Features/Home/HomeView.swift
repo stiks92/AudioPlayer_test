@@ -42,7 +42,7 @@ struct HomeView: View {
             ZStack {
                 AppBackground()
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 28) {
+                    VStack(alignment: .leading, spacing: Space.xxl) {
                         header
                         aiMixCard
                         statsCard
@@ -56,7 +56,7 @@ struct HomeView: View {
                         trendingSection
                         quickPicks
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, Space.screenMargin)
                     .padding(.top, 8)
                     .padding(.bottom, 140)
                 }
@@ -135,16 +135,16 @@ struct HomeView: View {
     @ViewBuilder
     private var madeForYouSection: some View {
         if madeForYou.state == .loaded, !madeForYou.songs.isEmpty {
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: Space.l) {
                 SectionHeader(title: "Made for you")
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 14) {
+                    HStack(spacing: Space.l) {
                         ForEach(madeForYou.songs) { song in
                             Button {
                                 audio.play(song, in: madeForYou.songs)
                             } label: {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    ArtworkThumbnail(song: song, size: 130, cornerRadius: 16, showBadge: true)
+                                    ArtworkThumbnail(song: song, size: 130, cornerRadius: Radius.card, showBadge: true)
                                     Text(song.title)
                                         .font(.system(.footnote).weight(.semibold))
                                         .foregroundColor(Theme.textPrimary)
@@ -164,16 +164,16 @@ struct HomeView: View {
     @ViewBuilder
     private var serverSection: some View {
         if serverStore.isConnected, serverFeed.state == .loaded {
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: Space.l) {
                 SectionHeader(title: "From your server")
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 14) {
+                    HStack(spacing: Space.l) {
                         ForEach(serverFeed.songs) { song in
                             Button {
                                 audio.play(song, in: serverFeed.songs)
                             } label: {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    ArtworkThumbnail(song: song, size: 130, cornerRadius: 16, showBadge: true)
+                                    ArtworkThumbnail(song: song, size: 130, cornerRadius: Radius.card, showBadge: true)
                                     Text(song.title)
                                         .font(.system(.footnote).weight(.semibold))
                                         .foregroundColor(Theme.textPrimary)
@@ -197,7 +197,7 @@ struct HomeView: View {
             Haptics.impact()
             showAIMix = true
         } label: {
-            HStack(spacing: 14) {
+            HStack(spacing: Space.l) {
                 Image(systemName: "sparkles")
                     .font(.system(.title).weight(.bold))
                     .foregroundColor(.white)
@@ -219,7 +219,7 @@ struct HomeView: View {
                 }
                 Image(systemName: "chevron.right").foregroundColor(.white.opacity(0.8))
             }
-            .padding(16)
+            .padding(Space.l)
             .background(Theme.proGradient)
             .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
             .shadow(color: .black.opacity(0.5), radius: 20, y: 10)
@@ -232,10 +232,10 @@ struct HomeView: View {
     @ViewBuilder
     private var editorialSection: some View {
         if !editorial.isEmpty {
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: Space.l) {
                 SectionHeader(title: "Editor's picks")
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 16) {
+                    HStack(spacing: Space.l) {
                         ForEach(editorial) { playlist in
                             NavigationLink {
                                 RemotePlaylistView(playlist: playlist)
@@ -250,8 +250,8 @@ struct HomeView: View {
                                         }
                                     }
                                     .frame(width: 160, height: 160)
-                                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                                    .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
+                                    .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
+                                    .overlay(RoundedRectangle(cornerRadius: Radius.card, style: .continuous).strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
                                     Text(playlist.title)
                                         .font(.system(.footnote).weight(.semibold))
                                         .foregroundColor(Theme.textPrimary)
@@ -273,16 +273,16 @@ struct HomeView: View {
     @ViewBuilder
     private var popularSection: some View {
         if charts.state == .loaded {
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: Space.l) {
                 SectionHeader(title: "Popular now")
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 14) {
+                    HStack(spacing: Space.l) {
                         ForEach(charts.songs) { song in
                             Button {
                                 audio.play(song, in: charts.songs)
                             } label: {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    ArtworkThumbnail(song: song, size: 150, cornerRadius: 18, showBadge: true)
+                                    ArtworkThumbnail(song: song, size: 150, cornerRadius: Radius.card, showBadge: true)
                                     Text(song.title)
                                         .font(.system(.footnote).weight(.semibold))
                                         .foregroundColor(Theme.textPrimary)
@@ -320,16 +320,16 @@ struct HomeView: View {
         case .loading:
             ShelfPlaceholder(title: "Trending on Audius")
         case .loaded:
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: Space.l) {
                 SectionHeader(title: "Trending on Audius")
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 14) {
+                    HStack(spacing: Space.l) {
                         ForEach(trending.songs) { song in
                             Button {
                                 audio.play(song, in: trending.songs)
                             } label: {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    ArtworkThumbnail(song: song, size: 150, cornerRadius: 18, showBadge: true)
+                                    ArtworkThumbnail(song: song, size: 150, cornerRadius: Radius.card, showBadge: true)
                                     Text(song.title)
                                         .font(.system(.footnote).weight(.semibold))
                                         .foregroundColor(Theme.textPrimary)
@@ -422,16 +422,16 @@ struct HomeView: View {
     // MARK: - Recently played
 
     private var recentlyPlayed: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: Space.l) {
             SectionHeader(title: "Recently played")
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 14) {
+                HStack(spacing: Space.l) {
                     ForEach(library.recentSongs) { song in
                         Button {
                             audio.play(song, in: library.songs)
                         } label: {
                             VStack(alignment: .leading, spacing: 8) {
-                                ArtworkThumbnail(song: song, size: 130, cornerRadius: 18)
+                                ArtworkThumbnail(song: song, size: 130, cornerRadius: Radius.card)
                                 Text(song.title)
                                     .font(.system(.footnote).weight(.semibold))
                                     .foregroundColor(Theme.textPrimary)
@@ -450,7 +450,7 @@ struct HomeView: View {
     // MARK: - Quick picks
 
     private var quickPicks: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: Space.m) {
             SectionHeader(title: "Quick picks")
             LazyVStack(spacing: 2) {
                 ForEach(library.songs.prefix(8)) { song in

@@ -19,7 +19,7 @@ struct AddToPlaylistView: View {
             ZStack {
                 Theme.background.ignoresSafeArea()
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
+                    VStack(alignment: .leading, spacing: Space.l) {
                         trackHeader
                         createRow
                         if !playlistStore.playlists.isEmpty {
@@ -33,7 +33,7 @@ struct AddToPlaylistView: View {
                             }
                         }
                     }
-                    .padding(20)
+                    .padding(Space.screenMargin)
                 }
             }
             .foregroundColor(.white)
@@ -49,7 +49,7 @@ struct AddToPlaylistView: View {
     }
 
     private var trackHeader: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: Space.m) {
             ArtworkThumbnail(song: song, size: 48)
             VStack(alignment: .leading, spacing: 2) {
                 Text(song.title).font(.system(.subheadline).weight(.semibold)).lineLimit(1)
@@ -60,7 +60,7 @@ struct AddToPlaylistView: View {
     }
 
     private var createRow: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: Space.m) {
             Image(systemName: "plus.circle.fill").foregroundColor(Theme.accentSoft)
             TextField("New playlist name", text: $newName)
                 .foregroundColor(.white)
@@ -71,7 +71,7 @@ struct AddToPlaylistView: View {
                 .foregroundColor(newName.trimmingCharacters(in: .whitespaces).isEmpty ? Theme.textTertiary : Theme.accentSoft)
                 .disabled(newName.trimmingCharacters(in: .whitespaces).isEmpty)
         }
-        .padding(.horizontal, 14).padding(.vertical, 12)
+        .padding(.horizontal, Space.l).padding(.vertical, Space.m)
         .card(cornerRadius: Radius.control)
     }
 
@@ -84,8 +84,8 @@ struct AddToPlaylistView: View {
                 playlistStore.addTrack(song, to: playlist.id)
             }
         } label: {
-            HStack(spacing: 14) {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
+            HStack(spacing: Space.l) {
+                RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
                     .fill(LinearGradient(colors: playlist.gradient, startPoint: .topLeading, endPoint: .bottomTrailing))
                     .frame(width: 44, height: 44)
                     .overlay(Image(systemName: "music.note.list").font(.system(.callout)).foregroundColor(.white))

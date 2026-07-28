@@ -21,7 +21,7 @@ struct ArtistView: View {
             ZStack {
                 Theme.background.ignoresSafeArea()
                 ScrollView {
-                    VStack(spacing: 20) {
+                    VStack(spacing: Space.screenMargin) {
                         header
                         content
                     }
@@ -46,7 +46,7 @@ struct ArtistView: View {
     }
 
     private var header: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: Space.l) {
             ZStack {
                 Circle()
                     .fill(LinearGradient(colors: gradient, startPoint: .topLeading, endPoint: .bottomTrailing))
@@ -62,14 +62,14 @@ struct ArtistView: View {
                 .multilineTextAlignment(.center)
 
             if feed.state == .loaded, let first = feed.songs.first {
-                HStack(spacing: 16) {
+                HStack(spacing: Space.l) {
                     Button {
                         if audio.isShuffling { audio.toggleShuffle() }
                         audio.play(first, in: feed.songs)
                     } label: {
                         Label("Play", systemImage: "play.fill")
                             .font(.headline).foregroundColor(Theme.background)
-                            .frame(maxWidth: .infinity).padding(.vertical, 14)
+                            .frame(maxWidth: .infinity).padding(.vertical, Space.l)
                             .background(Capsule().fill(Color.white))
                     }
                     .buttonStyle(BouncyButtonStyle(scale: 0.96))
@@ -80,15 +80,15 @@ struct ArtistView: View {
                     } label: {
                         Label("Shuffle", systemImage: "shuffle")
                             .font(.headline).foregroundColor(.white)
-                            .frame(maxWidth: .infinity).padding(.vertical, 14)
+                            .frame(maxWidth: .infinity).padding(.vertical, Space.l)
                             .card(cornerRadius: Radius.hero)
                     }
                     .buttonStyle(BouncyButtonStyle(scale: 0.96))
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, Space.screenMargin)
             }
         }
-        .padding(.top, 12)
+        .padding(.top, Space.m)
     }
 
     @ViewBuilder
@@ -110,7 +110,7 @@ struct ArtistView: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, Space.screenMargin)
         }
     }
 

@@ -41,21 +41,21 @@ struct NowPlayingView: View {
                 artwork
                 Spacer(minLength: 0)
                 info
-                    .padding(.top, 18)
+                    .padding(.top, Space.l)
                 scrubber
-                    .padding(.top, 22)
+                    .padding(.top, Space.xl)
                 visualizer
-                    .padding(.top, 18)
+                    .padding(.top, Space.l)
                 controls
                     .padding(.top, 8)
                 volume
-                    .padding(.top, 22)
+                    .padding(.top, Space.xl)
                 bottomBar
-                    .padding(.top, 22)
+                    .padding(.top, Space.xl)
             }
-            .padding(.horizontal, 26)
-            .padding(.top, 14)
-            .padding(.bottom, 26)
+            .padding(.horizontal, Space.xl)
+            .padding(.top, Space.l)
+            .padding(.bottom, Space.xl)
             .foregroundColor(.white)
         }
         .offset(y: dragOffset)
@@ -122,7 +122,7 @@ struct NowPlayingView: View {
                 if let song {
                     ArtworkImage(song: song, glyphSize: 72)
                         .frame(width: side, height: side)
-                        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: Radius.hero, style: .continuous))
                         .shadow(color: song.gradient.first?.opacity(0.6) ?? .black, radius: 34, y: 20)
                 }
             }
@@ -135,7 +135,7 @@ struct NowPlayingView: View {
     }
 
     private var info: some View {
-        HStack(alignment: .center, spacing: 12) {
+        HStack(alignment: .center, spacing: Space.m) {
             VStack(alignment: .leading, spacing: 4) {
                 MarqueeText(text: song?.title ?? "", font: .system(.title2).weight(.bold))
                     .frame(height: 30)
@@ -284,7 +284,7 @@ struct NowPlayingView: View {
     }
 
     private var volume: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: Space.m) {
             Image(systemName: "speaker.fill")
                 .font(.system(.footnote))
                 .foregroundColor(.white.opacity(0.6))

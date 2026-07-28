@@ -23,7 +23,7 @@ struct ConnectServerView: View {
             ZStack {
                 Theme.background.ignoresSafeArea()
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: Space.screenMargin) {
                         if serverStore.servers.isEmpty {
                             emptyState
                         } else {
@@ -32,7 +32,7 @@ struct ConnectServerView: View {
                         addButton
                         infoNote
                     }
-                    .padding(20)
+                    .padding(Space.screenMargin)
                 }
             }
             .foregroundColor(.white)
@@ -80,14 +80,14 @@ struct ConnectServerView: View {
                 row(connection)
             }
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, Space.l)
         .card(cornerRadius: Radius.card)
     }
 
     private func row(_ connection: ServerConnection) -> some View {
         let active = serverStore.activeID == connection.id
         let locked = !serverStore.isUsable(connection)
-        return HStack(spacing: 14) {
+        return HStack(spacing: Space.l) {
             Image(systemName: locked ? "lock.fill" : (active ? "checkmark.circle.fill" : "circle"))
                 .font(.system(.body))
                 .foregroundColor(locked ? Theme.textTertiary : (active ? Theme.positive : Theme.textTertiary))
@@ -114,7 +114,7 @@ struct ConnectServerView: View {
             .buttonStyle(.plain)
             .identified("server.remove", label: "Remove server")
         }
-        .padding(.vertical, 12)
+        .padding(.vertical, Space.m)
         .contentShape(Rectangle())
         .onTapGesture {
             if locked {
@@ -138,7 +138,7 @@ struct ConnectServerView: View {
                 .foregroundColor(Theme.textSecondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(18)
+        .padding(Space.l)
         .card(cornerRadius: Radius.card)
     }
 
@@ -159,7 +159,7 @@ struct ConnectServerView: View {
             }
             .foregroundColor(Theme.background)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 15)
+            .padding(.vertical, Space.l)
             .background(Capsule().fill(Color.white))
         }
         .buttonStyle(BouncyButtonStyle(scale: 0.97))
@@ -197,7 +197,7 @@ struct AddServerView: View {
             ZStack {
                 Theme.background.ignoresSafeArea()
                 ScrollView {
-                    VStack(spacing: 14) {
+                    VStack(spacing: Space.l) {
                         field("Server URL", text: $urlString,
                               placeholder: "https://music.example.com", keyboard: .URL)
                         field("Username", text: $username, placeholder: "Username")
@@ -219,7 +219,7 @@ struct AddServerView: View {
                             }
                             .foregroundColor(Theme.background)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 15)
+                            .padding(.vertical, Space.l)
                             .background(Capsule().fill(Color.white))
                         }
                         .buttonStyle(BouncyButtonStyle(scale: 0.97))
@@ -227,7 +227,7 @@ struct AddServerView: View {
                         .opacity(canConnect ? 1 : 0.5)
                         .identified("server.connect", label: "Connect")
                     }
-                    .padding(20)
+                    .padding(Space.screenMargin)
                 }
             }
             .foregroundColor(.white)
@@ -276,7 +276,7 @@ struct AddServerView: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .foregroundColor(.white)
-                .padding(.horizontal, 14).padding(.vertical, 12)
+                .padding(.horizontal, Space.l).padding(.vertical, Space.m)
                 .card(cornerRadius: Radius.control)
         }
     }
@@ -289,7 +289,7 @@ struct AddServerView: View {
                 .foregroundColor(Theme.textTertiary)
             SecureField("••••••••", text: text)
                 .foregroundColor(.white)
-                .padding(.horizontal, 14).padding(.vertical, 12)
+                .padding(.horizontal, Space.l).padding(.vertical, Space.m)
                 .card(cornerRadius: Radius.control)
         }
     }

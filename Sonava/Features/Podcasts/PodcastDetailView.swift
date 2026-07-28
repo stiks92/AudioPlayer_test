@@ -17,7 +17,7 @@ struct PodcastDetailView: View {
         ZStack {
             Theme.background.ignoresSafeArea()
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(spacing: Space.screenMargin) {
                     header
                     content
                 }
@@ -35,7 +35,7 @@ struct PodcastDetailView: View {
     }
 
     private var header: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: Space.l) {
             AsyncImage(url: podcast.artworkURL) { image in
                 image.resizable().aspectRatio(contentMode: .fill)
             } placeholder: {
@@ -45,7 +45,7 @@ struct PodcastDetailView: View {
                 }
             }
             .frame(width: 180, height: 180)
-            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
             .shadow(color: podcast.gradient.first?.opacity(0.5) ?? .clear, radius: 20, y: 12)
 
             VStack(spacing: 6) {
@@ -56,7 +56,7 @@ struct PodcastDetailView: View {
                     .font(.subheadline)
                     .foregroundColor(Theme.textSecondary)
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, Space.screenMargin)
 
             if episodes.state == .loaded, let latest = episodes.songs.first {
                 Button {
@@ -66,14 +66,14 @@ struct PodcastDetailView: View {
                         .font(.headline)
                         .foregroundColor(Theme.background)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
+                        .padding(.vertical, Space.l)
                         .background(Capsule().fill(Color.white))
                 }
                 .buttonStyle(BouncyButtonStyle(scale: 0.97))
                 .padding(.horizontal, 40)
             }
         }
-        .padding(.top, 10)
+        .padding(.top, Space.m)
     }
 
     @ViewBuilder
@@ -96,7 +96,7 @@ struct PodcastDetailView: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, Space.screenMargin)
         }
     }
 

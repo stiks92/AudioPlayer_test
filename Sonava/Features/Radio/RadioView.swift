@@ -28,12 +28,12 @@ struct RadioView: View {
                 AppBackground()
 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: Space.screenMargin) {
                         header
                         genreChips
                         content
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, Space.screenMargin)
                     .padding(.top, 8)
                     .padding(.bottom, 140)
                 }
@@ -52,13 +52,13 @@ struct RadioView: View {
 
     private var genreChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
+            HStack(spacing: Space.m) {
                 ForEach(genres) { genre in
                     let isSelected = (selectedTag ?? "") == genre.value
                     Text(genre.title)
                         .font(.system(.footnote).weight(.semibold))
                         .foregroundColor(isSelected ? Theme.background : Theme.textSecondary)
-                        .padding(.horizontal, 14)
+                        .padding(.horizontal, Space.l)
                         .padding(.vertical, 8)
                         .background(
                             Capsule().fill(isSelected ? Color.white : Color.white.opacity(0.08))
@@ -99,7 +99,7 @@ struct RadioView: View {
     }
 
     private var loading: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: Space.l) {
             ProgressView()
                 .tint(Theme.accentSoft)
             Text("Tuning in…")
@@ -111,7 +111,7 @@ struct RadioView: View {
     }
 
     private func message(icon: String, text: LocalizedStringKey) -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Space.m) {
             Image(systemName: icon)
                 .font(.system(size: 42))
                 .foregroundColor(Theme.textTertiary)

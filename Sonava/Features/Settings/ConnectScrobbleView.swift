@@ -20,7 +20,7 @@ struct ConnectScrobbleView: View {
             ZStack {
                 Theme.background.ignoresSafeArea()
                 ScrollView {
-                    VStack(spacing: 18) {
+                    VStack(spacing: Space.l) {
                         header
                         if scrobble.isConnected {
                             connectedCard
@@ -28,7 +28,7 @@ struct ConnectScrobbleView: View {
                             form
                         }
                     }
-                    .padding(20)
+                    .padding(Space.screenMargin)
                 }
             }
             .foregroundColor(.white)
@@ -44,7 +44,7 @@ struct ConnectScrobbleView: View {
     }
 
     private var header: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: Space.m) {
             Image(systemName: "waveform.badge.magnifyingglass")
                 .font(.system(size: 40, weight: .bold))
                 .foregroundColor(Theme.accentSoft)
@@ -60,7 +60,7 @@ struct ConnectScrobbleView: View {
 
     @ViewBuilder
     private var connectedCard: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: Space.l) {
             Image(systemName: "checkmark.seal.fill")
                 .font(.system(.title2)).foregroundColor(Theme.positive)
             VStack(alignment: .leading, spacing: 2) {
@@ -70,7 +70,7 @@ struct ConnectScrobbleView: View {
             }
             Spacer()
         }
-        .padding(16)
+        .padding(Space.l)
         .card(cornerRadius: Radius.card)
 
         Toggle(isOn: $scrobble.isEnabled) {
@@ -78,7 +78,7 @@ struct ConnectScrobbleView: View {
                 .font(.system(.subheadline))
         }
         .tint(Theme.accent)
-        .padding(16)
+        .padding(Space.l)
         .card(cornerRadius: Radius.card)
 
         Button(role: .destructive) {
@@ -86,14 +86,14 @@ struct ConnectScrobbleView: View {
         } label: {
             Text("Disconnect")
                 .font(.headline).foregroundColor(Theme.destructive)
-                .frame(maxWidth: .infinity).padding(.vertical, 14)
+                .frame(maxWidth: .infinity).padding(.vertical, Space.l)
                 .card(cornerRadius: Radius.hero)
         }
         .buttonStyle(BouncyButtonStyle(scale: 0.97))
     }
 
     private var form: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: Space.l) {
             VStack(alignment: .leading, spacing: 6) {
                 Text("User token")
                     .textCase(.uppercase)
@@ -103,7 +103,7 @@ struct ConnectScrobbleView: View {
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .foregroundColor(.white)
-                    .padding(.horizontal, 14).padding(.vertical, 12)
+                    .padding(.horizontal, Space.l).padding(.vertical, Space.m)
                     .card(cornerRadius: Radius.control)
             }
 
@@ -122,7 +122,7 @@ struct ConnectScrobbleView: View {
                         .font(.headline)
                 }
                 .foregroundColor(Theme.background)
-                .frame(maxWidth: .infinity).padding(.vertical, 15)
+                .frame(maxWidth: .infinity).padding(.vertical, Space.l)
                 .background(Capsule().fill(Color.white))
             }
             .buttonStyle(BouncyButtonStyle(scale: 0.97))

@@ -32,7 +32,7 @@ struct SettingsView: View {
             ZStack {
                 Theme.background.ignoresSafeArea()
                 ScrollView {
-                    VStack(spacing: 22) {
+                    VStack(spacing: Space.xl) {
                         proCard
                         appearanceSection
                         playbackSection
@@ -43,7 +43,7 @@ struct SettingsView: View {
                             .foregroundColor(Theme.textTertiary)
                             .padding(.top, 6)
                     }
-                    .padding(20)
+                    .padding(Space.screenMargin)
                     .padding(.bottom, 40)
                 }
             }
@@ -99,12 +99,12 @@ struct SettingsView: View {
                 }
                 Spacer()
             }
-            .padding(18)
+            .padding(Space.l)
             .background(Theme.brandGradient)
-            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
         } else {
             Button { showPaywall = true } label: {
-                HStack(spacing: 14) {
+                HStack(spacing: Space.l) {
                     Image(systemName: "sparkles")
                         .font(.system(.title).weight(.bold))
                         .foregroundColor(.white)
@@ -116,9 +116,9 @@ struct SettingsView: View {
                     Spacer()
                     Image(systemName: "chevron.right").foregroundColor(.white.opacity(0.8))
                 }
-                .padding(18)
+                .padding(Space.l)
                 .background(Theme.proGradient)
-                .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
             }
             .buttonStyle(BouncyButtonStyle(scale: 0.98))
         }
@@ -128,8 +128,8 @@ struct SettingsView: View {
 
     private var appearanceSection: some View {
         section("Appearance") {
-            VStack(alignment: .leading, spacing: 18) {
-                VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: Space.l) {
+                VStack(alignment: .leading, spacing: Space.m) {
                     Text("Accent")
                         .font(.system(.footnote).weight(.semibold))
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -147,7 +147,7 @@ struct SettingsView: View {
                 }
 
                 if appIcon.supportsAlternateIcons {
-                    VStack(alignment: .leading, spacing: 12) {
+                    VStack(alignment: .leading, spacing: Space.m) {
                         Text("App icon")
                             .font(.system(.footnote).weight(.semibold))
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -183,12 +183,12 @@ struct SettingsView: View {
             VStack(spacing: 6) {
                 ZStack {
                     // A miniature of the real icon: same gradient, same mark.
-                    RoundedRectangle(cornerRadius: 13, style: .continuous)
+                    RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
                         .fill(LinearGradient(colors: option.gradientHex.colors,
                                              startPoint: .topLeading, endPoint: .bottomTrailing))
                         .frame(width: 56, height: 56)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                            RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
                                 .strokeBorder(selected ? Color.white : Color.white.opacity(0.15),
                                               lineWidth: selected ? 3 : 1)
                         )
@@ -200,7 +200,7 @@ struct SettingsView: View {
                         }
                     }
                     if locked {
-                        RoundedRectangle(cornerRadius: 13, style: .continuous)
+                        RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
                             .fill(Color.black.opacity(0.45))
                             .frame(width: 56, height: 56)
                         Image(systemName: "lock.fill")
@@ -356,7 +356,7 @@ struct SettingsView: View {
                         .font(.system(.subheadline))
                 }
                 .tint(Theme.accent)
-                .padding(.vertical, 12)
+                .padding(.vertical, Space.m)
                 #endif
             }
         }
@@ -368,14 +368,14 @@ struct SettingsView: View {
         _ title: LocalizedStringKey,
         @ViewBuilder content: () -> Content
     ) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: Space.m) {
             Text(title)
                 .textCase(.uppercase)
                 .font(.system(.caption).weight(.bold))
                 .tracking(1)
                 .foregroundColor(Theme.textTertiary)
             VStack(spacing: 0) { content() }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, Space.l)
                 .padding(.vertical, 4)
                 .card(cornerRadius: Radius.card)
         }
@@ -388,7 +388,7 @@ struct SettingsView: View {
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            HStack(spacing: 14) {
+            HStack(spacing: Space.l) {
                 Image(systemName: icon).frame(width: 24).foregroundColor(Theme.accentSoft)
                 Text(title).font(.system(.subheadline))
                 Spacer()
@@ -397,7 +397,7 @@ struct SettingsView: View {
                 }
                 Image(systemName: "chevron.right").font(.system(.caption)).foregroundColor(Theme.textTertiary)
             }
-            .padding(.vertical, 12)
+            .padding(.vertical, Space.m)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -409,13 +409,13 @@ struct SettingsView: View {
         value: LocalizedStringKey,
         valueColor: Color
     ) -> some View {
-        HStack(spacing: 14) {
+        HStack(spacing: Space.l) {
             Image(systemName: icon).frame(width: 24).foregroundColor(Theme.accentSoft)
             Text(title).font(.system(.subheadline))
             Spacer()
             Text(value).font(.system(.footnote).weight(.semibold)).foregroundColor(valueColor)
         }
-        .padding(.vertical, 12)
+        .padding(.vertical, Space.m)
     }
 
     private var divider: some View {

@@ -51,7 +51,7 @@ struct OnboardingView: View {
                     .hitTarget()
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .padding(.horizontal, Space.screenMargin)
-                    .padding(.top, 12)
+                    .padding(.top, Space.m)
 
                 TabView(selection: $page) {
                     ForEach(Array(slides.enumerated()), id: \.element.id) { index, slide in
@@ -61,7 +61,7 @@ struct OnboardingView: View {
                 .tabViewStyle(.page(indexDisplayMode: .never))
 
                 pageDots
-                    .padding(.bottom, 20)
+                    .padding(.bottom, Space.screenMargin)
 
                 Button {
                     if page < slides.count - 1 {
@@ -74,7 +74,7 @@ struct OnboardingView: View {
                         .font(.headline)
                         .foregroundColor(Theme.background)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
+                        .padding(.vertical, Space.l)
                         .background(Capsule().fill(Color.white))
                 }
                 .buttonStyle(BouncyButtonStyle(scale: 0.97))
@@ -86,13 +86,13 @@ struct OnboardingView: View {
     }
 
     private func slideView(_ slide: Slide) -> some View {
-        VStack(spacing: 28) {
+        VStack(spacing: Space.xxl) {
             Spacer()
             Image(systemName: slide.icon)
                 .font(.system(size: 76, weight: .bold))
                 .foregroundColor(.white)
                 .shadow(color: .white.opacity(0.4), radius: 20)
-            VStack(spacing: 14) {
+            VStack(spacing: Space.l) {
                 Text(slide.title)
                     .font(.system(.title, design: .rounded).weight(.heavy))
                     .multilineTextAlignment(.center)

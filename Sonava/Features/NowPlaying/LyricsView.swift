@@ -82,7 +82,7 @@ struct LyricsView: View {
                         .font(.system(.title3, design: .rounded).weight(.semibold))
                         .foregroundColor(.white.opacity(0.85))
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(24)
+                        .padding(Space.xl)
                 }
             } else {
                 message(icon: "text.quote", text: "No lyrics found for this track.")
@@ -91,7 +91,7 @@ struct LyricsView: View {
     }
 
     private func message(icon: String, text: String) -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Space.m) {
             Image(systemName: icon)
                 .font(.system(size: 42))
                 .foregroundColor(.white.opacity(0.4))
@@ -118,7 +118,7 @@ private struct SyncedLyricsList: View {
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView(showsIndicators: false) {
-                LazyVStack(alignment: .leading, spacing: 18) {
+                LazyVStack(alignment: .leading, spacing: Space.l) {
                     Color.clear.frame(height: 40)
                     ForEach(Array(lines.enumerated()), id: \.element.id) { index, line in
                         Text(line.text)
@@ -134,7 +134,7 @@ private struct SyncedLyricsList: View {
                     }
                     Color.clear.frame(height: 200)
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, Space.xl)
             }
             .onChange(of: activeIndex) { _, newValue in
                 guard let newValue, lines.indices.contains(newValue) else { return }

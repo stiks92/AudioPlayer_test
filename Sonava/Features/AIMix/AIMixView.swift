@@ -68,11 +68,11 @@ struct AIMixView: View {
 
     private var generator: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: Space.screenMargin) {
                 Text("Describe a vibe")
                     .font(.system(.title2, design: .rounded).weight(.bold))
 
-                HStack(spacing: 10) {
+                HStack(spacing: Space.m) {
                     Image(systemName: "sparkles").foregroundColor(Theme.accentSoft)
                     // An explicit prompt rather than the implicit placeholder:
                     // the default renders at 2.43:1, and this is the only text
@@ -85,7 +85,7 @@ struct AIMixView: View {
                         .submitLabel(.go)
                         .onSubmit(generate)
                 }
-                .padding(.horizontal, 14).padding(.vertical, 14)
+                .padding(.horizontal, Space.l).padding(.vertical, Space.l)
                 .card(cornerRadius: Radius.card)
 
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -94,7 +94,7 @@ struct AIMixView: View {
                             Text(LocalizedStringKey(s))
                                 .font(.system(.footnote).weight(.semibold))
                                 .foregroundColor(.white)
-                                .padding(.horizontal, 14).padding(.vertical, 8)
+                                .padding(.horizontal, Space.l).padding(.vertical, 8)
                                 .background(Capsule().fill(Color.white.opacity(0.12)))
                                 .onTapGesture { prompt = localized(s); generate() }
                         }
@@ -114,7 +114,7 @@ struct AIMixView: View {
                     }
                     .foregroundColor(canGenerate ? Theme.background : .white.opacity(0.55))
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 15)
+                    .padding(.vertical, Space.l)
                     .background(Capsule().fill(canGenerate ? Color.white : Color.white.opacity(0.14)))
                 }
                 .buttonStyle(BouncyButtonStyle(scale: 0.97, dimsWhenDisabled: false))
@@ -140,7 +140,7 @@ struct AIMixView: View {
                     }
                 }
             }
-            .padding(20)
+            .padding(Space.screenMargin)
             .padding(.bottom, 120)
         }
     }
@@ -160,7 +160,7 @@ struct AIMixView: View {
                 Label("Play", systemImage: "play.fill")
                     .font(.subheadline.weight(.bold))
                     .foregroundColor(Theme.background)
-                    .padding(.horizontal, 18).padding(.vertical, 10)
+                    .padding(.horizontal, Space.l).padding(.vertical, Space.m)
                     .background(Capsule().fill(Color.white))
             }
             .buttonStyle(BouncyButtonStyle(scale: 0.95))
@@ -191,7 +191,7 @@ struct AIMixView: View {
     // MARK: - Locked (free tier)
 
     private var lockedState: some View {
-        VStack(spacing: 22) {
+        VStack(spacing: Space.xl) {
             Spacer()
             Image(systemName: "sparkles")
                 .font(.system(size: 54, weight: .bold))
@@ -209,12 +209,12 @@ struct AIMixView: View {
                 Text("Unlock with Sonava Pro")
                     .font(.headline)
                     .foregroundColor(Theme.background)
-                    .padding(.horizontal, 26).padding(.vertical, 15)
+                    .padding(.horizontal, Space.xl).padding(.vertical, Space.l)
                     .background(Capsule().fill(Color.white))
             }
             .buttonStyle(BouncyButtonStyle(scale: 0.96))
             Spacer()
         }
-        .padding(30)
+        .padding(Space.xxl)
     }
 }

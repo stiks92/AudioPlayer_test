@@ -50,7 +50,7 @@ struct EqualizerView: View {
 
     private var equalizer: some View {
         ScrollView {
-            VStack(spacing: 24) {
+            VStack(spacing: Space.xl) {
                 enableRow
                 // The switch must stay *outside* this group. `disabled` is
                 // additive down the hierarchy — a control inside a disabled
@@ -61,7 +61,7 @@ struct EqualizerView: View {
                 // way the off state reads honestly: `.disabled()` greys system
                 // controls but leaves hand-drawn shapes like the band knobs at
                 // full brightness, so the screen looked half-on, half-off.
-                VStack(spacing: 24) {
+                VStack(spacing: Space.xl) {
                     bands
                     preampRow
                     presetPicker
@@ -78,7 +78,7 @@ struct EqualizerView: View {
                 // is most needed when the equalizer is off.
                 footnote
             }
-            .padding(20)
+            .padding(Space.screenMargin)
             .padding(.bottom, 40)
             .animation(.easeInOut(duration: 0.2), value: effects.equalizer.isEnabled)
         }
@@ -195,12 +195,12 @@ struct EqualizerView: View {
             )
             .tint(Theme.accent)
         }
-        .padding(16)
+        .padding(Space.l)
         .card(cornerRadius: Radius.card)
     }
 
     private var presetPicker: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: Space.m) {
             Text("Presets")
                 .textCase(.uppercase)
                 .font(.system(.caption).weight(.bold)).tracking(1)
@@ -216,7 +216,7 @@ struct EqualizerView: View {
                             Text(LocalizedStringKey(preset.name))
                                 .font(.system(.footnote).weight(.semibold))
                                 .foregroundColor(selected ? Theme.background : Theme.textSecondary)
-                                .padding(.horizontal, 14).padding(.vertical, 8)
+                                .padding(.horizontal, Space.l).padding(.vertical, 8)
                                 .background(Capsule().fill(selected ? Color.white : Color.white.opacity(0.08)))
                         }
                         .buttonStyle(.plain)
@@ -250,7 +250,7 @@ struct EqualizerView: View {
     // MARK: - Locked (free tier)
 
     private var lockedState: some View {
-        VStack(spacing: 22) {
+        VStack(spacing: Space.xl) {
             Spacer()
             Image(systemName: "slider.vertical.3")
                 .font(.system(size: 54, weight: .bold))
@@ -269,13 +269,13 @@ struct EqualizerView: View {
                 Text("Unlock with Sonava Pro")
                     .font(.headline)
                     .foregroundColor(Theme.background)
-                    .padding(.horizontal, 26).padding(.vertical, 15)
+                    .padding(.horizontal, Space.xl).padding(.vertical, Space.l)
                     .background(Capsule().fill(Color.white))
             }
             .buttonStyle(BouncyButtonStyle(scale: 0.96))
             Spacer()
         }
-        .padding(30)
+        .padding(Space.xxl)
     }
 }
 

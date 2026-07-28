@@ -43,14 +43,14 @@ struct PodcastsView: View {
         "Science", "Health", "Sports", "History", "Education"
     ].map(FilterChip.init)
 
-    private let columns = [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)]
+    private let columns = [GridItem(.flexible(), spacing: Space.l), GridItem(.flexible(), spacing: Space.l)]
 
     var body: some View {
         NavigationStack {
             ZStack {
                 AppBackground()
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: Space.screenMargin) {
                         Text("Podcasts")
                             .font(.system(.largeTitle, design: .rounded).weight(.heavy))
                             .foregroundColor(Theme.textPrimary)
@@ -58,7 +58,7 @@ struct PodcastsView: View {
                         if query.isEmpty { genreChips }
                         content
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, Space.screenMargin)
                     .padding(.top, 8)
                     .padding(.bottom, 140)
                 }
@@ -78,7 +78,7 @@ struct PodcastsView: View {
     }
 
     private var searchField: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: Space.m) {
             Image(systemName: "magnifyingglass").foregroundColor(Theme.textSecondary)
             TextField("", text: $query,
                       prompt: Text("Search podcasts")
@@ -92,7 +92,7 @@ struct PodcastsView: View {
                 }
             }
         }
-        .padding(.horizontal, 14).padding(.vertical, 12)
+        .padding(.horizontal, Space.l).padding(.vertical, Space.m)
         .card(cornerRadius: Radius.card)
     }
 
@@ -104,7 +104,7 @@ struct PodcastsView: View {
                     Text(genre.title)
                         .font(.system(.footnote).weight(.semibold))
                         .foregroundColor(isSelected ? Theme.background : Theme.textSecondary)
-                        .padding(.horizontal, 14).padding(.vertical, 8)
+                        .padding(.horizontal, Space.l).padding(.vertical, 8)
                         .background(Capsule().fill(isSelected ? Color.white : Color.white.opacity(0.08)))
                         .onTapGesture {
                             selectedGenre = genre.value
@@ -120,7 +120,7 @@ struct PodcastsView: View {
     private var content: some View {
         switch feed.state {
         case .idle, .loading:
-            VStack(spacing: 14) {
+            VStack(spacing: Space.l) {
                 ProgressView().tint(Theme.accentSoft)
             }
             .frame(maxWidth: .infinity).padding(.top, 60)
@@ -134,7 +134,7 @@ struct PodcastsView: View {
         case .empty:
             message("magnifyingglass", "No podcasts found.")
         case .loaded:
-            LazyVGrid(columns: columns, spacing: 20) {
+            LazyVGrid(columns: columns, spacing: Space.screenMargin) {
                 ForEach(feed.podcasts) { podcast in
                     NavigationLink {
                         PodcastDetailView(podcast: podcast)
@@ -148,7 +148,7 @@ struct PodcastsView: View {
     }
 
     private func message(_ icon: String, _ text: LocalizedStringKey) -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Space.m) {
             Image(systemName: icon).font(.system(size: 42)).foregroundColor(Theme.textTertiary)
             Text(text).font(.subheadline).foregroundColor(Theme.textSecondary)
         }
@@ -171,9 +171,9 @@ struct PodcastCard: View {
             }
             .aspectRatio(1, contentMode: .fit)
             .frame(maxWidth: .infinity)
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
                     .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
             )
 

@@ -43,7 +43,7 @@ struct SongRow: View {
     private var downloadState: DownloadStore.DownloadState { audio.downloads.state(for: song) }
 
     var body: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: Space.l) {
             ArtworkThumbnail(song: song, showBadge: showBadge)
 
             VStack(alignment: .leading, spacing: 3) {

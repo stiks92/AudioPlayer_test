@@ -33,7 +33,7 @@ struct UserPlaylistDetailView: View {
             Theme.background.ignoresSafeArea()
             if let playlist {
                 ScrollView {
-                    VStack(spacing: 20) {
+                    VStack(spacing: Space.screenMargin) {
                         hero(playlist)
                         if playlist.tracks.isEmpty {
                             emptyState
@@ -102,12 +102,12 @@ struct UserPlaylistDetailView: View {
                 Text(playlist.name).font(.system(.title, design: .rounded).weight(.heavy)).lineLimit(2)
                 Text(playlist.subtitle).font(.subheadline).foregroundColor(Theme.textSecondary)
             }
-            .padding(20)
+            .padding(Space.screenMargin)
         }
     }
 
     private func actions(_ playlist: UserPlaylist) -> some View {
-        HStack(spacing: 16) {
+        HStack(spacing: Space.l) {
             Button {
                 if let first = playlist.tracks.first {
                     if audio.isShuffling { audio.toggleShuffle() }
@@ -116,7 +116,7 @@ struct UserPlaylistDetailView: View {
             } label: {
                 Label("Play", systemImage: "play.fill")
                     .font(.headline).foregroundColor(Theme.background)
-                    .frame(maxWidth: .infinity).padding(.vertical, 14)
+                    .frame(maxWidth: .infinity).padding(.vertical, Space.l)
                     .background(Capsule().fill(Color.white))
             }
             .buttonStyle(BouncyButtonStyle(scale: 0.96))
@@ -128,12 +128,12 @@ struct UserPlaylistDetailView: View {
             } label: {
                 Label("Shuffle", systemImage: "shuffle")
                     .font(.headline).foregroundColor(.white)
-                    .frame(maxWidth: .infinity).padding(.vertical, 14)
+                    .frame(maxWidth: .infinity).padding(.vertical, Space.l)
                     .card(cornerRadius: Radius.hero)
             }
             .buttonStyle(BouncyButtonStyle(scale: 0.96))
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, Space.screenMargin)
     }
 
     private func trackList(_ playlist: UserPlaylist) -> some View {
@@ -152,11 +152,11 @@ struct UserPlaylistDetailView: View {
                 }
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, Space.screenMargin)
     }
 
     private var emptyState: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Space.m) {
             Image(systemName: "music.note.list")
                 .font(.system(size: 46)).foregroundColor(Theme.textTertiary)
             Text("This playlist is empty")
@@ -165,6 +165,6 @@ struct UserPlaylistDetailView: View {
                 .font(.subheadline).foregroundColor(Theme.textTertiary)
                 .multilineTextAlignment(.center)
         }
-        .frame(maxWidth: .infinity).padding(.top, 40).padding(.horizontal, 30)
+        .frame(maxWidth: .infinity).padding(.top, 40).padding(.horizontal, Space.xxl)
     }
 }

@@ -46,7 +46,7 @@ struct SearchView: View {
                 AppBackground()
 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 22) {
+                    VStack(alignment: .leading, spacing: Space.xl) {
                         Text("Search")
                             .font(.system(.largeTitle, design: .rounded).weight(.heavy))
                             .foregroundColor(Theme.textPrimary)
@@ -59,7 +59,7 @@ struct SearchView: View {
                             resultsSections
                         }
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, Space.screenMargin)
                     .padding(.top, 8)
                     .padding(.bottom, 140)
                 }
@@ -88,7 +88,7 @@ struct SearchView: View {
     }
 
     private var searchField: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: Space.m) {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(Theme.textSecondary)
             TextField("", text: $query,
@@ -112,8 +112,8 @@ struct SearchView: View {
                 }
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
+        .padding(.horizontal, Space.l)
+        .padding(.vertical, Space.m)
         .card(cornerRadius: Radius.card)
     }
 
@@ -121,7 +121,7 @@ struct SearchView: View {
 
     @ViewBuilder
     private var resultsSections: some View {
-        VStack(alignment: .leading, spacing: 22) {
+        VStack(alignment: .leading, spacing: Space.xl) {
             // ── Full tracks first ──────────────────────────────
             if !localResults.isEmpty {
                 sourceSection("In your library", songs: localResults)
@@ -141,7 +141,7 @@ struct SearchView: View {
 
             // ── 30-second previews ─────────────────────────────
             if deezerFeed.state == .loaded || appleFeed.state == .loaded {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: Space.m) {
                     Text("PREVIEWS · 30 SEC")
                         .font(.system(.caption2).weight(.bold)).tracking(1)
                         .foregroundColor(Theme.textTertiary)
@@ -202,16 +202,16 @@ struct SearchView: View {
     }
 
     private var moodGrid: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: Space.l) {
             SectionHeader(title: "Browse moods")
-            LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], spacing: 14) {
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: Space.l), GridItem(.flexible(), spacing: Space.l)], spacing: Space.l) {
                 ForEach(moods) { mood in
                     ZStack(alignment: .topLeading) {
                         LinearGradient(colors: mood.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
                         Text(mood.title)
                             .font(.system(.body).weight(.bold))
                             .foregroundColor(.white)
-                            .padding(14)
+                            .padding(Space.l)
                         Image(systemName: "music.note")
                             .font(.system(.largeTitle).weight(.bold))
                             .foregroundColor(.white.opacity(0.25))
@@ -219,7 +219,7 @@ struct SearchView: View {
                             .offset(x: 70, y: 40)
                     }
                     .frame(height: 96)
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
                     .onTapGesture {
                         query = mood.term
                     }
@@ -229,7 +229,7 @@ struct SearchView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Space.m) {
             Image(systemName: "waveform.slash")
                 .font(.system(size: 46))
                 .foregroundColor(Theme.textTertiary)

@@ -37,7 +37,7 @@ struct StatsView: View {
             ZStack {
                 Theme.background.ignoresSafeArea()
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .leading, spacing: Space.xl) {
                         rangePicker
                         if stats.isEmpty {
                             emptyState
@@ -49,7 +49,7 @@ struct StatsView: View {
                             topList("Top tracks", entries: stats.topTracks, showDetail: true)
                         }
                     }
-                    .padding(20)
+                    .padding(Space.screenMargin)
                     .padding(.bottom, 40)
                 }
             }
@@ -188,14 +188,14 @@ struct StatsView: View {
             }
         }
         .frame(height: 160)
-        .padding(14)
+        .padding(Space.l)
         .card(cornerRadius: Radius.card)
     }
 
     // MARK: - Tiles
 
     private var tiles: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: Space.m) {
             tile(icon: "flame.fill",
                  value: "\(stats.streak)",
                  caption: "day streak",
@@ -222,7 +222,7 @@ struct StatsView: View {
             Text(caption).font(.system(.caption)).foregroundColor(Theme.textTertiary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
+        .padding(Space.l)
         .card(cornerRadius: Radius.card)
     }
 
@@ -231,7 +231,7 @@ struct StatsView: View {
     @ViewBuilder
     private func topList(_ title: LocalizedStringKey, entries: [ListeningStats.Entry], showDetail: Bool) -> some View {
         if !entries.isEmpty {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: Space.m) {
                 Text(title)
                     .textCase(.uppercase)
                     .font(.system(.caption).weight(.bold))
@@ -245,14 +245,14 @@ struct StatsView: View {
                         row(rank: index + 1, entry: entry, showDetail: showDetail)
                     }
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, Space.l)
                 .card(cornerRadius: Radius.card)
             }
         }
     }
 
     private func row(rank: Int, entry: ListeningStats.Entry, showDetail: Bool) -> some View {
-        HStack(spacing: 14) {
+        HStack(spacing: Space.l) {
             Text(rank, format: .number)
                 .font(.system(.subheadline, design: .rounded).weight(.heavy))
                 .foregroundColor(Theme.accentSoft)
@@ -274,13 +274,13 @@ struct StatsView: View {
                 .font(.system(.footnote).weight(.medium))
                 .foregroundColor(Theme.textSecondary)
         }
-        .padding(.vertical, 12)
+        .padding(.vertical, Space.m)
     }
 
     // MARK: - Empty
 
     private var emptyState: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Space.m) {
             Image(systemName: "chart.bar.xaxis")
                 .font(.system(size: 44))
                 .foregroundColor(Theme.accentSoft.opacity(0.7))
@@ -307,7 +307,7 @@ struct StatsTeaserCard: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 14) {
+            HStack(spacing: Space.l) {
                 ZStack {
                     Circle().fill(Theme.accent.opacity(0.18)).frame(width: 44, height: 44)
                     Image(systemName: "chart.bar.fill")
@@ -330,7 +330,7 @@ struct StatsTeaserCard: View {
                             .font(.system(.footnote, design: .rounded).weight(.heavy))
                     }
                     .foregroundColor(Theme.accentPink)
-                    .padding(.horizontal, 10)
+                    .padding(.horizontal, Space.m)
                     .padding(.vertical, 5)
                     .background(Capsule().fill(Theme.accentPink.opacity(0.14)))
                 }
@@ -338,7 +338,7 @@ struct StatsTeaserCard: View {
                     .font(.system(.caption).weight(.semibold))
                     .foregroundColor(Theme.textTertiary)
             }
-            .padding(14)
+            .padding(Space.l)
             .card(cornerRadius: Radius.card)
         }
         .buttonStyle(BouncyButtonStyle(scale: 0.98))
@@ -368,7 +368,7 @@ struct StatsShareCard: View {
             )
             Color.black.opacity(0.18)
 
-            VStack(spacing: 34) {
+            VStack(spacing: Space.xxl) {
                 Spacer()
                 Text("MY SOUND")
                     .font(.system(size: 40, weight: .black, design: .rounded))
@@ -385,9 +385,9 @@ struct StatsShareCard: View {
                 .foregroundColor(.white)
 
                 if !stats.topArtists.isEmpty {
-                    VStack(spacing: 18) {
+                    VStack(spacing: Space.l) {
                         ForEach(Array(stats.topArtists.prefix(3).enumerated()), id: \.element.id) { index, entry in
-                            HStack(spacing: 22) {
+                            HStack(spacing: Space.xl) {
                                 Text(index + 1, format: .number)
                                     .font(.system(size: 44, weight: .black, design: .rounded))
                                     .foregroundColor(.white.opacity(0.55))
@@ -404,7 +404,7 @@ struct StatsShareCard: View {
                 }
 
                 if stats.streak > 1 {
-                    HStack(spacing: 12) {
+                    HStack(spacing: Space.m) {
                         Image(systemName: "flame.fill").font(.system(size: 38, weight: .bold))
                         Text("\(stats.streak)-day streak").font(.system(size: 40, weight: .semibold))
                     }
@@ -413,7 +413,7 @@ struct StatsShareCard: View {
 
                 Spacer()
 
-                HStack(spacing: 14) {
+                HStack(spacing: Space.l) {
                     Image(systemName: "sparkles").font(.system(.largeTitle).weight(.bold))
                     Text("Sonava").font(.system(size: 40, weight: .heavy, design: .rounded))
                 }

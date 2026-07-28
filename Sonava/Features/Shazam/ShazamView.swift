@@ -50,7 +50,7 @@ struct ShazamView: View {
     // MARK: - Listen
 
     private var listenView: some View {
-        VStack(spacing: 30) {
+        VStack(spacing: Space.xxl) {
             Spacer()
             ZStack {
                 ForEach(0..<3, id: \.self) { i in
@@ -125,7 +125,7 @@ struct ShazamView: View {
     // MARK: - Match
 
     private func matchView(_ result: ShazamService.Result) -> some View {
-        VStack(spacing: 22) {
+        VStack(spacing: Space.xl) {
             Spacer()
             AsyncImage(url: result.artworkURL) { image in
                 image.resizable().aspectRatio(contentMode: .fill)
@@ -136,7 +136,7 @@ struct ShazamView: View {
                 }
             }
             .frame(width: 220, height: 220)
-            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
             .shadow(color: .black.opacity(0.4), radius: 24, y: 12)
 
             VStack(spacing: 6) {
@@ -147,9 +147,9 @@ struct ShazamView: View {
                     .font(.system(.callout))
                     .foregroundColor(.white.opacity(0.8))
             }
-            .padding(.horizontal, 30)
+            .padding(.horizontal, Space.xxl)
 
-            VStack(spacing: 12) {
+            VStack(spacing: Space.m) {
                 Button {
                     findOnAudius(result)
                 } label: {
@@ -161,7 +161,7 @@ struct ShazamView: View {
                     .font(.headline)
                     .foregroundColor(Theme.background)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 15)
+                    .padding(.vertical, Space.l)
                     .background(Capsule().fill(Color.white))
                 }
                 .buttonStyle(BouncyButtonStyle(scale: 0.97))
@@ -182,7 +182,7 @@ struct ShazamView: View {
                     .font(.footnote.weight(.semibold))
                     .foregroundColor(.white.opacity(0.8))
             }
-            .padding(.horizontal, 30)
+            .padding(.horizontal, Space.xxl)
             Spacer()
         }
     }

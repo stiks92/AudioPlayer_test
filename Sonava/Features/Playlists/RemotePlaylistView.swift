@@ -17,7 +17,7 @@ struct RemotePlaylistView: View {
         ZStack {
             Theme.background.ignoresSafeArea()
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(spacing: Space.screenMargin) {
                     header
                     content
                 }
@@ -35,7 +35,7 @@ struct RemotePlaylistView: View {
     }
 
     private var header: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: Space.l) {
             AsyncImage(url: playlist.artworkURL) { image in
                 image.resizable().aspectRatio(contentMode: .fill)
             } placeholder: {
@@ -45,7 +45,7 @@ struct RemotePlaylistView: View {
                 }
             }
             .frame(width: 200, height: 200)
-            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
             .shadow(color: playlist.gradient.first?.opacity(0.5) ?? .clear, radius: 20, y: 12)
 
             VStack(spacing: 6) {
@@ -55,17 +55,17 @@ struct RemotePlaylistView: View {
                 Text(playlist.subtitle)
                     .font(.subheadline).foregroundColor(Theme.textSecondary)
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, Space.screenMargin)
 
             if feed.state == .loaded, let first = feed.songs.first {
-                HStack(spacing: 16) {
+                HStack(spacing: Space.l) {
                     Button {
                         if audio.isShuffling { audio.toggleShuffle() }
                         audio.play(first, in: feed.songs)
                     } label: {
                         Label("Play", systemImage: "play.fill")
                             .font(.headline).foregroundColor(Theme.background)
-                            .frame(maxWidth: .infinity).padding(.vertical, 14)
+                            .frame(maxWidth: .infinity).padding(.vertical, Space.l)
                             .background(Capsule().fill(Color.white))
                     }
                     .buttonStyle(BouncyButtonStyle(scale: 0.96))
@@ -76,15 +76,15 @@ struct RemotePlaylistView: View {
                     } label: {
                         Label("Shuffle", systemImage: "shuffle")
                             .font(.headline).foregroundColor(.white)
-                            .frame(maxWidth: .infinity).padding(.vertical, 14)
+                            .frame(maxWidth: .infinity).padding(.vertical, Space.l)
                             .card(cornerRadius: Radius.hero)
                     }
                     .buttonStyle(BouncyButtonStyle(scale: 0.96))
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, Space.screenMargin)
             }
         }
-        .padding(.top, 10)
+        .padding(.top, Space.m)
     }
 
     @ViewBuilder
@@ -106,7 +106,7 @@ struct RemotePlaylistView: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, Space.screenMargin)
         }
     }
 }
