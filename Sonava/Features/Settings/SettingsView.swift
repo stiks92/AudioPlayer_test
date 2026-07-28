@@ -133,13 +133,17 @@ struct SettingsView: View {
                     Text("Accent")
                         .font(.system(.footnote).weight(.semibold))
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 14) {
+                        HStack(spacing: Space.iconGap) {
                             ForEach(ThemePalette.all) { palette in
                                 paletteSwatch(palette)
                             }
                         }
                         .padding(.vertical, 2)
                     }
+                    // Without this the row clips inside the card's own padding
+                    // and the sixth swatch is invisible — while the paywall two
+                    // screens earlier sells "six accent themes and six app icons".
+                    .carouselBleed(Space.l)
                 }
 
                 if appIcon.supportsAlternateIcons {
@@ -147,13 +151,14 @@ struct SettingsView: View {
                         Text("App icon")
                             .font(.system(.footnote).weight(.semibold))
                         ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 14) {
+                            HStack(spacing: Space.iconGap) {
                                 ForEach(AppIconOption.all) { option in
                                     iconSwatch(option)
                                 }
                             }
                             .padding(.vertical, 2)
                         }
+                        .carouselBleed(Space.l)
                         if let error = appIcon.lastError {
                             Text(error).font(.footnote).foregroundColor(Theme.error)
                         }

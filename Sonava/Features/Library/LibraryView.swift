@@ -99,8 +99,7 @@ struct LibraryView: View {
                 Text(item.title)
                     .font(.system(.footnote).weight(.semibold))
                     .foregroundColor(selected ? Theme.background : Theme.textSecondary)
-                    .padding(.vertical, 9)
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity, minHeight: Space.hitTarget)
                     .background(
                         ZStack {
                             if selected {
@@ -140,7 +139,7 @@ struct LibraryView: View {
             Text("No playlists yet")
                 .font(.headline)
                 .foregroundColor(Theme.textSecondary)
-            Text("Group tracks from any source into a playlist — your files, your server, radio, anything you've found.")
+            Text("Group tracks from any source into a playlist — your files, your server, radio, anything you’ve found.")
                 .font(.subheadline)
                 .foregroundColor(Theme.textTertiary)
                 .multilineTextAlignment(.center)

@@ -182,7 +182,8 @@ struct StatsView: View {
         }
         .chartXAxis {
             AxisMarks(values: .stride(by: .day, count: range == .week ? 1 : 7)) { value in
-                AxisValueLabel(format: .dateTime.day(.defaultDigits).month(range == .week ? .omitted : .abbreviated))
+                AxisValueLabel(format: .dateTime.day(.defaultDigits).month(range == .week ? .omitted : .abbreviated),
+                               centered: true)
                     .foregroundStyle(Theme.textTertiary)
             }
         }

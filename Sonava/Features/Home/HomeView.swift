@@ -371,28 +371,41 @@ struct HomeView: View {
                 Haptics.impact()
                 showShazam = true
             } label: {
-                Image(systemName: "waveform.circle.fill")
-                    .font(.system(.title))
-                    .foregroundColor(Theme.accentSoft)
-                    .frame(width: 40, height: 40)
+                // Both header buttons must be one species and one size. The
+                // left one used to draw its circle *inside* the glyph
+                // (`waveform.circle.fill`), which rendered 26.7pt against the
+                // right one's 40 — a 33% break in a two-item cluster.
+                headerButtonFace("waveform", tint: Theme.accentSoft)
             }
             .buttonStyle(BouncyButtonStyle())
+            .hitTarget()
             .identified(AccessibilityID.shazamButton, label: "Discover")
 
             Button {
                 showSettings = true
             } label: {
-                Circle()
-                    .fill(LinearGradient(colors: [Theme.accent, Theme.accentSoft], startPoint: .top, endPoint: .bottom))
-                    .frame(width: 40, height: 40)
-                    .overlay(
-                        Image(systemName: proStore.isPro ? "sparkles" : "person.fill")
-                            .foregroundColor(.white)
-                    )
+                // `sparkles` belongs to AI Mix; using it here too pointed one
+                // glyph at two unrelated destinations in the same viewport.
+                headerButtonFace(proStore.isPro ? "person.crop.circle.fill" : "person.fill",
+                                 tint: Theme.accentSoft)
             }
             .buttonStyle(BouncyButtonStyle())
+            .hitTarget()
             .identified(AccessibilityID.settingsButton, label: "Settings")
         }
+    }
+
+    /// One shape, one size, for every control in the header.
+    private func headerButtonFace(_ symbol: String, tint: Color) -> some View {
+        Circle()
+            .fill(Theme.surfaceElevated)
+            .frame(width: 40, height: 40)
+            .overlay(
+                Image(systemName: symbol)
+                    .font(.system(.body).weight(.semibold))
+                    .foregroundColor(tint)
+            )
+            .overlay(Circle().strokeBorder(Theme.hairline, lineWidth: 1))
     }
 
     // MARK: - Your Sound

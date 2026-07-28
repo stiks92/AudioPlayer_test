@@ -66,7 +66,7 @@ struct MiniPlayerView: View {
                     Button {
                         audio.next()
                     } label: {
-                        Image(systemName: "forward.fill")
+                        Image(systemName: "forward.end.fill")
                             .font(.system(.subheadline).weight(.bold))
                             .foregroundColor(.white)
                             .frame(width: Space.hitTarget, height: Space.hitTarget)
