@@ -684,6 +684,16 @@
         }
       }
     },
+    "Couldn't load this right now.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сейчас не удалось загрузить."
+          }
+        }
+      }
+    },
     "Couldn't reach Audius. Check your connection.": {
       "localizations": {
         "ru": {
@@ -853,6 +863,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Опиши настроение — получи мгновенный микс прямо на устройстве."
+          }
+        }
+      }
+    },
+    "Describe a vibe, get an instant mix.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Опиши настроение — получи мгновенный микс."
           }
         }
       }
@@ -1137,6 +1157,16 @@
         }
       }
     },
+    "Group tracks from any source into a playlist — your files, your server, radio, anything you've found.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Собирай треки из любых источников в один плейлист — свои файлы, свой сервер, радио, всё, что нашёл."
+          }
+        }
+      }
+    },
     "Health": {
       "localizations": {
         "ru": {
@@ -1322,6 +1352,16 @@
     },
     "Lo-fi": {
       "shouldTranslate": false
+    },
+    "Loading": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Загрузка"
+          }
+        }
+      }
     },
     "Loading plans…": {
       "localizations": {
@@ -1543,6 +1583,16 @@
         }
       }
     },
+    "Next": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Следующий"
+          }
+        }
+      }
+    },
     "No Audius tracks matched.": {
       "localizations": {
         "ru": {
@@ -1599,6 +1649,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Не найдено — попробуй ещё"
+          }
+        }
+      }
+    },
+    "No playlists yet": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Плейлистов пока нет"
           }
         }
       }
@@ -1852,6 +1912,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Вставь токен ListenBrainz"
+          }
+        }
+      }
+    },
+    "Pause": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пауза"
           }
         }
       }
@@ -2292,6 +2362,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Продолжи слушать в ${applicationName}"
+          }
+        }
+      }
+    },
+    "Retry": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Повторить"
           }
         }
       }

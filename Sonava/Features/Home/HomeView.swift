@@ -40,8 +40,6 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Theme.background.ignoresSafeArea()
-
                 ScrollView {
                     VStack(alignment: .leading, spacing: 28) {
                         header
@@ -62,6 +60,7 @@ struct HomeView: View {
                     .padding(.bottom, 140)
                 }
             }
+            .nowPlayingTint(audio.currentSong)
             .navigationBarHidden(true)
             .task {
                 if charts.state == .idle {
@@ -313,20 +312,16 @@ struct HomeView: View {
     @ViewBuilder
     private var trendingSection: some View {
         switch trending.state {
-        case .idle, .failed, .empty:
+        case .idle, .empty:
             EmptyView()
-        case .loading:
-            VStack(alignment: .leading, spacing: 14) {
-                SectionHeader(title: "Trending on Audius")
-                HStack(spacing: 14) {
-                    ForEach(0..<3, id: \.self) { _ in
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .fill(Theme.surface)
-                            .frame(width: 150, height: 190)
-                            .redacted(reason: .placeholder)
-                    }
-                }
+        case .failed:
+            // A shelf that failed to load is not a shelf with nothing in it,
+            // and the difference matters to someone on a bad connection.
+            ShelfFailure(title: "Trending on Audius") {
+                Task { await trending.load { try await AudiusService.shared.trending() } }
             }
+        case .loading:
+            ShelfPlaceholder(title: "Trending on Audius")
         case .loaded:
             VStack(alignment: .leading, spacing: 14) {
                 SectionHeader(title: "Trending on Audius")

@@ -204,6 +204,64 @@ struct SectionHeader: View {
     }
 }
 
+// MARK: - Shelf states
+
+/// What a shelf shows when its source could not be reached.
+///
+/// Collapsing `.failed` into `.empty` — which is what every shelf used to do —
+/// tells someone whose train just went into a tunnel that there is no music in
+/// the world, and offers them nothing to do about it.
+struct ShelfFailure: View {
+    let title: LocalizedStringKey
+    let retry: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Space.m) {
+            SectionHeader(title: title)
+            HStack(spacing: Space.m) {
+                Image(systemName: "wifi.exclamationmark")
+                    .font(.system(.title3))
+                    .foregroundColor(Theme.textSecondary)
+                    .frame(width: Space.iconColumn, height: Space.iconColumn)
+                Text("Couldn't load this right now.")
+                    .font(.sonavaRowMeta)
+                    .foregroundColor(Theme.textSecondary)
+                Spacer(minLength: Space.s)
+                Button("Retry", action: retry)
+                    .font(.sonavaRowMeta.weight(.semibold))
+                    .foregroundColor(Theme.accentSoft)
+                    .hitTarget()
+            }
+            .padding(.horizontal, Space.l)
+            .padding(.vertical, Space.m)
+            .card(cornerRadius: Radius.card)
+        }
+    }
+}
+
+/// The grey shapes a shelf shows while it is loading, so the layout does not
+/// jump when the real cards arrive.
+struct ShelfPlaceholder: View {
+    let title: LocalizedStringKey
+    var cardWidth: CGFloat = 150
+    var cardHeight: CGFloat = 190
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Space.m) {
+            SectionHeader(title: title)
+            HStack(spacing: Space.l) {
+                ForEach(0..<3, id: \.self) { _ in
+                    RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
+                        .fill(Theme.surface)
+                        .frame(width: cardWidth, height: cardHeight)
+                }
+            }
+            .redacted(reason: .placeholder)
+        }
+        .accessibilityLabel(Text("Loading"))
+    }
+}
+
 // MARK: - Symbol effect compatibility helper
 
 private struct BounceModifier: ViewModifier {

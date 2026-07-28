@@ -120,7 +120,49 @@ struct LibraryView: View {
         .card(cornerRadius: Radius.hero)
     }
 
+    @ViewBuilder
     private var playlistsSection: some View {
+        // Playlists is the landing tab, so a first-run user meets this screen
+        // before any other. It was the one tab of four with no zero state:
+        // a single "New Playlist" row and then half a screen of black.
+        if playlistStore.playlists.isEmpty {
+            emptyPlaylists
+        } else {
+            playlistRows
+        }
+    }
+
+    private var emptyPlaylists: some View {
+        VStack(spacing: Space.l) {
+            Image(systemName: "music.note.list")
+                .font(.system(size: 46))
+                .foregroundColor(Theme.textTertiary)
+            Text("No playlists yet")
+                .font(.headline)
+                .foregroundColor(Theme.textSecondary)
+            Text("Group tracks from any source into a playlist — your files, your server, radio, anything you've found.")
+                .font(.subheadline)
+                .foregroundColor(Theme.textTertiary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, Space.xl)
+            Button {
+                Haptics.impact()
+                showNewPlaylist = true
+            } label: {
+                Label("New Playlist", systemImage: "plus")
+                    .font(.subheadline.weight(.bold))
+                    .foregroundColor(Theme.background)
+                    .padding(.horizontal, Space.xl)
+                    .padding(.vertical, Space.m)
+                    .background(Capsule().fill(Color.white))
+            }
+            .buttonStyle(BouncyButtonStyle(scale: 0.96))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, Space.xxl)
+    }
+
+    private var playlistRows: some View {
         LazyVStack(spacing: 12) {
             Button {
                 showNewPlaylist = true
