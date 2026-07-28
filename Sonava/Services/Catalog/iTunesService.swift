@@ -13,6 +13,9 @@ final class iTunesService: Sendable {
 
     /// Search podcasts by free text.
     func searchPodcasts(_ query: String) async throws -> [Podcast] {
+#if DEBUG
+        if DemoCatalog.isActive { return DemoCatalog.podcasts }
+        #endif
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
         let url = URL(string: "https://itunes.apple.com/search?media=podcast&limit=40&term=\(Net.encode(trimmed))")!
@@ -27,6 +30,9 @@ final class iTunesService: Sendable {
 
     /// Mainstream music as 30-second Apple previews (keyless, legal).
     func searchMusic(_ query: String) async throws -> [Song] {
+#if DEBUG
+        if DemoCatalog.isActive { return DemoCatalog.searchResults }
+        #endif
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
         let url = URL(string: "https://itunes.apple.com/search?media=music&entity=song&limit=30&term=\(Net.encode(trimmed))")!

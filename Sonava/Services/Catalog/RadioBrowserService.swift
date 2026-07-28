@@ -25,12 +25,18 @@ final class RadioBrowserService: TrackProvider {
 
     /// Most-voted stations worldwide.
     func trending() async throws -> [Song] {
+#if DEBUG
+        if DemoCatalog.isActive { return DemoCatalog.stations }
+        #endif
         let url = URL(string: "\(host)/json/stations/topvote/60?hidebroken=true")!
         let stations = try await Net.getJSON(url, as: [RadioStation].self)
         return stations.compactMap(map)
     }
 
     func search(_ query: String) async throws -> [Song] {
+#if DEBUG
+        if DemoCatalog.isActive { return DemoCatalog.stations }
+        #endif
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
         let url = URL(string: "\(host)/json/stations/search?name=\(Net.encode(trimmed))&limit=60&hidebroken=true&order=votes&reverse=true")!
@@ -40,6 +46,9 @@ final class RadioBrowserService: TrackProvider {
 
     /// Stations filtered by a tag/genre (e.g. "jazz", "lofi", "news").
     func stations(tag: String) async throws -> [Song] {
+#if DEBUG
+        if DemoCatalog.isActive { return DemoCatalog.stations }
+        #endif
         let url = URL(string: "\(host)/json/stations/bytag/\(Net.encode(tag))?limit=60&hidebroken=true&order=votes&reverse=true")!
         let stations = try await Net.getJSON(url, as: [RadioStation].self)
         return stations.compactMap(map)

@@ -21,6 +21,9 @@ final class DeezerService: TrackProvider {
     }
 
     func search(_ query: String) async throws -> [Song] {
+#if DEBUG
+        if DemoCatalog.isActive { return DemoCatalog.searchResults }
+        #endif
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
         let url = URL(string: "https://api.deezer.com/search?q=\(Net.encode(trimmed))&limit=30")!
@@ -30,6 +33,9 @@ final class DeezerService: TrackProvider {
 
     /// Global top tracks.
     func chartTracks() async throws -> [Song] {
+#if DEBUG
+        if DemoCatalog.isActive { return DemoCatalog.charts }
+        #endif
         let url = URL(string: "https://api.deezer.com/chart/0/tracks?limit=30")!
         let response = try await Net.getJSON(url, as: DeezerListResponse.self)
         return response.data.compactMap(map)
@@ -37,6 +43,9 @@ final class DeezerService: TrackProvider {
 
     /// Editorial / charting playlists for the browse experience.
     func chartPlaylists() async throws -> [RemotePlaylist] {
+#if DEBUG
+        if DemoCatalog.isActive { return DemoCatalog.playlists }
+        #endif
         let url = URL(string: "https://api.deezer.com/chart/0/playlists?limit=20")!
         let response = try await Net.getJSON(url, as: DeezerPlaylistList.self)
         return response.data.map { p in
@@ -53,6 +62,9 @@ final class DeezerService: TrackProvider {
 
     /// Tracks inside a Deezer playlist.
     func playlistTracks(_ id: String) async throws -> [Song] {
+#if DEBUG
+        if DemoCatalog.isActive { return DemoCatalog.charts }
+        #endif
         let url = URL(string: "https://api.deezer.com/playlist/\(id)/tracks?limit=60")!
         let response = try await Net.getJSON(url, as: DeezerListResponse.self)
         return response.data.compactMap(map)

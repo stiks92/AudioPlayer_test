@@ -24,6 +24,9 @@ actor AudiusService: TrackProvider {
     // MARK: TrackProvider
 
     func trending() async throws -> [Song] {
+#if DEBUG
+        if DemoCatalog.isActive { return DemoCatalog.trending }
+        #endif
         let host = try await host()
         let url = URL(string: "\(host)/v1/tracks/trending?app_name=\(appName)")!
         let response = try await Net.getJSON(url, as: AudiusTracksResponse.self)
@@ -31,6 +34,9 @@ actor AudiusService: TrackProvider {
     }
 
     func search(_ query: String) async throws -> [Song] {
+#if DEBUG
+        if DemoCatalog.isActive { return DemoCatalog.searchResults }
+        #endif
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
         let host = try await host()
