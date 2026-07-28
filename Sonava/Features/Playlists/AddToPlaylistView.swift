@@ -24,7 +24,7 @@ struct AddToPlaylistView: View {
                         createRow
                         if !playlistStore.playlists.isEmpty {
                             Text("YOUR PLAYLISTS")
-                                .font(.system(size: 11, weight: .bold)).tracking(1)
+                                .font(.system(.caption2).weight(.bold)).tracking(1)
                                 .foregroundColor(Theme.textTertiary)
                             VStack(spacing: 8) {
                                 ForEach(playlistStore.playlists) { playlist in
@@ -52,7 +52,7 @@ struct AddToPlaylistView: View {
         HStack(spacing: 12) {
             ArtworkThumbnail(song: song, size: 48)
             VStack(alignment: .leading, spacing: 2) {
-                Text(song.title).font(.system(size: 15, weight: .semibold)).lineLimit(1)
+                Text(song.title).font(.system(.subheadline).weight(.semibold)).lineLimit(1)
                 Text(song.artist).font(.caption).foregroundColor(Theme.textSecondary).lineLimit(1)
             }
             Spacer()
@@ -88,14 +88,14 @@ struct AddToPlaylistView: View {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .fill(LinearGradient(colors: playlist.gradient, startPoint: .topLeading, endPoint: .bottomTrailing))
                     .frame(width: 44, height: 44)
-                    .overlay(Image(systemName: "music.note.list").font(.system(size: 16)).foregroundColor(.white))
+                    .overlay(Image(systemName: "music.note.list").font(.system(.callout)).foregroundColor(.white))
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(playlist.name).font(.system(size: 15, weight: .semibold)).lineLimit(1)
+                    Text(playlist.name).font(.system(.subheadline).weight(.semibold)).lineLimit(1)
                     Text(playlist.subtitle).font(.caption).foregroundColor(Theme.textSecondary)
                 }
                 Spacer()
                 Image(systemName: added ? "checkmark.circle.fill" : "plus.circle")
-                    .font(.system(size: 22))
+                    .font(.system(.title2))
                     .foregroundColor(added ? Theme.positive : Theme.textSecondary)
             }
             .contentShape(Rectangle())

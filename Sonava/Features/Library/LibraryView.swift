@@ -97,7 +97,7 @@ struct LibraryView: View {
             ForEach(Tab.allCases, id: \.self) { item in
                 let selected = tab == item
                 Text(item.title)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(.footnote).weight(.semibold))
                     .foregroundColor(selected ? Theme.background : Theme.textSecondary)
                     .padding(.vertical, 9)
                     .frame(maxWidth: .infinity)
@@ -129,9 +129,9 @@ struct LibraryView: View {
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .fill(Color.white.opacity(0.08))
                         .frame(width: 60, height: 60)
-                        .overlay(Image(systemName: "plus").font(.system(size: 22, weight: .semibold)).foregroundColor(Theme.accentSoft))
+                        .overlay(Image(systemName: "plus").font(.system(.title2).weight(.semibold)).foregroundColor(Theme.accentSoft))
                     Text("New Playlist")
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(.callout).weight(.semibold))
                         .foregroundColor(Theme.textPrimary)
                     Spacer()
                 }
@@ -150,7 +150,7 @@ struct LibraryView: View {
                             .overlay(Image(systemName: "music.note.list").foregroundColor(.white))
                         VStack(alignment: .leading, spacing: 4) {
                             Text(playlist.name)
-                                .font(.system(size: 16, weight: .semibold))
+                                .font(.system(.callout).weight(.semibold))
                                 .foregroundColor(Theme.textPrimary)
                                 .lineLimit(1)
                             Text(playlist.subtitle)
@@ -159,7 +159,7 @@ struct LibraryView: View {
                         }
                         Spacer()
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 13, weight: .semibold))
+                            .font(.system(.footnote).weight(.semibold))
                             .foregroundColor(Theme.textTertiary)
                     }
                     .padding(.vertical, 4)
@@ -211,11 +211,11 @@ struct LibraryView: View {
                     .frame(width: 44, height: 44)
                     .overlay(
                         Image(systemName: "square.and.arrow.down")
-                            .font(.system(size: 18, weight: .semibold))
+                            .font(.system(.body).weight(.semibold))
                             .foregroundColor(Theme.accentSoft)
                     )
                 Text("Import from Files")
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(.callout).weight(.semibold))
                     .foregroundColor(Theme.textPrimary)
                 Spacer()
             }

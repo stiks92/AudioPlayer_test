@@ -147,7 +147,7 @@ struct HomeView: View {
                                 VStack(alignment: .leading, spacing: 8) {
                                     ArtworkThumbnail(song: song, size: 130, cornerRadius: 16, showBadge: true)
                                     Text(song.title)
-                                        .font(.system(size: 13, weight: .semibold))
+                                        .font(.system(.footnote).weight(.semibold))
                                         .foregroundColor(Theme.textPrimary)
                                         .lineLimit(1)
                                         .frame(width: 130, alignment: .leading)
@@ -176,7 +176,7 @@ struct HomeView: View {
                                 VStack(alignment: .leading, spacing: 8) {
                                     ArtworkThumbnail(song: song, size: 130, cornerRadius: 16, showBadge: true)
                                     Text(song.title)
-                                        .font(.system(size: 13, weight: .semibold))
+                                        .font(.system(.footnote).weight(.semibold))
                                         .foregroundColor(Theme.textPrimary)
                                         .lineLimit(1)
                                         .frame(width: 130, alignment: .leading)
@@ -200,20 +200,20 @@ struct HomeView: View {
         } label: {
             HStack(spacing: 14) {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 26, weight: .bold))
+                    .font(.system(.title).weight(.bold))
                     .foregroundColor(.white)
                 VStack(alignment: .leading, spacing: 3) {
                     Text("Create an AI Mix")
-                        .font(.system(size: 17, weight: .bold))
+                        .font(.system(.body).weight(.bold))
                         .foregroundColor(.white)
                     Text("Describe a vibe — get an instant mix")
-                        .font(.system(size: 12))
+                        .font(.system(.caption))
                         .foregroundColor(.white.opacity(0.85))
                 }
                 Spacer()
                 if !proStore.isPro {
                     Text("PRO")
-                        .font(.system(size: 10, weight: .heavy))
+                        .font(.system(.caption2).weight(.heavy))
                         .foregroundColor(Theme.background)
                         .padding(.horizontal, 8).padding(.vertical, 3)
                         .background(Capsule().fill(Color.white))
@@ -250,14 +250,14 @@ struct HomeView: View {
                                     } placeholder: {
                                         ZStack {
                                             LinearGradient(colors: playlist.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
-                                            Image(systemName: "music.note.list").font(.system(size: 34)).foregroundColor(.white.opacity(0.85))
+                                            Image(systemName: "music.note.list").font(.system(.largeTitle)).foregroundColor(.white.opacity(0.85))
                                         }
                                     }
                                     .frame(width: 160, height: 160)
                                     .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                                     .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
                                     Text(playlist.title)
-                                        .font(.system(size: 13, weight: .semibold))
+                                        .font(.system(.footnote).weight(.semibold))
                                         .foregroundColor(Theme.textPrimary)
                                         .lineLimit(1)
                                         .frame(width: 160, alignment: .leading)
@@ -288,12 +288,12 @@ struct HomeView: View {
                                 VStack(alignment: .leading, spacing: 8) {
                                     ArtworkThumbnail(song: song, size: 150, cornerRadius: 18, showBadge: true)
                                     Text(song.title)
-                                        .font(.system(size: 13, weight: .semibold))
+                                        .font(.system(.footnote).weight(.semibold))
                                         .foregroundColor(Theme.textPrimary)
                                         .lineLimit(1)
                                         .frame(width: 150, alignment: .leading)
                                     Text(song.artist)
-                                        .font(.system(size: 11))
+                                        .font(.system(.caption2))
                                         .foregroundColor(Theme.textSecondary)
                                         .lineLimit(1)
                                         .frame(width: 150, alignment: .leading)
@@ -339,12 +339,12 @@ struct HomeView: View {
                                 VStack(alignment: .leading, spacing: 8) {
                                     ArtworkThumbnail(song: song, size: 150, cornerRadius: 18, showBadge: true)
                                     Text(song.title)
-                                        .font(.system(size: 13, weight: .semibold))
+                                        .font(.system(.footnote).weight(.semibold))
                                         .foregroundColor(Theme.textPrimary)
                                         .lineLimit(1)
                                         .frame(width: 150, alignment: .leading)
                                     Text(song.artist)
-                                        .font(.system(size: 11))
+                                        .font(.system(.caption2))
                                         .foregroundColor(Theme.textSecondary)
                                         .lineLimit(1)
                                         .frame(width: 150, alignment: .leading)
@@ -377,7 +377,7 @@ struct HomeView: View {
                 showShazam = true
             } label: {
                 Image(systemName: "waveform.circle.fill")
-                    .font(.system(size: 30))
+                    .font(.system(.title))
                     .foregroundColor(Theme.accentSoft)
                     .frame(width: 40, height: 40)
             }
@@ -428,7 +428,7 @@ struct HomeView: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 ArtworkThumbnail(song: song, size: 130, cornerRadius: 18)
                                 Text(song.title)
-                                    .font(.system(size: 13, weight: .semibold))
+                                    .font(.system(.footnote).weight(.semibold))
                                     .foregroundColor(Theme.textPrimary)
                                     .lineLimit(1)
                                     .frame(width: 130, alignment: .leading)

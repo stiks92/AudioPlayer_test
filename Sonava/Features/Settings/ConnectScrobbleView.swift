@@ -62,9 +62,9 @@ struct ConnectScrobbleView: View {
     private var connectedCard: some View {
         HStack(spacing: 14) {
             Image(systemName: "checkmark.seal.fill")
-                .font(.system(size: 24)).foregroundColor(Theme.positive)
+                .font(.system(.title2)).foregroundColor(Theme.positive)
             VStack(alignment: .leading, spacing: 2) {
-                Text("Connected").font(.system(size: 16, weight: .bold))
+                Text("Connected").font(.system(.callout).weight(.bold))
                 Text("Plays are being scrobbled.")
                     .font(.caption).foregroundColor(Theme.textSecondary)
             }
@@ -75,7 +75,7 @@ struct ConnectScrobbleView: View {
 
         Toggle(isOn: $scrobble.isEnabled) {
             Label("Scrobble my plays", systemImage: "dot.radiowaves.up.forward")
-                .font(.system(size: 15))
+                .font(.system(.subheadline))
         }
         .tint(Theme.accent)
         .padding(16)
@@ -97,7 +97,7 @@ struct ConnectScrobbleView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text("User token")
                     .textCase(.uppercase)
-                    .font(.system(size: 11, weight: .bold)).tracking(1)
+                    .font(.system(.caption2).weight(.bold)).tracking(1)
                     .foregroundColor(Theme.textTertiary)
                 SecureField("Paste your ListenBrainz token", text: $token)
                     .textInputAutocapitalization(.never)
@@ -129,7 +129,7 @@ struct ConnectScrobbleView: View {
             .disabled(token.trimmingCharacters(in: .whitespaces).isEmpty || scrobble.isConnecting)
 
             Text("Find your token on listenbrainz.org → Settings. It's stored only in your device's Keychain.")
-                .font(.system(size: 11))
+                .font(.system(.caption2))
                 .foregroundColor(Theme.textTertiary)
                 .multilineTextAlignment(.center)
         }

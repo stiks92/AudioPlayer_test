@@ -74,7 +74,7 @@ struct QueueView: View {
 
     private func header(_ title: LocalizedStringKey) -> some View {
         Text(title)
-            .font(.system(size: 13, weight: .bold))
+            .font(.system(.footnote).weight(.bold))
             .foregroundColor(Theme.textSecondary)
             .textCase(nil)
     }
@@ -82,7 +82,7 @@ struct QueueView: View {
     private var upNextHeader: some View {
         HStack {
             Text("Up Next")
-                .font(.system(size: 13, weight: .bold))
+                .font(.system(.footnote).weight(.bold))
                 .foregroundColor(Theme.textSecondary)
             Spacer()
             Button {
@@ -99,6 +99,6 @@ struct QueueView: View {
             }
         }
         .textCase(nil)
-        .font(.system(size: 15, weight: .semibold))
+        .font(.system(.subheadline).weight(.semibold))
     }
 }

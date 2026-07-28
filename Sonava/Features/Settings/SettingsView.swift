@@ -88,14 +88,14 @@ struct SettingsView: View {
     @ViewBuilder
     private var proCard: some View {
         if proStore.isPro {
-            HStack(spacing: 14) {
+            HStack(alignment: .top, spacing: Space.iconGap) {
                 Image(systemName: "checkmark.seal.fill")
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.system(.title).weight(.bold))
                     .foregroundColor(.white)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Sonava Pro").font(.system(size: 17, weight: .bold))
+                    Text("Sonava Pro").font(.system(.body).weight(.bold))
                     Text("Active — thank you for your support!")
-                        .font(.caption).foregroundColor(.white.opacity(0.85))
+                        .font(.caption).foregroundColor(.white)
                 }
                 Spacer()
             }
@@ -106,10 +106,10 @@ struct SettingsView: View {
             Button { showPaywall = true } label: {
                 HStack(spacing: 14) {
                     Image(systemName: "sparkles")
-                        .font(.system(size: 26, weight: .bold))
+                        .font(.system(.title).weight(.bold))
                         .foregroundColor(.white)
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("Unlock Sonava Pro").font(.system(size: 17, weight: .bold))
+                        Text("Unlock Sonava Pro").font(.system(.body).weight(.bold))
                         Text("Offline · EQ · AI Mix · themes")
                             .font(.caption).foregroundColor(.white.opacity(0.85))
                     }
@@ -131,7 +131,7 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 18) {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Accent")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(.footnote).weight(.semibold))
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 14) {
                             ForEach(ThemePalette.all) { palette in
@@ -145,7 +145,7 @@ struct SettingsView: View {
                 if appIcon.supportsAlternateIcons {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("App icon")
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(.system(.footnote).weight(.semibold))
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 14) {
                                 ForEach(AppIconOption.all) { option in
@@ -199,13 +199,14 @@ struct SettingsView: View {
                             .fill(Color.black.opacity(0.45))
                             .frame(width: 56, height: 56)
                         Image(systemName: "lock.fill")
-                            .font(.system(size: 15, weight: .bold))
+                            .font(.system(.subheadline).weight(.bold))
                             .foregroundColor(.white)
                     }
                 }
                 Text(LocalizedStringKey(option.name))
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.system(.caption2).weight(.medium))
                     .foregroundColor(selected ? Theme.textPrimary : Theme.textSecondary)
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
             }
         }
         .buttonStyle(BouncyButtonStyle(scale: 0.9))
@@ -237,19 +238,20 @@ struct SettingsView: View {
                         )
                     if locked {
                         Image(systemName: "lock.fill")
-                            .font(.system(size: 15, weight: .bold))
+                            .font(.system(.subheadline).weight(.bold))
                             .foregroundColor(.white)
                             .shadow(radius: 2)
                     } else if selected {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 16, weight: .bold))
+                            .font(.system(.callout).weight(.bold))
                             .foregroundColor(.white)
                             .shadow(radius: 2)
                     }
                 }
                 Text(LocalizedStringKey(palette.name))
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.system(.caption2).weight(.medium))
                     .foregroundColor(selected ? Theme.textPrimary : Theme.textSecondary)
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
             }
         }
         .buttonStyle(BouncyButtonStyle(scale: 0.9))
@@ -276,7 +278,7 @@ struct SettingsView: View {
             divider
             Toggle(isOn: $audio.autoExtendEnabled) {
                 Label("Endless playback", systemImage: "infinity")
-                    .font(.system(size: 15))
+                    .font(.system(.subheadline))
             }
             .tint(Theme.accent)
             .padding(.vertical, 6)
@@ -346,7 +348,7 @@ struct SettingsView: View {
                     set: { proStore.setDeveloperOverride($0) }
                 )) {
                     Label("Developer: unlock Pro", systemImage: "hammer")
-                        .font(.system(size: 15))
+                        .font(.system(.subheadline))
                 }
                 .tint(Theme.accent)
                 .padding(.vertical, 12)
@@ -364,7 +366,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
                 .textCase(.uppercase)
-                .font(.system(size: 12, weight: .bold))
+                .font(.system(.caption).weight(.bold))
                 .tracking(1)
                 .foregroundColor(Theme.textTertiary)
             VStack(spacing: 0) { content() }
@@ -383,12 +385,12 @@ struct SettingsView: View {
         Button(action: action) {
             HStack(spacing: 14) {
                 Image(systemName: icon).frame(width: 24).foregroundColor(Theme.accentSoft)
-                Text(title).font(.system(size: 15))
+                Text(title).font(.system(.subheadline))
                 Spacer()
                 if let value {
-                    Text(value).font(.system(size: 14)).foregroundColor(Theme.textSecondary)
+                    Text(value).font(.system(.footnote)).foregroundColor(Theme.textSecondary)
                 }
-                Image(systemName: "chevron.right").font(.system(size: 12)).foregroundColor(Theme.textTertiary)
+                Image(systemName: "chevron.right").font(.system(.caption)).foregroundColor(Theme.textTertiary)
             }
             .padding(.vertical, 12)
             .contentShape(Rectangle())
@@ -404,9 +406,9 @@ struct SettingsView: View {
     ) -> some View {
         HStack(spacing: 14) {
             Image(systemName: icon).frame(width: 24).foregroundColor(Theme.accentSoft)
-            Text(title).font(.system(size: 15))
+            Text(title).font(.system(.subheadline))
             Spacer()
-            Text(value).font(.system(size: 13, weight: .semibold)).foregroundColor(valueColor)
+            Text(value).font(.system(.footnote).weight(.semibold)).foregroundColor(valueColor)
         }
         .padding(.vertical, 12)
     }

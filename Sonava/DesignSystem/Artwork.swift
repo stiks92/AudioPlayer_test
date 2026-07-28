@@ -51,7 +51,7 @@ struct SourceBadge: View {
     var body: some View {
         if let text = source.badge {
             Text(text)
-                .font(.system(size: 8, weight: .heavy))
+                .font(.system(.caption2).weight(.heavy))
                 .tracking(0.5)
                 .foregroundColor(.white)
                 .padding(.horizontal, 5)

@@ -85,7 +85,7 @@ struct EqualizerView: View {
             set: { effects.setEnabled($0); Haptics.selection() }
         )) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Equalizer").font(.system(size: 17, weight: .bold))
+                Text("Equalizer").font(.system(.body).weight(.bold))
                 Text(effects.selectedPreset.map { LocalizedStringKey($0.name) } ?? "Custom")
                     .font(.caption).foregroundColor(Theme.textSecondary)
                     .accessibilityIdentifier("eq.selectedPreset")
@@ -114,10 +114,10 @@ struct EqualizerView: View {
     private var preampRow: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Pre-amp").font(.system(size: 15, weight: .semibold))
+                Text("Pre-amp").font(.system(.subheadline).weight(.semibold))
                 Spacer()
                 Text(gainText(effects.equalizer.preamp))
-                    .font(.system(size: 13, weight: .medium).monospacedDigit())
+                    .font(.system(.footnote).weight(.medium).monospacedDigit())
                     .foregroundColor(Theme.textSecondary)
             }
             Slider(
@@ -137,7 +137,7 @@ struct EqualizerView: View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Presets")
                 .textCase(.uppercase)
-                .font(.system(size: 12, weight: .bold)).tracking(1)
+                .font(.system(.caption).weight(.bold)).tracking(1)
                 .foregroundColor(Theme.textTertiary)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
@@ -148,7 +148,7 @@ struct EqualizerView: View {
                             Haptics.selection()
                         } label: {
                             Text(LocalizedStringKey(preset.name))
-                                .font(.system(size: 13, weight: .semibold))
+                                .font(.system(.footnote).weight(.semibold))
                                 .foregroundColor(selected ? Theme.background : Theme.textSecondary)
                                 .padding(.horizontal, 14).padding(.vertical, 8)
                                 .background(Capsule().fill(selected ? Color.white : Color.white.opacity(0.08)))
@@ -259,7 +259,7 @@ private struct BandSlider: View {
         }
         .overlay(alignment: .bottom) {
             Text(label)
-                .font(.system(size: 10, weight: .medium).monospacedDigit())
+                .font(.system(.caption2).weight(.medium).monospacedDigit())
                 .foregroundColor(Theme.textTertiary)
                 .fixedSize()
                 .offset(y: 16)

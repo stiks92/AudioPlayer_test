@@ -141,10 +141,10 @@ struct ShazamView: View {
 
             VStack(spacing: 6) {
                 Text(result.title)
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .font(.system(.title2, design: .rounded).weight(.bold))
                     .multilineTextAlignment(.center)
                 Text(result.artist)
-                    .font(.system(size: 16))
+                    .font(.system(.callout))
                     .foregroundColor(.white.opacity(0.8))
             }
             .padding(.horizontal, 30)

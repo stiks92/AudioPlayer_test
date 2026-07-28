@@ -89,15 +89,15 @@ struct ConnectServerView: View {
         let locked = !serverStore.isUsable(connection)
         return HStack(spacing: 14) {
             Image(systemName: locked ? "lock.fill" : (active ? "checkmark.circle.fill" : "circle"))
-                .font(.system(size: 18))
+                .font(.system(.body))
                 .foregroundColor(locked ? Theme.textTertiary : (active ? Theme.positive : Theme.textTertiary))
             VStack(alignment: .leading, spacing: 2) {
                 Text(connection.displayName)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.system(.subheadline).weight(.semibold))
                     .foregroundColor(locked ? Theme.textSecondary : Theme.textPrimary)
                     .lineLimit(1)
                 Text(connection.username)
-                    .font(.system(size: 12))
+                    .font(.system(.caption))
                     .foregroundColor(Theme.textTertiary)
                     .lineLimit(1)
             }
@@ -106,7 +106,7 @@ struct ConnectServerView: View {
                 pendingRemoval = connection
             } label: {
                 Image(systemName: "trash")
-                    .font(.system(size: 14))
+                    .font(.system(.footnote))
                     .foregroundColor(Theme.destructive)
                     .frame(width: 34, height: 34)
                     .contentShape(Rectangle())
@@ -132,7 +132,7 @@ struct ConnectServerView: View {
     private var emptyState: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("No server connected")
-                .font(.system(size: 17, weight: .bold))
+                .font(.system(.body).weight(.bold))
             Text("Stream your own library straight from Navidrome, Airsonic or any Subsonic-compatible server.")
                 .font(.footnote)
                 .foregroundColor(Theme.textSecondary)
@@ -269,7 +269,7 @@ struct AddServerView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
                 .textCase(.uppercase)
-                .font(.system(size: 11, weight: .bold)).tracking(1)
+                .font(.system(.caption2).weight(.bold)).tracking(1)
                 .foregroundColor(Theme.textTertiary)
             TextField(placeholder, text: text)
                 .keyboardType(keyboard)
@@ -285,7 +285,7 @@ struct AddServerView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
                 .textCase(.uppercase)
-                .font(.system(size: 11, weight: .bold)).tracking(1)
+                .font(.system(.caption2).weight(.bold)).tracking(1)
                 .foregroundColor(Theme.textTertiary)
             SecureField("••••••••", text: text)
                 .foregroundColor(.white)

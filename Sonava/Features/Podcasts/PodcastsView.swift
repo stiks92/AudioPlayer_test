@@ -102,7 +102,7 @@ struct PodcastsView: View {
                 ForEach(genres) { genre in
                     let isSelected = selectedGenre == genre.value
                     Text(genre.title)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(.footnote).weight(.semibold))
                         .foregroundColor(isSelected ? Theme.background : Theme.textSecondary)
                         .padding(.horizontal, 14).padding(.vertical, 8)
                         .background(Capsule().fill(isSelected ? Color.white : Color.white.opacity(0.08)))
@@ -166,7 +166,7 @@ struct PodcastCard: View {
             } placeholder: {
                 ZStack {
                     LinearGradient(colors: podcast.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
-                    Image(systemName: "mic.fill").font(.system(size: 30)).foregroundColor(.white.opacity(0.85))
+                    Image(systemName: "mic.fill").font(.system(.title)).foregroundColor(.white.opacity(0.85))
                 }
             }
             .aspectRatio(1, contentMode: .fit)
@@ -178,11 +178,11 @@ struct PodcastCard: View {
             )
 
             Text(podcast.title)
-                .font(.system(size: 14, weight: .semibold))
+                .font(.system(.footnote).weight(.semibold))
                 .foregroundColor(Theme.textPrimary)
                 .lineLimit(1)
             Text(podcast.author)
-                .font(.system(size: 12))
+                .font(.system(.caption))
                 .foregroundColor(Theme.textSecondary)
                 .lineLimit(1)
         }

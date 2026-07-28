@@ -92,7 +92,7 @@ struct AIMixView: View {
                     HStack(spacing: 8) {
                         ForEach(suggestions, id: \.self) { s in
                             Text(LocalizedStringKey(s))
-                                .font(.system(size: 13, weight: .semibold))
+                                .font(.system(.footnote).weight(.semibold))
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 14).padding(.vertical, 8)
                                 .background(Capsule().fill(Color.white.opacity(0.12)))

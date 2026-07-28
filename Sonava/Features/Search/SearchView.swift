@@ -143,7 +143,7 @@ struct SearchView: View {
             if deezerFeed.state == .loaded || appleFeed.state == .loaded {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("PREVIEWS · 30 SEC")
-                        .font(.system(size: 11, weight: .bold)).tracking(1)
+                        .font(.system(.caption2).weight(.bold)).tracking(1)
                         .foregroundColor(Theme.textTertiary)
                     if deezerFeed.state == .loaded {
                         sourceSection("Deezer", songs: deezerFeed.songs)
@@ -209,11 +209,11 @@ struct SearchView: View {
                     ZStack(alignment: .topLeading) {
                         LinearGradient(colors: mood.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
                         Text(mood.title)
-                            .font(.system(size: 17, weight: .bold))
+                            .font(.system(.body).weight(.bold))
                             .foregroundColor(.white)
                             .padding(14)
                         Image(systemName: "music.note")
-                            .font(.system(size: 34, weight: .bold))
+                            .font(.system(.largeTitle).weight(.bold))
                             .foregroundColor(.white.opacity(0.25))
                             .rotationEffect(.degrees(25))
                             .offset(x: 70, y: 40)

@@ -94,10 +94,10 @@ struct OnboardingView: View {
                 .shadow(color: .white.opacity(0.4), radius: 20)
             VStack(spacing: 14) {
                 Text(slide.title)
-                    .font(.system(size: 30, weight: .heavy, design: .rounded))
+                    .font(.system(.title, design: .rounded).weight(.heavy))
                     .multilineTextAlignment(.center)
                 Text(slide.subtitle)
-                    .font(.system(size: 16))
+                    .font(.system(.callout))
                     .foregroundColor(.white.opacity(0.85))
                     .multilineTextAlignment(.center)
             }

@@ -104,7 +104,7 @@ struct StatsView: View {
                     HStack(spacing: 4) {
                         Text(option.title)
                         if locked {
-                            Image(systemName: "lock.fill").font(.system(size: 9, weight: .bold))
+                            Image(systemName: "lock.fill").font(.system(.caption2).weight(.bold))
                         }
                     }
                     .font(.sonavaRowMeta.weight(.semibold))
@@ -129,7 +129,7 @@ struct StatsView: View {
     private var hero: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("You listened for")
-                .font(.system(size: 14, weight: .medium))
+                .font(.system(.footnote).weight(.medium))
                 .foregroundColor(Theme.textSecondary)
             Text(ListeningStats.duration(stats.totalSeconds))
                 .font(.system(size: 52, weight: .heavy, design: .rounded))
@@ -145,7 +145,7 @@ struct StatsView: View {
             (Text("\(stats.plays) tracks")
                 + Text(verbatim: " · ")
                 + Text("\(stats.artistCount) artists"))
-                .font(.system(size: 14))
+                .font(.system(.footnote))
                 .foregroundColor(Theme.textTertiary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -210,10 +210,10 @@ struct StatsView: View {
 
     private func tile(icon: String, value: String, caption: LocalizedStringKey, tint: Color) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Image(systemName: icon).font(.system(size: 18, weight: .bold)).foregroundColor(tint)
-            Text(value).font(.system(size: 26, weight: .heavy, design: .rounded))
+            Image(systemName: icon).font(.system(.body).weight(.bold)).foregroundColor(tint)
+            Text(value).font(.system(.title, design: .rounded).weight(.heavy))
                 .foregroundColor(Theme.textPrimary)
-            Text(caption).font(.system(size: 12)).foregroundColor(Theme.textTertiary)
+            Text(caption).font(.system(.caption)).foregroundColor(Theme.textTertiary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
@@ -228,7 +228,7 @@ struct StatsView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text(title)
                     .textCase(.uppercase)
-                    .font(.system(size: 12, weight: .bold))
+                    .font(.system(.caption).weight(.bold))
                     .tracking(1)
                     .foregroundColor(Theme.textTertiary)
                 VStack(spacing: 0) {
@@ -248,24 +248,24 @@ struct StatsView: View {
     private func row(rank: Int, entry: ListeningStats.Entry, showDetail: Bool) -> some View {
         HStack(spacing: 14) {
             Text(rank, format: .number)
-                .font(.system(size: 15, weight: .heavy, design: .rounded))
+                .font(.system(.subheadline, design: .rounded).weight(.heavy))
                 .foregroundColor(Theme.accentSoft)
                 .frame(width: 20, alignment: .leading)
             VStack(alignment: .leading, spacing: 2) {
                 Text(entry.name)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.system(.subheadline).weight(.semibold))
                     .foregroundColor(Theme.textPrimary)
                     .lineLimit(1)
                 if showDetail, !entry.detail.isEmpty {
                     Text(entry.detail)
-                        .font(.system(size: 12))
+                        .font(.system(.caption))
                         .foregroundColor(Theme.textSecondary)
                         .lineLimit(1)
                 }
             }
             Spacer()
             Text(ListeningStats.duration(entry.seconds))
-                .font(.system(size: 13, weight: .medium))
+                .font(.system(.footnote).weight(.medium))
                 .foregroundColor(Theme.textSecondary)
         }
         .padding(.vertical, 12)
@@ -279,10 +279,10 @@ struct StatsView: View {
                 .font(.system(size: 44))
                 .foregroundColor(Theme.accentSoft.opacity(0.7))
             Text("Nothing here yet")
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(.body).weight(.bold))
                 .foregroundColor(Theme.textPrimary)
             Text("Play something and your stats will start building — privately, on this device.")
-                .font(.system(size: 14))
+                .font(.system(.footnote))
                 .multilineTextAlignment(.center)
                 .foregroundColor(Theme.textSecondary)
         }
@@ -305,23 +305,23 @@ struct StatsTeaserCard: View {
                 ZStack {
                     Circle().fill(Theme.accent.opacity(0.18)).frame(width: 44, height: 44)
                     Image(systemName: "chart.bar.fill")
-                        .font(.system(size: 18, weight: .bold))
+                        .font(.system(.body).weight(.bold))
                         .foregroundColor(Theme.accentSoft)
                 }
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Your Sound")
-                        .font(.system(size: 15, weight: .bold))
+                        .font(.system(.subheadline).weight(.bold))
                         .foregroundColor(Theme.textPrimary)
                     Text(subtitle)
-                        .font(.system(size: 13))
+                        .font(.system(.footnote))
                         .foregroundColor(Theme.textSecondary)
                 }
                 Spacer()
                 if stats.streak > 1 {
                     HStack(spacing: 3) {
-                        Image(systemName: "flame.fill").font(.system(size: 12, weight: .bold))
+                        Image(systemName: "flame.fill").font(.system(.caption).weight(.bold))
                         Text(stats.streak, format: .number)
-                            .font(.system(size: 14, weight: .heavy, design: .rounded))
+                            .font(.system(.footnote, design: .rounded).weight(.heavy))
                     }
                     .foregroundColor(Theme.accentPink)
                     .padding(.horizontal, 10)
@@ -329,7 +329,7 @@ struct StatsTeaserCard: View {
                     .background(Capsule().fill(Theme.accentPink.opacity(0.14)))
                 }
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(.caption).weight(.semibold))
                     .foregroundColor(Theme.textTertiary)
             }
             .padding(14)
@@ -408,7 +408,7 @@ struct StatsShareCard: View {
                 Spacer()
 
                 HStack(spacing: 14) {
-                    Image(systemName: "sparkles").font(.system(size: 34, weight: .bold))
+                    Image(systemName: "sparkles").font(.system(.largeTitle).weight(.bold))
                     Text("Sonava").font(.system(size: 40, weight: .heavy, design: .rounded))
                 }
                 .foregroundColor(.white.opacity(0.95))

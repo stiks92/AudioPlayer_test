@@ -56,7 +56,7 @@ struct RadioView: View {
                 ForEach(genres) { genre in
                     let isSelected = (selectedTag ?? "") == genre.value
                     Text(genre.title)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(.footnote).weight(.semibold))
                         .foregroundColor(isSelected ? Theme.background : Theme.textSecondary)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)

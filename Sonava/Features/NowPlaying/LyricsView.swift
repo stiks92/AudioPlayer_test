@@ -79,7 +79,7 @@ struct LyricsView: View {
             } else if let plain = lyrics.plain {
                 ScrollView {
                     Text(plain)
-                        .font(.system(size: 20, weight: .semibold, design: .rounded))
+                        .font(.system(.title3, design: .rounded).weight(.semibold))
                         .foregroundColor(.white.opacity(0.85))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(24)
@@ -122,7 +122,7 @@ private struct SyncedLyricsList: View {
                     Color.clear.frame(height: 40)
                     ForEach(Array(lines.enumerated()), id: \.element.id) { index, line in
                         Text(line.text)
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .font(.system(.title2, design: .rounded).weight(.bold))
                             .foregroundColor(index == activeIndex ? .white : .white.opacity(0.35))
                             .scaleEffect(index == activeIndex ? 1.04 : 1, anchor: .leading)
                             .animation(.spring(response: 0.4, dampingFraction: 0.8), value: activeIndex)

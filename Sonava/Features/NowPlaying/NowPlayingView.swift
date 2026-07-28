@@ -102,11 +102,11 @@ struct NowPlayingView: View {
             Spacer()
             VStack(spacing: 2) {
                 Text("PLAYING FROM ALBUM")
-                    .font(.system(size: 10, weight: .bold))
+                    .font(.system(.caption2).weight(.bold))
                     .foregroundColor(.white.opacity(0.6))
                     .tracking(1.5)
                 Text(song?.album ?? "")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(.footnote).weight(.semibold))
             }
             Spacer()
             CircleIconButton(systemName: "list.bullet", size: 42, iconSize: 16) {
@@ -137,16 +137,16 @@ struct NowPlayingView: View {
     private var info: some View {
         HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                MarqueeText(text: song?.title ?? "", font: .system(size: 24, weight: .bold))
+                MarqueeText(text: song?.title ?? "", font: .system(.title2).weight(.bold))
                     .frame(height: 30)
                 Button {
                     if song != nil { showArtist = true }
                 } label: {
                     HStack(spacing: 4) {
                         Text(song?.artist ?? "")
-                            .font(.system(size: 16, weight: .medium))
+                            .font(.system(.callout).weight(.medium))
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 11, weight: .semibold))
+                            .font(.system(.caption2).weight(.semibold))
                             .opacity(0.6)
                     }
                     .foregroundColor(.white.opacity(0.7))
@@ -162,7 +162,7 @@ struct NowPlayingView: View {
                     showAddToPlaylist = true
                 } label: {
                     Image(systemName: "plus.circle")
-                        .font(.system(size: 22, weight: .semibold))
+                        .font(.system(.title2).weight(.semibold))
                         .foregroundColor(.white.opacity(0.85))
                 }
                 .buttonStyle(BouncyButtonStyle())
@@ -191,7 +191,7 @@ struct NowPlayingView: View {
             }
         } label: {
             Text(String(format: "%g×", Double(audio.playbackRate)))
-                .font(.system(size: 13, weight: .bold))
+                .font(.system(.footnote).weight(.bold))
                 .foregroundColor(.white)
                 .frame(minWidth: 40)
                 .padding(.vertical, 7)
@@ -208,11 +208,11 @@ struct NowPlayingView: View {
                     .frame(width: 8, height: 8)
                     .opacity(audio.isPlaying ? 1 : 0.4)
                 Text("LIVE")
-                    .font(.system(size: 13, weight: .heavy))
+                    .font(.system(.footnote).weight(.heavy))
                     .tracking(2)
                 Spacer()
                 Text("Radio")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(.caption).weight(.medium))
                     .foregroundColor(.white.opacity(0.6))
             }
             .frame(height: 24)
@@ -237,7 +237,7 @@ struct NowPlayingView: View {
                     Spacer()
                     Text(clock.duration.asClock)
                 }
-                .font(.system(size: 12, weight: .medium).monospacedDigit())
+                .font(.system(.caption).weight(.medium).monospacedDigit())
                 .foregroundColor(.white.opacity(0.6))
             }
         }
@@ -255,7 +255,7 @@ struct NowPlayingView: View {
                 withAnimation { audio.toggleShuffle() }
             } label: {
                 Image(systemName: "shuffle")
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.system(.body).weight(.semibold))
                     .foregroundColor(audio.isShuffling ? Theme.accentSoft : .white.opacity(0.7))
             }
             .buttonStyle(BouncyButtonStyle())
@@ -276,7 +276,7 @@ struct NowPlayingView: View {
                 withAnimation { audio.cycleRepeat() }
             } label: {
                 Image(systemName: audio.repeatMode.systemImage)
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.system(.body).weight(.semibold))
                     .foregroundColor(audio.repeatMode.isActive ? Theme.accentSoft : .white.opacity(0.7))
             }
             .buttonStyle(BouncyButtonStyle())
@@ -286,7 +286,7 @@ struct NowPlayingView: View {
     private var volume: some View {
         HStack(spacing: 12) {
             Image(systemName: "speaker.fill")
-                .font(.system(size: 13))
+                .font(.system(.footnote))
                 .foregroundColor(.white.opacity(0.6))
             ScrubberView(
                 value: Binding(
@@ -296,7 +296,7 @@ struct NowPlayingView: View {
                 onEditingChanged: { _ in }
             )
             Image(systemName: "speaker.wave.3.fill")
-                .font(.system(size: 13))
+                .font(.system(.footnote))
                 .foregroundColor(.white.opacity(0.6))
         }
     }
@@ -323,7 +323,7 @@ struct NowPlayingView: View {
     private func bottomButton(_ icon: String, active: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: icon)
-                .font(.system(size: 18, weight: .semibold))
+                .font(.system(.body).weight(.semibold))
                 .foregroundColor(active ? Theme.accentSoft : .white.opacity(0.7))
         }
         .buttonStyle(BouncyButtonStyle())

@@ -92,7 +92,7 @@ struct PaywallView: View {
             if !isOnboarding {
                 Button { dismiss() } label: {
                     Image(systemName: "xmark")
-                        .font(.system(size: 15, weight: .bold))
+                        .font(.system(.subheadline).weight(.bold))
                         .foregroundColor(.white.opacity(0.8))
                         .frame(width: Space.hitTarget, height: Space.hitTarget)
                         .background(Circle().fill(.ultraThinMaterial))
@@ -120,7 +120,7 @@ struct PaywallView: View {
                 .foregroundColor(.white)
                 .shadow(color: .white.opacity(0.5), radius: 16)
             Text("Sonava Pro")
-                .font(.system(size: 34, design: .rounded).weight(.heavy))
+                .font(.system(.largeTitle, design: .rounded).weight(.heavy))
             Text("The one player for all your music —\nunlocked to the fullest.")
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.85))
@@ -133,19 +133,19 @@ struct PaywallView: View {
             ForEach(perks) { perk in
                 HStack(alignment: .top, spacing: 14) {
                     Image(systemName: perk.icon)
-                        .font(.system(size: 18, weight: .semibold))
+                        .font(.system(.body).weight(.semibold))
                         .foregroundColor(Theme.accentSoft)
                         .frame(width: 40, height: 40)
                         .background(Circle().fill(Theme.accent.opacity(0.22)))
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(perk.title).font(.system(size: 15, weight: .semibold))
-                        Text(perk.subtitle).font(.system(size: 12)).foregroundColor(.white.opacity(0.75))
+                        Text(perk.title).font(.system(.subheadline).weight(.semibold))
+                        Text(perk.subtitle).font(.system(.caption)).foregroundColor(.white.opacity(0.75))
                     }
                     Spacer()
                 }
             }
             Text("Plus unlimited self-hosted servers searched together, scrobbling to ListenBrainz, and your full listening history.")
-                .font(.system(size: 12))
+                .font(.system(.caption))
                 .foregroundColor(.white.opacity(0.7))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, 2)
@@ -182,14 +182,14 @@ struct PaywallView: View {
                     .foregroundColor(isSelected ? .white : .white.opacity(0.5))
                 VStack(alignment: .leading, spacing: 2) {
                     Text(product.displayName.isEmpty ? product.id : product.displayName)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.system(.subheadline).weight(.semibold))
                     Text(proStore.period(for: product))
-                        .font(.system(size: 12))
+                        .font(.system(.caption))
                         .foregroundColor(.white.opacity(0.7))
                 }
                 Spacer()
                 Text(product.displayPrice)
-                    .font(.system(size: 16, weight: .bold))
+                    .font(.system(.callout).weight(.bold))
             }
             .padding(16)
             .background(
@@ -255,7 +255,7 @@ struct PaywallView: View {
             // Reassurance under the trial CTA.
             if let product = selectedProduct, let trial = proStore.trialText(for: product) {
                 Text("\(trial), then \(product.displayPrice) \(proStore.period(for: product)). Cancel anytime.")
-                    .font(.system(size: 11))
+                    .font(.system(.caption2))
                     .foregroundColor(.white.opacity(0.7))
                     .multilineTextAlignment(.center)
             }
@@ -271,7 +271,7 @@ struct PaywallView: View {
             .foregroundColor(.white.opacity(0.85))
 
             Text("Payment is charged to your Apple ID. Subscriptions renew automatically unless cancelled at least 24h before the period ends. Manage in Settings.")
-                .font(.system(size: 10))
+                .font(.system(.caption2))
                 .foregroundColor(.white.opacity(0.55))
                 .multilineTextAlignment(.center)
         }

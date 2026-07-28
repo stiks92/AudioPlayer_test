@@ -55,7 +55,7 @@ struct MiniPlayerView: View {
                         audio.togglePlayPause()
                     } label: {
                         Image(systemName: audio.isPlaying ? "pause.fill" : "play.fill")
-                            .font(.system(size: 17, weight: .bold))
+                            .font(.system(.body).weight(.bold))
                             .foregroundColor(.white)
                             .frame(width: Space.hitTarget, height: Space.hitTarget)
                     }
@@ -67,7 +67,7 @@ struct MiniPlayerView: View {
                         audio.next()
                     } label: {
                         Image(systemName: "forward.fill")
-                            .font(.system(size: 15, weight: .bold))
+                            .font(.system(.subheadline).weight(.bold))
                             .foregroundColor(.white)
                             .frame(width: Space.hitTarget, height: Space.hitTarget)
                     }

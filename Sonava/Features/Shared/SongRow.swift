@@ -65,7 +65,7 @@ struct SongRow: View {
                 NowPlayingBars(isAnimating: audio.isPlaying)
             } else if library.isFavorite(song) {
                 Image(systemName: "heart.fill")
-                    .font(.system(size: 13))
+                    .font(.system(.footnote))
                     .foregroundColor(Theme.destructive)
             }
         }
@@ -126,7 +126,7 @@ struct SongRow: View {
         switch downloadState {
         case .downloaded:
             Image(systemName: "arrow.down.circle.fill")
-                .font(.system(size: 13))
+                .font(.system(.footnote))
                 .foregroundColor(Theme.accentSoft)
         case .downloading:
             ProgressView().scaleEffect(0.7)
