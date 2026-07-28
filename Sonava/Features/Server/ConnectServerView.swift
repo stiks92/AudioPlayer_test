@@ -75,7 +75,10 @@ struct ConnectServerView: View {
         VStack(spacing: 0) {
             ForEach(Array(serverStore.servers.enumerated()), id: \.element.id) { index, connection in
                 if index > 0 {
-                    Rectangle().fill(Color.white.opacity(0.06)).frame(height: 1)
+                    Rectangle()
+                        .fill(Theme.hairline)
+                        .frame(height: Theme.hairlineWidth)
+                        .padding(.leading, Space.textRail)
                 }
                 row(connection)
             }

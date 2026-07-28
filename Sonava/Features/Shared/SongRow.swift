@@ -51,10 +51,16 @@ struct SongRow: View {
                     .font(.system(.subheadline, design: .rounded).weight(.semibold))
                     .foregroundColor(isCurrent ? Theme.accentSoft : Theme.textPrimary)
                     .lineLimit(1)
-                Text(song.artist)
-                    .font(.caption)
-                    .foregroundColor(Theme.textSecondary)
-                    .lineLimit(1)
+                HStack(spacing: Space.s) {
+                    // `Theme.live` was defined and used nowhere, so a station
+                    // row looked exactly like a file in the library — nothing
+                    // on the Radio tab said "this is a live stream".
+                    if song.isLive { LiveDot() }
+                    Text(song.artist)
+                        .font(.caption)
+                        .foregroundColor(Theme.textSecondary)
+                        .lineLimit(1)
+                }
             }
 
             Spacer(minLength: 8)
@@ -133,5 +139,26 @@ struct SongRow: View {
         case .none, .failed:
             EmptyView()
         }
+    }
+}
+
+// MARK: - Live indicator
+
+/// A slow pulse on a live stream. Reduce Motion gets a steady dot rather than
+/// nothing: the state still has to be legible, it just stops moving.
+private struct LiveDot: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var pulsing = false
+
+    var body: some View {
+        Circle()
+            .fill(Theme.live)
+            .frame(width: 7, height: 7)
+            .opacity(pulsing ? 0.35 : 1)
+            .animation(reduceMotion ? nil
+                       : .easeInOut(duration: 1.1).repeatForever(autoreverses: true),
+                       value: pulsing)
+            .onAppear { if !reduceMotion { pulsing = true } }
+            .accessibilityLabel(Text("Live"))
     }
 }

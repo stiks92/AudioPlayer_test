@@ -281,9 +281,17 @@ struct SettingsView: View {
                 showSleepOptions = true
             }
             divider
+            // `Label` sizes its own icon column, so this row's text started
+            // 8pt left of every other row in the card — a visible step in the
+            // card's left edge. It uses the same leading column as `row()`.
             Toggle(isOn: $audio.autoExtendEnabled) {
-                Label("Endless playback", systemImage: "infinity")
-                    .font(.system(.subheadline))
+                HStack(spacing: Space.iconGap) {
+                    Image(systemName: "infinity")
+                        .font(.sonavaRowTitle)
+                        .frame(width: Space.iconColumn, height: Space.iconColumn)
+                        .foregroundColor(Theme.textSecondary)
+                    Text("Endless playback").font(.system(.subheadline))
+                }
             }
             .tint(Theme.accent)
             .padding(.vertical, 6)
@@ -352,8 +360,13 @@ struct SettingsView: View {
                     get: { proStore.developerOverride },
                     set: { proStore.setDeveloperOverride($0) }
                 )) {
-                    Label("Developer: unlock Pro", systemImage: "hammer")
-                        .font(.system(.subheadline))
+                    HStack(spacing: Space.iconGap) {
+                        Image(systemName: "hammer")
+                            .font(.sonavaRowTitle)
+                            .frame(width: Space.iconColumn, height: Space.iconColumn)
+                            .foregroundColor(Theme.textSecondary)
+                        Text("Developer: unlock Pro").font(.system(.subheadline))
+                    }
                 }
                 .tint(Theme.accent)
                 .padding(.vertical, Space.m)
@@ -389,7 +402,10 @@ struct SettingsView: View {
     ) -> some View {
         Button(action: action) {
             HStack(spacing: Space.l) {
-                Image(systemName: icon).frame(width: 24).foregroundColor(Theme.accentSoft)
+                Image(systemName: icon)
+                    .font(.sonavaRowTitle)
+                    .frame(width: Space.iconColumn, height: Space.iconColumn)
+                    .foregroundColor(Theme.textSecondary)
                 Text(title).font(.system(.subheadline))
                 Spacer()
                 if let value {
@@ -398,6 +414,7 @@ struct SettingsView: View {
                 Image(systemName: "chevron.right").font(.system(.caption)).foregroundColor(Theme.textTertiary)
             }
             .padding(.vertical, Space.m)
+            .frame(minHeight: Space.hitTarget)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -410,7 +427,10 @@ struct SettingsView: View {
         valueColor: Color
     ) -> some View {
         HStack(spacing: Space.l) {
-            Image(systemName: icon).frame(width: 24).foregroundColor(Theme.accentSoft)
+            Image(systemName: icon)
+                    .font(.sonavaRowTitle)
+                    .frame(width: Space.iconColumn, height: Space.iconColumn)
+                    .foregroundColor(Theme.textSecondary)
             Text(title).font(.system(.subheadline))
             Spacer()
             Text(value).font(.system(.footnote).weight(.semibold)).foregroundColor(valueColor)
@@ -419,6 +439,9 @@ struct SettingsView: View {
     }
 
     private var divider: some View {
-        Rectangle().fill(Color.white.opacity(0.06)).frame(height: 1)
+        Rectangle()
+            .fill(Theme.hairline)
+            .frame(height: Theme.hairlineWidth)
+            .padding(.leading, Space.textRail)
     }
 }

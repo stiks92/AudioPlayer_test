@@ -1350,6 +1350,16 @@
         }
       }
     },
+    "Live": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В эфире"
+          }
+        }
+      }
+    },
     "Lo-fi": {
       "shouldTranslate": false
     },
