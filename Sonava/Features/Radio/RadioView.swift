@@ -51,24 +51,10 @@ struct RadioView: View {
     }
 
     private var genreChips: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: Space.m) {
-                ForEach(genres) { genre in
-                    let isSelected = (selectedTag ?? "") == genre.value
-                    Text(genre.title)
-                        .font(.system(.footnote).weight(.semibold))
-                        .foregroundColor(isSelected ? Theme.background : Theme.textSecondary)
-                        .padding(.horizontal, Space.l)
-                        .padding(.vertical, 8)
-                        .background(
-                            Capsule().fill(isSelected ? Color.white : Color.white.opacity(0.08))
-                        )
-                        .onTapGesture {
-                            selectedTag = genre.value.isEmpty ? nil : genre.value
-                            Task { await reload() }
-                        }
-                }
-            }
+        FilterChipRow(chips: genres,
+                      selection: Binding(get: { selectedTag ?? "" },
+                                         set: { selectedTag = $0.isEmpty ? nil : $0 })) { _ in
+            Task { await reload() }
         }
     }
 

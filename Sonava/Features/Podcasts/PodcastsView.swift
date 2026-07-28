@@ -97,22 +97,8 @@ struct PodcastsView: View {
     }
 
     private var genreChips: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(genres) { genre in
-                    let isSelected = selectedGenre == genre.value
-                    Text(genre.title)
-                        .font(.system(.footnote).weight(.semibold))
-                        .foregroundColor(isSelected ? Theme.background : Theme.textSecondary)
-                        .padding(.horizontal, Space.l).padding(.vertical, 8)
-                        .background(Capsule().fill(isSelected ? Color.white : Color.white.opacity(0.08)))
-                        .onTapGesture {
-                            selectedGenre = genre.value
-                            Haptics.selection()
-                            Task { await feed.load { try await iTunesService.shared.podcasts(genre: genre.value) } }
-                        }
-                }
-            }
+        FilterChipRow(chips: genres, selection: $selectedGenre) { genre in
+            Task { await feed.load { try await iTunesService.shared.podcasts(genre: genre) } }
         }
     }
 
