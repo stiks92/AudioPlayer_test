@@ -65,9 +65,19 @@ enum Theme {
     @MainActor static var accentDeep: Color { Color(hex: ThemeManager.shared.palette.accentDeep) }
     @MainActor static var accentPink: Color { Color(hex: ThemeManager.shared.palette.accentPink) }
 
-    /// The two-stop brand gradient used by Pro surfaces and primary actions.
+    /// The two-stop brand gradient for surfaces that sit *behind* content.
+    ///
+    /// Never use this on text: `accentDeep` measures 2.25:1 against the app
+    /// background, so any leading→trailing run of it dissolves the end of the
+    /// word. Foreground text wants `brandGradientOnDark`.
     @MainActor static var brandGradient: LinearGradient {
         LinearGradient(colors: [accent, accentDeep], startPoint: .leading, endPoint: .trailing)
+    }
+
+    /// The brand gradient for *foreground* use on a dark ground. Both stops
+    /// clear 4.5:1, so a headline stays legible end to end.
+    @MainActor static var brandGradientOnDark: LinearGradient {
+        LinearGradient(colors: [accentSoft, accent], startPoint: .leading, endPoint: .trailing)
     }
 
     /// The richer three-stop gradient reserved for the paywall and Pro upsells.
@@ -89,7 +99,18 @@ enum Theme {
     // MARK: Text
     static let textPrimary = Color.white
     static let textSecondary = Color.white.opacity(0.62)
-    static let textTertiary = Color.white.opacity(0.38)
+    /// The dimmest colour any *text* may use. 0.38 was the previous value and
+    /// measured ~3.5:1 everywhere it appeared — below the 4.5:1 body-text floor
+    /// in a dozen places, including section headers and chart axis labels.
+    static let textTertiary = Color.white.opacity(0.55)
+
+    // MARK: Lines
+    /// Separators and borders. Not for text — a line has no contrast floor to
+    /// meet, and the old 0.38 text colour was doing double duty as both.
+    static let hairline = Color.white.opacity(0.10)
+    /// The thickness a 1-pixel rule should actually be. `frame(height: 1)` on a
+    /// @3x display draws three device pixels.
+    @MainActor static var hairlineWidth: CGFloat { 1 / UIScreen.main.scale }
 }
 
 // MARK: - Aurora animated background
@@ -100,9 +121,25 @@ struct AuroraBackground: View {
     let colors: [Color]
     var animated: Bool = true
 
+    /// A permanently drifting full-screen gradient is exactly what this setting
+    /// exists to stop, so it freezes on a single frame instead.
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var isMoving: Bool { animated && !reduceMotion }
+
+    /// The middle stop of a three-colour gradient. The previous version read
+    /// only `first` and `last`, so `Theme.proGradient`'s third colour never
+    /// reached a pixel and the paywall rendered identically to the slide before
+    /// it — a documented "richer" gradient that was a no-op.
+    private var midColor: Color {
+        colors.count > 2 ? colors[1] : (colors.last ?? Theme.accentSoft)
+    }
+
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 20.0, paused: !animated)) { timeline in
-            let t = timeline.date.timeIntervalSinceReferenceDate
+        // 30fps rather than 20: on a 120Hz panel the old interval was visible
+        // as judder on something whose whole job is to drift smoothly.
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: !isMoving)) { timeline in
+            let t = isMoving ? timeline.date.timeIntervalSinceReferenceDate : 0
             GeometryReader { geo in
                 let w = geo.size.width
                 let h = geo.size.height
@@ -112,7 +149,7 @@ struct AuroraBackground: View {
                          x: 0.30 + 0.16 * sin(t * 0.20),
                          y: 0.26 + 0.12 * cos(t * 0.23),
                          size: 1.15, w: w, h: h)
-                    blob(colors.last ?? Theme.accentSoft,
+                    blob(midColor,
                          x: 0.72 + 0.14 * cos(t * 0.17),
                          y: 0.40 + 0.14 * sin(t * 0.19),
                          size: 1.0, w: w, h: h)
@@ -146,23 +183,61 @@ struct AuroraBackground: View {
 
 // MARK: - Glass surface
 
-struct GlassBackground: ViewModifier {
-    var cornerRadius: CGFloat = 20
-    var strokeOpacity: Double = 0.12
+/// An opaque content surface.
+///
+/// Content is deliberately *not* glass. Apple reserves Liquid Glass for the
+/// floating navigation layer — bars, toolbars, floating controls — and states
+/// plainly that it must never be applied to lists, media or scrollable content.
+/// Every card in this app used to be `.ultraThinMaterial`, which over an opaque
+/// page had nothing to refract and simply composited to flat grey anyway.
+struct CardBackground: ViewModifier {
+    var cornerRadius: CGFloat = Radius.card
 
     func body(content: Content) -> some View {
         content
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            .background(Theme.surfaceElevated,
+                        in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .strokeBorder(Color.white.opacity(strokeOpacity), lineWidth: 1)
+                    .strokeBorder(Theme.hairline, lineWidth: 1)
             )
     }
 }
 
 extension View {
-    func glass(cornerRadius: CGFloat = 20, strokeOpacity: Double = 0.12) -> some View {
-        modifier(GlassBackground(cornerRadius: cornerRadius, strokeOpacity: strokeOpacity))
+    /// A content surface: cards, grouped rows, panels.
+    func card(cornerRadius: CGFloat = Radius.card) -> some View {
+        modifier(CardBackground(cornerRadius: cornerRadius))
+    }
+
+    /// Real Liquid Glass, for the floating navigation layer only.
+    ///
+    /// iOS 26 supplies the material; below that we keep the old frosted
+    /// approximation, which is the closest the platform can get. The deployment
+    /// target is 18.0, so the fallback is required rather than optional.
+    @ViewBuilder
+    func floatingGlass(cornerRadius: CGFloat = Radius.control) -> some View {
+        if #available(iOS 26, *) {
+            glassEffect(.regular, in: .rect(cornerRadius: cornerRadius, style: .continuous))
+        } else {
+            background(.ultraThinMaterial,
+                       in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .strokeBorder(Theme.hairline, lineWidth: 1)
+                )
+        }
+    }
+
+    /// Liquid Glass for a control that responds to touch — it scales, shimmers
+    /// and lights up under the finger on iOS 26.
+    @ViewBuilder
+    func interactiveGlass<S: Shape>(in shape: S) -> some View {
+        if #available(iOS 26, *) {
+            glassEffect(.regular.interactive(), in: shape)
+        } else {
+            background(.ultraThinMaterial, in: shape)
+        }
     }
 }
 

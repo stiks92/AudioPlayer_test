@@ -72,7 +72,7 @@ struct AddToPlaylistView: View {
                 .disabled(newName.trimmingCharacters(in: .whitespaces).isEmpty)
         }
         .padding(.horizontal, 14).padding(.vertical, 12)
-        .glass(cornerRadius: 14)
+        .card(cornerRadius: Radius.control)
     }
 
     private func playlistRow(_ playlist: UserPlaylist) -> some View {

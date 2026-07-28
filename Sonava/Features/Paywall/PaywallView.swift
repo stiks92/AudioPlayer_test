@@ -94,8 +94,9 @@ struct PaywallView: View {
                     Image(systemName: "xmark")
                         .font(.system(size: 15, weight: .bold))
                         .foregroundColor(.white.opacity(0.8))
-                        .frame(width: 34, height: 34)
+                        .frame(width: Space.hitTarget, height: Space.hitTarget)
                         .background(Circle().fill(.ultraThinMaterial))
+                        .contentShape(Circle())
                 }
                 .identified(AccessibilityID.paywallClose, label: "Close")
             }
@@ -130,12 +131,12 @@ struct PaywallView: View {
     private var perksList: some View {
         VStack(spacing: 14) {
             ForEach(perks) { perk in
-                HStack(spacing: 14) {
+                HStack(alignment: .top, spacing: 14) {
                     Image(systemName: perk.icon)
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.white)
+                        .foregroundColor(Theme.accentSoft)
                         .frame(width: 40, height: 40)
-                        .background(Circle().fill(.ultraThinMaterial))
+                        .background(Circle().fill(Theme.accent.opacity(0.22)))
                     VStack(alignment: .leading, spacing: 2) {
                         Text(perk.title).font(.system(size: 15, weight: .semibold))
                         Text(perk.subtitle).font(.system(size: 12)).foregroundColor(.white.opacity(0.75))
@@ -150,7 +151,7 @@ struct PaywallView: View {
                 .padding(.top, 2)
         }
         .padding(18)
-        .glass(cornerRadius: 22)
+        .card(cornerRadius: Radius.card)
     }
 
     @ViewBuilder
@@ -215,7 +216,20 @@ struct PaywallView: View {
         return "Unlock Sonava Pro"
     }
 
+    @ViewBuilder
     private var subscribeButton: some View {
+        // No products means nothing to buy, and a permanently dead button is
+        // worse than none: faded, its dark label measured 2.63:1 against its
+        // own capsule — less legible than "Restore purchases" underneath it.
+        // The plans placeholder already explains the situation.
+        if proStore.products.isEmpty {
+            EmptyView()
+        } else {
+            purchaseControls
+        }
+    }
+
+    private var purchaseControls: some View {
         VStack(spacing: 8) {
             Button {
                 guard let product = selectedProduct else { return }
@@ -235,8 +249,7 @@ struct PaywallView: View {
                 .background(Capsule().fill(Color.white))
             }
             .buttonStyle(BouncyButtonStyle(scale: 0.97))
-            .disabled(proStore.products.isEmpty || selectedID == nil || isPurchasing)
-            .opacity(proStore.products.isEmpty ? 0.5 : 1)
+            .disabled(selectedID == nil || isPurchasing)
             .accessibilityIdentifier("paywall.subscribe")
 
             // Reassurance under the trial CTA.

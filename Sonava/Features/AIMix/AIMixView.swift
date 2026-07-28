@@ -70,14 +70,19 @@ struct AIMixView: View {
 
                 HStack(spacing: 10) {
                     Image(systemName: "sparkles").foregroundColor(Theme.accentSoft)
-                    TextField("e.g. rainy Sunday focus, no vocals", text: $prompt)
+                    // An explicit prompt rather than the implicit placeholder:
+                    // the default renders at 2.43:1, and this is the only text
+                    // on the screen that tells you what to type.
+                    TextField("", text: $prompt,
+                              prompt: Text("e.g. rainy Sunday focus, no vocals")
+                                .foregroundColor(.white.opacity(0.62)))
                         .focused($focused)
                         .foregroundColor(.white)
                         .submitLabel(.go)
                         .onSubmit(generate)
                 }
                 .padding(.horizontal, 14).padding(.vertical, 14)
-                .glass(cornerRadius: 16)
+                .card(cornerRadius: Radius.card)
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {

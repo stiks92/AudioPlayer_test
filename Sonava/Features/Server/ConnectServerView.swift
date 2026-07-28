@@ -81,7 +81,7 @@ struct ConnectServerView: View {
             }
         }
         .padding(.horizontal, 16)
-        .glass(cornerRadius: 20)
+        .card(cornerRadius: Radius.card)
     }
 
     private func row(_ connection: ServerConnection) -> some View {
@@ -139,7 +139,7 @@ struct ConnectServerView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(18)
-        .glass(cornerRadius: 20)
+        .card(cornerRadius: Radius.card)
     }
 
     // MARK: - Add
@@ -277,7 +277,7 @@ struct AddServerView: View {
                 .autocorrectionDisabled()
                 .foregroundColor(.white)
                 .padding(.horizontal, 14).padding(.vertical, 12)
-                .glass(cornerRadius: 12)
+                .card(cornerRadius: Radius.control)
         }
     }
 
@@ -290,7 +290,7 @@ struct AddServerView: View {
             SecureField("••••••••", text: text)
                 .foregroundColor(.white)
                 .padding(.horizontal, 14).padding(.vertical, 12)
-                .glass(cornerRadius: 12)
+                .card(cornerRadius: Radius.control)
         }
     }
 }

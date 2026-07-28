@@ -91,7 +91,7 @@ struct PodcastsView: View {
             }
         }
         .padding(.horizontal, 14).padding(.vertical, 12)
-        .glass(cornerRadius: 16)
+        .card(cornerRadius: Radius.card)
     }
 
     private var genreChips: some View {

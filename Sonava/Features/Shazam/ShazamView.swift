@@ -174,7 +174,7 @@ struct ShazamView: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 13)
-                            .glass(cornerRadius: 30)
+                            .card(cornerRadius: Radius.hero)
                     }
                 }
 

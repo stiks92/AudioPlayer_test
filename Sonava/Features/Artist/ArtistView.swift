@@ -81,7 +81,7 @@ struct ArtistView: View {
                         Label("Shuffle", systemImage: "shuffle")
                             .font(.headline).foregroundColor(.white)
                             .frame(maxWidth: .infinity).padding(.vertical, 14)
-                            .glass(cornerRadius: 30)
+                            .card(cornerRadius: Radius.hero)
                     }
                     .buttonStyle(BouncyButtonStyle(scale: 0.96))
                 }

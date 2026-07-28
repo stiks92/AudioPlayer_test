@@ -122,7 +122,7 @@ struct EqualizerView: View {
             .tint(Theme.accent)
         }
         .padding(16)
-        .glass(cornerRadius: 18)
+        .card(cornerRadius: Radius.card)
     }
 
     private var presetPicker: some View {

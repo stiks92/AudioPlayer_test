@@ -107,10 +107,9 @@ struct StatsView: View {
                             Image(systemName: "lock.fill").font(.system(size: 9, weight: .bold))
                         }
                     }
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.sonavaRowMeta.weight(.semibold))
                     .foregroundColor(selected ? .white : Theme.textSecondary)
-                    .padding(.vertical, 8)
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity, minHeight: Space.hitTarget)
                     .background {
                         if selected {
                             Capsule().fill(Theme.accent.opacity(0.9))
@@ -134,7 +133,10 @@ struct StatsView: View {
                 .foregroundColor(Theme.textSecondary)
             Text(ListeningStats.duration(stats.totalSeconds))
                 .font(.system(size: 52, weight: .heavy, design: .rounded))
-                .foregroundStyle(Theme.brandGradient)
+                // Not `brandGradient`: it ends on accentDeep, which measures
+                // 2.25:1 on this ground, so the minutes half of the number
+                // dissolved into the background.
+                .foregroundStyle(Theme.brandGradientOnDark)
                 .contentTransition(.numericText())
                 .accessibilityIdentifier(AccessibilityID.statsTotal)
             // Two keys rather than one: a single string with two plural
@@ -178,7 +180,7 @@ struct StatsView: View {
         }
         .frame(height: 160)
         .padding(14)
-        .glass(cornerRadius: 20)
+        .card(cornerRadius: Radius.card)
     }
 
     // MARK: - Tiles
@@ -212,7 +214,7 @@ struct StatsView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
-        .glass(cornerRadius: 20)
+        .card(cornerRadius: Radius.card)
     }
 
     // MARK: - Ranked lists
@@ -235,7 +237,7 @@ struct StatsView: View {
                     }
                 }
                 .padding(.horizontal, 16)
-                .glass(cornerRadius: 20)
+                .card(cornerRadius: Radius.card)
             }
         }
     }
@@ -328,7 +330,7 @@ struct StatsTeaserCard: View {
                     .foregroundColor(Theme.textTertiary)
             }
             .padding(14)
-            .glass(cornerRadius: 20)
+            .card(cornerRadius: Radius.card)
         }
         .buttonStyle(BouncyButtonStyle(scale: 0.98))
         .identified(AccessibilityID.statsCard, label: "Your Sound")

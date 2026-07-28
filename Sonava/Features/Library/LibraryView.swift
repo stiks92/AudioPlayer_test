@@ -117,7 +117,7 @@ struct LibraryView: View {
             }
         }
         .padding(5)
-        .glass(cornerRadius: 30)
+        .card(cornerRadius: Radius.hero)
     }
 
     private var playlistsSection: some View {

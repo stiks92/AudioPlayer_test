@@ -370,7 +370,7 @@ struct SettingsView: View {
             VStack(spacing: 0) { content() }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 4)
-                .glass(cornerRadius: 18)
+                .card(cornerRadius: Radius.card)
         }
     }
 

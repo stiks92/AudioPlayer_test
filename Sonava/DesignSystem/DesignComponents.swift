@@ -12,10 +12,19 @@ import SwiftUI
 /// Subtle spring scale on tap, applied to buttons.
 struct BouncyButtonStyle: ButtonStyle {
     var scale: CGFloat = 0.88
+
+    /// A custom `ButtonStyle` gets no disabled treatment for free, so without
+    /// this a disabled button rendered pixel-identical to a live one — the AI
+    /// Mix screen's primary call to action was the brightest thing on screen
+    /// and completely inert, with nothing to say so.
+    @Environment(\.isEnabled) private var isEnabled
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? scale : 1)
-            .animation(.spring(response: 0.28, dampingFraction: 0.55), value: configuration.isPressed)
+            .opacity(isEnabled ? 1 : 0.35)
+            .animation(Motion.press, value: configuration.isPressed)
+            .animation(Motion.fade, value: isEnabled)
     }
 }
 

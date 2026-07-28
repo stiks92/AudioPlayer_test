@@ -71,7 +71,7 @@ struct ConnectScrobbleView: View {
             Spacer()
         }
         .padding(16)
-        .glass(cornerRadius: 16)
+        .card(cornerRadius: Radius.card)
 
         Toggle(isOn: $scrobble.isEnabled) {
             Label("Scrobble my plays", systemImage: "dot.radiowaves.up.forward")
@@ -79,7 +79,7 @@ struct ConnectScrobbleView: View {
         }
         .tint(Theme.accent)
         .padding(16)
-        .glass(cornerRadius: 16)
+        .card(cornerRadius: Radius.card)
 
         Button(role: .destructive) {
             scrobble.disconnect()
@@ -87,7 +87,7 @@ struct ConnectScrobbleView: View {
             Text("Disconnect")
                 .font(.headline).foregroundColor(Theme.destructive)
                 .frame(maxWidth: .infinity).padding(.vertical, 14)
-                .glass(cornerRadius: 26)
+                .card(cornerRadius: Radius.hero)
         }
         .buttonStyle(BouncyButtonStyle(scale: 0.97))
     }
@@ -104,7 +104,7 @@ struct ConnectScrobbleView: View {
                     .autocorrectionDisabled()
                     .foregroundColor(.white)
                     .padding(.horizontal, 14).padding(.vertical, 12)
-                    .glass(cornerRadius: 12)
+                    .card(cornerRadius: Radius.control)
             }
 
             if let error = scrobble.lastError {
