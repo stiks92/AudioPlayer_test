@@ -12,12 +12,22 @@ import Foundation
 
 struct EqualizerSettingsTests {
 
-    @Test("A fresh curve is flat, disabled and named Flat")
+    /// The equalizer starts *on*, sitting on the flat curve.
+    ///
+    /// It used to start off, which meant the screen opened as a wall of dimmed
+    /// controls — a design review measured the frequency scale at 1.69:1 in
+    /// that state. A flat curve is audibly identical to bypass, so switching
+    /// the default costs the listener nothing and the feature opens alive.
+    @Test("A fresh curve is flat, enabled and named Flat")
     func defaultsAreFlat() {
         let settings = EqualizerSettings()
         #expect(settings.gains == Array(repeating: 0, count: EqualizerBand.count))
-        #expect(settings.isEnabled == false)
+        #expect(settings.isEnabled)
         #expect(settings.presetID == EqualizerPreset.flat.id)
+        // Flat means every band at unity, which is what makes "on by default"
+        // an honest default rather than a silent change to someone's audio.
+        #expect(settings.gains.allSatisfy { $0 == 0 })
+        #expect(settings.preamp == 0)
     }
 
     @Test("Gains are clamped to ±12 dB so the audio unit never sees a bad value")

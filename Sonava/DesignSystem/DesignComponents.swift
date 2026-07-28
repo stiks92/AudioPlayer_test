@@ -13,16 +13,26 @@ import SwiftUI
 struct BouncyButtonStyle: ButtonStyle {
     var scale: CGFloat = 0.88
 
+    /// Whether to fade the whole label when disabled.
+    ///
+    /// Right for the icon buttons this style mostly wraps, and wrong for a
+    /// filled capsule: fading a dark label and its light fill together
+    /// collapses the contrast *between* them — one such button measured
+    /// 1.81:1. Those buttons colour their own disabled state and opt out.
+    var dimsWhenDisabled = true
+
     /// A custom `ButtonStyle` gets no disabled treatment for free, so without
-    /// this a disabled button rendered pixel-identical to a live one — the AI
-    /// Mix screen's primary call to action was the brightest thing on screen
-    /// and completely inert, with nothing to say so.
+    /// this a disabled button renders pixel-identical to a live one.
     @Environment(\.isEnabled) private var isEnabled
+
+    private var opacity: Double {
+        (dimsWhenDisabled && !isEnabled) ? 0.35 : 1
+    }
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? scale : 1)
-            .opacity(isEnabled ? 1 : 0.35)
+            .opacity(opacity)
             .animation(Motion.press, value: configuration.isPressed)
             .animation(Motion.fade, value: isEnabled)
     }

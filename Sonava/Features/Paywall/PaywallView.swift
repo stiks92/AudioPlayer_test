@@ -38,12 +38,12 @@ struct PaywallView: View {
     /// Everything else that is gated is listed underneath rather than given a
     /// row of its own — a paywall that lists everything persuades of nothing.
     private let perks: [Perk] = [
-        Perk(icon: "arrow.down.circle", title: "Offline downloads",
+        Perk(icon: "arrow.down", title: "Offline downloads",
              subtitle: "Save full tracks and listen with no signal."),
         Perk(icon: "slider.vertical.3", title: "10-band equalizer",
              subtitle: "Studio presets and per-band control."),
         Perk(icon: "sparkles", title: "AI Mix",
-             subtitle: "Describe a vibe — get an instant, on-device mix."),
+             subtitle: "Describe a vibe, get an instant mix."),
         Perk(icon: "paintpalette.fill", title: "Make it yours",
              subtitle: "Six accent themes and six app icons."),
         Perk(icon: "heart.fill", title: "Support indie dev",
@@ -64,7 +64,7 @@ struct PaywallView: View {
                     if isOnboarding { maybeLater }
                     footer
                 }
-                .padding(.horizontal, 22)
+                .padding(.horizontal, Space.screenMargin)
                 .padding(.bottom, 30)
             }
         }

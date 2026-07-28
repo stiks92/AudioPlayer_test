@@ -48,8 +48,9 @@ struct OnboardingView: View {
                 Button("Skip", action: onFinish)
                     .font(.subheadline.weight(.semibold))
                     .foregroundColor(.white.opacity(0.8))
+                    .hitTarget()
                     .frame(maxWidth: .infinity, alignment: .trailing)
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, Space.screenMargin)
                     .padding(.top, 12)
 
                 TabView(selection: $page) {
@@ -77,7 +78,7 @@ struct OnboardingView: View {
                         .background(Capsule().fill(Color.white))
                 }
                 .buttonStyle(BouncyButtonStyle(scale: 0.97))
-                .padding(.horizontal, 28)
+                .padding(.horizontal, Space.screenMargin)
                 .padding(.bottom, 40)
             }
         }
@@ -100,7 +101,7 @@ struct OnboardingView: View {
                     .foregroundColor(.white.opacity(0.85))
                     .multilineTextAlignment(.center)
             }
-            .padding(.horizontal, 34)
+            .padding(.horizontal, Space.screenMargin)
             Spacer()
         }
     }

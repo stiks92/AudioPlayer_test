@@ -60,10 +60,18 @@ struct EqualizerView: View {
                     bands
                     preampRow
                     presetPicker
-                    footnote
                 }
-                .opacity(effects.equalizer.isEnabled ? 1 : 0.35)
+                // 0.35 pushed the frequency scale to 1.69:1 and the preset
+                // labels to 1.55:1 — a switched-off equalizer became a screen
+                // nothing could be read on. Controls may recede; they may not
+                // become invisible.
+                .opacity(effects.equalizer.isEnabled ? 1 : 0.55)
                 .allowsHitTesting(effects.equalizer.isEnabled)
+
+                // Outside the dimmed group on purpose: this is the only text
+                // that explains what the feature does and does not do, and it
+                // is most needed when the equalizer is off.
+                footnote
             }
             .padding(20)
             .padding(.bottom, 40)
@@ -151,6 +159,7 @@ struct EqualizerView: View {
                     }
                 }
             }
+            .carouselBleed()
         }
     }
 

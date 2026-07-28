@@ -44,14 +44,10 @@ struct RadioView: View {
     }
 
     private var header: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "dot.radiowaves.left.and.right")
-                .font(.system(size: 26, weight: .bold))
-                .foregroundColor(Theme.accentSoft)
-            Text("Radio")
-                .font(.system(.largeTitle, design: .rounded).weight(.heavy))
-                .foregroundColor(Theme.textPrimary)
-        }
+        Text("Radio")
+            .font(.sonavaDisplay)
+            .foregroundColor(Theme.textPrimary)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var genreChips: some View {

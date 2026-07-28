@@ -110,4 +110,30 @@ extension View {
         frame(minWidth: size, minHeight: size)
             .contentShape(Rectangle())
     }
+
+    /// Lets a horizontal scroller run to the physical screen edges while its
+    /// content still starts on the screen margin.
+    ///
+    /// Applied to a scroller inside a padded column, otherwise the viewport
+    /// stops at the margin and guillotines the last card — and its title —
+    /// down the middle, which reads as a layout bug rather than as "there is
+    /// more this way". Every shipping Apple carousel bleeds.
+    func carouselBleed(_ margin: CGFloat = Space.screenMargin) -> some View {
+        padding(.horizontal, -margin)
+            .contentMargins(.horizontal, margin, for: .scrollContent)
+    }
+
+    /// Gives content passing under the floating tab bar a solid backdrop.
+    ///
+    /// The soft default lets saturated artwork read straight through the
+    /// glass: with album art scrolled under it the selected tab measured
+    /// 1.39:1, and the selected tab is the app's single most important state.
+    @ViewBuilder
+    func opaqueBottomScrollEdge() -> some View {
+        if #available(iOS 26, *) {
+            scrollEdgeEffectStyle(.hard, for: .bottom)
+        } else {
+            self
+        }
+    }
 }

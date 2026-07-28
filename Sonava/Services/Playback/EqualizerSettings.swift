@@ -38,7 +38,11 @@ struct EqualizerSettings: Codable, Equatable, Sendable {
     init(
         gains: [Float] = Array(repeating: 0, count: EqualizerBand.count),
         preamp: Float = 0,
-        isEnabled: Bool = false,
+        // On by default, sitting on the flat curve. A flat equalizer is
+        // audibly identical to bypass, so this costs the listener nothing —
+        // and it means the screen opens alive instead of opening as a wall of
+        // dimmed controls, which is what every subscriber saw first.
+        isEnabled: Bool = true,
         presetID: String? = EqualizerPreset.flat.id
     ) {
         self.gains = Self.normalize(gains)

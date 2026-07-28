@@ -20,14 +20,13 @@ struct ArtworkThumbnail: View {
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                    .strokeBorder(Theme.hairline, lineWidth: 1)
             )
             .overlay(alignment: .bottomLeading) {
                 if showBadge {
-                    SourceBadge(source: song.source).padding(4)
+                    SourceBadge(source: song.source).padding(Space.s)
                 }
             }
-            .shadow(color: song.gradient.first?.opacity(0.4) ?? .clear, radius: 8, y: 4)
     }
 }
 

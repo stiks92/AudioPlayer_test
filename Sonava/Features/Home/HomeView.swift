@@ -157,6 +157,7 @@ struct HomeView: View {
                         }
                     }
                 }
+                .carouselBleed()
             }
         }
     }
@@ -185,6 +186,7 @@ struct HomeView: View {
                         }
                     }
                 }
+                .carouselBleed()
             }
         }
     }
@@ -265,6 +267,7 @@ struct HomeView: View {
                         }
                     }
                 }
+                .carouselBleed()
             }
         }
     }
@@ -300,6 +303,7 @@ struct HomeView: View {
                         }
                     }
                 }
+                .carouselBleed()
             }
         }
     }
@@ -350,6 +354,7 @@ struct HomeView: View {
                         }
                     }
                 }
+                .carouselBleed()
             }
         }
     }
@@ -433,6 +438,7 @@ struct HomeView: View {
                     }
                 }
             }
+            .carouselBleed()
         }
     }
 

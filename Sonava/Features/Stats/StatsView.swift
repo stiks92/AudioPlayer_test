@@ -66,7 +66,7 @@ struct StatsView: View {
                             Label("Clear history", systemImage: "trash")
                         }
                     } label: {
-                        Image(systemName: "ellipsis.circle").foregroundColor(Theme.accentSoft)
+                        Image(systemName: "ellipsis").foregroundColor(Theme.accentSoft)
                     }
                     .identified(AccessibilityID.statsMenu, label: "More")
                 }
@@ -159,7 +159,10 @@ struct StatsView: View {
                 x: .value("Day", bucket.day, unit: .day),
                 y: .value("Minutes", bucket.seconds / 60)
             )
-            .foregroundStyle(Theme.brandGradient)
+            .foregroundStyle(
+                LinearGradient(colors: [Theme.accentSoft, Theme.accent],
+                               startPoint: .top, endPoint: .bottom)
+            )
             .cornerRadius(4)
         }
         .chartYAxis {

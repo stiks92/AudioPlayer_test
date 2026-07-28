@@ -17,6 +17,10 @@ struct AIMixView: View {
     @State private var mix: AIMixService.Mix?
     @State private var failed = false
     @State private var showPaywall = false
+
+    private var canGenerate: Bool {
+        !prompt.trimmingCharacters(in: .whitespaces).isEmpty && !isGenerating
+    }
     @FocusState private var focused: Bool
 
     /// Example prompts. The English string is the catalog key; the chip shows
@@ -96,20 +100,25 @@ struct AIMixView: View {
                         }
                     }
                 }
+                .carouselBleed()
 
+                // A dark label on a white capsule cannot be dimmed as a whole:
+                // fading both together collapses the contrast between them —
+                // measured at 1.81:1. The disabled state gets its own colours
+                // instead, and keeps a legible label.
                 Button(action: generate) {
                     HStack {
-                        if isGenerating { ProgressView().tint(Theme.background) }
+                        if isGenerating { ProgressView().tint(canGenerate ? Theme.background : .white) }
                         Text(isGenerating ? "Composing…" : "Generate mix")
                             .font(.headline)
                     }
-                    .foregroundColor(Theme.background)
+                    .foregroundColor(canGenerate ? Theme.background : .white.opacity(0.55))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 15)
-                    .background(Capsule().fill(Color.white))
+                    .background(Capsule().fill(canGenerate ? Color.white : Color.white.opacity(0.14)))
                 }
-                .buttonStyle(BouncyButtonStyle(scale: 0.97))
-                .disabled(prompt.trimmingCharacters(in: .whitespaces).isEmpty || isGenerating)
+                .buttonStyle(BouncyButtonStyle(scale: 0.97, dimsWhenDisabled: false))
+                .disabled(!canGenerate)
 
                 if failed {
                     Text("Couldn't build a mix. Try another vibe or check your connection.")

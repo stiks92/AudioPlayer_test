@@ -49,6 +49,7 @@ struct RootView: View {
                 ForEach(AppTab.allCases, id: \.self) { tab in
                     Tab(tab.title, systemImage: tab.icon, value: tab) {
                         view(for: tab)
+                            .opaqueBottomScrollEdge()
                     }
                 }
             }

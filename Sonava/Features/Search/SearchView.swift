@@ -91,7 +91,9 @@ struct SearchView: View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(Theme.textSecondary)
-            TextField("Songs, artists, stations…", text: $query)
+            TextField("", text: $query,
+                      prompt: Text("Songs, artists, stations…")
+                        .foregroundColor(Theme.textSecondary))
                 .accessibilityIdentifier(AccessibilityID.searchField)
                 .focused($focused)
                 .foregroundColor(.white)

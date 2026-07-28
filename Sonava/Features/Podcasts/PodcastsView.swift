@@ -80,7 +80,9 @@ struct PodcastsView: View {
     private var searchField: some View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass").foregroundColor(Theme.textSecondary)
-            TextField("Search podcasts", text: $query)
+            TextField("", text: $query,
+                      prompt: Text("Search podcasts")
+                        .foregroundColor(Theme.textSecondary))
                 .foregroundColor(.white)
                 .autocorrectionDisabled()
                 .submitLabel(.search)
