@@ -9,80 +9,128 @@
 import SwiftUI
 
 struct MiniPlayerView: View {
+    /// Where the mini player is being shown.
+    enum Style {
+        /// iOS 26's tab-view accessory slot. The system draws the glass, the
+        /// shape and the shadow, and morphs it as the tab bar contracts — so
+        /// the view must bring content only.
+        case accessory
+        /// Floated above the tab bar ourselves, on iOS 18–25.
+        case docked
+    }
+
+    var style: Style = .docked
     let onExpand: () -> Void
 
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var clock: PlaybackClock
 
+    /// The accessory slot is short and the system owns its chrome, so the
+    /// docked layout's artwork and padding do not fit it.
+    private var artworkSide: CGFloat { style == .accessory ? 36 : 44 }
+    private var horizontalPadding: CGFloat { style == .accessory ? Space.m : Space.s + 2 }
+    private var verticalPadding: CGFloat { style == .accessory ? Space.xs + 2 : Space.s }
+
     var body: some View {
         if let song = audio.currentSong {
             VStack(spacing: 0) {
-                HStack(spacing: 12) {
-                    ArtworkImage(song: song, glyphSize: 16)
-                        .frame(width: 44, height: 44)
-                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                HStack(spacing: Space.m) {
+                    ArtworkImage(song: song, glyphSize: 14)
+                        .frame(width: artworkSide, height: artworkSide)
+                        .clipShape(RoundedRectangle(cornerRadius: Radius.inner(Radius.control, inset: 3),
+                                                    style: .continuous))
 
-                    VStack(alignment: .leading, spacing: 2) {
-                        MarqueeText(text: song.title, font: .system(size: 14, weight: .semibold))
+                    VStack(alignment: .leading, spacing: 1) {
+                        MarqueeText(text: song.title, font: .subheadline.weight(.semibold))
                             .frame(height: 18)
                         Text(song.artist)
-                            .font(.system(size: 11))
+                            .font(.sonavaRowMeta)
                             .foregroundColor(Theme.textSecondary)
                             .lineLimit(1)
                     }
 
-                    Spacer(minLength: 6)
+                    Spacer(minLength: Space.xs)
 
                     Button {
                         audio.togglePlayPause()
                     } label: {
                         Image(systemName: audio.isPlaying ? "pause.fill" : "play.fill")
-                            .font(.system(size: 18, weight: .bold))
+                            .font(.system(size: 17, weight: .bold))
                             .foregroundColor(.white)
-                            .frame(width: 34, height: 34)
+                            .frame(width: Space.hitTarget, height: Space.hitTarget)
                     }
                     .buttonStyle(BouncyButtonStyle())
+                    .accessibilityIdentifier(AccessibilityID.playPauseButton)
+                    .accessibilityLabel(Text(audio.isPlaying ? "Pause" : "Play"))
 
                     Button {
                         audio.next()
                     } label: {
                         Image(systemName: "forward.fill")
-                            .font(.system(size: 16, weight: .bold))
+                            .font(.system(size: 15, weight: .bold))
                             .foregroundColor(.white)
-                            .frame(width: 34, height: 34)
+                            .frame(width: Space.hitTarget, height: Space.hitTarget)
                     }
                     .buttonStyle(BouncyButtonStyle())
+                    .accessibilityLabel(Text("Next"))
                 }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 8)
+                .padding(.horizontal, horizontalPadding)
+                .padding(.vertical, verticalPadding)
 
-                // Progress line
-                GeometryReader { geo in
-                    ZStack(alignment: .leading) {
-                        Rectangle().fill(Color.white.opacity(0.14))
-                        Rectangle()
-                            .fill(LinearGradient(colors: song.gradient, startPoint: .leading, endPoint: .trailing))
-                            .frame(width: geo.size.width * CGFloat(clock.progress))
+                // A hairline of progress, docked only. In the accessory slot the
+                // system rounds and insets the capsule, so a full-bleed rule at
+                // its bottom edge reads as a rendering artefact.
+                if style == .docked {
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Rectangle().fill(Theme.hairline)
+                            Rectangle()
+                                .fill(LinearGradient(colors: song.gradient,
+                                                     startPoint: .leading, endPoint: .trailing))
+                                .frame(width: geo.size.width * CGFloat(clock.progress))
+                        }
                     }
+                    .frame(height: 2)
                 }
-                .frame(height: 2)
             }
-            .background(
-                ZStack {
-                    LinearGradient(colors: song.gradient.map { $0.opacity(0.35) },
-                                   startPoint: .leading, endPoint: .trailing)
-                    Rectangle().fill(.ultraThinMaterial)
-                }
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
-            )
-            .shadow(color: .black.opacity(0.4), radius: 16, y: 8)
-            .padding(.horizontal, 12)
+            .modifier(MiniPlayerSurface(style: style, gradient: song.gradient))
             .contentShape(Rectangle())
             .onTapGesture(perform: onExpand)
+            .accessibilityIdentifier(AccessibilityID.miniPlayer)
+        }
+    }
+}
+
+/// The chrome around the mini player, which the system owns in the accessory
+/// slot and we own when docked.
+private struct MiniPlayerSurface: ViewModifier {
+    let style: MiniPlayerView.Style
+    let gradient: [Color]
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        switch style {
+        case .accessory:
+            // Nothing of our own here: drawing a second background inside the
+            // accessory would stack a surface on the system's glass, which is
+            // the one thing Apple's guidance is explicit about.
+            content
+        case .docked:
+            content
+                .background(
+                    ZStack {
+                        LinearGradient(colors: gradient.map { $0.opacity(0.35) },
+                                       startPoint: .leading, endPoint: .trailing)
+                        Rectangle().fill(.ultraThinMaterial)
+                    }
+                )
+                .clipShape(RoundedRectangle(cornerRadius: Radius.control, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
+                        .strokeBorder(Theme.hairline, lineWidth: 1)
+                )
+                .shadow(color: .black.opacity(0.4), radius: 16, y: 8)
+                .padding(.horizontal, Space.m)
         }
     }
 }

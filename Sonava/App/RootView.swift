@@ -29,9 +29,6 @@ struct RootView: View {
     @AppStorage("hasOnboarded.v1") private var hasOnboarded = false
     @State private var selection: AppTab = .home
     @State private var showNowPlaying = false
-    /// Tabs that have been opened at least once — kept alive so switching
-    /// back is instant (no reload flicker).
-    @State private var visited: Set<AppTab> = [.home]
     #if DEBUG
     @State private var debugShowEqualizer = false
     @State private var debugShowPaywall = false
@@ -45,18 +42,22 @@ struct RootView: View {
     private let playerSpring = Animation.spring(response: 0.45, dampingFraction: 0.86)
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            tabContent
-
-            VStack(spacing: 8) {
-                if audio.currentSong != nil && !showNowPlaying {
-                    MiniPlayerView {
-                        withAnimation(playerSpring) { showNowPlaying = true }
+        ZStack {
+            // The system tab bar: it supplies Liquid Glass, 44pt targets and
+            // the contract-on-scroll behaviour that a hand-rolled bar cannot.
+            TabView(selection: $selection) {
+                ForEach(AppTab.allCases, id: \.self) { tab in
+                    Tab(tab.title, systemImage: tab.icon, value: tab) {
+                        view(for: tab)
                     }
-                    .transition(.opacity)
                 }
-                AppTabBar(selection: $selection)
             }
+            // Without this the system bar tints itself blue and the app's
+            // whole palette stops at the tab bar.
+            .tint(Theme.accent)
+            .modifier(MiniPlayerSlot(isHidden: showNowPlaying) {
+                withAnimation(playerSpring) { showNowPlaying = true }
+            })
 
             if showNowPlaying {
                 NowPlayingView {
@@ -153,15 +154,13 @@ struct RootView: View {
             requestReview()
             reviewPrompt.markPresented()
         }
-        .onChange(of: selection) { _, newValue in
-            visited.insert(newValue)
+        .onChange(of: selection) { _, _ in
             Haptics.selection()
         }
         .onOpenURL { url in
             // A shared playlist link: import it and take the user to Library.
             if let shared = PlaylistSharing.playlist(from: url) {
                 playlistStore.importShared(shared)
-                visited.insert(.library)
                 selection = .library
             }
         }
@@ -172,19 +171,6 @@ struct RootView: View {
             theme.enforceFreeIfNeeded(isPro: pro)   // don't keep a paid palette if Pro lapses
             serverStore.isPro = pro                 // extra servers stay saved, just unreachable
             AppIconManager.shared.enforceFreeIfNeeded(isPro: pro)
-        }
-    }
-
-    /// All visited tabs stay in the hierarchy; only the selected one is shown.
-    private var tabContent: some View {
-        ZStack {
-            ForEach(AppTab.allCases, id: \.self) { tab in
-                if visited.contains(tab) {
-                    view(for: tab)
-                        .opacity(selection == tab ? 1 : 0)
-                        .allowsHitTesting(selection == tab)
-                }
-            }
         }
     }
 
@@ -209,12 +195,14 @@ struct RootView: View {
         if let index = arguments.firstIndex(of: "-openTab"),
            index + 1 < arguments.count,
            let tab = AppTab(rawValue: arguments[index + 1]) {
-            visited.insert(tab)
             selection = tab
         }
 
-        if arguments.contains("-demoPlay"), let first = library.songs.first {
-            audio.play(first, in: library.songs)
+        if arguments.contains("-demoPlay") {
+            // Prefer the user's own files; fall back to the demo catalogue so
+            // the player is reviewable on a device with an empty library.
+            let queue = library.songs.isEmpty ? DemoCatalog.trending : library.songs
+            if let first = queue.first { audio.play(first, in: queue) }
         }
 
         if arguments.contains("-openNowPlaying"), audio.currentSong != nil {
@@ -271,55 +259,39 @@ enum AppTab: String, CaseIterable {
     }
 }
 
-struct AppTabBar: View {
-    @Binding var selection: AppTab
-    @Namespace private var indicator
+/// Places the mini player in the right slot for the running OS.
+///
+/// iOS 26 has a slot designed for exactly this — the tab view's bottom
+/// accessory — which brings the glass, the shadow and the morph into the
+/// contracted tab bar with it. Below that we float the player ourselves in a
+/// bottom safe-area inset, which is the closest the older layout can get.
+private struct MiniPlayerSlot: ViewModifier {
+    /// Hidden while the full player is up: the same track would otherwise be
+    /// on screen twice.
+    let isHidden: Bool
+    let onExpand: () -> Void
 
-    var body: some View {
-        HStack {
-            ForEach(AppTab.allCases, id: \.self) { tab in
-                let selected = selection == tab
-                Button {
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
-                        selection = tab
+    @EnvironmentObject private var audio: AudioManager
+
+    private var isVisible: Bool { audio.currentSong != nil && !isHidden }
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if #available(iOS 26, *) {
+            content
+                .tabViewBottomAccessory {
+                    if isVisible {
+                        MiniPlayerView(style: .accessory, onExpand: onExpand)
                     }
-                } label: {
-                    VStack(spacing: 4) {
-                        ZStack {
-                            if selected {
-                                Capsule()
-                                    .fill(Theme.accent.opacity(0.25))
-                                    .matchedGeometryEffect(id: "tabIndicator", in: indicator)
-                                    .frame(width: 54, height: 32)
-                            }
-                            Image(systemName: tab.icon)
-                                .font(.system(size: 18, weight: .semibold))
-                                .foregroundColor(selected ? Theme.accentSoft : Theme.textSecondary)
-                        }
-                        .frame(height: 32)
-                        Text(tab.title)
-                            .font(.system(size: 10, weight: .semibold))
-                            .foregroundColor(selected ? Theme.accentSoft : Theme.textTertiary)
-                    }
-                    .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.plain)
+                .tabBarMinimizeBehavior(.onScrollDown)
+        } else {
+            content.safeAreaInset(edge: .bottom) {
+                if isVisible {
+                    MiniPlayerView(style: .docked, onExpand: onExpand)
+                        .transition(.opacity)
+                }
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.top, 10)
-        .padding(.bottom, 4)
-        .background(
-            Rectangle()
-                .fill(.ultraThinMaterial)
-                .overlay(Rectangle().fill(Theme.background.opacity(0.5)))
-                .ignoresSafeArea(edges: .bottom)
-        )
-        .overlay(
-            Rectangle()
-                .fill(Color.white.opacity(0.06))
-                .frame(height: 1),
-            alignment: .top
-        )
     }
 }

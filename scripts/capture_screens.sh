@@ -56,8 +56,9 @@ shot() {
 
 echo "Capturing $LANG_CODE/$TIER → $OUT"
 
-# Tabs
-shot "01-home"      -openTab home
+# Tabs. A track is playing throughout so the mini player is in every shot —
+# it is part of the layout, not an overlay to review separately.
+shot "01-home"      -openTab home -demoPlay
 shot "02-search"    -openTab search
 shot "03-radio"     -openTab radio
 shot "04-podcasts"  -openTab podcasts
