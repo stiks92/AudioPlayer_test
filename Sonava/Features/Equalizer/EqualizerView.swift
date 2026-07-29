@@ -145,6 +145,13 @@ struct EqualizerView: View {
 
             // Frequency scale, outside the graph so the curve owns its full
             // height and the labels keep a stable baseline.
+            //
+            // Inset by the same gutter as the plot. Giving the ordinate its own
+            // column and leaving this row full width made every label drift
+            // right of the rail it names, by an amount that grew across the
+            // screen — the mirror image of a defect a review had already found
+            // here once, and it was visible on the very first screenshot after
+            // the change.
             HStack(spacing: 0) {
                 ForEach(EqualizerBand.frequencies, id: \.self) { frequency in
                     Text(EqualizerBand.label(for: frequency))
@@ -153,6 +160,7 @@ struct EqualizerView: View {
                         .frame(maxWidth: .infinity)
                 }
             }
+            .padding(.trailing, Plot.dBGutter)
         }
     }
 
