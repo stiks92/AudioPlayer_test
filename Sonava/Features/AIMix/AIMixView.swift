@@ -79,7 +79,7 @@ struct AIMixView: View {
                     .font(.system(.title2, design: .rounded).weight(.bold))
 
                 HStack(spacing: Space.m) {
-                    Image(systemName: "sparkles").foregroundColor(Theme.accentSoft)
+                    SonavaIcon(glyph: .aiMix, size: 20, tint: Theme.accentSoft)
                     // An explicit prompt rather than the implicit placeholder:
                     // the default renders at 2.43:1, and this is the only text
                     // on the screen that tells you what to type.
@@ -207,9 +207,7 @@ struct AIMixView: View {
     private var lockedState: some View {
         VStack(spacing: Space.xl) {
             Spacer()
-            Image(systemName: "sparkles")
-                .font(.system(size: 54, weight: .bold))
-                .foregroundColor(.white)
+            SonavaIcon(glyph: .aiMix, size: 60)
                 .shadow(color: .white.opacity(0.5), radius: 18)
             Text("AI Mix is a Pro feature")
                 .font(.system(.title2, design: .rounded).weight(.bold))

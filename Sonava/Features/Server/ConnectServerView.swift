@@ -274,7 +274,11 @@ struct ConnectServerView: View {
             Label("Works with Navidrome, Airsonic, Gonic and any Subsonic-compatible server.", systemImage: "info.circle")
             Label("Your password is stored securely in the Keychain and only used to sign requests to your server.", systemImage: "lock.shield")
             if !proStore.isPro {
-                Label("Sonava Pro connects unlimited servers and searches them all at once.", systemImage: "sparkles")
+                Label {
+                    Text("Sonava Pro connects unlimited servers and searches them all at once.")
+                } icon: {
+                    SonavaIcon(glyph: .aiMix, size: 15, tint: Theme.textTertiary)
+                }
             }
         }
         .font(.footnote)

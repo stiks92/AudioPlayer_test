@@ -198,9 +198,7 @@ struct HomeView: View {
             showAIMix = true
         } label: {
             HStack(spacing: Space.l) {
-                Image(systemName: "sparkles")
-                    .font(.system(.title).weight(.bold))
-                    .foregroundColor(.white)
+                SonavaIcon(glyph: .aiMix, size: 30)
                 VStack(alignment: .leading, spacing: 3) {
                     Text("Create an AI Mix")
                         .font(.system(.body).weight(.bold))

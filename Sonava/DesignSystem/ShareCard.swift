@@ -49,8 +49,7 @@ struct NowPlayingShareCard: View {
                 Spacer()
 
                 HStack(spacing: 14) {
-                    Image(systemName: "sparkles")
-                        .font(.system(.largeTitle).weight(.bold))
+                    SonavaMark(height: 40)
                     Text("Now playing on Sonava")
                         .font(.system(size: 36, weight: .semibold, design: .rounded))
                 }

@@ -394,7 +394,7 @@ struct StatsShareCard: View {
                 Spacer()
 
                 HStack(spacing: Space.l) {
-                    Image(systemName: "sparkles").font(.system(.largeTitle).weight(.bold))
+                    SonavaMark(height: 34)
                     Text("Sonava").font(.system(size: 40, weight: .heavy, design: .rounded))
                 }
                 .foregroundColor(.white.opacity(0.95))

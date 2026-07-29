@@ -33,6 +33,7 @@ struct RootView: View {
     @State private var debugShowEqualizer = false
     @State private var debugShowPaywall = false
     @State private var debugShowAIMix = false
+    @State private var debugShowIcons = false
     @State private var debugShowScrobble = false
     @State private var debugShowStats = false
     @State private var debugShowServers = false
@@ -101,6 +102,7 @@ struct RootView: View {
                 .environmentObject(library)
                 .environmentObject(proStore)
         }
+        .sheet(isPresented: $debugShowIcons) { IconGallery() }
         .sheet(isPresented: $debugShowScrobble) {
             ConnectScrobbleView().environmentObject(scrobbleStore)
         }
@@ -221,6 +223,9 @@ struct RootView: View {
         }
         if arguments.contains("-openPaywall") { debugShowPaywall = true }
         if arguments.contains("-openAIMix") { debugShowAIMix = true }
+        // The icon set on one sheet, so the family can be judged as a
+        // family rather than one glyph at a time on five screens.
+        if arguments.contains("-openIcons") { debugShowIcons = true }
         if arguments.contains("-openScrobble") { debugShowScrobble = true }
         // Stats need a history to show, so seeding is offered alongside.
         if arguments.contains("-seedStats") { history.seedDemoData() }

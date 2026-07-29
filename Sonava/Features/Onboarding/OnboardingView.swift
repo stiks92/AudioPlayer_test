@@ -14,28 +14,30 @@ struct OnboardingView: View {
 
     private struct Slide: Identifiable {
         let id = UUID()
-        let icon: String
+        let glyph: SonavaIcon.Glyph?
         let title: LocalizedStringKey
         let subtitle: LocalizedStringKey
         let colors: [Color]
     }
 
     private let slides: [Slide] = [
-        // Empty icon = the app's own mark. Only the opening slide gets it;
-        // repeating a logo on all four would make it wallpaper.
-        Slide(icon: "",
+        // `nil` glyph = the app's own mark. Only the opening slide gets it;
+        // repeating a logo on all four would make it wallpaper. The rest are
+        // drawn glyphs — the first four screens of the app are not the place
+        // for symbols every other app on the phone also ships.
+        Slide(glyph: nil,
               title: "All your music, one player",
               subtitle: "Streaming, internet radio, podcasts and your own server — unified in one beautiful place.",
               colors: [Theme.accent, Theme.accentDeep]),
-        Slide(icon: "magnifyingglass",
+        Slide(glyph: .search,
               title: "Search everything at once",
               subtitle: "One query fans out across Audius, Apple, Deezer and your library — full tracks and previews together.",
               colors: [Color(hex: 0x00C6FF), Color(hex: 0x0072FF)]),
-        Slide(icon: "sparkles",
+        Slide(glyph: .aiMix,
               title: "AI Mix & Shazam",
               subtitle: "Describe a vibe and get an instant mix. Identify what's playing around you in a tap.",
               colors: [Theme.accentPink, Color(hex: 0x8E2DE2)]),
-        Slide(icon: "lock.shield.fill",
+        Slide(glyph: .server,
               title: "Private by design",
               subtitle: "On-device intelligence, no tracking, no ads. Your taste stays yours.",
               colors: [Color(hex: 0x11998E), Theme.positive])
@@ -96,15 +98,14 @@ struct OnboardingView: View {
             // screen a person actually sees first opened with
             // `square.stack.3d.up.fill`, a glyph that also duplicated the tab
             // bar's old library icon.
-            if slide.icon.isEmpty {
-                SonavaMark(height: 76)
-                    .shadow(color: .white.opacity(0.4), radius: 20)
-            } else {
-                Image(systemName: slide.icon)
-                    .font(.system(size: 76, weight: .bold))
-                    .foregroundColor(.white)
-                    .shadow(color: .white.opacity(0.4), radius: 20)
+            Group {
+                if let glyph = slide.glyph {
+                    SonavaIcon(glyph: glyph, size: 76)
+                } else {
+                    SonavaMark(height: 76)
+                }
             }
+            .shadow(color: .white.opacity(0.4), radius: 20)
             VStack(spacing: Space.l) {
                 Text(slide.title)
                     .font(.system(.title, design: .rounded).weight(.heavy))

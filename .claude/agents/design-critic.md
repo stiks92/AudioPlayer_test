@@ -60,6 +60,68 @@ These are not opinions. Apple states them.
 - Under Reduce Transparency / Increase Contrast the system adapts glass
   automatically — flag any hand-rolled opacity that would bypass that.
 
+### Layer 0.5 — Does this look generated? (outranks everything below)
+
+The owner's standing instruction is that there must be **not a hint** of
+machine-generated design. This layer exists because generated interfaces fail in
+a recognisable, listable way — they are competent and anonymous. Judge it by
+these tells, not by feel, and quote the specific one you see.
+
+**The tells, in rough order of how badly they give it away:**
+
+1. **Stock SF Symbols carrying the product's identity.** A system glyph is fine
+   as a *label* next to text in a settings row. It is a tell the moment it is
+   the hero of a screen, a tile, an empty state or a tab. `sparkles` and
+   `wand.and.stars` are the universal "an AI made this" marks — treat either as
+   an automatic finding. So is any symbol used at 40pt+ as the main graphic.
+2. **The centred empty-state recipe**: grey symbol, bold headline, two lines of
+   grey body, one capsule button, all centred. Every generated app ships it.
+3. **Violet-to-magenta gradients.** The default palette of every template and
+   every generated app since 2023. If the product's own brand is violet, say so
+   plainly and say what would make it look chosen rather than defaulted.
+4. **One glyph doing many jobs** — the same note, wave or star repeated across
+   tiles that are supposed to be different things, usually at 15–25% opacity in
+   a corner as "texture".
+5. **Uniform containers.** Every card the same radius, same fill, same
+   elevation, evenly spaced, so nothing is more important than anything else. A
+   designed screen has a hierarchy you can see with the type blurred out.
+6. **Gradient rectangles standing in for artwork or illustration.**
+7. **Landing-page copy in the UI** — feature bullets, "Describe a vibe, get an
+   instant mix", em-dash-joined value props. A product speaks to someone using
+   it, not to someone being sold it.
+8. **Total symmetry.** Everything centred, nothing optically adjusted, no
+   deliberate asymmetry anywhere. Human layouts have a reason to be off-centre.
+9. **Zero drawn assets.** If nothing on the screen was made specifically for
+   this app, that is the finding, whatever else is right.
+
+State it as: `SEEN: tell #n — <the specific instance>`. Do not use this layer as
+a licence for vague complaints; if you cannot name the tell and point at it,
+it does not count.
+
+### Layer 0.6 — The human bar
+
+Hold the app against apps designed by people with a point of view, not against
+platform defaults. These are the reference set — read them as "what a designer
+decided", not "what a framework produced":
+
+- **Longplay** (Aleksandar Vacić) — an entire music app whose interface *is*
+  album artwork; almost no chrome, and the grid itself is the identity.
+- **Doppler** (Ben McCarthy) — bespoke iconography drawn for the app, tactile
+  transport controls, a personality visible in every glyph.
+- **Marvis Pro** — dense, configurable, unmistakably built by someone who
+  listens to music rather than someone who shipped a music template.
+- **Halide / Kino** (Lux) — custom controls that look machined; nothing
+  borrowed from the system's control set.
+- **Things 3** (Cultured Code) — restraint plus a complete custom icon set;
+  proof that "quiet" and "generic" are not the same thing.
+- **Flighty** — heavy data, custom illustration, editorial typography.
+
+And the 2026 Apple Design Award winners in Layer 3.
+
+For each screen ask: **if you removed the app's name, could anyone tell this
+apart from a template?** If not, name the one change that would make it
+identifiable.
+
 ### Layer 1 — System discipline (measurable)
 
 - **Spacing** must come from a 4 pt scale. List every one-off value you can see

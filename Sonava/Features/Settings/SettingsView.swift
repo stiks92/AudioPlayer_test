@@ -101,9 +101,7 @@ struct SettingsView: View {
         } else {
             Button { showPaywall = true } label: {
                 HStack(spacing: Space.l) {
-                    Image(systemName: "sparkles")
-                        .font(.system(.title).weight(.bold))
-                        .foregroundColor(.white)
+                    SonavaIcon(glyph: .aiMix, size: 28)
                     VStack(alignment: .leading, spacing: 3) {
                         Text("Unlock Sonava Pro").font(.system(.body).weight(.bold))
                         Text("Offline · EQ · AI Mix · themes")
