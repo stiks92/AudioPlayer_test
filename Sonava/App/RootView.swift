@@ -48,9 +48,23 @@ struct RootView: View {
             // the contract-on-scroll behaviour that a hand-rolled bar cannot.
             TabView(selection: $selection) {
                 ForEach(AppTab.allCases, id: \.self) { tab in
-                    Tab(tab.title, systemImage: tab.icon, value: tab) {
+                    Tab(value: tab) {
                         view(for: tab)
                             .opaqueBottomScrollEdge()
+                    } label: {
+                        // The app's own glyphs, not the system's. A tab bar is
+                        // the one row where five icons are read side by side,
+                        // so it is where a borrowed set is most obvious — and
+                        // where the old one mixed two stroke weights.
+                        Label {
+                            Text(tab.title)
+                        } icon: {
+                            if let raster = IconRaster.image(tab.glyph, size: 24) {
+                                Image(uiImage: raster)
+                            } else {
+                                SonavaIcon(glyph: tab.glyph, size: 22)
+                            }
+                        }
                     }
                 }
             }
@@ -262,27 +276,18 @@ enum AppTab: String, CaseIterable {
         }
     }
 
-    /// One symbol weight across all five.
+    /// The app's own glyph for each tab.
     ///
-    /// They were mixed: `magnifyingglass` and `dot.radiowaves.left.and.right`
-    /// draw as hairlines while `mic.fill` and `square.stack.fill` drew solid,
-    /// so the right half of the bar was visibly heavier than the left — in one
-    /// row of five peers, which is the single place symbol discipline is most
-    /// legible.
-    ///
-    /// Outline is the set that can actually be made whole: neither radio waves
-    /// nor a track list has a filled variant, so "all filled" would have been a
-    /// comment this code could not honour.
-    ///
-    /// `square.stack.fill` had to go regardless. At 24pt it reads as a jar, and
-    /// it repeated the layers metaphor the first onboarding slide was using.
-    var icon: String {
+    /// Replaced a mixed set of system symbols — two filled, three hairline —
+    /// where the right half of the bar was visibly heavier than the left. One
+    /// family, one stroke, drawn on one grid.
+    var glyph: SonavaIcon.Glyph {
         switch self {
-        case .home: return "house"
-        case .search: return "magnifyingglass"
-        case .radio: return "dot.radiowaves.left.and.right"
-        case .podcasts: return "mic"
-        case .library: return "music.note.list"
+        case .home: return .home
+        case .search: return .search
+        case .radio: return .radio
+        case .podcasts: return .podcasts
+        case .library: return .library
         }
     }
 }

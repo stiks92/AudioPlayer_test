@@ -35,6 +35,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 // MARK: - Shared geometry
 
@@ -417,3 +418,29 @@ struct IconGallery: View {
     }
 }
 #endif
+
+// MARK: - Rasterised, for places that demand an image
+
+/// A glyph as a template `UIImage`.
+///
+/// The system tab bar takes a label and renders it into its own image; a
+/// `Canvas` does not survive that trip, and the first attempt at custom tab
+/// icons shipped a bar with five labels and no glyphs at all. Handing UIKit an
+/// image it can tint is the way in.
+///
+/// Cached because a tab bar re-reads its items often and re-rendering a vector
+/// per pass would be visible.
+@MainActor
+enum IconRaster {
+    private static var cache: [String: UIImage] = [:]
+
+    static func image(_ glyph: SonavaIcon.Glyph, size: CGFloat) -> UIImage? {
+        let key = "\(glyph)@\(size)"
+        if let hit = cache[key] { return hit }
+        let renderer = ImageRenderer(content: SonavaIcon(glyph: glyph, size: size, tint: .white))
+        renderer.scale = UIScreen.main.scale
+        guard let rendered = renderer.uiImage?.withRenderingMode(.alwaysTemplate) else { return nil }
+        cache[key] = rendered
+        return rendered
+    }
+}

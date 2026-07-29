@@ -212,7 +212,7 @@ struct SearchView: View {
                             .font(.system(.body).weight(.bold))
                             .foregroundColor(.white)
                             .padding(Space.l)
-                        Image(systemName: "music.note")
+                        SonavaIcon(glyph: .note, size: 24)
                             .font(.system(.largeTitle).weight(.bold))
                             .foregroundColor(.white.opacity(0.25))
                             .rotationEffect(.degrees(25))

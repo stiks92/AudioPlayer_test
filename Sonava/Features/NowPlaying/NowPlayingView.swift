@@ -254,7 +254,7 @@ struct NowPlayingView: View {
             Button {
                 withAnimation { audio.toggleShuffle() }
             } label: {
-                Image(systemName: "shuffle")
+                SonavaIcon(glyph: .shuffle, size: 20)
                     .font(.system(.body).weight(.semibold))
                     .foregroundColor(audio.isShuffling ? Theme.accentSoft : .white.opacity(0.7))
             }

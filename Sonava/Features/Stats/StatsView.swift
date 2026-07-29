@@ -305,7 +305,7 @@ struct StatsTeaserCard: View {
                 Spacer()
                 if stats.streak > 1 {
                     HStack(spacing: 3) {
-                        Image(systemName: "flame.fill").font(.system(.caption).weight(.bold))
+                        SonavaIcon(glyph: .streak, size: 14, tint: Theme.accentPink)
                         Text(stats.streak, format: .number)
                             .font(.system(.footnote, design: .rounded).weight(.heavy))
                     }
@@ -385,7 +385,7 @@ struct StatsShareCard: View {
 
                 if stats.streak > 1 {
                     HStack(spacing: Space.m) {
-                        Image(systemName: "flame.fill").font(.system(size: 38, weight: .bold))
+                        SonavaIcon(glyph: .streak, size: 40)
                         Text("\(stats.streak)-day streak").font(.system(size: 40, weight: .semibold))
                     }
                     .foregroundColor(.white.opacity(0.95))

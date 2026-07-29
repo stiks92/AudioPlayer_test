@@ -38,9 +38,12 @@ struct ArtworkImage: View {
     /// No cover art (or it failed to load): the track's gradient carries a
     /// glyph. Sonava bundles no artwork, so there is nothing else to show.
     private var fallback: some View {
-        Image(systemName: song.isLive ? "dot.radiowaves.left.and.right" : "music.note")
-            .font(.system(size: glyphSize, weight: .bold))
-            .foregroundColor(.white.opacity(0.9))
+        // The most-seen glyph in the app: every cover that has not loaded, or
+        // does not exist, is this. A borrowed one here is a borrowed one
+        // everywhere.
+        SonavaIcon(glyph: song.isLive ? .radio : .note,
+                   size: glyphSize * 1.25,
+                   tint: .white.opacity(0.9))
     }
 }
 

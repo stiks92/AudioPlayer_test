@@ -73,7 +73,7 @@ struct MiniPlayerView: View {
                     Button {
                         audio.togglePlayPause()
                     } label: {
-                        Image(systemName: audio.isPlaying ? "pause.fill" : "play.fill")
+                        SonavaIcon(glyph: audio.isPlaying ? .pause : .play, size: 19)
                             .font(.system(.body).weight(.bold))
                             .foregroundColor(.white)
                             .frame(width: Space.hitTarget, height: Space.hitTarget)
@@ -85,7 +85,7 @@ struct MiniPlayerView: View {
                     Button {
                         audio.next()
                     } label: {
-                        Image(systemName: "forward.end.fill")
+                        SonavaIcon(glyph: .next, size: 19)
                             .font(.system(.subheadline).weight(.bold))
                             .foregroundColor(.white)
                             .frame(width: Space.hitTarget, height: Space.hitTarget)

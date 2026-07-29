@@ -128,7 +128,7 @@ struct ShazamView: View {
             } placeholder: {
                 ZStack {
                     LinearGradient(colors: [Color(hex: 0x00C6FF), Theme.accent], startPoint: .top, endPoint: .bottom)
-                    Image(systemName: "music.note").font(.system(size: 60)).foregroundColor(.white.opacity(0.8))
+                    SonavaIcon(glyph: .note, size: 64, tint: .white.opacity(0.8))
                 }
             }
             .frame(width: 220, height: 220)
@@ -151,7 +151,7 @@ struct ShazamView: View {
                 } label: {
                     HStack {
                         if isFindingOnAudius { ProgressView().tint(Theme.background) }
-                        Image(systemName: "play.fill")
+                        SonavaIcon(glyph: .play, size: 16, tint: Theme.background)
                         Text(isFindingOnAudius ? "Searching…" : "Play on Sonava")
                     }
                     .font(.headline)

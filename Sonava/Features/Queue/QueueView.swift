@@ -86,7 +86,7 @@ struct QueueView: View {
             Button {
                 withAnimation { audio.toggleShuffle() }
             } label: {
-                Image(systemName: "shuffle")
+                SonavaIcon(glyph: .shuffle, size: 18)
                     .foregroundColor(audio.isShuffling ? Theme.accentSoft : Theme.textSecondary)
             }
             Button {

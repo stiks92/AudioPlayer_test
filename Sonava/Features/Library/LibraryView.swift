@@ -116,9 +116,7 @@ struct LibraryView: View {
 
     private var emptyPlaylists: some View {
         VStack(spacing: Space.l) {
-            Image(systemName: "music.note.list")
-                .font(.system(size: 46))
-                .foregroundColor(Theme.textTertiary)
+            SonavaIcon(glyph: .library, size: 52, tint: Theme.textTertiary)
             Text("No playlists yet")
                 .font(.headline)
                 .foregroundColor(Theme.textSecondary)
@@ -174,7 +172,7 @@ struct LibraryView: View {
                         RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
                             .fill(LinearGradient(colors: playlist.gradient, startPoint: .topLeading, endPoint: .bottomTrailing))
                             .frame(width: 60, height: 60)
-                            .overlay(Image(systemName: "music.note.list").foregroundColor(.white))
+                            .overlay(SonavaIcon(glyph: .library, size: 24))
                         VStack(alignment: .leading, spacing: 4) {
                             Text(playlist.name)
                                 .font(.system(.callout).weight(.semibold))
@@ -291,7 +289,7 @@ struct LibraryView: View {
         let downloads = audio.downloads.downloads
         if downloads.isEmpty {
             VStack(spacing: Space.m) {
-                Image(systemName: "arrow.down.circle")
+                SonavaIcon(glyph: .download, size: 46)
                     .font(.system(size: 46))
                     .foregroundColor(Theme.textTertiary)
                 Text("Nothing downloaded yet")

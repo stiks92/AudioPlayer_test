@@ -142,7 +142,7 @@ struct PlayPauseButton: View {
                 Circle()
                     .fill(Color.white)
                     .shadow(color: .white.opacity(0.35), radius: 22, y: 8)
-                Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                SonavaIcon(glyph: isPlaying ? .pause : .play, size: size * 0.42)
                     .font(.system(size: size * 0.4, weight: .black))
                     .foregroundColor(Theme.background)
                     .offset(x: isPlaying ? 0 : size * 0.03)

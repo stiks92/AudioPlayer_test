@@ -286,7 +286,7 @@ struct EqualizerView: View {
     private var lockedState: some View {
         VStack(spacing: Space.xl) {
             Spacer()
-            Image(systemName: "slider.vertical.3")
+            SonavaIcon(glyph: .equalizer, size: 56)
                 .font(.system(size: 54, weight: .bold))
                 .foregroundColor(.white)
                 .shadow(color: Theme.accent.opacity(0.6), radius: 18)
