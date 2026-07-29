@@ -258,6 +258,11 @@ struct RootView: View {
         // The icon set on one sheet, so the family can be judged as a
         // family rather than one glyph at a time on five screens.
         if arguments.contains("-openIcons") { debugShowIcons = true }
+        // Forces any palette, including the review-only candidates, so a whole
+        // screen can be looked at in each rather than compared as hex values.
+        if let index = arguments.firstIndex(of: "-palette"), index + 1 < arguments.count {
+            ThemeManager.shared.select(ThemePalette.palette(id: arguments[index + 1]))
+        }
         if arguments.contains("-openScrobble") { debugShowScrobble = true }
         // Stats need a history to show, so seeding is offered alongside.
         if arguments.contains("-seedStats") { history.seedDemoData() }

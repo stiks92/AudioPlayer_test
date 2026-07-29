@@ -47,8 +47,44 @@ extension ThemePalette {
 
     static let all: [ThemePalette] = [aurora, sunset, ocean, forest, rose, mono]
 
+#if DEBUG
+    // MARK: - Candidate defaults, for design review only
+
+    /// Alternatives to `aurora` as the app's free, default palette.
+    ///
+    /// A review layer lists violet-to-magenta gradients as a tell of generated
+    /// design — the palette every template and every generated app has shipped
+    /// since 2023 — and `aurora` is exactly that pair. These are here to be
+    /// *seen* on real screens rather than argued about as hex values. They are
+    /// not offered in Settings and do not count toward the six themes the
+    /// paywall sells; a launch argument selects one.
+
+    /// Analogue warmth: tape, VU meters, the amber of a hi-fi at night. Chosen
+    /// partly by elimination — Spotify owns green, Apple Music red-pink, Tidal
+    /// cyan, YouTube red — so amber is the one warm slot in the category that
+    /// is not already somebody's brand.
+    static let ember = ThemePalette(id: "ember", name: "Ember",
+        accent: 0xFF8A3D, accentSoft: 0xFFC48A, accentDeep: 0xE0400C, accentPink: 0xFFB84D, isPro: false)
+
+    /// Editorial restraint: paper on ink, one warm off-white doing the work of
+    /// a colour. The direction Things and Longplay take — quiet is not the same
+    /// as generic. Tint stops being a hue and becomes a *weight*.
+    static let ink = ThemePalette(id: "ink", name: "Ink",
+        accent: 0xF0E6D2, accentSoft: 0xFFFAF0, accentDeep: 0x2A241C, accentPink: 0xD8C6A4, isPro: false)
+
+    /// A single saturated signal colour against near-black, the way studio
+    /// hardware marks the one thing that is live.
+    static let signal = ThemePalette(id: "signal", name: "Signal",
+        accent: 0xC6F24A, accentSoft: 0xE4FA9E, accentDeep: 0x1F3A00, accentPink: 0x9FE03C, isPro: false)
+
+    static let candidates: [ThemePalette] = [ember, ink, signal]
+#endif
+
     static func palette(id: String?) -> ThemePalette {
-        all.first { $0.id == id } ?? .aurora
+        #if DEBUG
+        if let id, let candidate = candidates.first(where: { $0.id == id }) { return candidate }
+        #endif
+        return all.first { $0.id == id } ?? .aurora
     }
 }
 
