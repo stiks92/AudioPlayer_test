@@ -61,10 +61,15 @@ struct NowPlayingTint: View {
                         startPoint: .top,
                         endPoint: .bottom
                     )
-                    .frame(height: geo.size.height * falloff)
-                    // A wide blur so the two stops read as one atmosphere
-                    // rather than as a banded gradient.
+                    // Drawn taller than it is shown, blurred, then clipped.
+                    // Blurring a frame whose edges are transparent bleeds alpha
+                    // outwards, so roughly half the authored opacity never
+                    // arrives — which is why two calibration passes kept
+                    // landing short of what the code said.
+                    .frame(height: geo.size.height * falloff * 1.4)
                     .blur(radius: 60)
+                    .frame(height: geo.size.height * falloff, alignment: .top)
+                    .clipped()
                 }
                 // Cross-fading between two tracks' palettes is the whole point;
                 // a hard cut would read as a glitch.

@@ -53,7 +53,7 @@ struct FilterChipRow<Value: Hashable>: View {
                 .background {
                     if isSelected {
                         Capsule()
-                            .fill(Theme.accent)
+                            .fill(Theme.accent.mix(with: Theme.background, by: 0.12))
                             .matchedGeometryEffect(id: "filterChip", in: indicator)
                     } else {
                         Capsule().fill(Color.white.opacity(0.08))

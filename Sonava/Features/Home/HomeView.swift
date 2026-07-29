@@ -220,7 +220,10 @@ struct HomeView: View {
                 Image(systemName: "chevron.right").foregroundColor(.white.opacity(0.8))
             }
             .padding(Space.l)
-            .background(Theme.proGradient)
+            // The gradient peaks magenta mid-card, which put this copy at
+            // 1.9:1. `StatsShareCard` solves the identical problem on the
+            // identical gradient with a scrim; same answer here.
+            .background(Theme.proGradient.overlay(Color.black.opacity(0.25)))
             .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
             .shadow(color: .black.opacity(0.5), radius: 20, y: 10)
         }
@@ -357,7 +360,7 @@ struct HomeView: View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text(greeting)
-                    .font(.system(.title, design: .rounded).weight(.heavy))
+                    .font(.sonavaDisplay)
                     .foregroundColor(Theme.textPrimary)
                 Text("What do you feel like hearing?")
                     .font(.subheadline)
@@ -383,7 +386,7 @@ struct HomeView: View {
             } label: {
                 // `sparkles` belongs to AI Mix; using it here too pointed one
                 // glyph at two unrelated destinations in the same viewport.
-                headerButtonFace(proStore.isPro ? "person.crop.circle.fill" : "person.fill",
+                headerButtonFace(proStore.isPro ? "person.fill" : "person",
                                  tint: Theme.accentSoft)
             }
             .buttonStyle(BouncyButtonStyle())

@@ -93,8 +93,10 @@ enum Theme {
     static let destructive = Color(hex: 0xFF3B6B)
     /// Inline error copy — softer than `destructive` so it reads as text.
     static let error = Color(hex: 0xFF6B8A)
-    /// Live radio indicator.
-    static let live = Color(hex: 0xFF3B6B)
+    /// Live radio indicator. Deliberately *not* `destructive`: they shared a
+    /// hex, so one colour meant "live", "favourite" and "delete" at once, and
+    /// therefore meant none of them.
+    static let live = Color(hex: 0xFF9F0A)
 
     // MARK: Text
     static let textPrimary = Color.white

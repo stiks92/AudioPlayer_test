@@ -111,10 +111,18 @@ private struct MiniPlayerSurface: ViewModifier {
     func body(content: Content) -> some View {
         switch style {
         case .accessory:
-            // Nothing of our own here: drawing a second background inside the
-            // accessory would stack a surface on the system's glass, which is
-            // the one thing Apple's guidance is explicit about.
-            content
+            // The system owns the glass here, so this adds no surface of its
+            // own — but glass samples whatever is scrolled beneath it, which
+            // meant the mini player took its colour from a passing tile while
+            // the ground behind it took its colour from the playing track.
+            // Two colour systems, two different tracks, 200pt apart.
+            //
+            // A wash from *this* track sits under the glass so the two agree,
+            // faint enough to leave the label contrast alone.
+            content.background(
+                LinearGradient(colors: gradient.map { $0.opacity(0.30) },
+                               startPoint: .leading, endPoint: .trailing)
+            )
         case .docked:
             content
                 .background(

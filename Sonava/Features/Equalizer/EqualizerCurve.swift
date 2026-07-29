@@ -80,14 +80,22 @@ struct ResponseCurve: Shape {
         guard values.count > 1 else { return Path() }
 
         let midY = rect.midY
-        let step = rect.width / CGFloat(values.count - 1)
+        // The same mapping the handles use: ten equal columns, each knob at its
+        // column's centre. Dividing by `count - 1` instead drew the curve 11%
+        // wider than the controls it claims to describe, so it missed every
+        // knob — by up to 7.7pt at 8 kHz — while this file's own header claimed
+        // the picture tells the truth about the sound.
+        let step = rect.width / CGFloat(values.count)
         let points = values.enumerated().map { index, gain in
-            CGPoint(x: rect.minX + CGFloat(index) * step,
+            CGPoint(x: rect.minX + step * (CGFloat(index) + 0.5),
                     y: midY - CGFloat(gain / limit) * (rect.height / 2))
         }
 
         var path = Path()
-        path.move(to: points[0])
+        // Run flat out to both edges so the graph still spans its full width
+        // without inventing control points that no band corresponds to.
+        path.move(to: CGPoint(x: rect.minX, y: points[0].y))
+        path.addLine(to: points[0])
         // Catmull-Rom, expressed as the cubic Bézier segments SwiftUI draws.
         for index in 0..<(points.count - 1) {
             let p0 = points[max(index - 1, 0)]
@@ -101,9 +109,11 @@ struct ResponseCurve: Shape {
             path.addCurve(to: p2, control1: control1, control2: control2)
         }
 
+        path.addLine(to: CGPoint(x: rect.maxX, y: points.last!.y))
+
         if closed {
-            path.addLine(to: CGPoint(x: points.last!.x, y: midY))
-            path.addLine(to: CGPoint(x: points[0].x, y: midY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: midY))
+            path.addLine(to: CGPoint(x: rect.minX, y: midY))
             path.closeSubpath()
         }
         return path
@@ -135,9 +145,17 @@ struct ResponseGraph: View {
                         .frame(height: 1)
                         .position(x: geo.size.width / 2, y: half + offset)
                 }
+                // Dashed, so a flat curve resting exactly on it still reads
+                // as a curve on a datum rather than as one unexplained line.
                 Rectangle()
                     .fill(Theme.textTertiary)
                     .frame(height: 1)
+                    .overlay(
+                        Rectangle()
+                            .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [5, 4]))
+                            .foregroundColor(Theme.background)
+                            .frame(height: 1)
+                    )
                     .position(x: geo.size.width / 2, y: half)
             }
 

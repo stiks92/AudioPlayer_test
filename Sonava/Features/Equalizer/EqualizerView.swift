@@ -205,8 +205,9 @@ struct EqualizerView: View {
                 .textCase(.uppercase)
                 .font(.system(.caption).weight(.bold)).tracking(1)
                 .foregroundColor(Theme.textTertiary)
+            ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
+                HStack(spacing: Space.s) {
                     ForEach(EqualizerPreset.all) { preset in
                         let selected = effects.equalizer.presetID == preset.id
                         Button {
@@ -215,17 +216,27 @@ struct EqualizerView: View {
                         } label: {
                             Text(LocalizedStringKey(preset.name))
                                 .font(.system(.footnote).weight(.semibold))
-                                .foregroundColor(selected ? Theme.background : Theme.textSecondary)
-                                .padding(.horizontal, Space.l).padding(.vertical, 8)
-                                .background(Capsule().fill(selected ? Color.white : Color.white.opacity(0.08)))
+                                .foregroundColor(selected ? .white : Theme.textSecondary)
+                                .padding(.horizontal, Space.l)
+                                .frame(minHeight: Space.hitTarget)
+                                .background(Capsule().fill(selected ? Theme.accent.mix(with: Theme.background, by: 0.12)
+                                                                : Color.white.opacity(0.08)))
                         }
                         .buttonStyle(.plain)
                         // Identify by preset id so UI tests are language-agnostic.
                         .accessibilityIdentifier("eq.preset.\(preset.id)")
+                        .id(preset.id)
                     }
                 }
             }
             .carouselBleed()
+            // The screen must not open with its own current state sliced at the
+            // screen edge, which is what happened with nothing scrolling it in.
+            .onAppear { proxy.scrollTo(effects.equalizer.presetID, anchor: .center) }
+            .onChange(of: effects.equalizer.presetID) { _, id in
+                withAnimation(Motion.standard) { proxy.scrollTo(id, anchor: .center) }
+            }
+            }
         }
     }
 

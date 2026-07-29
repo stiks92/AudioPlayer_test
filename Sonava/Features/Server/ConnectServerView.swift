@@ -92,6 +92,7 @@ struct ConnectServerView: View {
         let locked = !serverStore.isUsable(connection)
         return HStack(spacing: Space.l) {
             Image(systemName: locked ? "lock.fill" : (active ? "checkmark.circle.fill" : "circle"))
+                .frame(width: Space.iconColumn, height: Space.iconColumn)
                 .font(.system(.body))
                 .foregroundColor(locked ? Theme.textTertiary : (active ? Theme.positive : Theme.textTertiary))
             VStack(alignment: .leading, spacing: 2) {
@@ -111,7 +112,7 @@ struct ConnectServerView: View {
                 Image(systemName: "trash")
                     .font(.system(.footnote))
                     .foregroundColor(Theme.destructive)
-                    .frame(width: 34, height: 34)
+                    .frame(width: Space.hitTarget, height: Space.hitTarget)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)

@@ -70,7 +70,7 @@ struct SegmentedControl<Value: Hashable>: View {
             .background {
                 if isSelected {
                     Capsule()
-                        .fill(Theme.accent)
+                        .fill(Theme.accent.mix(with: Theme.background, by: 0.12))
                         .matchedGeometryEffect(id: "segment", in: indicator)
                 }
             }
