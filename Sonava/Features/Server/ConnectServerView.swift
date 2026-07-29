@@ -45,11 +45,7 @@ struct ConnectServerView: View {
             .foregroundColor(.white)
             .navigationTitle("Self-hosted servers")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }.foregroundColor(Theme.accentSoft)
-                }
-            }
+            .doneToolbar { dismiss() }
             .sheet(isPresented: $showAddServer) {
                 AddServerView().environmentObject(serverStore)
             }

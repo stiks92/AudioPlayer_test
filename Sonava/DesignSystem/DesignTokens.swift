@@ -45,6 +45,22 @@ enum Space {
     static let hitTarget: CGFloat = 44
 }
 
+// MARK: - Artwork tiles
+
+/// Two tile sizes for the horizontal rails, and only two.
+///
+/// Home had three — 130, 150 and 160 — with identical gutters and identical
+/// margins, so the difference read as a mistake rather than as a hierarchy.
+/// Worse, the smallest belonged to "Made for you": the rail that carries the
+/// app's personalisation promise was drawn smaller than "Popular now".
+enum Tile {
+    /// The rails that lead a screen and carry a promise: what the app picked
+    /// for this listener, and the curated playlists.
+    static let feature: CGFloat = 160
+    /// Every other rail.
+    static let standard: CGFloat = 140
+}
+
 // MARK: - Radius
 
 enum Radius {
@@ -118,9 +134,48 @@ extension View {
     /// stops at the margin and guillotines the last card — and its title —
     /// down the middle, which reads as a layout bug rather than as "there is
     /// more this way". Every shipping Apple carousel bleeds.
-    func carouselBleed(_ margin: CGFloat = Space.screenMargin) -> some View {
-        padding(.horizontal, -margin)
+    /// The trailing edge dissolves rather than being cut.
+    ///
+    /// The bleed is deliberate — a half-visible card is how a reader knows to
+    /// swipe — but a hard vertical cut through a cover, a badge or a word reads
+    /// as clipping damage rather than as an invitation. A review found it on
+    /// four scrollers at once, worst on the accent swatches, where a circle was
+    /// sliced down the middle against the card's own border and its label was
+    /// truncated to a single letter.
+    ///
+    /// Only the trailing side. A leading fade would dim the first card while
+    /// the row sits unscrolled at its margin, which is the state it is in most
+    /// of the time.
+    ///
+    /// Pass `fade: nil` for a scroller inside a container that clips — a card,
+    /// say — where the mask must not be applied at all.
+    ///
+    /// Measured, and the measurement corrected a wrong guess. With a mask on,
+    /// the sixth accent swatch vanished while the five before it stayed at
+    /// pixel-identical positions, so the layout had not moved. The first guess
+    /// was that the gradient was too wide; narrowing it from 28pt to 14
+    /// changed nothing, and a plain opaque `Rectangle()` mask erased the swatch
+    /// too. So it is applying a mask at all that re-clips the scroller to its
+    /// unbled bounds inside a card, which is precisely where the peeking item
+    /// lives. Trading a sliced circle for no "there is more" cue is a worse
+    /// deal, and that cue is what an earlier round added this bleed to restore.
+    @ViewBuilder
+    func carouselBleed(_ margin: CGFloat = Space.screenMargin,
+                       fade: CGFloat? = 14) -> some View {
+        let bled = padding(.horizontal, -margin)
             .contentMargins(.horizontal, margin, for: .scrollContent)
+        if let fade {
+            bled.mask(alignment: .leading) {
+                HStack(spacing: 0) {
+                    Rectangle()
+                    LinearGradient(colors: [.black, .clear],
+                                   startPoint: .leading, endPoint: .trailing)
+                        .frame(width: fade)
+                }
+            }
+        } else {
+            bled
+        }
     }
 
     /// Centres a zero state in the space the screen actually has.

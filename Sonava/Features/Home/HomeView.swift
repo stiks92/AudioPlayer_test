@@ -144,12 +144,12 @@ struct HomeView: View {
                                 audio.play(song, in: madeForYou.songs)
                             } label: {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    ArtworkThumbnail(song: song, size: 130, cornerRadius: Radius.card, showBadge: true)
+                                    ArtworkThumbnail(song: song, size: Tile.feature, cornerRadius: Radius.card, showBadge: true)
                                     Text(song.title)
                                         .font(.system(.footnote).weight(.semibold))
                                         .foregroundColor(Theme.textPrimary)
                                         .lineLimit(1)
-                                        .frame(width: 130, alignment: .leading)
+                                        .frame(width: Tile.feature, alignment: .leading)
                                 }
                             }
                             .buttonStyle(BouncyButtonStyle(scale: 0.95))
@@ -173,12 +173,12 @@ struct HomeView: View {
                                 audio.play(song, in: serverFeed.songs)
                             } label: {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    ArtworkThumbnail(song: song, size: 130, cornerRadius: Radius.card, showBadge: true)
+                                    ArtworkThumbnail(song: song, size: Tile.standard, cornerRadius: Radius.card, showBadge: true)
                                     Text(song.title)
                                         .font(.system(.footnote).weight(.semibold))
                                         .foregroundColor(Theme.textPrimary)
                                         .lineLimit(1)
-                                        .frame(width: 130, alignment: .leading)
+                                        .frame(width: Tile.standard, alignment: .leading)
                                 }
                             }
                             .buttonStyle(BouncyButtonStyle(scale: 0.95))
@@ -252,14 +252,14 @@ struct HomeView: View {
                                             Image(systemName: "music.note.list").font(.system(.largeTitle)).foregroundColor(.white.opacity(0.85))
                                         }
                                     }
-                                    .frame(width: 160, height: 160)
+                                    .frame(width: Tile.feature, height: Tile.feature)
                                     .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
                                     .overlay(RoundedRectangle(cornerRadius: Radius.card, style: .continuous).strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
                                     Text(playlist.title)
                                         .font(.system(.footnote).weight(.semibold))
                                         .foregroundColor(Theme.textPrimary)
                                         .lineLimit(1)
-                                        .frame(width: 160, alignment: .leading)
+                                        .frame(width: Tile.feature, alignment: .leading)
                                 }
                             }
                             .buttonStyle(BouncyButtonStyle(scale: 0.96))
@@ -285,17 +285,17 @@ struct HomeView: View {
                                 audio.play(song, in: charts.songs)
                             } label: {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    ArtworkThumbnail(song: song, size: 150, cornerRadius: Radius.card, showBadge: true)
+                                    ArtworkThumbnail(song: song, size: Tile.standard, cornerRadius: Radius.card, showBadge: true)
                                     Text(song.title)
                                         .font(.system(.footnote).weight(.semibold))
                                         .foregroundColor(Theme.textPrimary)
                                         .lineLimit(1)
-                                        .frame(width: 150, alignment: .leading)
+                                        .frame(width: Tile.standard, alignment: .leading)
                                     Text(song.artist)
                                         .font(.system(.caption2))
                                         .foregroundColor(Theme.textSecondary)
                                         .lineLimit(1)
-                                        .frame(width: 150, alignment: .leading)
+                                        .frame(width: Tile.standard, alignment: .leading)
                                 }
                             }
                             .buttonStyle(BouncyButtonStyle(scale: 0.95))
@@ -332,17 +332,17 @@ struct HomeView: View {
                                 audio.play(song, in: trending.songs)
                             } label: {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    ArtworkThumbnail(song: song, size: 150, cornerRadius: Radius.card, showBadge: true)
+                                    ArtworkThumbnail(song: song, size: Tile.standard, cornerRadius: Radius.card, showBadge: true)
                                     Text(song.title)
                                         .font(.system(.footnote).weight(.semibold))
                                         .foregroundColor(Theme.textPrimary)
                                         .lineLimit(1)
-                                        .frame(width: 150, alignment: .leading)
+                                        .frame(width: Tile.standard, alignment: .leading)
                                     Text(song.artist)
                                         .font(.system(.caption2))
                                         .foregroundColor(Theme.textSecondary)
                                         .lineLimit(1)
-                                        .frame(width: 150, alignment: .leading)
+                                        .frame(width: Tile.standard, alignment: .leading)
                                 }
                             }
                             .buttonStyle(BouncyButtonStyle(scale: 0.95))
@@ -434,12 +434,12 @@ struct HomeView: View {
                             audio.play(song, in: library.songs)
                         } label: {
                             VStack(alignment: .leading, spacing: 8) {
-                                ArtworkThumbnail(song: song, size: 130, cornerRadius: Radius.card)
+                                ArtworkThumbnail(song: song, size: Tile.standard, cornerRadius: Radius.card)
                                 Text(song.title)
                                     .font(.system(.footnote).weight(.semibold))
                                     .foregroundColor(Theme.textPrimary)
                                     .lineLimit(1)
-                                    .frame(width: 130, alignment: .leading)
+                                    .frame(width: Tile.standard, alignment: .leading)
                             }
                         }
                         .buttonStyle(BouncyButtonStyle(scale: 0.95))

@@ -39,11 +39,7 @@ struct AddToPlaylistView: View {
             .foregroundColor(.white)
             .navigationTitle("Add to Playlist")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }.foregroundColor(Theme.accentSoft)
-                }
-            }
+            .doneToolbar { dismiss() }
         }
         .preferredColorScheme(.dark)
     }

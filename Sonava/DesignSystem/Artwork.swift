@@ -51,13 +51,22 @@ struct SourceBadge: View {
     var body: some View {
         if let text = source.badge {
             Text(text)
-                .font(.system(.caption2).weight(.heavy))
-                .tracking(0.5)
-                .foregroundColor(.white)
-                .padding(.horizontal, 5)
+                // Was `.heavy` with tracking, which made a third-party
+                // catalogue's name heavier than the track title beneath it —
+                // the loudest thing on the artwork was the name of the
+                // service, not the music.
+                .font(.system(.caption2).weight(.semibold))
+                .foregroundColor(.white.opacity(0.92))
+                .padding(.horizontal, 6)
                 .padding(.vertical, 2)
                 .background(
-                    Capsule().fill(source == .radio ? Theme.destructive : Color.black.opacity(0.55))
+                    // A fixed fill rather than translucent black. Over one row
+                    // of covers `black.opacity(0.55)` rendered plum, olive and
+                    // indigo — the same badge in three colours, which is not a
+                    // badge. `LIVE` keeps its own colour because there it is
+                    // the status, not the provenance.
+                    Capsule().fill(source == .radio ? Theme.destructive
+                                                    : Theme.background.opacity(0.78))
                 )
         }
     }

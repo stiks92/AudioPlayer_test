@@ -27,11 +27,7 @@ struct ShazamView: View {
             .foregroundColor(.white)
             .navigationTitle("Discover")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { shazam.stop(); dismiss() }.foregroundColor(.white)
-                }
-            }
+            .doneToolbar { shazam.stop(); dismiss() }
             .onDisappear { shazam.stop() }
         }
         .preferredColorScheme(.dark)

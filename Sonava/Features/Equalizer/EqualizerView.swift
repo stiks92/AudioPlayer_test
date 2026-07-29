@@ -34,11 +34,7 @@ struct EqualizerView: View {
             .foregroundColor(.white)
             .navigationTitle("Equalizer")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }.foregroundColor(Theme.accentSoft)
-                }
-            }
+            .doneToolbar { dismiss() }
             .sheet(isPresented: $showPaywall) {
                 PaywallView().environmentObject(proStore)
             }

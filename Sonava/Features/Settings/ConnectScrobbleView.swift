@@ -34,11 +34,7 @@ struct ConnectScrobbleView: View {
             .foregroundColor(.white)
             .navigationTitle("Scrobbling")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }.foregroundColor(Theme.accentSoft)
-                }
-            }
+            .doneToolbar { dismiss() }
         }
         .preferredColorScheme(.dark)
     }

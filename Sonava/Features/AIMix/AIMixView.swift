@@ -52,11 +52,7 @@ struct AIMixView: View {
             .foregroundColor(.white)
             .navigationTitle("AI Mix")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }.foregroundColor(.white)
-                }
-            }
+            .doneToolbar { dismiss() }
             .sheet(isPresented: $showPaywall) {
                 PaywallView().environmentObject(proStore)
             }

@@ -50,11 +50,7 @@ struct SettingsView: View {
             .foregroundColor(.white)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }.foregroundColor(Theme.accentSoft)
-                }
-            }
+            .doneToolbar { dismiss() }
             .sheet(isPresented: $showPaywall) {
                 PaywallView().environmentObject(proStore)
             }
@@ -143,7 +139,7 @@ struct SettingsView: View {
                     // Without this the row clips inside the card's own padding
                     // and the sixth swatch is invisible — while the paywall two
                     // screens earlier sells "six accent themes and six app icons".
-                    .carouselBleed(Space.l)
+                    .carouselBleed(Space.l, fade: nil)
                 }
 
                 if appIcon.supportsAlternateIcons {
@@ -158,7 +154,7 @@ struct SettingsView: View {
                             }
                             .padding(.vertical, 2)
                         }
-                        .carouselBleed(Space.l)
+                        .carouselBleed(Space.l, fade: nil)
                         if let error = appIcon.lastError {
                             Text(error).font(.footnote).foregroundColor(Theme.error)
                                 // Identified so a test can tell "the system

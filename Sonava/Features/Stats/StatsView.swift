@@ -55,11 +55,12 @@ struct StatsView: View {
             }
             .navigationTitle("Your Sound")
             .navigationBarTitleDisplayMode(.inline)
+            // "Done" was the one on this screen sitting at the leading edge —
+            // the position that means Cancel or Back on every other sheet — so
+            // the menu moves across to make room for it where it belongs.
+            .doneToolbar { dismiss() }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Done") { dismiss() }.foregroundColor(Theme.accentSoft)
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         Button {
                             shareItem = StatsShareCardRenderer.render(stats, range: range)

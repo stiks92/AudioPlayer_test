@@ -38,6 +38,31 @@ struct BouncyButtonStyle: ButtonStyle {
     }
 }
 
+// MARK: - Dismissal
+
+extension View {
+    /// The one way a sheet is dismissed.
+    ///
+    /// Eleven sheets had built this for themselves, and they did not agree.
+    /// Ten put "Done" at the trailing edge and one at the leading edge — the
+    /// position that means Cancel or Back everywhere else in iOS — and three
+    /// coloured it white while eight used the accent. A reader builds muscle
+    /// memory for the dismiss target within a session, and this app was
+    /// moving it and recolouring it between screens.
+    ///
+    /// Composes with a screen's other toolbar items: SwiftUI merges multiple
+    /// `.toolbar` modifiers, so a view that also needs a menu keeps declaring
+    /// it separately.
+    func doneToolbar(_ dismiss: @escaping () -> Void) -> some View {
+        toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Done", action: dismiss)
+                    .foregroundColor(Theme.accentSoft)
+            }
+        }
+    }
+}
+
 // MARK: - Primary action
 
 /// The app's one full-width primary action: a white capsule with a dark label.

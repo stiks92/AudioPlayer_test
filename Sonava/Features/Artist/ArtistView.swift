@@ -31,11 +31,7 @@ struct ArtistView: View {
             .foregroundColor(.white)
             .navigationTitle(artistName)
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }.foregroundColor(Theme.accentSoft)
-                }
-            }
+            .doneToolbar { dismiss() }
             .task {
                 if feed.state == .idle {
                     await feed.load { await Self.tracks(for: artistName) }

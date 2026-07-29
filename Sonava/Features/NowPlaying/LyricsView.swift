@@ -54,11 +54,7 @@ struct LyricsView: View {
             .foregroundColor(.white)
             .navigationTitle("Lyrics")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }.foregroundColor(.white)
-                }
-            }
+            .doneToolbar { dismiss() }
             .task(id: audio.currentSong) { await loader.load(for: audio.currentSong) }
         }
         .preferredColorScheme(.dark)

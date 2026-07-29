@@ -63,10 +63,8 @@ struct QueueView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     EditButton().foregroundColor(Theme.accentSoft)
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }.foregroundColor(Theme.accentSoft)
-                }
             }
+            .doneToolbar { dismiss() }
         }
         .presentationDetents([.large, .medium])
         .preferredColorScheme(.dark)

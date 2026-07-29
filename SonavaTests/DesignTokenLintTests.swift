@@ -70,6 +70,49 @@ struct DesignTokenLintTests {
             """)
     }
 
+    /// Keeps the tile vocabulary at two.
+    ///
+    /// A review counted three artwork sizes on Home — 130, 150 and 160 — with
+    /// identical gutters and margins, so the differences read as accidents.
+    /// Its verdict on the app as a whole was that the tokens are well-conceived
+    /// and then bypassed at the call site, over and over. A rule nobody can
+    /// enforce is the thing that lets that happen, so this is the enforcement:
+    /// `Tile.feature` and `Tile.standard` exist, and a literal is a failure.
+    @Test("Artwork tiles come from the two tokens, not from literals")
+    func tileSizesComeFromTokens() throws {
+        let root = try #require(Self.sourceRoot, "sources not present; nothing to lint")
+
+        // Deliberately narrow, and narrow on purpose. A first draft matched any
+        // `size:`/`width:` in the hundreds and would have failed on six
+        // legitimate sites — a podcast's hero cover, an artist portrait, the
+        // Shazam rings, a chart height. Lint that fires on correct code is lint
+        // that gets switched off, so this matches exactly one call shape.
+        //
+        // The trade is real: the curated-playlist tile is an `AsyncImage`, not
+        // an `ArtworkThumbnail`, so a literal creeping back in there would slip
+        // past this. A rule that is always right about less beats one that is
+        // sometimes wrong about more.
+        let pattern = try NSRegularExpression(pattern: #"ArtworkThumbnail\([^)]*?size:\s*(\d+)"#)
+        var offenders: [String] = []
+
+        for file in Self.swiftFiles(in: root) {
+            guard let text = try? String(contentsOf: file, encoding: .utf8) else { continue }
+            for match in pattern.matches(in: text, range: NSRange(text.startIndex..., in: text)) {
+                guard let range = Range(match.range(at: 1), in: text),
+                      let size = Int(text[range]), size >= 100 else { continue }
+                let line = text[text.startIndex..<text.index(text.startIndex, offsetBy: match.range.location)]
+                    .count(where: { $0 == "\n" }) + 1
+                offenders.append("\(file.lastPathComponent):\(line) — size: \(size)")
+            }
+        }
+
+        #expect(offenders.isEmpty, """
+            Artwork rails must use Tile.feature or Tile.standard from DesignTokens.swift. \
+            A third size on one screen reads as a mistake, not a hierarchy:
+            \(offenders.joined(separator: "\n"))
+            """)
+    }
+
     @Test("The type ramp is actually used")
     func rampIsAdopted() throws {
         let root = try #require(Self.sourceRoot, "sources not present; nothing to lint")
