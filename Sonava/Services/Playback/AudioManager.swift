@@ -340,7 +340,9 @@ final class AudioManager: NSObject, ObservableObject {
         engine.setVolume(volume)
         engine.apply(effects.equalizer)
 
-        clock.reset(duration: song.isLive ? 0 : 1)
+        // `isFileURL` is the same test that picks the engine, so the meter's
+        // honesty and the engine's capability can never drift apart.
+        clock.reset(duration: song.isLive ? 0 : 1, metered: url.isFileURL)
 
         // Speed persists across podcast episodes but resets for music/radio.
         if song.source != .podcast { playbackRate = 1.0 }

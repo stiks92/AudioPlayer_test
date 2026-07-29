@@ -246,9 +246,9 @@ struct NowPlayingView: View {
     }
 
     private var visualizer: some View {
-        AudioVisualizerView(level: clock.audioLevel, isActive: audio.isPlaying, tint: .white)
-            .frame(height: 40)
-            .opacity(0.9)
+        OutputMeter(level: clock.audioLevel,
+                    metered: clock.isMetered,
+                    isPlaying: audio.isPlaying)
     }
 
     private var controls: some View {

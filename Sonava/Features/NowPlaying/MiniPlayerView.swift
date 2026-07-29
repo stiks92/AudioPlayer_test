@@ -62,9 +62,14 @@ struct MiniPlayerView: View {
                     // actual output level, in the playing track's own colours —
                     // the same palette that tints the ground behind it, so the
                     // two finally say the same thing.
+                    // `clock.isMetered` gates it. I added these bars earlier in
+                    // the redesign and wrote "the mini player breathes" in the
+                    // commit — on a stream they were breathing a sine wave, and
+                    // motion that means nothing is precisely what makes an
+                    // interface feel machine-made.
                     AudioVisualizerView(
                         level: clock.audioLevel,
-                        isActive: audio.isPlaying && !reduceMotion,
+                        isActive: audio.isPlaying && clock.isMetered && !reduceMotion,
                         barCount: 7,
                         tint: song.gradient.first ?? Theme.accentSoft
                     )
