@@ -257,13 +257,27 @@ enum AppTab: String, CaseIterable {
         }
     }
 
+    /// One symbol weight across all five.
+    ///
+    /// They were mixed: `magnifyingglass` and `dot.radiowaves.left.and.right`
+    /// draw as hairlines while `mic.fill` and `square.stack.fill` drew solid,
+    /// so the right half of the bar was visibly heavier than the left — in one
+    /// row of five peers, which is the single place symbol discipline is most
+    /// legible.
+    ///
+    /// Outline is the set that can actually be made whole: neither radio waves
+    /// nor a track list has a filled variant, so "all filled" would have been a
+    /// comment this code could not honour.
+    ///
+    /// `square.stack.fill` had to go regardless. At 24pt it reads as a jar, and
+    /// it repeated the layers metaphor the first onboarding slide was using.
     var icon: String {
         switch self {
-        case .home: return "house.fill"
+        case .home: return "house"
         case .search: return "magnifyingglass"
         case .radio: return "dot.radiowaves.left.and.right"
-        case .podcasts: return "mic.fill"
-        case .library: return "square.stack.fill"
+        case .podcasts: return "mic"
+        case .library: return "music.note.list"
         }
     }
 }

@@ -30,10 +30,18 @@ struct NowPlayingTint: View {
     /// stronger now, and the contrast it costs is measured rather than
     /// guessed: the dimmest text over it still clears its floor.
     private let peakOpacity: Double = 0.55
-    /// The fraction of the screen the wash covers before it is fully gone.
-    private let falloff: Double = 0.62
+    /// How much of the wash survives at the foot of the screen.
+    ///
+    /// Not zero any more. The wash used to be gone by 62% of the height, which
+    /// meant the app's one distinctive idea was a decoration on the top third
+    /// of five screens and nothing at all below it. It now reaches the bottom,
+    /// quietly — enough that the ground is unmistakably the track's colour
+    /// wherever you look, far too little to lift the dark ground the text
+    /// tokens were measured against.
+    private let floorOpacity: Double = 0.16
 
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// Pulls a track colour most of the way toward the ground before it is
     /// used as a wash.
@@ -42,8 +50,43 @@ struct NowPlayingTint: View {
     /// the text tokens were measured against; deepening it first keeps the
     /// hue unmistakable while the ground stays dark, which is how an ambient
     /// tint reads as atmosphere rather than as a coloured overlay.
+    /// 0.40, not 0.22.
+    ///
+    /// Reaching the foot of the screen with the old mix lifted the ground
+    /// enough to cost real contrast — a tertiary line on Radio went from
+    /// 6.85:1 to 6.07:1, still passing but spending headroom the text tokens
+    /// were tuned to have. The lever is here rather than in the opacities:
+    /// mixing further toward the ground drops *luminance* while leaving the
+    /// hue plainly readable, so the colour stays the track's and the dark
+    /// stays dark. Weakening the wash instead would have walked straight back
+    /// to the version a review called noise rather than intent.
     private func deepened(_ color: Color) -> Color {
-        color.mix(with: Theme.background, by: 0.22)
+        color.mix(with: Theme.background, by: 0.40)
+    }
+
+    /// Boundary vertices stay on their edge — a mesh requires it — so only the
+    /// mid-edge points slide along their own side and the centre roams.
+    private func meshPoints(_ t: Double) -> [SIMD2<Float>] {
+        let dx = Float(sin(t * 0.21) * 0.10)
+        let dy = Float(cos(t * 0.17) * 0.08)
+        return [
+            SIMD2(0, 0),            SIMD2(0.5 + dx, 0),           SIMD2(1, 0),
+            SIMD2(0, 0.42 + dy),    SIMD2(0.5 - dx, 0.5 + dy),    SIMD2(1, 0.58 - dy),
+            SIMD2(0, 1),            SIMD2(0.5, 1),                SIMD2(1, 1)
+        ]
+    }
+
+    /// Nine vertices, brightest at the top and thinning downward, so the head
+    /// of the screen carries the colour and the foot only remembers it.
+    private func meshColors(_ palette: [Color]) -> [Color] {
+        let start = deepened(palette.first ?? Theme.accent)
+        let end = deepened(palette.last ?? Theme.accentDeep)
+        let middle = start.mix(with: end, by: 0.5)
+        return [
+            start.opacity(peakOpacity), middle.opacity(peakOpacity * 0.92), end.opacity(peakOpacity),
+            start.opacity(peakOpacity * 0.48), middle.opacity(peakOpacity * 0.62), end.opacity(peakOpacity * 0.44),
+            start.opacity(floorOpacity), middle.opacity(floorOpacity * 0.85), end.opacity(floorOpacity)
+        ]
     }
 
     var body: some View {
@@ -51,37 +94,33 @@ struct NowPlayingTint: View {
             Theme.background
 
             if let colors, !colors.isEmpty, !reduceTransparency {
-                GeometryReader { geo in
-                    // The fade is expressed as stops in a full-height frame,
-                    // not as a short frame that gets clipped.
-                    //
-                    // It used to be drawn 1.4× tall, blurred, then cut back to
-                    // `falloff` — with a comment above it explaining that trick
-                    // as the fix for blur eating the authored opacity. The
-                    // trick was the defect. The `.clear` stop sat at the bottom
-                    // of the *drawn* frame while the scissor came down at 71%
-                    // of it, so roughly 29% of the alpha was still live when it
-                    // was cut: a razor-straight seam across the full width at
-                    // y = 0.62 × screen height, on every one of the five tab
-                    // screens. Measured at (9,14,22) dropping to (8,8,12) in a
-                    // single row.
-                    //
-                    // With the transparency written into the gradient there is
-                    // nothing to clip, and the blur has room to bleed.
-                    LinearGradient(
-                        stops: [
-                            .init(color: deepened(colors.first ?? Theme.accent)
-                                .opacity(peakOpacity), location: 0),
-                            .init(color: deepened(colors.last ?? Theme.accentDeep)
-                                .opacity(peakOpacity * 0.55), location: falloff * 0.5),
-                            .init(color: .clear, location: falloff)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .frame(height: geo.size.height)
-                    .blur(radius: 60)
+                // A mesh rather than a linear ramp, and it drifts.
+                //
+                // A linear gradient fading out at 62% of the height was the
+                // safe version of this idea, and a review put its cost
+                // plainly: the one genuinely distinctive thing in the app was
+                // so quiet that its most noticeable effect was a clipping
+                // seam. A mesh has a centre of gravity that moves, so the
+                // ground reads as *lit* by the artwork rather than tinted with
+                // it, and the drift is slow enough — a full cycle takes about
+                // half a minute — that it is felt rather than watched.
+                //
+                // Under Reduce Motion it holds still at t = 0. It is not
+                // decoration that can be dropped: it is the screen's ground,
+                // and a still mesh is still the track's colour.
+                TimelineView(.animation(minimumInterval: 1 / 20, paused: reduceMotion)) { timeline in
+                    let t = reduceMotion ? 0
+                        : timeline.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 3600)
+                    MeshGradient(width: 3, height: 3,
+                                 points: meshPoints(t),
+                                 colors: meshColors(colors))
+                        // Softens the mesh's own control points into a wash.
+                        // Without it the interior vertex reads as a coloured
+                        // blob with an edge, which is a different — and much
+                        // cheaper-looking — effect.
+                        .blur(radius: 40)
                 }
+                .ignoresSafeArea()
                 // Cross-fading between two tracks' palettes is the whole point;
                 // a hard cut would read as a glitch.
                 .transition(.opacity)

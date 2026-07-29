@@ -21,7 +21,9 @@ struct OnboardingView: View {
     }
 
     private let slides: [Slide] = [
-        Slide(icon: "square.stack.3d.up.fill",
+        // Empty icon = the app's own mark. Only the opening slide gets it;
+        // repeating a logo on all four would make it wallpaper.
+        Slide(icon: "",
               title: "All your music, one player",
               subtitle: "Streaming, internet radio, podcasts and your own server — unified in one beautiful place.",
               colors: [Theme.accent, Theme.accentDeep]),
@@ -88,10 +90,21 @@ struct OnboardingView: View {
     private func slideView(_ slide: Slide) -> some View {
         VStack(spacing: Space.xxl) {
             Spacer()
-            Image(systemName: slide.icon)
-                .font(.system(size: 76, weight: .bold))
-                .foregroundColor(.white)
-                .shadow(color: .white.opacity(0.4), radius: 20)
+            // The first frame of the app is the app's own mark, not a symbol
+            // Apple ships on every device. `SonavaMark` existed and appeared on
+            // exactly one screen in the whole product — the paywall — while the
+            // screen a person actually sees first opened with
+            // `square.stack.3d.up.fill`, a glyph that also duplicated the tab
+            // bar's old library icon.
+            if slide.icon.isEmpty {
+                SonavaMark(height: 76)
+                    .shadow(color: .white.opacity(0.4), radius: 20)
+            } else {
+                Image(systemName: slide.icon)
+                    .font(.system(size: 76, weight: .bold))
+                    .foregroundColor(.white)
+                    .shadow(color: .white.opacity(0.4), radius: 20)
+            }
             VStack(spacing: Space.l) {
                 Text(slide.title)
                     .font(.system(.title, design: .rounded).weight(.heavy))
