@@ -102,22 +102,17 @@ struct AIMixView: View {
                 }
                 .carouselBleed()
 
-                // A dark label on a white capsule cannot be dimmed as a whole:
-                // fading both together collapses the contrast between them —
-                // measured at 1.81:1. The disabled state gets its own colours
-                // instead, and keeps a legible label.
+                // The disabled colours that used to be written out here now
+                // live in the style, because a review found the identical
+                // uncorrected bug on two other screens while this one carried
+                // the fix as a local comment.
                 Button(action: generate) {
                     HStack {
-                        if isGenerating { ProgressView().tint(canGenerate ? Theme.background : .white) }
+                        if isGenerating { ProgressView() }
                         Text(isGenerating ? "Composing…" : "Generate mix")
-                            .font(.headline)
                     }
-                    .foregroundColor(canGenerate ? Theme.background : .white.opacity(0.55))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, Space.l)
-                    .background(Capsule().fill(canGenerate ? Color.white : Color.white.opacity(0.14)))
                 }
-                .buttonStyle(BouncyButtonStyle(scale: 0.97, dimsWhenDisabled: false))
+                .buttonStyle(PrimaryCapsuleButtonStyle())
                 .disabled(!canGenerate)
 
                 if failed {

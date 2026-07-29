@@ -117,15 +117,11 @@ struct ConnectScrobbleView: View {
                 Task { _ = await scrobble.connect(token: token) }
             } label: {
                 HStack {
-                    if scrobble.isConnecting { ProgressView().tint(Theme.background) }
+                    if scrobble.isConnecting { ProgressView() }
                     Text(scrobble.isConnecting ? "Connecting…" : "Connect")
-                        .font(.headline)
                 }
-                .foregroundColor(Theme.background)
-                .frame(maxWidth: .infinity).padding(.vertical, Space.l)
-                .background(Capsule().fill(Color.white))
             }
-            .buttonStyle(BouncyButtonStyle(scale: 0.97))
+            .buttonStyle(PrimaryCapsuleButtonStyle())
             .disabled(token.trimmingCharacters(in: .whitespaces).isEmpty || scrobble.isConnecting)
 
             Text("Find your token on listenbrainz.org → Settings. It's stored only in your device's Keychain.")

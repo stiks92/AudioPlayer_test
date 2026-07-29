@@ -97,6 +97,13 @@ enum Theme {
     /// hex, so one colour meant "live", "favourite" and "delete" at once, and
     /// therefore meant none of them.
     static let live = Color(hex: 0xFF9F0A)
+    /// Something the user owns is degraded but not broken — a saved server that
+    /// isn't answering. Separate from `live` for exactly the reason recorded
+    /// above: `live` had started doing this job as well, and a token that means
+    /// "broadcasting now" and "not responding" at the same time means neither.
+    /// Separate from `error` too, because an unreachable box is a fact about
+    /// the house, not a fault in the app.
+    static let warning = Color(hex: 0xFFB340)
 
     // MARK: Text
     static let textPrimary = Color.white

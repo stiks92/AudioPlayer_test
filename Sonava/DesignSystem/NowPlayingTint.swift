@@ -52,24 +52,35 @@ struct NowPlayingTint: View {
 
             if let colors, !colors.isEmpty, !reduceTransparency {
                 GeometryReader { geo in
+                    // The fade is expressed as stops in a full-height frame,
+                    // not as a short frame that gets clipped.
+                    //
+                    // It used to be drawn 1.4× tall, blurred, then cut back to
+                    // `falloff` — with a comment above it explaining that trick
+                    // as the fix for blur eating the authored opacity. The
+                    // trick was the defect. The `.clear` stop sat at the bottom
+                    // of the *drawn* frame while the scissor came down at 71%
+                    // of it, so roughly 29% of the alpha was still live when it
+                    // was cut: a razor-straight seam across the full width at
+                    // y = 0.62 × screen height, on every one of the five tab
+                    // screens. Measured at (9,14,22) dropping to (8,8,12) in a
+                    // single row.
+                    //
+                    // With the transparency written into the gradient there is
+                    // nothing to clip, and the blur has room to bleed.
                     LinearGradient(
-                        colors: [
-                            deepened(colors.first ?? Theme.accent).opacity(peakOpacity),
-                            deepened(colors.last ?? Theme.accentDeep).opacity(peakOpacity * 0.55),
-                            .clear
+                        stops: [
+                            .init(color: deepened(colors.first ?? Theme.accent)
+                                .opacity(peakOpacity), location: 0),
+                            .init(color: deepened(colors.last ?? Theme.accentDeep)
+                                .opacity(peakOpacity * 0.55), location: falloff * 0.5),
+                            .init(color: .clear, location: falloff)
                         ],
                         startPoint: .top,
                         endPoint: .bottom
                     )
-                    // Drawn taller than it is shown, blurred, then clipped.
-                    // Blurring a frame whose edges are transparent bleeds alpha
-                    // outwards, so roughly half the authored opacity never
-                    // arrives — which is why two calibration passes kept
-                    // landing short of what the code said.
-                    .frame(height: geo.size.height * falloff * 1.4)
+                    .frame(height: geo.size.height)
                     .blur(radius: 60)
-                    .frame(height: geo.size.height * falloff, alignment: .top)
-                    .clipped()
                 }
                 // Cross-fading between two tracks' palettes is the whole point;
                 // a hard cut would read as a glitch.

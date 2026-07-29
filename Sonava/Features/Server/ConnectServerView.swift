@@ -146,19 +146,21 @@ struct ConnectServerView: View {
                     }
                 }
 
-                HStack(spacing: Space.xs) {
-                    // Stated, not assumed. A plain-http box on a LAN is a
-                    // legitimate setup, and drawing a padlock over it would be
-                    // a lie about the user's own network.
-                    Image(systemName: connection.isSecure ? "lock.fill" : "lock.open.fill")
-                        .font(.system(.caption2))
-                        .foregroundColor(connection.isSecure ? Theme.textTertiary : Theme.live)
-                    Text(connection.host)
-                        .font(.system(.footnote, design: .monospaced))
-                        .foregroundColor(Theme.textSecondary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                }
+                // Encryption is stated in the address rather than colour-coded.
+                //
+                // It was an amber open padlock, which spent a semantic hue on
+                // it — and the same amber was four rows down meaning "this
+                // server is unreachable", and on the Radio screen meaning
+                // "broadcasting now". Writing `http://` in front of the host
+                // says the same thing exactly, in the place a self-hoster
+                // already reads, and costs no colour at all. A plain-http box
+                // on a LAN is a legitimate setup; this labels it without
+                // implying it is a fault.
+                Text(connection.addressLine)
+                    .font(.system(.footnote, design: .monospaced))
+                    .foregroundColor(Theme.textSecondary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
 
                 metaLine(connection, health)
             }
@@ -332,7 +334,7 @@ private struct StatusBadge: View {
         switch state {
         case .unknown, .checking: Theme.textTertiary
         case .online: Theme.positive
-        case .unreachable: Theme.live
+        case .unreachable: Theme.warning
         }
     }
 }
@@ -380,18 +382,12 @@ struct AddServerView: View {
 
                         Button(action: connect) {
                             HStack {
-                                if isConnecting { ProgressView().tint(Theme.background) }
+                                if isConnecting { ProgressView() }
                                 Text(isConnecting ? "Connecting…" : "Connect")
-                                    .font(.headline)
                             }
-                            .foregroundColor(Theme.background)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, Space.l)
-                            .background(Capsule().fill(Color.white))
                         }
-                        .buttonStyle(BouncyButtonStyle(scale: 0.97))
+                        .buttonStyle(PrimaryCapsuleButtonStyle())
                         .disabled(!canConnect || isConnecting)
-                        .opacity(canConnect ? 1 : 0.5)
                         .identified("server.connect", label: "Connect")
                     }
                     .padding(Space.screenMargin)

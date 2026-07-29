@@ -162,6 +162,12 @@ struct EqualizerView: View {
             }
             .padding(.trailing, Plot.dBGutter)
         }
+        // A matching inset on the leading side, so the plot itself is centred
+        // under the header instead of the whole graph sitting 32pt left of the
+        // Pre-amp card below it. Reserving the ordinate's column on one side
+        // only made the chart off-axis from everything else on the screen —
+        // correct chart anatomy, wrong composition.
+        .padding(.leading, Plot.dBGutter)
     }
 
     /// Resolves a touch anywhere in the graph to a band and a gain.

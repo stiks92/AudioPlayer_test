@@ -35,6 +35,13 @@ struct ServerConnection: Identifiable, Codable, Equatable, Sendable {
     /// `http://` server on a LAN is a legitimate setup, and quietly implying a
     /// padlock over it would be a lie about the user's own network.
     var isSecure: Bool { url?.scheme?.lowercased() == "https" }
+
+    /// The host, with the scheme spelled out only when it is not encrypted.
+    ///
+    /// The exception is what needs stating. Prefixing every row with `https://`
+    /// would be noise; showing `http://` on the one row it applies to says the
+    /// thing that matters, in text, without spending a colour on it.
+    var addressLine: String { isSecure ? host : "http://\(host)" }
 }
 
 /// What we actually know about a connection, as opposed to what the screen

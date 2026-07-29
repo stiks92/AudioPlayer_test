@@ -38,6 +38,39 @@ struct BouncyButtonStyle: ButtonStyle {
     }
 }
 
+// MARK: - Primary action
+
+/// The app's one full-width primary action: a white capsule with a dark label.
+///
+/// Extracted because three screens had built it independently — Scrobble,
+/// Add server and AI Mix — and two of them carried the same defect. A dark
+/// label on a light fill cannot be dimmed as a whole: fading both together
+/// collapses the contrast *between* them, and the label goes with it. Measured
+/// at 1.60:1 on the Scrobble button and 1.81:1 before AI Mix was fixed by hand.
+///
+/// AI Mix's hand-written fix was correct and stayed a local fact, which is the
+/// actual failure — a review round later found the identical bug two screens
+/// over. So the disabled colours live here now, where a fourth call site
+/// inherits them instead of having to remember them.
+struct PrimaryCapsuleButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.headline)
+            .foregroundColor(isEnabled ? Theme.background : .white.opacity(0.55))
+            .tint(isEnabled ? Theme.background : .white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, Space.l)
+            .background(
+                Capsule().fill(isEnabled ? Color.white : Color.white.opacity(0.14))
+            )
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(Motion.press, value: configuration.isPressed)
+            .animation(Motion.fade, value: isEnabled)
+    }
+}
+
 // MARK: - Circular icon button
 
 struct CircleIconButton: View {
