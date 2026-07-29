@@ -19,23 +19,6 @@
 
 import SwiftUI
 
-// MARK: - Plot geometry
-
-/// Geometry shared by the plot and the controls drawn over it.
-///
-/// One constant in one place, because the last time two files each decided
-/// where a band lived they disagreed by 11% and the curve missed every knob it
-/// claimed to describe.
-enum Plot {
-    /// The ordinate's own column, at the right edge.
-    ///
-    /// Without it the +6 label was drawn on top of the 16 kHz rail: the axis
-    /// that explains the plot collided with the plot. Everything that belongs
-    /// to the data — rules, curve, handles, the frequency scale — stops short
-    /// of this; only the dB numbers live inside it.
-    static let dBGutter: CGFloat = 30
-}
-
 // MARK: - Animatable gains
 
 /// Lets a `Shape` interpolate between two whole sets of band gains, so
@@ -109,10 +92,15 @@ struct ResponseCurve: Shape {
         }
 
         var path = Path()
-        // Run flat out to both edges so the graph still spans its full width
-        // without inventing control points that no band corresponds to.
-        path.move(to: CGPoint(x: rect.minX, y: points[0].y))
-        path.addLine(to: points[0])
+        // Starts at the first band and ends at the last.
+        //
+        // It used to run flat out to both container edges, which put the
+        // stroke 15pt left of the 32 Hz control and 17pt right of 16 kHz,
+        // ending in mid-air with the fill claiming boost at frequencies no
+        // band corresponds to. A plot may not draw values outside its own
+        // domain, and this file's header claims the picture tells the truth
+        // about the sound.
+        path.move(to: points[0])
         // Catmull-Rom, expressed as the cubic Bézier segments SwiftUI draws.
         for index in 0..<(points.count - 1) {
             let p0 = points[max(index - 1, 0)]
@@ -126,11 +114,9 @@ struct ResponseCurve: Shape {
             path.addCurve(to: p2, control1: control1, control2: control2)
         }
 
-        path.addLine(to: CGPoint(x: rect.maxX, y: points.last!.y))
-
         if closed {
-            path.addLine(to: CGPoint(x: rect.maxX, y: midY))
-            path.addLine(to: CGPoint(x: rect.minX, y: midY))
+            path.addLine(to: CGPoint(x: points.last!.x, y: midY))
+            path.addLine(to: CGPoint(x: points[0].x, y: midY))
             path.closeSubpath()
         }
         return path
@@ -153,16 +139,37 @@ struct ResponseGraph: View {
         ZStack {
             // ±6 dB rules first, then 0 dB brighter — "flat" should be legible
             // as a shape against a reference, not inferred from knob positions.
+            // No gutter any more. Reserving a column for the ordinate on the
+            // right, then a matching one on the left to keep the plot centred,
+            // bought symmetry by pushing the graph 30pt inside the 20pt rail
+            // that the Pre-amp card and every other element on the sheet sits
+            // on — edge discipline traded for centring. The numbers sit inside
+            // the plot instead, above their own rule at the leading edge, which
+            // is what a chart normally does.
             GeometryReader { geo in
-                let plotWidth = geo.size.width - Plot.dBGutter
+                let width = geo.size.width
                 let half = geo.size.height / 2
                 let sixth = CGFloat(6 / limit) * half
                 ForEach([-sixth, sixth], id: \.self) { offset in
                     Rectangle()
                         .fill(Theme.hairline)
-                        .frame(width: plotWidth, height: 1)
-                        .position(x: plotWidth / 2, y: half + offset)
+                        .frame(width: width, height: 1)
+                        .position(x: width / 2, y: half + offset)
                 }
+                // Full width and dashed along its whole length.
+                //
+                // It was a `Rectangle().strokeBorder(dash:)` over a 1pt-high
+                // frame, which dashes that rectangle's *outline* rather than
+                // drawing a dashed rule — so the datum rendered as a stub
+                // across the part of the width the fill happened to cover. A
+                // stroked path is the shape that was meant.
+                Path { path in
+                    path.move(to: CGPoint(x: 0, y: half))
+                    path.addLine(to: CGPoint(x: width, y: half))
+                }
+                .stroke(Theme.textTertiary,
+                        style: StrokeStyle(lineWidth: 1, dash: [5, 4]))
+
                 // The plot withheld its own ordinate: three rules and no
                 // numbers, so "how much boost is that" had no answer except
                 // dragging the band again.
@@ -173,23 +180,11 @@ struct ResponseGraph: View {
                     Text(label)
                         .font(.system(.caption2).weight(.medium).monospacedDigit())
                         .foregroundColor(Theme.textTertiary)
-                        .frame(width: Plot.dBGutter - Space.xs, alignment: .trailing)
-                        // On the rule rather than above it, and in the gutter
-                        // rather than over the last band's rail.
-                        .position(x: plotWidth + Plot.dBGutter / 2, y: half + offset)
+                        // Above the rule, not on it, so the rule stays
+                        // unbroken; and at the leading edge, where the only
+                        // thing behind it is a hairline rail rather than a knob.
+                        .position(x: 12, y: half + offset - 10)
                 }
-                // Dashed, so a flat curve resting exactly on it still reads
-                // as a curve on a datum rather than as one unexplained line.
-                Rectangle()
-                    .fill(Theme.textTertiary)
-                    .frame(width: plotWidth, height: 1)
-                    .overlay(
-                        Rectangle()
-                            .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [5, 4]))
-                            .foregroundColor(Theme.background)
-                            .frame(height: 1)
-                    )
-                    .position(x: plotWidth / 2, y: half)
             }
 
             ResponseCurve(gains: animatable, limit: Double(limit), closed: true)
@@ -198,13 +193,11 @@ struct ResponseGraph: View {
                                             Theme.accent.opacity(0.10)],
                                    startPoint: .top, endPoint: .bottom)
                 )
-                .padding(.trailing, Plot.dBGutter)
 
             ResponseCurve(gains: animatable, limit: Double(limit))
                 .stroke(Theme.accentSoft, style: StrokeStyle(lineWidth: 3,
                                                              lineCap: .round,
                                                              lineJoin: .round))
-                .padding(.trailing, Plot.dBGutter)
         }
         .animation(Motion.expressive, value: gains)
         .allowsHitTesting(false)

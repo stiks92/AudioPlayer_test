@@ -85,12 +85,17 @@ struct EqualizerView: View {
             get: { effects.equalizer.isEnabled },
             set: { effects.setEnabled($0); Haptics.selection() }
         )) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Equalizer").font(.system(.body).weight(.bold))
-                Text(effects.selectedPreset.map { LocalizedStringKey($0.name) } ?? "Custom")
-                    .font(.caption).foregroundColor(Theme.textSecondary)
-                    .accessibilityIdentifier("eq.selectedPreset")
-            }
+            // One line, and it is the one that changes.
+            //
+            // The screen said "Equalizer" in the toolbar and again 40pt below
+            // it, with "Bass Boost" underneath that and "Bass Boost"
+            // highlighted again in the chip row further down — three
+            // restatements of two facts. The title above already names the
+            // screen; what this row is for is the switch and the state it is
+            // switching.
+            Text(effects.selectedPreset.map { LocalizedStringKey($0.name) } ?? "Custom")
+                .font(.system(.body).weight(.bold))
+                .accessibilityIdentifier("eq.selectedPreset")
         }
         .tint(Theme.accent)
         .accessibilityIdentifier(AccessibilityID.eqEnable)
@@ -103,7 +108,7 @@ struct EqualizerView: View {
                 // gutter belongs to the ordinate. Derived from the same
                 // constant the graph draws with, so the two cannot drift apart
                 // the way the curve and its knobs once did.
-                let columnWidth = (geo.size.width - Plot.dBGutter) / CGFloat(EqualizerBand.count)
+                let columnWidth = geo.size.width / CGFloat(EqualizerBand.count)
 
                 ZStack {
                     // The response the ten bands actually produce, behind them.
@@ -156,14 +161,7 @@ struct EqualizerView: View {
                         .frame(maxWidth: .infinity)
                 }
             }
-            .padding(.trailing, Plot.dBGutter)
         }
-        // A matching inset on the leading side, so the plot itself is centred
-        // under the header instead of the whole graph sitting 32pt left of the
-        // Pre-amp card below it. Reserving the ordinate's column on one side
-        // only made the chart off-axis from everything else on the screen —
-        // correct chart anatomy, wrong composition.
-        .padding(.leading, Plot.dBGutter)
     }
 
     /// Resolves a touch anywhere in the graph to a band and a gain.
