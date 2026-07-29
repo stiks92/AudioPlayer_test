@@ -161,6 +161,11 @@ struct SettingsView: View {
                         .carouselBleed(Space.l)
                         if let error = appIcon.lastError {
                             Text(error).font(.footnote).foregroundColor(Theme.error)
+                                // Identified so a test can tell "the system
+                                // refused and we said so" apart from "the
+                                // picker silently kept an icon that was never
+                                // applied" — the second is the actual defect.
+                                .accessibilityIdentifier("icon.error")
                         }
                     }
                 }
