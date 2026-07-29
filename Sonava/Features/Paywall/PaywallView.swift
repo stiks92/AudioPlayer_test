@@ -158,21 +158,45 @@ struct PaywallView: View {
 
     @ViewBuilder
     private var plans: some View {
-        if proStore.products.isEmpty {
-            // Ghost cards in the plans' own footprint. A bare line of text let
-            // the composition collapse, and the real cards would then shove the
-            // CTA ~200pt down the page under the reader's thumb.
+        if proStore.isLoadingProducts {
+            // Filled skeletons in the plans' own footprint, so the composition
+            // does not collapse and then shove the CTA ~200pt down the page
+            // when the real cards arrive.
+            //
+            // Filled, not dashed. A dashed outline is the universal drawing for
+            // "not built yet"; on the screen that asks for money it read as an
+            // unfinished wireframe shipped by accident, which is what a review
+            // called it. A solid block reads as "loading", which is true.
             VStack(spacing: Space.m) {
-                // Above the ghosts, not centred across them — centring on the
-                // stack put the label in the gap between the two cards.
-                Text(proStore.isLoadingProducts ? "Loading plans…" : "Plans will be available at launch.")
+                Text("Loading plans…")
                     .font(.sonavaCardSubtitle.weight(.semibold))
                     .foregroundColor(.white)
                 ForEach(0..<2, id: \.self) { _ in
                     RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
-                        .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [6, 5]))
-                        .foregroundColor(.white.opacity(0.45))
+                        .fill(Color.white.opacity(0.12))
                         .frame(height: 68)
+                }
+            }
+        } else if proStore.products.isEmpty {
+            // Nothing to sell yet, so this states that and offers the only
+            // action that is actually true right now. Previously the reader
+            // finished the feature list and landed on two empty rectangles:
+            // the app's monetisation screen had no primary action at all.
+            VStack(spacing: Space.m) {
+                Text("Plans will be available at launch.")
+                    .font(.sonavaCardSubtitle.weight(.semibold))
+                    .foregroundColor(.white)
+                Text("Everything above is built and waiting. Nothing is on sale yet, so there is nothing to decide today.")
+                    .font(.system(.footnote))
+                    .foregroundColor(.white.opacity(0.75))
+                    .multilineTextAlignment(.center)
+                // Not in onboarding: there the escape is "Maybe later" at the
+                // foot of the page, and two buttons doing one job is how a
+                // screen stops having a primary action.
+                if !isOnboarding {
+                    Button("Continue with the free version") { finish() }
+                        .buttonStyle(PrimaryCapsuleButtonStyle())
+                        .accessibilityIdentifier("paywall.continueFree")
                 }
             }
         } else {

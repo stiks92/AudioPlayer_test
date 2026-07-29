@@ -664,6 +664,16 @@
         }
       }
     },
+    "Continue with the free version": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продолжить с бесплатной версией"
+          }
+        }
+      }
+    },
     "Couldn't build a mix. Try another vibe or check your connection.": {
       "localizations": {
         "ru": {
@@ -1073,6 +1083,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Все источники вместе"
+          }
+        }
+      }
+    },
+    "Everything above is built and waiting. Nothing is on sale yet, so there is nothing to decide today.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Всё перечисленное уже готово и ждёт. Продажа ещё не открыта, так что решать сегодня нечего."
           }
         }
       }
