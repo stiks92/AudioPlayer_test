@@ -20,6 +20,7 @@ struct MiniPlayerView: View {
     }
 
     var style: Style = .docked
+    let namespace: Namespace.ID
     let onExpand: () -> Void
 
     @EnvironmentObject private var audio: AudioManager

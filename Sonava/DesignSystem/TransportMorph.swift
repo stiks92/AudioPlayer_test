@@ -153,3 +153,14 @@ struct PlayPauseGlyph: View {
     return Demo()
 }
 #endif
+
+// MARK: - Shared geometry between the two players
+
+/// Ids for the elements that travel between the mini player and the full one.
+///
+/// A constant rather than a string literal at each end, because a geometry
+/// match that does not match fails silently: the element simply cross-fades,
+/// which looks like a design decision rather than a typo.
+enum PlayerTransition {
+    static let artwork = "player.artwork"
+}

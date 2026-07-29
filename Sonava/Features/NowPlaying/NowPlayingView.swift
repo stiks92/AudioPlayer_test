@@ -10,6 +10,7 @@
 import SwiftUI
 
 struct NowPlayingView: View {
+    let namespace: Namespace.ID
     let onClose: () -> Void
 
     @EnvironmentObject private var audio: AudioManager
@@ -99,6 +100,7 @@ struct NowPlayingView: View {
             CircleIconButton(systemName: "chevron.down", size: 42, iconSize: 16) {
                 onClose()
             }
+            .identified("player.collapse", label: "Collapse player")
             Spacer()
             VStack(spacing: 2) {
                 Text("PLAYING FROM ALBUM")

@@ -29,6 +29,9 @@ struct RootView: View {
     @AppStorage("hasOnboarded.v1") private var hasOnboarded = false
     @State private var selection: AppTab = .home
     @State private var showNowPlaying = false
+    /// Shared by the mini player's thumbnail and the full player's cover, so
+    /// the artwork travels between them instead of one fading into the other.
+    @Namespace private var playerTransition
     #if DEBUG
     @State private var debugShowEqualizer = false
     @State private var debugShowPaywall = false
@@ -73,15 +76,30 @@ struct RootView: View {
             // on the selection pill the accent measured 3.44:1, so the one tab
             // that must be identifiable was the least legible thing in the bar.
             .tint(Theme.accentSoft)
-            .modifier(MiniPlayerSlot(isHidden: showNowPlaying) {
+            .modifier(MiniPlayerSlot(isHidden: showNowPlaying,
+                                      namespace: playerTransition) {
                 withAnimation(playerSpring) { showNowPlaying = true }
             })
 
             if showNowPlaying {
-                NowPlayingView {
+                NowPlayingView(namespace: playerTransition) {
                     withAnimation(playerSpring) { showNowPlaying = false }
                 }
-                .transition(.move(edge: .bottom))
+                // Grows out of the bottom of the screen, where the mini
+                // player is, rather than sliding up as a finished sheet.
+                //
+                // This was a `matchedGeometryEffect` on the artwork, which is
+                // the obvious way to do it and does not work here. A frame
+                // captured mid-flight showed the cover missing from its
+                // destination and a fragment of it in the *top-left corner*,
+                // half off-screen: on iOS 26 the mini player lives inside
+                // `tabViewBottomAccessory`, a system-hosted container whose
+                // coordinate space does not resolve into this ZStack, so the
+                // match had a source rect but the wrong one. Removed rather
+                // than shipped — a transition that flies from the wrong place
+                // is worse than one that does not fly.
+                .transition(.scale(scale: 0.88, anchor: .bottom)
+                    .combined(with: .opacity))
                 .zIndex(2)
             }
         }
@@ -302,6 +320,7 @@ private struct MiniPlayerSlot: ViewModifier {
     /// Hidden while the full player is up: the same track would otherwise be
     /// on screen twice.
     let isHidden: Bool
+    let namespace: Namespace.ID
     let onExpand: () -> Void
 
     @EnvironmentObject private var audio: AudioManager
@@ -314,14 +333,14 @@ private struct MiniPlayerSlot: ViewModifier {
             content
                 .tabViewBottomAccessory {
                     if isVisible {
-                        MiniPlayerView(style: .accessory, onExpand: onExpand)
+                        MiniPlayerView(style: .accessory, namespace: namespace, onExpand: onExpand)
                     }
                 }
                 .tabBarMinimizeBehavior(.onScrollDown)
         } else {
             content.safeAreaInset(edge: .bottom) {
                 if isVisible {
-                    MiniPlayerView(style: .docked, onExpand: onExpand)
+                    MiniPlayerView(style: .docked, namespace: namespace, onExpand: onExpand)
                         .transition(.opacity)
                 }
             }
