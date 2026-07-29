@@ -60,13 +60,27 @@ struct PaywallView: View {
                     hero
                     perksList
                     plans
-                    subscribeButton
                     if isOnboarding { maybeLater }
                     footer
                 }
                 .padding(.horizontal, Space.screenMargin)
                 .padding(.bottom, Space.xxl)
             }
+            // The action is pinned rather than scrolled.
+            //
+            // Measured, after two wrong fixes. The first diagnosis — "the page
+            // overflows the screen" — was wrong: the page scrolls, and text
+            // passing under the home indicator is what scrolling text does.
+            // Restructuring the background around that theory changed the
+            // numbers by nothing at all, which is how the theory died.
+            //
+            // What is a defect is narrower, and only visible in Russian: the
+            // longer copy pushes the purchase control to 802–854pt while the
+            // home indicator occupies 858–871pt, so the bottom of a *control*
+            // sits inside the system's edge-gesture strip at rest. Pinning it
+            // puts the one thing this screen exists for permanently above that
+            // strip, in both languages, and lets the perks scroll behind it.
+            .safeAreaInset(edge: .bottom, spacing: 0) { pinnedAction }
         }
         .foregroundColor(.white)
         .task {
@@ -190,14 +204,7 @@ struct PaywallView: View {
                     .font(.system(.footnote))
                     .foregroundColor(.white.opacity(0.75))
                     .multilineTextAlignment(.center)
-                // Not in onboarding: there the escape is "Maybe later" at the
-                // foot of the page, and two buttons doing one job is how a
-                // screen stops having a primary action.
-                if !isOnboarding {
-                    Button("Continue with the free version") { finish() }
-                        .buttonStyle(PrimaryCapsuleButtonStyle())
-                        .accessibilityIdentifier("paywall.continueFree")
-                }
+                // The button itself is pinned to the bottom, not here.
             }
         } else {
             VStack(spacing: Space.m) {
@@ -253,16 +260,29 @@ struct PaywallView: View {
         return "Unlock Sonava Pro"
     }
 
+    /// The screen's one action, held above the home indicator.
+    ///
+    /// Onboarding is the exception: there the page already ends with "Maybe
+    /// later", and pinning a second escape would leave the slide with two
+    /// buttons doing one job.
     @ViewBuilder
-    private var subscribeButton: some View {
-        // No products means nothing to buy, and a permanently dead button is
-        // worse than none: faded, its dark label measured 2.63:1 against its
-        // own capsule — less legible than "Restore purchases" underneath it.
-        // The plans placeholder already explains the situation.
-        if proStore.products.isEmpty {
-            EmptyView()
-        } else {
-            purchaseControls
+    private var pinnedAction: some View {
+        if !proStore.products.isEmpty || !isOnboarding {
+            VStack(spacing: 0) {
+                if proStore.products.isEmpty {
+                    Button("Continue with the free version") { finish() }
+                        .buttonStyle(PrimaryCapsuleButtonStyle())
+                        .accessibilityIdentifier("paywall.continueFree")
+                } else {
+                    purchaseControls
+                }
+            }
+            .padding(.horizontal, Space.screenMargin)
+            .padding(.top, Space.m)
+            .padding(.bottom, Space.s)
+            // The perks scroll behind this, so it needs a ground of its own or
+            // a track title would read through the button's own copy.
+            .background(.ultraThinMaterial)
         }
     }
 
@@ -277,15 +297,14 @@ struct PaywallView: View {
                 }
             } label: {
                 HStack {
-                    if isPurchasing { ProgressView().tint(Theme.background) }
-                    Text(ctaTitle).font(.headline)
+                    if isPurchasing { ProgressView() }
+                    Text(ctaTitle)
                 }
-                .foregroundColor(Theme.background)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, Space.l)
-                .background(Capsule().fill(Color.white))
             }
-            .buttonStyle(BouncyButtonStyle(scale: 0.97))
+            // Was a hand-rolled white capsule, invisible in a build with no
+            // products and therefore free to drift from the shared style the
+            // moment there are some.
+            .buttonStyle(PrimaryCapsuleButtonStyle())
             .disabled(selectedID == nil || isPurchasing)
             .accessibilityIdentifier("paywall.subscribe")
 

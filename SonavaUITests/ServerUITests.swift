@@ -83,7 +83,13 @@ final class ServerUITests: XCTestCase {
         let app = launch(servers: 3, pro: true)
         waitFor(app.navigationBars["Self-hosted servers"])
 
-        waitFor(app.staticTexts["navidrome.home.arpa"], "the row does not say which box it is")
+        // The scheme is part of the address on every row now: showing it only
+        // on the insecure one asked the reader to read a *missing* prefix as
+        // "encrypted", which nothing on the screen teaches.
+        waitFor(app.staticTexts["https://navidrome.home.arpa"],
+                "the row does not say which box it is")
+        waitFor(app.staticTexts["http://nas.local"],
+                "an unencrypted connection is not labelled as one")
         waitFor(app.staticTexts["Online"], "the row does not say whether the server answered")
         // The seed makes the third connection unreachable on purpose: a rack
         // that can only draw its happy state has never had its failure state

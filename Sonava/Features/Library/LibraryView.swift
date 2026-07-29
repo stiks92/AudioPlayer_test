@@ -135,7 +135,10 @@ struct LibraryView: View {
                     .font(.subheadline.weight(.bold))
                     .foregroundColor(Theme.background)
                     .padding(.horizontal, Space.xl)
-                    .padding(.vertical, Space.m)
+                    // Height rather than vertical padding: at `Space.m` this
+                    // measured 42pt, under Apple's 44 minimum, on the one
+                    // control an empty Library offers.
+                    .frame(minHeight: Space.hitTarget)
                     .background(Capsule().fill(Color.white))
             }
             .buttonStyle(BouncyButtonStyle(scale: 0.96))

@@ -36,12 +36,17 @@ struct ServerConnection: Identifiable, Codable, Equatable, Sendable {
     /// padlock over it would be a lie about the user's own network.
     var isSecure: Bool { url?.scheme?.lowercased() == "https" }
 
-    /// The host, with the scheme spelled out only when it is not encrypted.
+    /// The address as typed, scheme included, on every row.
     ///
-    /// The exception is what needs stating. Prefixing every row with `https://`
-    /// would be noise; showing `http://` on the one row it applies to says the
-    /// thing that matters, in text, without spending a colour on it.
-    var addressLine: String { isSecure ? host : "http://\(host)" }
+    /// The first attempt showed `http://` only on the insecure row, on the
+    /// theory that the exception is what needs stating. A review pointed out
+    /// what that actually asks of the reader: the *absence* of a prefix means
+    /// encrypted — a negative signal nothing on the screen teaches, on two
+    /// rows out of three. Spelling both costs one word and asks nothing.
+    var addressLine: String {
+        guard let scheme = url?.scheme?.lowercased() else { return host }
+        return "\(scheme)://\(host)"
+    }
 }
 
 /// What we actually know about a connection, as opposed to what the screen

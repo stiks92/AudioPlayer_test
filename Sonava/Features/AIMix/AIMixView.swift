@@ -39,9 +39,19 @@ struct AIMixView: View {
         NavigationStack {
             ZStack {
                 Theme.background.ignoresSafeArea()
-                AuroraBackground(colors: [Theme.accent, Theme.accentPink, Theme.accentDeep],
-                                 animated: !proStore.isPro)
-                    .opacity(proStore.isPro ? 0.25 : 0.6)
+                // The aurora belongs to the pitch, not to the tool.
+                //
+                // It was the only sheet in the app with a coloured ground —
+                // (48,28,55) at the trailing edge where Settings, Stats,
+                // Servers, Equalizer and Scrobbling all measure (8,8,12) — and
+                // Apple's iOS 26 guidance is that a sheet takes its material
+                // from the system. A subscriber using the feature now gets the
+                // same ground as every other sheet; a free listener still gets
+                // the atmosphere, because there the screen *is* an offer.
+                if !proStore.isPro {
+                    AuroraBackground(colors: [Theme.accent, Theme.accentPink, Theme.accentDeep])
+                        .opacity(0.6)
+                }
 
                 if proStore.isPro {
                     generator
@@ -81,17 +91,30 @@ struct AIMixView: View {
                         .submitLabel(.go)
                         .onSubmit(generate)
                 }
-                .padding(.horizontal, Space.l).padding(.vertical, Space.l)
-                .card(cornerRadius: Radius.card)
+                // Matched to the token field on the Scrobbling sheet, which is
+                // visually the same object and measured 45pt against this
+                // one's 54, with a different corner radius on the same fill
+                // and the same stroke.
+                .padding(.horizontal, Space.l).padding(.vertical, Space.m)
+                .card(cornerRadius: Radius.control)
 
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
+                    HStack(spacing: Space.s) {
                         ForEach(suggestions, id: \.self) { s in
                             Text(LocalizedStringKey(s))
-                                .font(.system(.footnote).weight(.semibold))
-                                .foregroundColor(.white)
-                                .padding(.horizontal, Space.l).padding(.vertical, 8)
-                                .background(Capsule().fill(Color.white.opacity(0.12)))
+                                .font(.sonavaRowMeta.weight(.semibold))
+                                .foregroundColor(Theme.textSecondary)
+                                .padding(.horizontal, Space.l)
+                                // 31.7pt before this — under Apple's 44pt
+                                // minimum, and the only chips in the app that
+                                // were: Radio, Podcasts, the EQ presets and
+                                // both segmented controls all measure exactly
+                                // 44. Same fill as an unselected filter chip,
+                                // too; these were 0.12 against everyone
+                                // else's 0.08.
+                                .frame(minHeight: Space.hitTarget)
+                                .background(Capsule().fill(Color.white.opacity(0.08)))
+                                .contentShape(Capsule())
                                 .onTapGesture { prompt = localized(s); generate() }
                         }
                     }
