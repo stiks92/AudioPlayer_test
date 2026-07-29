@@ -39,6 +39,17 @@ xcrun simctl boot "$UDID" 2>/dev/null || true
 xcrun simctl bootstatus "$UDID" -b >/dev/null 2>&1 || true
 xcrun simctl install "$UDID" "$APP"
 
+# Pin the things that silently change what a screenshot measures.
+#
+# Two capture runs were once compared for text contrast and the count moved by
+# 93 rows on screens nobody had touched. The cause was the text size: erasing a
+# simulator resets its content size category, so the two sets were rendered at
+# different type scales and the comparison was void — glyphs occupying more
+# sampled rows, not worse contrast. A run-to-run delta only means something if
+# everything except the code is held still.
+xcrun simctl ui "$UDID" content_size large >/dev/null 2>&1 || true
+xcrun simctl ui "$UDID" appearance dark >/dev/null 2>&1 || true
+
 # Shared arguments: skip onboarding, fix the language, seed everything the
 # screens need so no shelf is empty for reasons unrelated to design.
 COMMON=(-hasOnboarded.v1 YES -pro.dev.override.v1 "$PRO"

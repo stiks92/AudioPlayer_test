@@ -14,6 +14,19 @@ scored low — it under-reports, sometimes by a lot. It also cannot tell text fr
 artwork, so a saturated album tile scores as a failure. Treat the absolute count
 as a candidate list, and the run-to-run delta as the real signal.
 
+Two things about that delta, both learned the hard way.
+
+Its noise floor is about ±2 rows: two captures of the *same* build scored 304
+and 306, because remote artwork does not load identically every time. A change
+of three rows is nothing.
+
+And it only means anything if the capture conditions are held still. Comparing
+two sets once showed +93 rows on screens nobody had touched — the sets had been
+rendered at different Dynamic Type sizes, because erasing a simulator resets its
+content size category. Larger glyphs occupy more sampled rows; the contrast had
+not moved at all. `capture_screens.sh` pins the type scale and appearance now,
+and a comparison against a set captured before it did is void.
+
 The method is deliberately blunt. For every text-sized run of light pixels it
 finds, it compares the run against the local background just outside it. That
 over-reports on artwork and gradients, so the default run only *reports*; pass
