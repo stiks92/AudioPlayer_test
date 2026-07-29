@@ -61,6 +61,13 @@ enum Tile {
     static let standard: CGFloat = 140
 }
 
+/// The accent and app-icon pickers, sized so six fit a settings card's inner
+/// width with a real gutter. They were 52 and 56, which did not, and the row
+/// spent three rounds being sliced by the card's own border instead.
+enum Swatch {
+    static let size: CGFloat = 46
+}
+
 // MARK: - Radius
 
 enum Radius {

@@ -128,33 +128,34 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: Space.m) {
                     Text("Accent")
                         .font(.system(.footnote).weight(.semibold))
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: Space.iconGap) {
-                            ForEach(ThemePalette.all) { palette in
-                                paletteSwatch(palette)
-                            }
+                    // Six across, not a scroller.
+                    //
+                    // Three rounds tried to make a horizontal scroller behave
+                    // inside a clipping card: it sliced the sixth swatch
+                    // against the card's own border, and a fade mask erased it
+                    // outright. The scrolling was never the point — there are
+                    // exactly six palettes and they fit. At six equal columns
+                    // in the card's inner width nothing clips, nothing needs an
+                    // affordance, and the paywall's promise of "six accent
+                    // themes" is a thing you can count on the screen.
+                    HStack(spacing: 0) {
+                        ForEach(ThemePalette.all) { palette in
+                            paletteSwatch(palette).frame(maxWidth: .infinity)
                         }
-                        .padding(.vertical, 2)
                     }
-                    // Without this the row clips inside the card's own padding
-                    // and the sixth swatch is invisible — while the paywall two
-                    // screens earlier sells "six accent themes and six app icons".
-                    .carouselBleed(Space.l, fade: nil)
+                    .padding(.vertical, 2)
                 }
 
                 if appIcon.supportsAlternateIcons {
                     VStack(alignment: .leading, spacing: Space.m) {
                         Text("App icon")
                             .font(.system(.footnote).weight(.semibold))
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: Space.iconGap) {
-                                ForEach(AppIconOption.all) { option in
-                                    iconSwatch(option)
-                                }
+                        HStack(spacing: 0) {
+                            ForEach(AppIconOption.all) { option in
+                                iconSwatch(option).frame(maxWidth: .infinity)
                             }
-                            .padding(.vertical, 2)
                         }
-                        .carouselBleed(Space.l, fade: nil)
+                        .padding(.vertical, 2)
                         if let error = appIcon.lastError {
                             Text(error).font(.footnote).foregroundColor(Theme.error)
                                 // Identified so a test can tell "the system
@@ -187,7 +188,7 @@ struct SettingsView: View {
                     RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
                         .fill(LinearGradient(colors: option.gradientHex.colors,
                                              startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .frame(width: 56, height: 56)
+                        .frame(width: Swatch.size, height: Swatch.size)
                         .overlay(
                             RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
                                 .strokeBorder(selected ? Color.white : Color.white.opacity(0.15),
@@ -197,13 +198,13 @@ struct SettingsView: View {
                         ForEach([0.34, 0.62, 1.0, 0.70, 0.44], id: \.self) { height in
                             Capsule()
                                 .fill(Color.white.opacity(0.92))
-                                .frame(width: 5, height: 30 * height)
+                                .frame(width: Swatch.size * 0.107, height: Swatch.size * 0.54 * height)
                         }
                     }
                     if locked {
                         RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
                             .fill(Color.black.opacity(0.45))
-                            .frame(width: 56, height: 56)
+                            .frame(width: Swatch.size, height: Swatch.size)
                         Image(systemName: "lock.fill")
                             .font(.system(.subheadline).weight(.bold))
                             .foregroundColor(.white)
@@ -237,7 +238,7 @@ struct SettingsView: View {
                 ZStack {
                     Circle()
                         .fill(LinearGradient(colors: palette.swatch, startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .frame(width: 52, height: 52)
+                        .frame(width: Swatch.size, height: Swatch.size)
                         .overlay(
                             Circle().strokeBorder(selected ? Color.white : Color.white.opacity(0.15),
                                                   lineWidth: selected ? 3 : 1)
