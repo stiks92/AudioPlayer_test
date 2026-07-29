@@ -99,24 +99,81 @@ enum Motion {
 
 // MARK: - Type
 
-/// A seven-role ramp built on text styles, so every size responds to the
-/// reader's Dynamic Type setting. `Font.system(size:)` does not scale at all,
-/// which is why it no longer appears in the app.
+/// Three families, one rule each, so the ramp can be checked in a sentence:
+/// **if a human named it, it is serif; if a machine measured it, it is
+/// monospaced; everything else is the system face.**
+///
+/// The previous ramp put `design: .rounded` on the display, metric, card-title
+/// and section-header roles. Two independent design reviews named it, without
+/// prompting, as the single loudest signal that a screen was generated rather
+/// than designed — SF Rounded is the friendliness default of every template.
+/// It appears in exactly zero roles now.
+///
+/// Serif is New York, which the system ships and which optically sizes itself.
+/// It carries names — track titles, artists, the app's own word — because a
+/// name is written by a person. Monospaced carries facts, and the reason is
+/// mechanical as well as editorial: a tabular numeral does not twitch when the
+/// value under it changes thirty times a second.
+///
+/// Every role is anchored to a text style, never `Font.system(size:)`, so it
+/// still answers Dynamic Type.
 extension Font {
-    /// Screen titles.
-    static let sonavaDisplay = Font.system(.largeTitle, design: .rounded).weight(.heavy)
-    /// The big number on a stat: durations, counts, streaks.
-    static let sonavaMetric = Font.system(.title, design: .rounded).weight(.heavy)
-    /// The title of a card or a sheet section.
-    static let sonavaCardTitle = Font.system(.headline, design: .rounded).weight(.bold)
-    /// Supporting copy under a card title.
+    /// The app's own word, and nothing else. Once per screen at most.
+    static let sonavaMasthead = Font.system(.largeTitle, design: .serif).weight(.black)
+    /// The one hero figure on a screen: a duration, a count, a streak.
+    static let sonavaFigure = Font.system(.largeTitle, design: .serif).weight(.black)
+    /// A title someone chose: a track, an album, a playlist.
+    static let sonavaTitle = Font.system(.title, design: .serif).weight(.bold)
+    /// A row's primary line — the name of the thing.
+    static let sonavaName = Font.system(.callout, design: .serif).weight(.semibold)
+    /// An attribution: the artist, set the way a credit is set.
+    static let sonavaAttribution = Font.system(.body, design: .serif).italic()
+    /// A row's secondary line.
+    static let sonavaByline = Font.system(.footnote)
+    /// The department label above a rule. Set in caps and tracked.
+    static let sonavaDepartment = Font.system(.caption2).weight(.heavy)
+    /// A measured fact: elapsed time, latency, a count, a format, an address.
+    static let sonavaFact = Font.system(.footnote, design: .monospaced)
+        .weight(.medium).monospacedDigit()
+    /// The smallest machine voice: stamps, datelines, badges, units.
+    static let sonavaStamp = Font.system(.caption2, design: .monospaced).weight(.medium)
+    /// A rank. Hangs outside the text rail, the way a folio does.
+    static let sonavaOrdinal = Font.system(.subheadline, design: .monospaced)
+        .weight(.semibold).monospacedDigit()
+
+    // Retained so the app keeps building while screens migrate one at a time.
+    // Each now points at its replacement rather than at a rounded face.
+    static let sonavaDisplay = sonavaMasthead
+    static let sonavaMetric = sonavaFigure
+    static let sonavaCardTitle = Font.system(.headline).weight(.semibold)
     static let sonavaCardSubtitle = Font.system(.subheadline)
-    /// A list row's primary line.
     static let sonavaRowTitle = Font.system(.subheadline).weight(.medium)
-    /// A row's secondary line, values and metadata.
     static let sonavaRowMeta = Font.system(.footnote)
-    /// The small uppercase label above a group.
-    static let sonavaSectionLabel = Font.system(.caption).weight(.bold)
+    static let sonavaSectionLabel = sonavaDepartment
+}
+
+// MARK: - Rails and rules
+
+/// The two vertical lines nothing crosses, and the four weights of rule.
+///
+/// A page is held together by where things start and stop, not by the boxes
+/// they sit in. Home previously had six horizontal rails whose contents each
+/// began at a different optical position, because each tile was a different
+/// width — so the left edge of the screen was a suggestion.
+enum Rail {
+    /// Rank numerals hang here, outside the measure.
+    static let ordinal: CGFloat = 32
+    static let gap: CGFloat = 20
+    /// Where text starts in a ranked row.
+    static var text: CGFloat { ordinal + gap }
+}
+
+enum Rule {
+    /// Ends the nameplate. Full bleed, once per screen.
+    static let masthead: CGFloat = 2
+    /// Above a department label. Drawn in the accent, so choosing a palette
+    /// repaints every rule in the app rather than tinting a chevron.
+    static let section: CGFloat = 1
 }
 
 extension View {

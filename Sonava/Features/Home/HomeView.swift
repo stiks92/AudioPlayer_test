@@ -42,19 +42,24 @@ struct HomeView: View {
             ZStack {
                 AppBackground()
                 ScrollView {
+                    // The order is the argument.
+                    //
+                    // It used to run: greeting, AI Mix banner, stats card, two
+                    // algorithmic shelves, a chart of 30-second previews, and
+                    // *then*, at positions eight and ten, the listener's own
+                    // server and their own imported files. An app for people
+                    // who own their music put the music they own last. No
+                    // amount of typography fixes that, and it is the single
+                    // largest change here.
                     VStack(alignment: .leading, spacing: Space.xxl) {
-                        header
-                        aiMixCard
-                        statsCard
+                        masthead
+                        figure
+                        yourFilesSection
+                        serverSection
                         madeForYouSection
                         popularSection
-                        if !library.recentSongs.isEmpty {
-                            recentlyPlayed
-                        }
-                        editorialSection
-                        serverSection
                         trendingSection
-                        quickPicks
+                        indexSection
                     }
                     .padding(.horizontal, Space.screenMargin)
                     .padding(.top, 8)
@@ -135,24 +140,32 @@ struct HomeView: View {
     @ViewBuilder
     private var madeForYouSection: some View {
         if madeForYou.state == .loaded, !madeForYou.songs.isEmpty {
-            VStack(alignment: .leading, spacing: Space.l) {
-                SectionHeader(title: "Made for you")
+            VStack(alignment: .leading, spacing: Space.m) {
+                Department(title: "Made for you",
+                           fact: "\(madeForYou.songs.count) \(String(localized: "TRACKS"))")
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: Space.l) {
-                        ForEach(madeForYou.songs) { song in
+                    HStack(alignment: .bottom, spacing: Space.m) {
+                        ForEach(Array(madeForYou.songs.enumerated()), id: \.element.id) { index, song in
                             Button {
                                 audio.play(song, in: madeForYou.songs)
                             } label: {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    ArtworkThumbnail(song: song, size: Tile.feature, cornerRadius: Radius.card, showBadge: true)
+                                // The lead sleeve is 1.5x its followers, and the
+                                // row is bottom-aligned so they share a
+                                // baseline. A rail whose first item is larger
+                                // cannot be mistaken for a stock carousel — and
+                                // the old one had twenty identical tiles.
+                                let side: CGFloat = index == 0 ? Tile.feature : Tile.standard * 0.84
+                                VStack(alignment: .leading, spacing: Space.s) {
+                                    ArtworkThumbnail(song: song, size: side,
+                                                     cornerRadius: 2, showBadge: false)
                                     Text(song.title)
-                                        .font(.system(.footnote).weight(.semibold))
-                                        .foregroundColor(Theme.textPrimary)
+                                        .font(index == 0 ? .sonavaName : .sonavaByline)
+                                        .foregroundColor(index == 0 ? Theme.textPrimary : Theme.textSecondary)
                                         .lineLimit(1)
-                                        .frame(width: Tile.feature, alignment: .leading)
+                                        .frame(width: side, alignment: .leading)
                                 }
                             }
-                            .buttonStyle(BouncyButtonStyle(scale: 0.95))
+                            .buttonStyle(.plain)
                         }
                     }
                 }
@@ -161,34 +174,6 @@ struct HomeView: View {
         }
     }
 
-    @ViewBuilder
-    private var serverSection: some View {
-        if serverStore.isConnected, serverFeed.state == .loaded {
-            VStack(alignment: .leading, spacing: Space.l) {
-                SectionHeader(title: "From your server")
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: Space.l) {
-                        ForEach(serverFeed.songs) { song in
-                            Button {
-                                audio.play(song, in: serverFeed.songs)
-                            } label: {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    ArtworkThumbnail(song: song, size: Tile.standard, cornerRadius: Radius.card, showBadge: true)
-                                    Text(song.title)
-                                        .font(.system(.footnote).weight(.semibold))
-                                        .foregroundColor(Theme.textPrimary)
-                                        .lineLimit(1)
-                                        .frame(width: Tile.standard, alignment: .leading)
-                                }
-                            }
-                            .buttonStyle(BouncyButtonStyle(scale: 0.95))
-                        }
-                    }
-                }
-                .carouselBleed()
-            }
-        }
-    }
 
     // MARK: - AI Mix banner
 
@@ -271,86 +256,9 @@ struct HomeView: View {
 
     // MARK: - Popular now (Deezer charts)
 
-    @ViewBuilder
-    private var popularSection: some View {
-        if charts.state == .loaded {
-            VStack(alignment: .leading, spacing: Space.l) {
-                SectionHeader(title: "Popular now")
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: Space.l) {
-                        ForEach(charts.songs) { song in
-                            Button {
-                                audio.play(song, in: charts.songs)
-                            } label: {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    ArtworkThumbnail(song: song, size: Tile.standard, cornerRadius: Radius.card, showBadge: true)
-                                    Text(song.title)
-                                        .font(.system(.footnote).weight(.semibold))
-                                        .foregroundColor(Theme.textPrimary)
-                                        .lineLimit(1)
-                                        .frame(width: Tile.standard, alignment: .leading)
-                                    Text(song.artist)
-                                        .font(.system(.caption2))
-                                        .foregroundColor(Theme.textSecondary)
-                                        .lineLimit(1)
-                                        .frame(width: Tile.standard, alignment: .leading)
-                                }
-                            }
-                            .buttonStyle(BouncyButtonStyle(scale: 0.95))
-                        }
-                    }
-                }
-                .carouselBleed()
-            }
-        }
-    }
 
     // MARK: - Trending on Audius (live)
 
-    @ViewBuilder
-    private var trendingSection: some View {
-        switch trending.state {
-        case .idle, .empty:
-            EmptyView()
-        case .failed:
-            // A shelf that failed to load is not a shelf with nothing in it,
-            // and the difference matters to someone on a bad connection.
-            ShelfFailure(title: "Trending on Audius") {
-                Task { await trending.load { try await AudiusService.shared.trending() } }
-            }
-        case .loading:
-            ShelfPlaceholder(title: "Trending on Audius")
-        case .loaded:
-            VStack(alignment: .leading, spacing: Space.l) {
-                SectionHeader(title: "Trending on Audius")
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: Space.l) {
-                        ForEach(trending.songs) { song in
-                            Button {
-                                audio.play(song, in: trending.songs)
-                            } label: {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    ArtworkThumbnail(song: song, size: Tile.standard, cornerRadius: Radius.card, showBadge: true)
-                                    Text(song.title)
-                                        .font(.system(.footnote).weight(.semibold))
-                                        .foregroundColor(Theme.textPrimary)
-                                        .lineLimit(1)
-                                        .frame(width: Tile.standard, alignment: .leading)
-                                    Text(song.artist)
-                                        .font(.system(.caption2))
-                                        .foregroundColor(Theme.textSecondary)
-                                        .lineLimit(1)
-                                        .frame(width: Tile.standard, alignment: .leading)
-                                }
-                            }
-                            .buttonStyle(BouncyButtonStyle(scale: 0.95))
-                        }
-                    }
-                }
-                .carouselBleed()
-            }
-        }
-    }
 
     // MARK: - Header
 
@@ -464,5 +372,228 @@ struct HomeView: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - The editorial Home
+
+extension HomeView {
+
+    /// The nameplate. A fixed word and a dateline that is never the same twice.
+    ///
+    /// Replaces "Good evening / What do you feel like hearing?" — 60pt of
+    /// rounded display type saying nothing about the app. Hardware does not
+    /// greet you, and neither does a record sleeve.
+    var masthead: some View {
+        VStack(alignment: .leading, spacing: Space.s) {
+            Text(verbatim: "SONAVA")
+                .font(.sonavaMasthead)
+                .tracking(-1.6)
+                .foregroundColor(Theme.textPrimary)
+            // The only full-bleed rule in the app. It says "this is the top of
+            // the page" once, and nothing else may claim it.
+            Rectangle()
+                .fill(Theme.textPrimary)
+                .frame(height: Rule.masthead)
+                .padding(.horizontal, -Space.screenMargin)
+            HStack(alignment: .firstTextBaseline) {
+                Text(Self.dateline.string(from: Date()).uppercased())
+                Spacer(minLength: Space.m)
+                Text(inventory)
+            }
+            .font(.sonavaStamp)
+            .tracking(1.2)
+            .foregroundColor(Theme.textTertiary)
+            .lineLimit(1)
+        }
+    }
+
+    static let dateline: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.setLocalizedDateFormatFromTemplate("EEE d MMM HH:mm")
+        return formatter
+    }()
+
+    /// What this install actually holds. Every number measured, and a count of
+    /// zero is still printed — an instrument with nothing to measure says so.
+    var inventory: String {
+        var parts: [String] = ["\(library.songs.count) \(String(localized: "FILES"))"]
+        if serverStore.servers.count > 0 {
+            parts.append("\(serverStore.servers.count) \(String(localized: "SERVERS"))")
+        }
+        return parts.joined(separator: " · ")
+    }
+
+    /// One hero figure per screen, and it is the listener's own time.
+    ///
+    /// This was a 90pt card containing 17pt text. The card was *containing* a
+    /// small number; now the number is the thing, and the container is gone.
+    @ViewBuilder
+    var figure: some View {
+        let stats = history.stats(range: .week)
+        Button {
+            showStats = true
+        } label: {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(ListeningStats.duration(stats.totalSeconds))
+                    .font(.sonavaFigure)
+                    .tracking(-1.2)
+                    .foregroundColor(Theme.textPrimary)
+                    .contentTransition(.numericText())
+                Text(weekLine(stats))
+                    .font(.sonavaStamp)
+                    .tracking(1.2)
+                    .foregroundColor(Theme.textTertiary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .buttonStyle(.plain)
+        // The stats card is gone; the figure is the way in now, and it carries
+        // the identifier the journey was always about.
+        .identified(AccessibilityID.statsCard, label: "Your sound")
+    }
+
+    func weekLine(_ stats: ListeningStats) -> String {
+        var parts = [String(localized: "THIS WEEK")]
+        if stats.plays > 0 { parts.append("\(stats.plays) \(String(localized: "TRACKS"))") }
+        if stats.artistCount > 0 { parts.append("\(stats.artistCount) \(String(localized: "ARTISTS"))") }
+        if stats.streak > 0 { parts.append("\(String(localized: "DAY")) \(stats.streak)") }
+        return parts.joined(separator: " · ")
+    }
+
+    /// The listener's own imported files — moved from position ten to position
+    /// three, and given the artwork the charts no longer get.
+    @ViewBuilder
+    var yourFilesSection: some View {
+        if !library.songs.isEmpty {
+            let songs = Array(library.songs.prefix(4))
+            VStack(alignment: .leading, spacing: Space.m) {
+                Department(title: "Your files",
+                           fact: "\(library.songs.count) \(String(localized: "IMPORTED"))")
+                ForEach(Array(songs.enumerated()), id: \.element.id) { index, song in
+                    Button {
+                        audio.play(song, in: library.songs)
+                    } label: {
+                        OwnedRow(song: song, fact: song.fileExtension.uppercased())
+                    }
+                    .buttonStyle(.plain)
+                    if index < songs.count - 1 { RowRule(inset: 56) }
+                }
+            }
+        }
+    }
+
+    /// A ranked list, not a rail. The numerals are the point.
+    @ViewBuilder
+    func chart(_ title: LocalizedStringKey, fact: String, feed: SongFeed) -> some View {
+        if feed.state == .loaded, !feed.songs.isEmpty {
+            let songs = Array(feed.songs.prefix(5))
+            VStack(alignment: .leading, spacing: Space.m) {
+                Department(title: title, fact: fact)
+                ForEach(Array(songs.enumerated()), id: \.element.id) { index, song in
+                    Button {
+                        audio.play(song, in: feed.songs)
+                    } label: {
+                        RankedRow(rank: index + 1, song: song)
+                    }
+                    .buttonStyle(.plain)
+                    if index < songs.count - 1 { RowRule(inset: Rail.text) }
+                }
+            }
+        }
+    }
+
+    var popularSection: some View {
+        chart("Popular now", fact: "DEEZER · 30s", feed: charts)
+    }
+
+    /// The department label is the machine's own name, and the fact beside it
+    /// is its measured state. No other music app would ever print a latency on
+    /// its home screen, because no other music app's library lives in your
+    /// house.
+    @ViewBuilder
+    var serverSection: some View {
+        if serverStore.isConnected, serverFeed.state == .loaded, !serverFeed.songs.isEmpty {
+            let songs = Array(serverFeed.songs.prefix(4))
+            VStack(alignment: .leading, spacing: Space.m) {
+                Department(title: LocalizedStringKey(serverStore.active?.host.uppercased() ?? "YOUR SERVER"),
+                           fact: serverFact)
+                ForEach(Array(songs.enumerated()), id: \.element.id) { index, song in
+                    Button {
+                        audio.play(song, in: serverFeed.songs)
+                    } label: {
+                        OwnedRow(song: song,
+                                 fact: audio.downloads.isDownloaded(song) ? String(localized: "SAVED") : nil)
+                    }
+                    .buttonStyle(.plain)
+                    if index < songs.count - 1 { RowRule(inset: 56) }
+                }
+            }
+        }
+    }
+
+    var serverFact: String {
+        guard let active = serverStore.active else { return "" }
+        let health = serverStore.health(for: active)
+        switch health.state {
+        case .online:
+            var parts = [String(localized: "ONLINE")]
+            if let latency = health.latency { parts.append("\(Int((latency * 1000).rounded())) ms") }
+            if let files = health.files { parts.append(files.formatted(.number)) }
+            return parts.joined(separator: " · ")
+        case .unreachable: return String(localized: "UNREACHABLE")
+        case .checking:    return String(localized: "CHECKING")
+        case .unknown:     return ""
+        }
+    }
+
+    var trendingSection: some View {
+        chart("Trending", fact: "AUDIUS", feed: trending)
+    }
+
+    /// The app's own features, set as an index rather than as banners.
+    var indexSection: some View {
+        VStack(alignment: .leading, spacing: Space.m) {
+            Department(title: "In the app")
+            // The index is the app's own contents page, and each entry keeps
+            // the identifier its journey has always used. The banner and the
+            // two round chrome buttons are gone; the routes are not.
+            indexRow(1, "Create an AI Mix", fact: proStore.isPro ? nil : "PRO",
+                     id: AccessibilityID.aiMixCard) { showAIMix = true }
+            RowRule(inset: Rail.text)
+            indexRow(2, "Identify a track", fact: nil,
+                     id: AccessibilityID.shazamButton) { showShazam = true }
+            RowRule(inset: Rail.text)
+            indexRow(3, "Settings", fact: nil,
+                     id: AccessibilityID.settingsButton) { showSettings = true }
+        }
+    }
+
+    func indexRow(_ rank: Int, _ title: LocalizedStringKey, fact: String?,
+                  id: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(alignment: .center, spacing: Space.l) {
+                Text(String(format: "%02d", rank))
+                    .font(.sonavaOrdinal)
+                    .foregroundColor(Theme.textTertiary)
+                    .frame(width: Rail.ordinal, alignment: .trailing)
+                Text(title)
+                    .font(.system(.title3, design: .serif))
+                    .foregroundColor(Theme.textPrimary)
+                Spacer(minLength: Space.s)
+                if let fact {
+                    Text(fact)
+                        .font(.sonavaStamp)
+                        .tracking(1.2)
+                        .foregroundColor(Theme.accentSoft)
+                }
+            }
+            .frame(minHeight: Space.hitTarget + 12)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .identified(id, label: title)
     }
 }

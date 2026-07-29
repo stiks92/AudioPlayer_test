@@ -308,6 +308,16 @@
         }
       }
     },
+    "ARTISTS": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "АРТИСТОВ"
+          }
+        }
+      }
+    },
     "Accent": {
       "localizations": {
         "ru": {
@@ -490,6 +500,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Бизнес"
+          }
+        }
+      }
+    },
+    "CHECKING": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ПРОВЕРКА"
           }
         }
       }
@@ -814,6 +834,16 @@
         }
       }
     },
+    "DAY": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ДЕНЬ"
+          }
+        }
+      }
+    },
     "Dark": {
       "localizations": {
         "ru": {
@@ -1097,6 +1127,16 @@
         }
       }
     },
+    "FILES": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ФАЙЛОВ"
+          }
+        }
+      }
+    },
     "Favorite": {
       "localizations": {
         "ru": {
@@ -1257,6 +1297,26 @@
         }
       }
     },
+    "IMPORTED": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ИМПОРТИРОВАНО"
+          }
+        }
+      }
+    },
+    "Identify a track": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Узнать трек"
+          }
+        }
+      }
+    },
     "Identify another": {
       "localizations": {
         "ru": {
@@ -1293,6 +1353,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Импортируй свои аудиофайлы из Файлов или iCloud Drive. Они останутся на устройстве и будут играть офлайн."
+          }
+        }
+      }
+    },
+    "In the app": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В приложении"
           }
         }
       }
@@ -1459,6 +1529,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Для тебя"
+          }
+        }
+      }
+    },
+    "Make a mix": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Собрать микс"
           }
         }
       }
@@ -2476,6 +2556,26 @@
         }
       }
     },
+    "SAVED": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "СОХРАНЕНО"
+          }
+        }
+      }
+    },
+    "SERVERS": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "СЕРВЕРОВ"
+          }
+        }
+      }
+    },
     "Sad piano": {
       "localizations": {
         "ru": {
@@ -2975,6 +3075,26 @@
         }
       }
     },
+    "THIS WEEK": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ЗА НЕДЕЛЮ"
+          }
+        }
+      }
+    },
+    "TRACKS": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ТРЕКОВ"
+          }
+        }
+      }
+    },
     "Tap the heart on any track to save it here.": {
       "localizations": {
         "ru": {
@@ -3131,6 +3251,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Усиление верхов"
+          }
+        }
+      }
+    },
+    "Trending": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В тренде"
           }
         }
       }
@@ -3345,6 +3475,16 @@
         }
       }
     },
+    "Your files": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Твои файлы"
+          }
+        }
+      }
+    },
     "Your music stays on your server. Only this connection is forgotten.": {
       "localizations": {
         "ru": {
@@ -3371,6 +3511,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Твой сервер"
+          }
+        }
+      }
+    },
+    "Your sound": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Твой звук"
           }
         }
       }
