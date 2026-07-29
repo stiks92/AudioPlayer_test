@@ -137,7 +137,7 @@ struct EqualizerView: View {
                         }
                 )
             }
-            .frame(height: 320)
+            .frame(height: 240)
 
             // Frequency scale, outside the graph so the curve owns its full
             // height and the labels keep a stable baseline.
@@ -318,7 +318,10 @@ private struct BandHandle: View {
 
             Circle()
                 .fill(Color.white)
-                .frame(width: isActive ? 30 : 24, height: isActive ? 30 : 24)
+                // Ringed in the ground colour so a handle punches out of the
+                // curve instead of burying it.
+                .overlay(Circle().strokeBorder(Theme.background, lineWidth: 2))
+                .frame(width: isActive ? 30 : 15, height: isActive ? 30 : 15)
                 .shadow(color: .black.opacity(0.45), radius: isActive ? 8 : 4, y: 2)
                 .position(x: width / 2, y: knobY)
 

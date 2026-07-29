@@ -161,10 +161,13 @@ struct ConnectServerView: View {
                 Text(serverStore.servers.isEmpty ? "Connect a server" : "Add another server")
                     .font(.headline)
             }
-            .foregroundColor(Theme.background)
+            .foregroundColor(.white)
             .frame(maxWidth: .infinity)
             .padding(.vertical, Space.l)
-            .background(Capsule().fill(Color.white))
+            // Was a pure-white capsule: the loudest object on a screen whose
+            // actual subject is which server is active. Tint belongs to the
+            // call to action, and white belongs to the purchase.
+            .background(Capsule().fill(Theme.accent.mix(with: Theme.background, by: 0.12)))
         }
         .buttonStyle(BouncyButtonStyle(scale: 0.97))
         .identified("server.add", label: "Add server")

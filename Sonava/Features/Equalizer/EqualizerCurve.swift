@@ -155,7 +155,7 @@ struct ResponseGraph: View {
                     Text(label)
                         .font(.system(.caption2).weight(.medium).monospacedDigit())
                         .foregroundColor(Theme.textTertiary)
-                        .position(x: geo.size.width - 18, y: half + offset - 10)
+                        .position(x: geo.size.width - 14, y: half + offset - 11)
                 }
                 // Dashed, so a flat curve resting exactly on it still reads
                 // as a curve on a datum rather than as one unexplained line.
@@ -179,7 +179,7 @@ struct ResponseGraph: View {
                 )
 
             ResponseCurve(gains: animatable, limit: Double(limit))
-                .stroke(Theme.accentSoft, style: StrokeStyle(lineWidth: 2.5,
+                .stroke(Theme.accentSoft, style: StrokeStyle(lineWidth: 3,
                                                              lineCap: .round,
                                                              lineJoin: .round))
         }

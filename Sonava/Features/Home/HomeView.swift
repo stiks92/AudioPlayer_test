@@ -223,7 +223,7 @@ struct HomeView: View {
             // The gradient peaks magenta mid-card, which put this copy at
             // 1.9:1. `StatsShareCard` solves the identical problem on the
             // identical gradient with a scrim; same answer here.
-            .background(Theme.proGradient.overlay(Color.black.opacity(0.25)))
+            .background(Theme.proGradient.overlay(Color.black.opacity(0.40)))
             .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
             .shadow(color: .black.opacity(0.5), radius: 20, y: 10)
         }

@@ -54,8 +54,10 @@ struct RootView: View {
                 }
             }
             // Without this the system bar tints itself blue and the app's
-            // whole palette stops at the tab bar.
-            .tint(Theme.accent)
+            // whole palette stops at the tab bar. `accentSoft`, not `accent`:
+            // on the selection pill the accent measured 3.44:1, so the one tab
+            // that must be identifiable was the least legible thing in the bar.
+            .tint(Theme.accentSoft)
             .modifier(MiniPlayerSlot(isHidden: showNowPlaying) {
                 withAnimation(playerSpring) { showNowPlaying = true }
             })

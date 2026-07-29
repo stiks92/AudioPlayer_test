@@ -42,7 +42,7 @@ struct PaywallView: View {
              subtitle: "Save full tracks and listen with no signal."),
         Perk(icon: "slider.vertical.3", title: "10-band equalizer",
              subtitle: "Studio presets and per-band control."),
-        Perk(icon: "sparkles", title: "AI Mix",
+        Perk(icon: "wand.and.stars", title: "AI Mix",
              subtitle: "Describe a vibe, get an instant mix."),
         Perk(icon: "paintpalette.fill", title: "Make it yours",
              subtitle: "Six accent themes and six app icons."),
@@ -95,7 +95,7 @@ struct PaywallView: View {
                         .font(.system(.subheadline).weight(.bold))
                         .foregroundColor(.white.opacity(0.8))
                         .frame(width: Space.hitTarget, height: Space.hitTarget)
-                        .background(Circle().fill(.ultraThinMaterial))
+                        .interactiveGlass(in: Circle())
                         .contentShape(Circle())
                 }
                 .identified(AccessibilityID.paywallClose, label: "Close")
@@ -115,10 +115,12 @@ struct PaywallView: View {
 
     private var hero: some View {
         VStack(spacing: Space.m) {
-            Image(systemName: "sparkles")
-                .font(.system(size: 44, weight: .bold))
-                .foregroundColor(.white)
-                .shadow(color: .white.opacity(0.5), radius: 16)
+            // The app's own mark rather than a stock glyph: `sparkles` was
+            // doing duty as both the product hero and one feature's icon
+            // 700pt below, so the image standing for Sonava was one Apple
+            // ships on every device.
+            SonavaMark(height: 46)
+                .shadow(color: .white.opacity(0.35), radius: 16)
             Text("Sonava Pro")
                 .font(.system(.largeTitle, design: .rounded).weight(.heavy))
             Text("The one player for all your music —\nunlocked to the fullest.")
@@ -157,11 +159,22 @@ struct PaywallView: View {
     @ViewBuilder
     private var plans: some View {
         if proStore.products.isEmpty {
-            Text(proStore.isLoadingProducts ? "Loading plans…" : "Plans will be available at launch.")
-                .font(.footnote)
-                .foregroundColor(.white.opacity(0.75))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, Space.l)
+            // Ghost cards in the plans' own footprint. A bare line of text let
+            // the composition collapse, and the real cards would then shove the
+            // CTA ~200pt down the page under the reader's thumb.
+            VStack(spacing: Space.m) {
+                // Above the ghosts, not centred across them — centring on the
+                // stack put the label in the gap between the two cards.
+                Text(proStore.isLoadingProducts ? "Loading plans…" : "Plans will be available at launch.")
+                    .font(.sonavaCardSubtitle.weight(.semibold))
+                    .foregroundColor(.white)
+                ForEach(0..<2, id: \.self) { _ in
+                    RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
+                        .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [6, 5]))
+                        .foregroundColor(.white.opacity(0.45))
+                        .frame(height: 68)
+                }
+            }
         } else {
             VStack(spacing: Space.m) {
                 ForEach(proStore.products, id: \.id) { product in
