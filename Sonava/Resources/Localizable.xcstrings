@@ -2836,6 +2836,16 @@
         }
       }
     },
+    "Sleep": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сон"
+          }
+        }
+      }
+    },
     "Sleep timer": {
       "localizations": {
         "ru": {

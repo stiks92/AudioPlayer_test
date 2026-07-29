@@ -32,9 +32,13 @@ struct NowPlayingView: View {
 
     var body: some View {
         ZStack {
-            AuroraBackground(colors: song?.gradient ?? [Theme.accent, Theme.background],
-                             animated: audio.isPlaying)
-                .animation(.easeInOut(duration: 0.8), value: song)
+            // Flat ground, because the artwork is the colour.
+            //
+            // Three blurred blobs of the track's own palette washed the whole
+            // screen, which meant a Blue Note sleeve and a Warp sleeve arrived
+            // looking like the same purple record. Somebody with 12,431 files
+            // needs the opposite: the sleeve doing the identifying.
+            Theme.background.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 header
@@ -49,8 +53,6 @@ struct NowPlayingView: View {
                     .padding(.top, Space.l)
                 controls
                     .padding(.top, 8)
-                volume
-                    .padding(.top, Space.xl)
                 bottomBar
                     .padding(.top, Space.xl)
             }
@@ -102,14 +104,15 @@ struct NowPlayingView: View {
             }
             .identified("player.collapse", label: "Collapse player")
             Spacer()
-            VStack(spacing: 2) {
-                Text("PLAYING FROM ALBUM")
-                    .font(.system(.caption2).weight(.bold))
-                    .foregroundColor(.white.opacity(0.6))
-                    .tracking(1.5)
-                Text(song?.album ?? "")
-                    .font(.system(.footnote).weight(.semibold))
-            }
+            // Was "PLAYING FROM ALBUM" over the album name — a centred caps
+            // label duplicating a fact printed 26pt lower. What belongs here is
+            // where the audio is coming from, which is the one thing this app
+            // knows and a streaming client cannot.
+            Text(provenance)
+                .font(.sonavaStamp)
+                .tracking(1.2)
+                .foregroundColor(Theme.textTertiary)
+                .lineLimit(1)
             Spacer()
             CircleIconButton(systemName: "list.bullet", size: 42, iconSize: 16) {
                 showQueue = true
@@ -117,36 +120,45 @@ struct NowPlayingView: View {
         }
     }
 
+    /// The sleeve: full bleed, square, radius 0, no shadow.
+    ///
+    /// It is the only object in the app permitted to touch the trim, which is
+    /// what stops it reading as a card the instant you see it. The 28pt radius
+    /// and the coloured drop shadow were the two things that made it one.
+    ///
+    /// The 0.86 scale on pause is gone as well. A deck does not shrink its
+    /// platter to tell you it stopped — the transport key does that, and it now
+    /// does it by morphing. What marks the paused state here is a 22% black
+    /// veil, which is a dimmed lamp rather than a shrinking record.
     private var artwork: some View {
-        GeometryReader { geo in
-            let side = min(geo.size.width, geo.size.height)
-            ZStack {
-                if let song {
-                    ArtworkImage(song: song, glyphSize: 72)
-                        .frame(width: side, height: side)
-                        .clipShape(RoundedRectangle(cornerRadius: Radius.hero, style: .continuous))
-                        .shadow(color: song.gradient.first?.opacity(0.6) ?? .black, radius: 34, y: 20)
-                }
+        ZStack {
+            if let song {
+                ArtworkImage(song: song, glyphSize: 72)
+                    .aspectRatio(1, contentMode: .fill)
+                    .frame(maxWidth: .infinity)
+                    .clipped()
+                    .overlay(Color.black.opacity(audio.isPlaying ? 0 : 0.22))
+                    .animation(Motion.fade, value: audio.isPlaying)
             }
-            .frame(width: geo.size.width, height: geo.size.height)
-            .scaleEffect(audio.isPlaying ? 1 : 0.86)
-            .animation(.spring(response: 0.5, dampingFraction: 0.7), value: audio.isPlaying)
         }
-        .aspectRatio(1, contentMode: .fit)
-        .frame(maxHeight: 360)
+        .padding(.horizontal, -Space.xl)
     }
 
     private var info: some View {
         HStack(alignment: .center, spacing: Space.m) {
             VStack(alignment: .leading, spacing: 4) {
-                MarqueeText(text: song?.title ?? "", font: .system(.title2).weight(.bold))
-                    .frame(height: 30)
+                // Serif, because a person named this track. The rule the ramp
+                // enforces: a human named it, so it is set in a book face; the
+                // numbers below it are set in a machine face.
+                MarqueeText(text: song?.title ?? "",
+                            font: .system(.title, design: .serif).weight(.bold))
+                    .frame(height: 34)
                 Button {
                     if song != nil { showArtist = true }
                 } label: {
                     HStack(spacing: 4) {
                         Text(song?.artist ?? "")
-                            .font(.system(.callout).weight(.medium))
+                            .font(.sonavaAttribution)
                         Image(systemName: "chevron.right")
                             .font(.system(.caption2).weight(.semibold))
                             .opacity(0.6)
@@ -303,23 +315,46 @@ struct NowPlayingView: View {
         }
     }
 
+    /// Words, not glyphs.
+    ///
+    /// Four unlabelled SF Symbols sat here — a speech bubble, a moon, a share
+    /// arrow and a list — and between them they were four guesses. The sleep
+    /// entry now shows the countdown when a timer is armed, which is a fact the
+    /// app already computes and previously rendered as a filled moon.
     private var bottomBar: some View {
-        HStack {
-            Spacer()
-            bottomButton("quote.bubble", active: false) { showLyrics = true }
-            Spacer()
-            bottomButton("moon.zzz\(audio.sleepTimerMinutes != nil ? ".fill" : "")",
-                         active: audio.sleepTimerMinutes != nil) {
-                showSleepOptions = true
-            }
-            Spacer()
-            bottomButton("square.and.arrow.up", active: false) {
+        HStack(spacing: 0) {
+            barWord("Lyrics", active: false) { showLyrics = true }
+            barWord(sleepWord, active: audio.sleepTimerMinutes != nil) { showSleepOptions = true }
+            barWord("Share", active: false) {
                 if let song { shareItem = ShareCardRenderer.render(song) }
             }
-            Spacer()
-            bottomButton("list.bullet", active: false) { showQueue = true }
-            Spacer()
+            barWord("Queue", active: false) { showQueue = true }
         }
+    }
+
+    private var sleepWord: LocalizedStringKey {
+        guard let minutes = audio.sleepTimerMinutes else { return "Sleep" }
+        return LocalizedStringKey("\(minutes) min")
+    }
+
+    private func barWord(_ title: LocalizedStringKey, active: Bool,
+                         action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.sonavaDepartment)
+                .tracking(1.4)
+                .textCase(.uppercase)
+                .foregroundColor(active ? Theme.accentSoft : Theme.textSecondary)
+                // Cyrillic in tracked caps runs far wider than Latin:
+                // "ПОДЕЛИТЬСЯ" against "SHARE" broke across two lines with a
+                // hyphen inside an equal-width column. One line, and it shrinks
+                // rather than hyphenating.
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+                .frame(maxWidth: .infinity, minHeight: Space.hitTarget)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     private func bottomButton(_ icon: String, active: Bool, action: @escaping () -> Void) -> some View {
@@ -349,4 +384,24 @@ struct NowPlayingView: View {
                 }
             }
     }
+}
+
+extension NowPlayingView {
+    /// Where this audio is actually coming from, named as specifically as the
+    /// app can truthfully name it.
+    var provenance: String {
+        guard let song else { return "" }
+        if audio.downloads.isDownloaded(song) { return String(localized: "OFFLINE") }
+        switch song.source {
+        case .local:    return String(localized: "YOUR FILES")
+        case .subsonic: return serverName ?? String(localized: "YOUR SERVER")
+        case .radio:    return String(localized: "LIVE")
+        default:        return song.source.badge ?? ""
+        }
+    }
+
+    /// The app does not thread the server identity down to the player, and
+    /// inventing one here would be a guess printed as a fact. The generic label
+    /// is the honest fallback until it is plumbed.
+    var serverName: String? { nil }
 }
