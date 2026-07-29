@@ -142,12 +142,13 @@ struct PlayPauseButton: View {
                 Circle()
                     .fill(Color.white)
                     .shadow(color: .white.opacity(0.35), radius: 22, y: 8)
-                SonavaIcon(glyph: isPlaying ? .pause : .play, size: size * 0.42)
-                    .font(.system(size: size * 0.4, weight: .black))
-                    .foregroundColor(Theme.background)
-                    .offset(x: isPlaying ? 0 : size * 0.03)
-                    .scaleEffect(isPlaying ? 1 : 1.02)
-                    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPlaying)
+                // One shape leaning between the two states, not two glyphs
+                // cross-fading. The optical nudge stays: a play triangle sits
+                // right of centre by its own geometry, and the old fix for that
+                // has to travel with it.
+                PlayPauseGlyph(isPlaying: isPlaying, size: size * 0.42,
+                               tint: Theme.background)
+                    .offset(x: isPlaying ? 0 : size * 0.02)
             }
             .frame(width: size, height: size)
         }

@@ -73,7 +73,7 @@ struct MiniPlayerView: View {
                     Button {
                         audio.togglePlayPause()
                     } label: {
-                        SonavaIcon(glyph: audio.isPlaying ? .pause : .play, size: 19)
+                        PlayPauseGlyph(isPlaying: audio.isPlaying, size: 19)
                             .font(.system(.body).weight(.bold))
                             .foregroundColor(.white)
                             .frame(width: Space.hitTarget, height: Space.hitTarget)
