@@ -19,6 +19,23 @@
 
 import SwiftUI
 
+// MARK: - Plot geometry
+
+/// Geometry shared by the plot and the controls drawn over it.
+///
+/// One constant in one place, because the last time two files each decided
+/// where a band lived they disagreed by 11% and the curve missed every knob it
+/// claimed to describe.
+enum Plot {
+    /// The ordinate's own column, at the right edge.
+    ///
+    /// Without it the +6 label was drawn on top of the 16 kHz rail: the axis
+    /// that explains the plot collided with the plot. Everything that belongs
+    /// to the data — rules, curve, handles, the frequency scale — stops short
+    /// of this; only the dB numbers live inside it.
+    static let dBGutter: CGFloat = 30
+}
+
 // MARK: - Animatable gains
 
 /// Lets a `Shape` interpolate between two whole sets of band gains, so
@@ -137,13 +154,14 @@ struct ResponseGraph: View {
             // ±6 dB rules first, then 0 dB brighter — "flat" should be legible
             // as a shape against a reference, not inferred from knob positions.
             GeometryReader { geo in
+                let plotWidth = geo.size.width - Plot.dBGutter
                 let half = geo.size.height / 2
                 let sixth = CGFloat(6 / limit) * half
                 ForEach([-sixth, sixth], id: \.self) { offset in
                     Rectangle()
                         .fill(Theme.hairline)
-                        .frame(height: 1)
-                        .position(x: geo.size.width / 2, y: half + offset)
+                        .frame(width: plotWidth, height: 1)
+                        .position(x: plotWidth / 2, y: half + offset)
                 }
                 // The plot withheld its own ordinate: three rules and no
                 // numbers, so "how much boost is that" had no answer except
@@ -151,24 +169,27 @@ struct ResponseGraph: View {
                 // `y = half + offset`, and positive y is *down*, so the top
                 // rule is +6 and the bottom is −6. Labelling them the other way
                 // round told the reader the plot was upside down.
-                ForEach([(-sixth, "+6"), (sixth, "−6")], id: \.1) { offset, label in
+                ForEach([(-sixth, "+6"), (0, "0"), (sixth, "−6")], id: \.1) { offset, label in
                     Text(label)
                         .font(.system(.caption2).weight(.medium).monospacedDigit())
                         .foregroundColor(Theme.textTertiary)
-                        .position(x: geo.size.width - 14, y: half + offset - 11)
+                        .frame(width: Plot.dBGutter - Space.xs, alignment: .trailing)
+                        // On the rule rather than above it, and in the gutter
+                        // rather than over the last band's rail.
+                        .position(x: plotWidth + Plot.dBGutter / 2, y: half + offset)
                 }
                 // Dashed, so a flat curve resting exactly on it still reads
                 // as a curve on a datum rather than as one unexplained line.
                 Rectangle()
                     .fill(Theme.textTertiary)
-                    .frame(height: 1)
+                    .frame(width: plotWidth, height: 1)
                     .overlay(
                         Rectangle()
                             .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [5, 4]))
                             .foregroundColor(Theme.background)
                             .frame(height: 1)
                     )
-                    .position(x: geo.size.width / 2, y: half)
+                    .position(x: plotWidth / 2, y: half)
             }
 
             ResponseCurve(gains: animatable, limit: Double(limit), closed: true)
@@ -177,11 +198,13 @@ struct ResponseGraph: View {
                                             Theme.accent.opacity(0.10)],
                                    startPoint: .top, endPoint: .bottom)
                 )
+                .padding(.trailing, Plot.dBGutter)
 
             ResponseCurve(gains: animatable, limit: Double(limit))
                 .stroke(Theme.accentSoft, style: StrokeStyle(lineWidth: 3,
                                                              lineCap: .round,
                                                              lineJoin: .round))
+                .padding(.trailing, Plot.dBGutter)
         }
         .animation(Motion.expressive, value: gains)
         .allowsHitTesting(false)

@@ -25,6 +25,47 @@ struct ServerConnection: Identifiable, Codable, Equatable, Sendable {
     var url: URL? { URL(string: urlString) }
     /// What the UI shows: the host, falling back to whatever was typed.
     var displayName: String { label.isEmpty ? (url?.host ?? urlString) : label }
+
+    /// The host on its own, for the screen that is about infrastructure. A
+    /// named connection otherwise hides the one fact a self-hoster navigates
+    /// by — "Home server" tells you nothing about which box answered.
+    var host: String { url?.host ?? urlString }
+
+    /// Whether the connection is encrypted. Shown rather than assumed: a plain
+    /// `http://` server on a LAN is a legitimate setup, and quietly implying a
+    /// padlock over it would be a lie about the user's own network.
+    var isSecure: Bool { url?.scheme?.lowercased() == "https" }
+}
+
+/// What we actually know about a connection, as opposed to what the screen
+/// could invent about it.
+///
+/// Every field here is either measured or absent. `files` is nil until a server
+/// answers `getScanStatus`, and a nil renders as nothing at all — a row never
+/// shows a placeholder number, because a fabricated library size on the screen
+/// that exists to make self-hosters trust their own setup is worse than a
+/// blank.
+struct ServerHealth: Equatable, Sendable {
+    enum State: Equatable, Sendable {
+        case unknown
+        case checking
+        case online
+        case unreachable
+    }
+
+    var state: State = .unknown
+    /// Round trip of the last successful ping, in seconds.
+    var latency: TimeInterval?
+    /// Media files the server reports having indexed, when it says.
+    var files: Int?
+    var checkedAt: Date?
+}
+
+private extension Duration {
+    /// `components` is (seconds, attoseconds); the row wants one number.
+    var seconds: TimeInterval {
+        TimeInterval(components.seconds) + TimeInterval(components.attoseconds) / 1e18
+    }
 }
 
 @MainActor
@@ -33,6 +74,11 @@ final class ServerStore: ObservableObject {
     @Published private(set) var servers: [ServerConnection] = []
     @Published private(set) var activeID: String?
     @Published var lastError: String?
+
+    /// Measured reachability per connection id. Deliberately not persisted:
+    /// a status carried over from a previous launch is a claim about the
+    /// network as it was, presented as if it were now.
+    @Published private(set) var healthByID: [String: ServerHealth] = [:]
 
     /// Mirrors the subscription, so call sites can ask "search my library"
     /// without also having to know the entitlement rules.
@@ -81,6 +127,53 @@ final class ServerStore: ObservableObject {
         else { return nil }
         return SubsonicService(baseURL: url, username: connection.username,
                                password: password, libraryID: connection.id)
+    }
+
+    // MARK: - Reachability
+
+    func health(for connection: ServerConnection) -> ServerHealth {
+        healthByID[connection.id] ?? ServerHealth()
+    }
+
+    /// Pings every saved connection at once and records what came back.
+    ///
+    /// Locked connections are probed too. A lapsed subscriber deciding whether
+    /// to renew should be able to see that their other libraries are still
+    /// there and still answering; hiding that would make the gate feel like
+    /// confiscation.
+    func refreshHealth() async {
+        #if DEBUG
+        if isDemoSeeded { return }
+        #endif
+        let probes: [(String, SubsonicService)] = servers.compactMap { connection in
+            service(for: connection).map { (connection.id, $0) }
+        }
+        guard !probes.isEmpty else { return }
+
+        for (id, _) in probes {
+            healthByID[id, default: ServerHealth()].state = .checking
+        }
+
+        await withTaskGroup(of: (String, ServerHealth).self) { group in
+            for (id, service) in probes {
+                group.addTask {
+                    let clock = ContinuousClock()
+                    let started = clock.now
+                    let reachable = (try? await service.ping()) ?? false
+                    let elapsed = clock.now - started
+                    guard reachable else {
+                        return (id, ServerHealth(state: .unreachable, checkedAt: Date()))
+                    }
+                    return (id, ServerHealth(
+                        state: .online,
+                        latency: elapsed.seconds,
+                        files: await service.scannedFileCount(),
+                        checkedAt: Date()
+                    ))
+                }
+            }
+            for await (id, result) in group { healthByID[id] = result }
+        }
     }
 
     // MARK: - Editing
@@ -161,6 +254,7 @@ final class ServerStore: ObservableObject {
     func remove(_ connection: ServerConnection) {
         _ = Keychain.delete(Self.passwordKey(connection.id))
         servers.removeAll { $0.id == connection.id }
+        healthByID[connection.id] = nil
         if activeID == connection.id { activeID = usableServers.first?.id }
         persist()
     }
@@ -169,6 +263,7 @@ final class ServerStore: ObservableObject {
     func removeAll() {
         for connection in servers { _ = Keychain.delete(Self.passwordKey(connection.id)) }
         servers = []
+        healthByID = [:]
         activeID = nil
         persist()
     }
@@ -231,21 +326,48 @@ final class ServerStore: ObservableObject {
     }
 
     #if DEBUG
+    /// Set when the connections came from `-seedServers`. Those hosts do not
+    /// resolve, so probing them would paint the whole rack red — which is a
+    /// true statement about `nas.local` and a useless one about the design.
+    /// Never set outside a debug launch argument.
+    private(set) var isDemoSeeded = false
+
     /// Saves plausible connections without contacting anything, so the
     /// multi-server UI (and its Pro gate) can be driven in UI tests. Debug
     /// builds only, and only ever reached from a launch argument.
     func seedDemoServers(count: Int) {
         removeAll()
+        isDemoSeeded = true
         let wasPro = isPro
         isPro = true                    // seeding bypasses the gate it is testing
+        // Hosts a self-hoster would recognise, rather than server1/2/3: the
+        // rack is meant to look like somebody's actual infrastructure.
+        let hosts = ["navidrome.home.arpa", "nas.local", "airsonic.example.net"]
+        let labels = ["Home server", "Attic NAS", "Friend's library"]
         for index in 0..<count {
-            guard let url = URL(string: "https://server\(index + 1).example.com") else { continue }
-            save(url: url, username: "listener", password: "demo",
-                 label: index == 0 ? "Home server" : "Server \(index + 1)")
+            let host = hosts[index % hosts.count]
+            let scheme = index == 1 ? "http" : "https"   // a LAN box on plain http is a real setup
+            guard let url = URL(string: "\(scheme)://\(host)") else { continue }
+            save(url: url, username: index == 2 ? "guest" : "listener", password: "demo",
+                 label: labels[index % labels.count])
         }
         if let first = servers.first { activeID = first.id }
         persist()
         isPro = wasPro
+
+        // Seeded health, because these hosts do not exist and a real probe
+        // would say so. Fixed values, not random ones — a UI test that reads a
+        // latency must get the same number every run. The third is deliberately
+        // unreachable: a rack that can only draw its happy state is a rack
+        // whose failure state has never been looked at.
+        let seeded: [ServerHealth] = [
+            ServerHealth(state: .online, latency: 0.012, files: 12_431, checkedAt: Date()),
+            ServerHealth(state: .online, latency: 0.048, files: 3_207, checkedAt: Date()),
+            ServerHealth(state: .unreachable, checkedAt: Date())
+        ]
+        for (index, connection) in servers.enumerated() {
+            healthByID[connection.id] = seeded[index % seeded.count]
+        }
     }
     #endif
 

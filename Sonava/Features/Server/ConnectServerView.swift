@@ -5,6 +5,24 @@
 //  Manage self-hosted Subsonic-compatible servers (Navidrome, Airsonic…).
 //  One connection is free; several — and searching them all at once — is Pro.
 //
+//  A design review named what was wrong with this screen better than a list of
+//  fixes would have: it was three rows saying "listener" and three delete
+//  buttons. Everything a self-hoster navigates by — which box, is it up, how
+//  big is the library, when did we last talk to it — was known to the app and
+//  shown to nobody, while the one thing that was prominent was the button that
+//  destroys a connection.
+//
+//  So it is a rack now. Each row states its host, its measured reachability and
+//  what the server itself reports having indexed; the active connection is
+//  marked by a rail you can see from across the room rather than by a tick in a
+//  column of ticks. Removal moved behind a swipe, where destructive actions
+//  belong.
+//
+//  Nothing on the row is inferred. `ServerHealth` fields are either measured or
+//  absent, and an absent one draws nothing — this is the screen that has to
+//  make somebody trust their own infrastructure, and a plausible invented
+//  number would be exactly the wrong thing to put on it.
+//
 
 import SwiftUI
 import UIKit
@@ -22,18 +40,7 @@ struct ConnectServerView: View {
         NavigationStack {
             ZStack {
                 Theme.background.ignoresSafeArea()
-                ScrollView {
-                    VStack(alignment: .leading, spacing: Space.screenMargin) {
-                        if serverStore.servers.isEmpty {
-                            emptyState
-                        } else {
-                            serverList
-                        }
-                        addButton
-                        infoNote
-                    }
-                    .padding(Space.screenMargin)
-                }
+                rack
             }
             .foregroundColor(.white)
             .navigationTitle("Self-hosted servers")
@@ -69,68 +76,158 @@ struct ConnectServerView: View {
         .preferredColorScheme(.dark)
     }
 
-    // MARK: - List
+    // MARK: - The rack
 
-    private var serverList: some View {
-        VStack(spacing: 0) {
-            ForEach(Array(serverStore.servers.enumerated()), id: \.element.id) { index, connection in
-                if index > 0 {
-                    Rectangle()
-                        .fill(Theme.hairline)
-                        .frame(height: Theme.hairlineWidth)
-                        .padding(.leading, Space.textRail)
+    /// A `List` rather than the previous `ScrollView`, for one reason: swipe to
+    /// delete. Three always-armed trash cans put the destructive action at the
+    /// same prominence as the connection itself, on a screen whose subject is
+    /// which library is playing.
+    private var rack: some View {
+        List {
+            if serverStore.servers.isEmpty {
+                emptyState.rackRow()
+            } else {
+                ForEach(serverStore.servers) { connection in
+                    row(connection)
+                        .rackRow()
+                        // `allowsFullSwipe` off deliberately: a flick that
+                        // removes a saved credential with no landing point is
+                        // the wrong amount of ceremony for this.
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                pendingRemoval = connection
+                            } label: {
+                                Label("Remove", systemImage: "trash")
+                            }
+                            .identified("server.remove", label: "Remove server")
+                        }
                 }
-                row(connection)
             }
+            addButton.rackRow()
+            infoNote.rackRow()
         }
-        .padding(.horizontal, Space.l)
-        .card(cornerRadius: Radius.card)
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .environment(\.defaultMinListRowHeight, 0)
+        // Pull to re-probe: the natural gesture for "is it back yet" on a
+        // screen whose whole point is the state of somebody's own network.
+        .refreshable { await serverStore.refreshHealth() }
+        .task { await serverStore.refreshHealth() }
     }
 
     private func row(_ connection: ServerConnection) -> some View {
         let active = serverStore.activeID == connection.id
         let locked = !serverStore.isUsable(connection)
-        return HStack(spacing: Space.l) {
-            Image(systemName: locked ? "lock.fill" : (active ? "checkmark.circle.fill" : "circle"))
-                .frame(width: Space.iconColumn, height: Space.iconColumn)
-                .font(.system(.body))
-                .foregroundColor(locked ? Theme.textTertiary : (active ? Theme.positive : Theme.textTertiary))
-            VStack(alignment: .leading, spacing: 2) {
-                Text(connection.displayName)
-                    .font(.system(.subheadline).weight(.semibold))
-                    .foregroundColor(locked ? Theme.textSecondary : Theme.textPrimary)
-                    .lineLimit(1)
-                Text(connection.username)
-                    .font(.system(.caption))
-                    .foregroundColor(Theme.textTertiary)
-                    .lineLimit(1)
+        let health = serverStore.health(for: connection)
+
+        return HStack(spacing: 0) {
+            // The active connection gets a rail, not a tick. On a screen about
+            // hardware, "which box am I listening to" should survive being
+            // glanced at, and a checkmark in a column of circles does not.
+            Capsule()
+                .fill(active ? Theme.accentSoft : Color.clear)
+                .frame(width: 3)
+                .padding(.vertical, Space.m)
+                .padding(.leading, Space.s)
+
+            VStack(alignment: .leading, spacing: Space.xs) {
+                HStack(spacing: Space.s) {
+                    Text(connection.displayName)
+                        .font(.sonavaCardTitle)
+                        .foregroundColor(locked ? Theme.textSecondary : Theme.textPrimary)
+                        .lineLimit(1)
+                    Spacer(minLength: Space.s)
+                    if locked {
+                        Label("Pro", systemImage: "lock.fill")
+                            .font(.system(.caption).weight(.semibold))
+                            .foregroundColor(Theme.accentSoft)
+                    } else {
+                        StatusBadge(state: health.state)
+                    }
+                }
+
+                HStack(spacing: Space.xs) {
+                    // Stated, not assumed. A plain-http box on a LAN is a
+                    // legitimate setup, and drawing a padlock over it would be
+                    // a lie about the user's own network.
+                    Image(systemName: connection.isSecure ? "lock.fill" : "lock.open.fill")
+                        .font(.system(.caption2))
+                        .foregroundColor(connection.isSecure ? Theme.textTertiary : Theme.live)
+                    Text(connection.host)
+                        .font(.system(.footnote, design: .monospaced))
+                        .foregroundColor(Theme.textSecondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+
+                metaLine(connection, health)
             }
-            Spacer()
-            Button {
-                pendingRemoval = connection
-            } label: {
-                Image(systemName: "trash")
-                    .font(.system(.footnote))
-                    .foregroundColor(Theme.destructive)
-                    .frame(width: Space.hitTarget, height: Space.hitTarget)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .identified("server.remove", label: "Remove server")
+            .padding(.vertical, Space.m)
+            .padding(.horizontal, Space.l)
         }
-        .padding(.vertical, Space.m)
-        .contentShape(Rectangle())
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
+                .fill(active ? Theme.surfaceElevated : Theme.surface)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
+                .strokeBorder(active ? Theme.accentSoft.opacity(0.5) : Theme.hairline,
+                              lineWidth: active ? 1.5 : Theme.hairlineWidth)
+        )
+        .contentShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
         .onTapGesture {
             if locked {
                 showPaywall = true
-            } else {
-                serverStore.select(connection)
+            } else if !active {
+                withAnimation(Motion.standard) { serverStore.select(connection) }
                 Haptics.selection()
             }
         }
         // No identifier on the row itself: giving a container one makes it a
-        // single accessibility element, which would swallow the delete button
+        // single accessibility element, which would swallow the host and status
         // inside it — for VoiceOver as well as for the tests.
+    }
+
+    /// Facts about the connection, each one omitted rather than guessed.
+    ///
+    /// Rendered as symbol-and-number pairs instead of a sentence, which keeps
+    /// it to one line at any text size and sidesteps plural agreement — "12 431
+    /// файлов" versus "12 432 файла" is a category of bug this screen does not
+    /// need. VoiceOver gets the words spelled out instead.
+    private func metaLine(_ connection: ServerConnection, _ health: ServerHealth) -> some View {
+        HStack(spacing: Space.m) {
+            fact("person", connection.username)
+            if let files = health.files {
+                fact("music.note", files.formatted(.number))
+            }
+            if let latency = health.latency {
+                fact("bolt", "\(Int((latency * 1000).rounded())) ms")
+            }
+        }
+        .font(.sonavaRowMeta.monospacedDigit())
+        .foregroundColor(Theme.textTertiary)
+        .lineLimit(1)
+        .accessibilityElement()
+        .accessibilityLabel(metaDescription(connection, health))
+    }
+
+    private func fact(_ symbol: String, _ value: String) -> some View {
+        HStack(spacing: Space.xs) {
+            Image(systemName: symbol).font(.system(.caption2))
+            Text(value)
+        }
+    }
+
+    private func metaDescription(_ connection: ServerConnection, _ health: ServerHealth) -> Text {
+        var text = Text("Signed in as \(connection.username)")
+        if let files = health.files {
+            text = text + Text(", ") + Text("indexed files: \(files.formatted(.number))")
+        }
+        if let latency = health.latency {
+            text = text + Text(", ") + Text("response \(Int((latency * 1000).rounded())) milliseconds")
+        }
+        return text
     }
 
     private var emptyState: some View {
@@ -171,6 +268,7 @@ struct ConnectServerView: View {
         }
         .buttonStyle(BouncyButtonStyle(scale: 0.97))
         .identified("server.add", label: "Add server")
+        .padding(.top, Space.m)
     }
 
     private var infoNote: some View {
@@ -184,6 +282,68 @@ struct ConnectServerView: View {
         .font(.footnote)
         .foregroundColor(Theme.textTertiary)
         .padding(.top, 8)
+    }
+}
+
+// MARK: - Status
+
+/// Measured reachability, stated in a word and a dot.
+///
+/// The unreachable colour is `live` (amber), not `destructive` (red): a server
+/// that is off or off-network is a fact about the house, not an error the
+/// listener made, and colouring it like a failure invites them to go looking
+/// for a bug in the app.
+private struct StatusBadge: View {
+    let state: ServerHealth.State
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var pulsing = false
+
+    var body: some View {
+        HStack(spacing: Space.xs) {
+            Circle()
+                .fill(colour)
+                .frame(width: 7, height: 7)
+                .opacity(state == .checking && pulsing ? 0.25 : 1)
+            Text(title)
+                .font(.system(.caption).weight(.semibold))
+                .foregroundColor(colour)
+        }
+        .onAppear {
+            guard state == .checking, !reduceMotion else { return }
+            withAnimation(.easeInOut(duration: 0.7).repeatForever(autoreverses: true)) {
+                pulsing = true
+            }
+        }
+        .accessibilityElement()
+        .accessibilityLabel(title)
+    }
+
+    private var title: LocalizedStringKey {
+        switch state {
+        case .unknown: "Not checked"
+        case .checking: "Checking…"
+        case .online: "Online"
+        case .unreachable: "Unreachable"
+        }
+    }
+
+    private var colour: Color {
+        switch state {
+        case .unknown, .checking: Theme.textTertiary
+        case .online: Theme.positive
+        case .unreachable: Theme.live
+        }
+    }
+}
+
+private extension View {
+    /// A list row carrying no list chrome — the cards do their own drawing.
+    func rackRow() -> some View {
+        listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+            .listRowInsets(EdgeInsets(top: Space.xs, leading: Space.screenMargin,
+                                      bottom: Space.xs, trailing: Space.screenMargin))
     }
 }
 

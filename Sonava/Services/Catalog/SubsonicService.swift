@@ -42,6 +42,18 @@ struct SubsonicService {
         return (body.starred2?.song ?? []).map(map)
     }
 
+    /// How many media files the server says it has indexed, or nil if it won't
+    /// say.
+    ///
+    /// This is `getScanStatus`'s `count`, which the API defines as *scanned
+    /// media files* — not albums, not artists, and not necessarily playable
+    /// tracks. The UI labels it as files for that reason. Plenty of Subsonic
+    /// implementations don't answer this call at all, so every failure maps to
+    /// nil and the row then claims nothing rather than guessing a number.
+    func scannedFileCount() async -> Int? {
+        try? await get("getScanStatus", as: ScanStatusBody.self).scanStatus?.count
+    }
+
     func search(_ query: String) async throws -> [Song] {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
@@ -131,6 +143,16 @@ private struct StarredBody: Decodable {
 private struct SearchBody: Decodable {
     let status: String
     let searchResult3: SongList?
+}
+
+private struct ScanStatusBody: Decodable {
+    let status: String
+    let scanStatus: ScanStatus?
+}
+
+private struct ScanStatus: Decodable {
+    let scanning: Bool?
+    let count: Int?
 }
 
 private struct SongList: Decodable {

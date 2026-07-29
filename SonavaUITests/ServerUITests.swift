@@ -55,11 +55,11 @@ final class ServerUITests: XCTestCase {
 
         // Nothing was deleted…
         waitFor(app.staticTexts["Home server"])
-        waitFor(app.staticTexts["Server 2"])
-        waitFor(app.staticTexts["Server 3"])
+        waitFor(app.staticTexts["Attic NAS"])
+        waitFor(app.staticTexts["Friend's library"])
 
         // …but the locked ones lead to the offer instead of switching.
-        app.staticTexts["Server 2"].tap()
+        app.staticTexts["Attic NAS"].tap()
         waitFor(app.staticTexts["Sonava Pro"], "a locked server did not open the paywall")
         app.buttons["paywall.close"].tap()
     }
@@ -68,27 +68,58 @@ final class ServerUITests: XCTestCase {
         let app = launch(servers: 3, pro: true)
         waitFor(app.navigationBars["Self-hosted servers"])
 
-        app.staticTexts["Server 3"].tap()
+        app.staticTexts["Friend's library"].tap()
         // A subscriber switches libraries silently — no paywall, no reconnect.
         XCTAssertFalse(app.staticTexts["Sonava Pro"].waitForExistence(timeout: 2),
                        "a subscriber was shown the paywall while switching servers")
-        waitFor(app.staticTexts["Server 3"])
+        waitFor(app.staticTexts["Friend's library"])
+    }
+
+    /// The rack states what it knows about each box, and nothing it doesn't.
+    ///
+    /// This is the assertion the redesign exists for: before it, every row said
+    /// "listener" and the only other thing on it was a delete button.
+    func testEachServerStatesItsHostAndReachability() {
+        let app = launch(servers: 3, pro: true)
+        waitFor(app.navigationBars["Self-hosted servers"])
+
+        waitFor(app.staticTexts["navidrome.home.arpa"], "the row does not say which box it is")
+        waitFor(app.staticTexts["Online"], "the row does not say whether the server answered")
+        // The seed makes the third connection unreachable on purpose: a rack
+        // that can only draw its happy state has never had its failure state
+        // looked at.
+        waitFor(app.staticTexts["Unreachable"], "the unreachable server is drawn as if it were fine")
     }
 
     func testRemovingAServerAsksFirst() {
         let app = launch(servers: 2, pro: true)
         waitFor(app.navigationBars["Self-hosted servers"])
 
-        app.buttons["server.remove"].firstMatch.tap()
+        // Removal lives behind a swipe now — the trash cans that used to sit
+        // armed on every row are gone.
+        revealRemove(in: app, row: "Home server")
         waitFor(app.staticTexts["Remove this server?"], "removal happened without confirmation")
 
-        app.buttons["Cancel"].tap()
+        app.alerts.buttons["Cancel"].tap()
         waitFor(app.staticTexts["Home server"], "cancelling still removed the server")
 
-        app.buttons["server.remove"].firstMatch.tap()
-        app.buttons["Remove"].tap()
+        revealRemove(in: app, row: "Home server")
+        app.alerts.buttons["Remove"].tap()
         XCTAssertFalse(app.staticTexts["Home server"].waitForExistence(timeout: 2),
                        "the server was not removed")
+    }
+
+    /// Swipes a row open and taps its remove action.
+    ///
+    /// Checks first rather than swiping blindly: after the confirmation is
+    /// cancelled the row can still be open, and a second swipe would close it
+    /// again — the test would then fail on the UI being in the right state.
+    private func revealRemove(in app: XCUIApplication, row: String) {
+        if !app.buttons["server.remove"].exists {
+            app.staticTexts[row].swipeLeft()
+        }
+        waitFor(app.buttons["server.remove"], "the swipe did not reveal a way to remove the server")
+        app.buttons["server.remove"].tap()
     }
 
     func testServerScreenIsTranslated() {

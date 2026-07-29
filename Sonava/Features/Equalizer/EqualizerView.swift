@@ -103,7 +103,11 @@ struct EqualizerView: View {
     private var bands: some View {
         VStack(spacing: Space.s) {
             GeometryReader { geo in
-                let columnWidth = geo.size.width / CGFloat(EqualizerBand.count)
+                // The bands share the plot's width, not the view's: the dB
+                // gutter belongs to the ordinate. Derived from the same
+                // constant the graph draws with, so the two cannot drift apart
+                // the way the curve and its knobs once did.
+                let columnWidth = (geo.size.width - Plot.dBGutter) / CGFloat(EqualizerBand.count)
 
                 ZStack {
                     // The response the ten bands actually produce, behind them.
@@ -254,8 +258,19 @@ struct EqualizerView: View {
         return rounded > 0 ? "+\(gainString(rounded))" : gainString(rounded)
     }
 
+    /// Two defects lived in the `String(format: "%.1f dB")` this replaces, and
+    /// both were visible at once on this screen.
+    ///
+    /// `String(format:)` takes no locale, so a Russian reader — who writes 1,5
+    /// — was shown "1.5", and the unit stayed "dB" in a fully translated app.
+    /// And its negative sign is the ASCII hyphen, sitting directly under a
+    /// graph whose own ±6 rules are typographic minuses: two different marks
+    /// for one meaning, 40pt apart.
     private func gainString(_ value: Float) -> String {
-        String(format: "%.1f dB", value)
+        let number = Double(value)
+            .formatted(.number.precision(.fractionLength(1)))
+            .replacingOccurrences(of: "-", with: "\u{2212}")
+        return String(localized: "\(number) dB")
     }
 
     // MARK: - Locked (free tier)

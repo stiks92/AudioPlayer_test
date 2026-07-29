@@ -4,6 +4,16 @@
     "%@": {
       "shouldTranslate": false
     },
+    "%@ dB": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ дБ"
+          }
+        }
+      }
+    },
     "%@ this week": {
       "localizations": {
         "ru": {
@@ -490,6 +500,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Отмена"
+          }
+        }
+      }
+    },
+    "Checking…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проверка…"
           }
         }
       }
@@ -1723,6 +1743,16 @@
         }
       }
     },
+    "Not checked": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не проверялся"
+          }
+        }
+      }
+    },
     "Nothing downloaded yet": {
       "localizations": {
         "ru": {
@@ -1869,6 +1899,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Один запрос ищет сразу в Audius, Apple, Deezer и твоей медиатеке — полные треки и превью вместе."
+          }
+        }
+      }
+    },
+    "Online": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В сети"
           }
         }
       }
@@ -2182,6 +2222,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Приватно по умолчанию"
+          }
+        }
+      }
+    },
+    "Pro": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro"
           }
         }
       }
@@ -2632,6 +2682,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Перемешивает треки из избранного."
+          }
+        }
+      }
+    },
+    "Signed in as %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вход: %@"
           }
         }
       }
@@ -3125,6 +3185,16 @@
         }
       }
     },
+    "Unreachable": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не отвечает"
+          }
+        }
+      }
+    },
     "Up Next": {
       "localizations": {
         "ru": {
@@ -3328,12 +3398,32 @@
     "https://music.example.com": {
       "shouldTranslate": false
     },
+    "indexed files: %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Файлов: %@"
+          }
+        }
+      }
+    },
     "peak hour": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "час пик"
+          }
+        }
+      }
+    },
+    "response %lld milliseconds": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отклик: %lld мс"
           }
         }
       }
