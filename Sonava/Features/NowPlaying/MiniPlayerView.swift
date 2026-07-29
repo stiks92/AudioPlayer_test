@@ -25,6 +25,11 @@ struct MiniPlayerView: View {
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var clock: PlaybackClock
 
+    /// A permanently moving element is exactly what this setting exists to
+    /// calm; the bars rest at their floor rather than disappearing, so the
+    /// row keeps its shape.
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     /// The accessory slot is short and the system owns its chrome, so the
     /// docked layout's artwork and padding do not fit it.
     private var artworkSide: CGFloat { style == .accessory ? 36 : 44 }
@@ -50,6 +55,20 @@ struct MiniPlayerView: View {
                     }
 
                     Spacer(minLength: Space.xs)
+
+                    // The one element on screen 100% of the time, and it was a
+                    // static glyph beside dead space. It breathes with the
+                    // actual output level, in the playing track's own colours —
+                    // the same palette that tints the ground behind it, so the
+                    // two finally say the same thing.
+                    AudioVisualizerView(
+                        level: clock.audioLevel,
+                        isActive: audio.isPlaying && !reduceMotion,
+                        barCount: 7,
+                        tint: song.gradient.first ?? Theme.accentSoft
+                    )
+                    .frame(width: 34, height: 20)
+                    .accessibilityHidden(true)
 
                     Button {
                         audio.togglePlayPause()

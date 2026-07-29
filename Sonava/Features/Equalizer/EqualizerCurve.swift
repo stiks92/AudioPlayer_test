@@ -145,6 +145,18 @@ struct ResponseGraph: View {
                         .frame(height: 1)
                         .position(x: geo.size.width / 2, y: half + offset)
                 }
+                // The plot withheld its own ordinate: three rules and no
+                // numbers, so "how much boost is that" had no answer except
+                // dragging the band again.
+                // `y = half + offset`, and positive y is *down*, so the top
+                // rule is +6 and the bottom is −6. Labelling them the other way
+                // round told the reader the plot was upside down.
+                ForEach([(-sixth, "+6"), (sixth, "−6")], id: \.1) { offset, label in
+                    Text(label)
+                        .font(.system(.caption2).weight(.medium).monospacedDigit())
+                        .foregroundColor(Theme.textTertiary)
+                        .position(x: geo.size.width - 18, y: half + offset - 10)
+                }
                 // Dashed, so a flat curve resting exactly on it still reads
                 // as a curve on a datum rather than as one unexplained line.
                 Rectangle()

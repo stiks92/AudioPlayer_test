@@ -137,7 +137,7 @@ struct EqualizerView: View {
                         }
                 )
             }
-            .frame(height: 240)
+            .frame(height: 320)
 
             // Frequency scale, outside the graph so the curve owns its full
             // height and the labels keep a stable baseline.
