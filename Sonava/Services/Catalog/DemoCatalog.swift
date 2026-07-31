@@ -142,7 +142,12 @@ enum DemoCatalog {
                 source: source,
                 artworkURL: artwork(seed: album),
                 streamURL: URL(string: "https://demo.invalid/\(index).mp3"),
-                gradientHex: Palette.hex(forSeed: album)
+                gradientHex: Palette.hex(forSeed: album),
+                // Deterministic, plausible lengths — a fixture that lacked them
+                // would hide the duration column on every review screenshot.
+                durationSeconds: Double(172 + (index * 37) % 191),
+                trackNumber: index % 4 + 1,
+                year: 2019 + index % 7
             )
         }
     }

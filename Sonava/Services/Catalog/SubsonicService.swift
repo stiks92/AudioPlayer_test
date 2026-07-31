@@ -116,7 +116,11 @@ struct SubsonicService {
             source: .subsonic,
             artworkURL: coverArtURL(id: song.coverArt),
             streamURL: streamURL(id: song.id),
-            gradientHex: Palette.hex(forSeed: song.id)
+            gradientHex: Palette.hex(forSeed: song.id),
+            durationSeconds: song.duration.map(Double.init),
+            trackNumber: song.track,
+            year: song.year,
+            bitRate: song.bitRate
         )
     }
 }
@@ -165,4 +169,12 @@ private struct SubsonicSong: Decodable {
     let artist: String?
     let album: String?
     let coverArt: String?
+    // The API has been sending these on every track; the DTO was discarding
+    // them, which is why no list row in the app could state a length, an
+    // order, a year or a bit rate.
+    let duration: Int?
+    let track: Int?
+    let year: Int?
+    let bitRate: Int?
+    let suffix: String?
 }

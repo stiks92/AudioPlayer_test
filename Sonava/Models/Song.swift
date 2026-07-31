@@ -66,6 +66,26 @@ struct Song: Identifiable, Equatable, Hashable, Codable {
     /// Two-stop gradient stored as hex so `Song` stays `Codable`.
     let gradientHex: [UInt]
 
+    // What the source truthfully knows about the recording, or nil. Subsonic
+    // has been returning all four on every track while the DTO decoded five
+    // fields and discarded the rest — so every list row in the app had nothing
+    // to say about length, order, vintage or quality. All optional: unknown
+    // stays absent, never invented.
+    /// Length in seconds.
+    let durationSeconds: Double?
+    /// Position on the record.
+    let trackNumber: Int?
+    /// Release year.
+    let year: Int?
+    /// Encoded bit rate, kbit/s.
+    let bitRate: Int?
+
+    /// `3:47` for the margin, or nil when the length is unknown.
+    var durationText: String? {
+        guard let seconds = durationSeconds, seconds > 0 else { return nil }
+        return seconds.asClock
+    }
+
     /// The track's theme gradient.
     var gradient: [Color] { gradientHex.colors }
 
@@ -80,7 +100,11 @@ struct Song: Identifiable, Equatable, Hashable, Codable {
         artworkURL: URL? = nil,
         streamURL: URL? = nil,
         isLive: Bool = false,
-        gradientHex: [UInt]
+        gradientHex: [UInt],
+        durationSeconds: Double? = nil,
+        trackNumber: Int? = nil,
+        year: Int? = nil,
+        bitRate: Int? = nil
     ) {
         self.id = id
         self.title = title
@@ -93,6 +117,10 @@ struct Song: Identifiable, Equatable, Hashable, Codable {
         self.streamURL = streamURL
         self.isLive = isLive
         self.gradientHex = gradientHex
+        self.durationSeconds = durationSeconds
+        self.trackNumber = trackNumber
+        self.year = year
+        self.bitRate = bitRate
     }
 
     /// Playable URL. Local tracks are files the user imported, which live in

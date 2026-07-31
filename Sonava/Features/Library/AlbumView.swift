@@ -16,6 +16,13 @@ struct AlbumView: View {
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var library: MusicLibrary
 
+    /// The side listing, in the record's own order when the tags carry one.
+    private var listing: [Song] {
+        album.songs.sorted {
+            ($0.trackNumber ?? .max, $0.title) < ($1.trackNumber ?? .max, $1.title)
+        }
+    }
+
     var body: some View {
         ZStack {
             Theme.background.ignoresSafeArea()
@@ -65,8 +72,11 @@ struct AlbumView: View {
         VStack(alignment: .leading, spacing: Space.m) {
             HStack(alignment: .firstTextBaseline) {
                 Button {
-                    if let first = album.songs.first {
-                        audio.play(first, in: album.songs)
+                    // The printed order is the played order — a "play the
+                    // record" that starts on the wrong track is a lie in a
+                    // button.
+                    if let first = listing.first {
+                        audio.play(first, in: listing)
                         Haptics.impact(.medium)
                     }
                 } label: {
@@ -84,9 +94,9 @@ struct AlbumView: View {
                        fact: "\(album.trackCount) \(String(localized: "TRACKS"))")
                 .padding(.top, Space.m)
 
-            ForEach(Array(album.songs.enumerated()), id: \.element.id) { index, song in
+            ForEach(Array(listing.enumerated()), id: \.element.id) { index, song in
                 Button {
-                    audio.play(song, in: album.songs)
+                    audio.play(song, in: listing)
                 } label: {
                     HStack(alignment: .center, spacing: Space.m) {
                         Text(String(format: "%02d", index + 1))
@@ -103,6 +113,12 @@ struct AlbumView: View {
                             // The one playing gets the app's own mark, small,
                             // in the accent — a needle on the groove.
                             SonavaIcon(glyph: .stats, size: 13, tint: Theme.accentSoft)
+                        } else if let duration = song.durationText {
+                            // Length over format, when known: on the back of a
+                            // jacket the number beside a track is its time.
+                            Text(duration)
+                                .font(.sonavaFact)
+                                .foregroundColor(Theme.textTertiary)
                         } else {
                             Text(song.fileExtension.uppercased())
                                 .font(.sonavaStamp)
@@ -114,7 +130,7 @@ struct AlbumView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                if index < album.songs.count - 1 { RowRule(inset: Rail.text) }
+                if index < listing.count - 1 { RowRule(inset: Rail.text) }
             }
         }
     }
