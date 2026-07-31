@@ -372,10 +372,8 @@ extension LibraryView {
                            GridItem(.flexible(), spacing: Space.m)]
             LazyVGrid(columns: columns, alignment: .leading, spacing: Space.xl) {
                 ForEach(albums) { album in
-                    Button {
-                        if let first = album.songs.first {
-                            audio.play(first, in: album.songs)
-                        }
+                    NavigationLink {
+                        AlbumView(album: album)
                     } label: {
                         VStack(alignment: .leading, spacing: Space.s) {
                             ZStack {

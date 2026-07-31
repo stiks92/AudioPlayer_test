@@ -2246,6 +2246,16 @@
         }
       }
     },
+    "Play the record": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Слушать пластинку"
+          }
+        }
+      }
+    },
     "Playback": {
       "localizations": {
         "ru": {
@@ -2842,6 +2852,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Перемешивает треки из избранного."
+          }
+        }
+      }
+    },
+    "Side listing": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Треклист"
           }
         }
       }

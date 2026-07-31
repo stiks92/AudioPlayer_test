@@ -37,6 +37,7 @@ struct RootView: View {
     @State private var debugShowPaywall = false
     @State private var debugShowAIMix = false
     @State private var debugShowIcons = false
+    @State private var debugShowAlbum = false
     @State private var debugShowScrobble = false
     @State private var debugShowStats = false
     @State private var debugShowServers = false
@@ -135,6 +136,13 @@ struct RootView: View {
                 .environmentObject(proStore)
         }
         .sheet(isPresented: $debugShowIcons) { IconGallery() }
+        .sheet(isPresented: $debugShowAlbum) {
+            if let album = library.albums.first {
+                NavigationStack { AlbumView(album: album) }
+                    .environmentObject(audio)
+                    .environmentObject(library)
+            }
+        }
         .sheet(isPresented: $debugShowScrobble) {
             ConnectScrobbleView().environmentObject(scrobbleStore)
         }
@@ -258,6 +266,9 @@ struct RootView: View {
         // The icon set on one sheet, so the family can be judged as a
         // family rather than one glyph at a time on five screens.
         if arguments.contains("-openIcons") { debugShowIcons = true }
+        // Straight to the first record, for screenshots of the album screen —
+        // simctl cannot tap, so a route is the only scriptable way in.
+        if arguments.contains("-openAlbum") { debugShowAlbum = true }
         // Forces any palette, including the review-only candidates, so a whole
         // screen can be looked at in each rather than compared as hex values.
         if let index = arguments.firstIndex(of: "-palette"), index + 1 < arguments.count {
