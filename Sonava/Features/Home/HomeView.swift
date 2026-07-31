@@ -219,7 +219,7 @@ struct HomeView: View {
     private var editorialSection: some View {
         if !editorial.isEmpty {
             VStack(alignment: .leading, spacing: Space.l) {
-                SectionHeader(title: "Editor's picks")
+                Department(title: "Editor's picks")
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: Space.l) {
                         ForEach(editorial) { playlist in
@@ -332,7 +332,7 @@ struct HomeView: View {
 
     private var recentlyPlayed: some View {
         VStack(alignment: .leading, spacing: Space.l) {
-            SectionHeader(title: "Recently played")
+            Department(title: "Recently played")
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Space.l) {
                     ForEach(library.recentSongs) { song in
@@ -360,7 +360,7 @@ struct HomeView: View {
 
     private var quickPicks: some View {
         VStack(alignment: .leading, spacing: Space.m) {
-            SectionHeader(title: "Quick picks")
+            Department(title: "Quick picks")
             LazyVStack(spacing: 2) {
                 ForEach(library.songs.prefix(8)) { song in
                     Button {

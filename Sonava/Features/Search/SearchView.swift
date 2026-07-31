@@ -131,7 +131,7 @@ struct SearchView: View {
             }
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 8) {
-                    SectionHeader(title: "Audius · full tracks")
+                    Department(title: "Audius · full tracks")
                     if audiusFeed.state == .loading {
                         ProgressView().tint(Theme.accentSoft)
                     }
@@ -163,7 +163,7 @@ struct SearchView: View {
 
     private func sourceSection(_ title: LocalizedStringKey, songs: [Song]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            SectionHeader(title: title)
+            Department(title: title)
             songList(songs)
         }
     }
@@ -203,7 +203,7 @@ struct SearchView: View {
 
     private var moodGrid: some View {
         VStack(alignment: .leading, spacing: Space.l) {
-            SectionHeader(title: "Browse moods")
+            Department(title: "Browse moods")
             LazyVGrid(columns: [GridItem(.flexible(), spacing: Space.l), GridItem(.flexible(), spacing: Space.l)], spacing: Space.l) {
                 ForEach(moods) { mood in
                     ZStack(alignment: .topLeading) {

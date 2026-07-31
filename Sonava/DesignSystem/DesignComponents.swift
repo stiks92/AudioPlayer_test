@@ -276,7 +276,7 @@ struct ShelfFailure: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Space.m) {
-            SectionHeader(title: title)
+            Department(title: title)
             HStack(spacing: Space.m) {
                 Image(systemName: "wifi.exclamationmark")
                     .font(.system(.title3))
@@ -307,7 +307,7 @@ struct ShelfPlaceholder: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Space.m) {
-            SectionHeader(title: title)
+            Department(title: title)
             HStack(spacing: Space.l) {
                 ForEach(0..<3, id: \.self) { _ in
                     RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
