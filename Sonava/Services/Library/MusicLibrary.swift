@@ -21,7 +21,21 @@ final class MusicLibrary: ObservableObject {
 
     /// Files the user imported. Owned by `LocalFileStore`; surfaced here so
     /// screens have a single place to ask about "my library".
-    var songs: [Song] { localFiles.songs }
+    var songs: [Song] {
+        #if DEBUG
+        // The demo catalogue stands in for the import the reviewer has not
+        // done, the same way it stands in for every remote service.
+        if DemoCatalog.isActive, localFiles.songs.isEmpty { return DemoCatalog.localFiles }
+        #endif
+        return localFiles.songs
+    }
+
+    /// Records assembled out of the tracks on this device.
+    ///
+    /// Derived rather than stored: an album is a view of the files, so importing
+    /// a folder produces one without any new persistence. See `Album.group` for
+    /// why this yields fewer albums than a naive grouping would.
+    var albums: [Album] { Album.group(songs) }
 
     let localFiles: LocalFileStore
 

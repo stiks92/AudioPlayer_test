@@ -388,6 +388,16 @@
         }
       }
     },
+    "Albums": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Альбомы"
+          }
+        }
+      }
+    },
     "All time": {
       "localizations": {
         "ru": {
@@ -1337,12 +1347,32 @@
         }
       }
     },
+    "Import files with album tags, or connect your server — anything with a real album title and one artist becomes a record here.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Импортируй файлы с тегами альбома или подключи сервер — всё, у чего есть настоящее название альбома и один артист, становится здесь пластинкой."
+          }
+        }
+      }
+    },
     "Import from Files": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Импортировать из Файлов"
+          }
+        }
+      }
+    },
+    "Import music": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Импортировать музыку"
           }
         }
       }
@@ -1799,6 +1829,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Подкасты не найдены."
+          }
+        }
+      }
+    },
+    "No records yet": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пластинок пока нет"
           }
         }
       }

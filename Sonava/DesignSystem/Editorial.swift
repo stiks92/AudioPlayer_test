@@ -74,12 +74,14 @@ struct Department: View {
 
 // MARK: - Rows
 
-/// A ranked row: the numeral hangs outside the measure, and there is no
-/// artwork.
+/// A ranked row: the numeral hangs outside the measure, and the sleeve sits
+/// beside it.
 ///
-/// A chart's identity is its rank. A horizontal rail of covers destroys the one
-/// fact that makes it a chart, which is why the old Home's two chart sections
-/// were indistinguishable from its four recommendation sections.
+/// The first version of this row had no artwork, on the theory that "borrowed
+/// music is text". The owner overruled it in plain words — why are there no
+/// covers — and they were right: in a music app the sleeve is not decoration,
+/// it is how people recognise music they cannot yet name. The rank makes it a
+/// chart; the cover makes it music.
 struct RankedRow: View {
     let rank: Int
     let song: Song
@@ -87,11 +89,18 @@ struct RankedRow: View {
     var fact: String? = nil
 
     var body: some View {
-        HStack(alignment: .center, spacing: Space.l) {
+        HStack(alignment: .center, spacing: Space.m) {
             Text(String(format: "%02d", rank))
                 .font(.sonavaOrdinal)
                 .foregroundColor(Theme.textTertiary)
                 .frame(width: Rail.ordinal, alignment: .trailing)
+            ArtworkImage(song: song, glyphSize: 16)
+                .frame(width: 48, height: 48)
+                .clipShape(RoundedRectangle(cornerRadius: 2, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 2, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                )
             VStack(alignment: .leading, spacing: 2) {
                 Text(song.title)
                     .font(.sonavaName)
@@ -115,11 +124,8 @@ struct RankedRow: View {
     }
 }
 
-/// A row for music the listener owns: it keeps its artwork, and states in the
-/// margin what the app truthfully knows about the file.
-///
-/// The asymmetry is deliberate and it is the hierarchy: **borrowed music is
-/// text, your music has a picture.**
+/// A row for music the listener owns: artwork, and in the margin whatever the
+/// app truthfully knows about the file.
 struct OwnedRow: View {
     let song: Song
     var fact: String? = nil

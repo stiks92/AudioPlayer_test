@@ -52,7 +52,7 @@ struct PodcastsView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: Space.screenMargin) {
                         Text("Podcasts")
-                            .font(.system(.largeTitle, design: .rounded).weight(.heavy))
+                            .font(.sonavaMasthead)
                             .foregroundColor(Theme.textPrimary)
                         searchField
                         if query.isEmpty { genreChips }

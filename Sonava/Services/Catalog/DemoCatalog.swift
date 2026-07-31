@@ -92,6 +92,31 @@ enum DemoCatalog {
         ]
     }
 
+    /// A ripped collection: real album titles, one artist each, several tracks
+    /// per record — the shape `Album.group` exists to find. Without this the
+    /// design-review captures showed "0 files" and an empty record wall, and
+    /// every screen about owning music was being judged with nothing owned.
+    static var localFiles: [Song] {
+        songs(from: [
+            ("First Light", "Vaelo", "Nightfold"),
+            ("Halcyon Drift", "Vaelo", "Nightfold"),
+            ("Undertow", "Vaelo", "Nightfold"),
+            ("Roman Candle", "Vaelo", "Nightfold"),
+            ("Paper Lanterns", "Sable Youth", "Every Little Ghost"),
+            ("Every Little Ghost", "Sable Youth", "Every Little Ghost"),
+            ("Cinder", "Sable Youth", "Every Little Ghost"),
+            ("Golden Static", "Peral", "Field Recordings"),
+            ("Warm Wire", "Peral", "Field Recordings"),
+            ("Tape Hiss", "Peral", "Field Recordings"),
+            ("Salt Air", "Peral", "Field Recordings"),
+            ("Longitude", "Kestrel Bay", "Charts"),
+            ("Latitude", "Kestrel Bay", "Charts"),
+            ("Meridian Line", "Kestrel Bay", "Charts"),
+            ("The Owl Field", "The Owl Field", "The Owl Field"),
+            ("Long Way Down", "The Owl Field", "The Owl Field")
+        ], source: .local)
+    }
+
     static var podcasts: [Podcast] {
         [
             show("The Quiet Part", "Field Notes Media"),
@@ -167,35 +192,109 @@ enum DemoCatalog {
 
     /// A deterministic cover for a seed string: the same album always gets the
     /// same art, so two capture runs are comparable.
+    ///
+    /// What this replaced was a two-stop diagonal gradient with three random
+    /// translucent white circles scattered on it — and the comment above it
+    /// claimed they made the result "read as artwork rather than as a gradient
+    /// placeholder". They did the opposite. Those bubbles filled every tile of
+    /// every screenshot through eight rounds of design review, and the owner
+    /// named them before I did: pretentious bubbles. Everything else on the
+    /// screen was being judged around fake art that looked machine-made,
+    /// because it was.
+    ///
+    /// Real sleeves are *printed*: flat fields, hard edges, structural
+    /// geometry, high contrast. Six archetypes drawn from that tradition, one
+    /// picked per seed, so a wall of them varies the way a shelf of records
+    /// does instead of looking like one effect applied forty times. No
+    /// gradients, no translucency, no soft shapes.
     private static func artwork(seed: String) -> URL? {
         let file = artworkDirectory.appendingPathComponent("\(abs(stableHash(seed))).png")
         if FileManager.default.fileExists(atPath: file.path) { return file }
 
         let side: CGFloat = 600
-        let colors = Palette.hex(forSeed: seed).colors.map { UIColor($0) }
+        let palette = Palette.hex(forSeed: seed).colors.map { UIColor($0) }
+        var rng = SeededGenerator(seed: UInt64(abs(stableHash(seed))))
+        let ink = palette.first ?? .black
+        let paper = palette.last ?? .white
+        let archetype = Int.random(in: 0..<6, using: &rng)
+
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: side, height: side))
         let image = renderer.image { context in
             let cg = context.cgContext
-            // Diagonal two-stop gradient, matching the app's own palette.
-            if let gradient = CGGradient(
-                colorsSpace: CGColorSpaceCreateDeviceRGB(),
-                colors: colors.map(\.cgColor) as CFArray,
-                locations: [0, 1]
-            ) {
-                cg.drawLinearGradient(gradient, start: .zero,
-                                      end: CGPoint(x: side, y: side), options: [])
-            }
-            // A few soft shapes so covers read as artwork rather than as a
-            // gradient placeholder — deterministic, seeded by the title.
-            var rng = SeededGenerator(seed: UInt64(abs(stableHash(seed))))
-            for _ in 0..<3 {
-                let radius = CGFloat.random(in: side * 0.18...side * 0.42, using: &rng)
-                let x = CGFloat.random(in: 0...side, using: &rng)
-                let y = CGFloat.random(in: 0...side, using: &rng)
-                cg.setFillColor(UIColor.white.withAlphaComponent(
-                    CGFloat.random(in: 0.05...0.16, using: &rng)).cgColor)
-                cg.fillEllipse(in: CGRect(x: x - radius, y: y - radius,
+            cg.setFillColor(paper.cgColor)
+            cg.fill(CGRect(x: 0, y: 0, width: side, height: side))
+            cg.setFillColor(ink.cgColor)
+
+            switch archetype {
+            case 0:
+                // A horizontal band, held off centre. ECM and Blue Note both
+                // live here: one field, one edge, nothing else.
+                let height = side * CGFloat.random(in: 0.28...0.46, using: &rng)
+                let top = side * CGFloat.random(in: 0.12...0.44, using: &rng)
+                cg.fill(CGRect(x: 0, y: top, width: side, height: height))
+
+            case 1:
+                // Concentric rings — structural, not scattered. A record is a
+                // set of circles, so the circles are drawn as one object.
+                let centre = CGPoint(x: side * CGFloat.random(in: 0.35...0.65, using: &rng),
+                                     y: side * CGFloat.random(in: 0.35...0.65, using: &rng))
+                let stroke = side * 0.045
+                cg.setStrokeColor(ink.cgColor)
+                cg.setLineWidth(stroke)
+                for step in 1...5 {
+                    let radius = side * 0.09 * CGFloat(step)
+                    cg.strokeEllipse(in: CGRect(x: centre.x - radius, y: centre.y - radius,
+                                                width: radius * 2, height: radius * 2))
+                }
+
+            case 2:
+                // A diagonal, cut edge to edge. Two flat fields meeting on a
+                // hard line.
+                cg.beginPath()
+                cg.move(to: CGPoint(x: 0, y: side * CGFloat.random(in: 0.2...0.6, using: &rng)))
+                cg.addLine(to: CGPoint(x: side, y: side * CGFloat.random(in: 0.1...0.5, using: &rng)))
+                cg.addLine(to: CGPoint(x: side, y: side))
+                cg.addLine(to: CGPoint(x: 0, y: side))
+                cg.closePath()
+                cg.fillPath()
+
+            case 3:
+                // Bars in the app mark's own proportions, at sleeve scale. The
+                // cover and the icon share a silhouette.
+                let bars: [CGFloat] = [0.34, 0.62, 1.0, 0.70, 0.44]
+                let width = side * 0.088
+                let gap = side * 0.052
+                let total = width * 5 + gap * 4
+                var x = (side - total) / 2
+                for scale in bars {
+                    let height = side * 0.62 * scale
+                    cg.fill(CGRect(x: x, y: (side - height) / 2, width: width, height: height))
+                    x += width + gap
+                }
+
+            case 4:
+                // A grid, one cell knocked out. Systematic, with one deliberate
+                // fault — which is how a designed grid differs from a rendered
+                // one.
+                let cells = Int.random(in: 3...5, using: &rng)
+                let unit = side / CGFloat(cells)
+                let skip = Int.random(in: 0..<(cells * cells), using: &rng)
+                for index in 0..<(cells * cells) where index != skip {
+                    guard index % 2 == 0 else { continue }
+                    let row = CGFloat(index / cells), column = CGFloat(index % cells)
+                    cg.fill(CGRect(x: column * unit, y: row * unit, width: unit, height: unit))
+                }
+
+            case 5:
+                // One disc, cropped by the sleeve's own edge.
+                let radius = side * CGFloat.random(in: 0.42...0.62, using: &rng)
+                let centre = CGPoint(x: side * CGFloat.random(in: 0.1...0.9, using: &rng),
+                                     y: side * CGFloat.random(in: 0.1...0.9, using: &rng))
+                cg.fillEllipse(in: CGRect(x: centre.x - radius, y: centre.y - radius,
                                           width: radius * 2, height: radius * 2))
+
+            default:
+                break
             }
         }
         guard let data = image.pngData() else { return nil }

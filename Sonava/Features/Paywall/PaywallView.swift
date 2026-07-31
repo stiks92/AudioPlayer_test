@@ -136,7 +136,7 @@ struct PaywallView: View {
             SonavaMark(height: 46)
                 .shadow(color: .white.opacity(0.35), radius: 16)
             Text("Sonava Pro")
-                .font(.system(.largeTitle, design: .rounded).weight(.heavy))
+                .font(.sonavaMasthead)
             Text("The one player for all your music —\nunlocked to the fullest.")
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.85))

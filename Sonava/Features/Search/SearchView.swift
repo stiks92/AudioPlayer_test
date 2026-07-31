@@ -48,7 +48,7 @@ struct SearchView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: Space.xl) {
                         Text("Search")
-                            .font(.system(.largeTitle, design: .rounded).weight(.heavy))
+                            .font(.sonavaMasthead)
                             .foregroundColor(Theme.textPrimary)
 
                         searchField

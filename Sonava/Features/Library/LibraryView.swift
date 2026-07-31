@@ -15,10 +15,11 @@ struct LibraryView: View {
     @EnvironmentObject private var playlistStore: PlaylistStore
 
     enum Tab: String, CaseIterable {
-        case playlists, songs, downloads, favorites
+        case albums, playlists, songs, downloads, favorites
 
         var title: LocalizedStringKey {
             switch self {
+            case .albums: return "Albums"
             case .playlists: return "Playlists"
             case .songs: return "Songs"
             case .downloads: return "Offline"
@@ -27,7 +28,10 @@ struct LibraryView: View {
         }
     }
 
-    @State private var tab: Tab = .playlists
+    // Albums lead. The app had no album at all until this release — nothing
+    // ever grouped `Song.album` — and for somebody who ripped their collection,
+    // the record is the unit of memory, not the track.
+    @State private var tab: Tab = .albums
     @State private var showNewPlaylist = false
     @State private var newPlaylistName = ""
     @State private var showImporter = false
@@ -42,12 +46,13 @@ struct LibraryView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: Space.screenMargin) {
                         Text("Your Library")
-                            .font(.system(.largeTitle, design: .rounded).weight(.heavy))
+                            .font(.sonavaMasthead)
                             .foregroundColor(Theme.textPrimary)
 
                         segmentedControl
 
                         switch tab {
+                        case .albums:    albumsSection
                         case .playlists: playlistsSection
                         case .songs:     songsSection
                         case .downloads: downloadsSection
@@ -345,6 +350,78 @@ struct LibraryView: View {
                     .buttonStyle(.plain)
                 }
             }
+        }
+    }
+}
+
+// MARK: - Albums (the record wall)
+
+extension LibraryView {
+    /// A wall of sleeves, two across, edge to edge of the content column.
+    ///
+    /// The unit is the record. Tapping one plays it from the top in its own
+    /// order, which is the single thing a person who owns albums does most and
+    /// the app could not do at all before `Album.group` existed.
+    @ViewBuilder
+    var albumsSection: some View {
+        let albums = library.albums
+        if albums.isEmpty {
+            emptyAlbums
+        } else {
+            let columns = [GridItem(.flexible(), spacing: Space.m),
+                           GridItem(.flexible(), spacing: Space.m)]
+            LazyVGrid(columns: columns, alignment: .leading, spacing: Space.xl) {
+                ForEach(albums) { album in
+                    Button {
+                        if let first = album.songs.first {
+                            audio.play(first, in: album.songs)
+                        }
+                    } label: {
+                        VStack(alignment: .leading, spacing: Space.s) {
+                            ZStack {
+                                if let cover = album.artwork {
+                                    ArtworkImage(song: cover, glyphSize: 34)
+                                }
+                            }
+                            .aspectRatio(1, contentMode: .fit)
+                            .frame(maxWidth: .infinity)
+                            .clipShape(RoundedRectangle(cornerRadius: 2, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 2, style: .continuous)
+                                    .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                            )
+                            Text(album.title)
+                                .font(.sonavaName)
+                                .foregroundColor(Theme.textPrimary)
+                                .lineLimit(1)
+                            Text("\(album.artist) · \(album.trackCount)")
+                                .font(.sonavaStamp)
+                                .tracking(0.8)
+                                .foregroundColor(Theme.textTertiary)
+                                .lineLimit(1)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    /// The empty wall states what fills it, in the same voice as the rest of
+    /// the app — not a centred glyph with a pill button.
+    var emptyAlbums: some View {
+        VStack(alignment: .leading, spacing: Space.m) {
+            Department(title: "No records yet")
+            Text("Import files with album tags, or connect your server — anything with a real album title and one artist becomes a record here.")
+                .font(.sonavaByline)
+                .foregroundColor(Theme.textSecondary)
+            Button {
+                showImporter = true
+            } label: {
+                Text("Import music")
+            }
+            .buttonStyle(PrimaryCapsuleButtonStyle())
+            .padding(.top, Space.s)
         }
     }
 }

@@ -65,6 +65,10 @@ struct SegmentedControl<Value: Hashable>: View {
                 }
             }
             .font(.sonavaRowMeta.weight(.semibold))
+                // Russian labels — "Плейлисты", "Избранное" — hyphenated into
+                // two lines inside the pill. A segment shrinks, never wraps.
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
             .foregroundColor(isSelected ? .white : Theme.textSecondary)
             .frame(maxWidth: .infinity, minHeight: Space.hitTarget - Space.s)
             .background {
