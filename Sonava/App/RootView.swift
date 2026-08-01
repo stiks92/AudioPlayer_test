@@ -38,6 +38,7 @@ struct RootView: View {
     @State private var debugShowAIMix = false
     @State private var debugShowIcons = false
     @State private var debugShowAlbum = false
+    @State private var debugShowQueue = false
     @State private var debugShowScrobble = false
     @State private var debugShowStats = false
     @State private var debugShowServers = false
@@ -136,6 +137,12 @@ struct RootView: View {
                 .environmentObject(proStore)
         }
         .sheet(isPresented: $debugShowIcons) { IconGallery() }
+        .sheet(isPresented: $debugShowQueue) {
+            QueueView()
+                .environmentObject(audio)
+                .environmentObject(library)
+                .environmentObject(proStore)
+        }
         .sheet(isPresented: $debugShowAlbum) {
             if let album = library.albums.first {
                 NavigationStack { AlbumView(album: album) }
@@ -269,6 +276,7 @@ struct RootView: View {
         // Straight to the first record, for screenshots of the album screen —
         // simctl cannot tap, so a route is the only scriptable way in.
         if arguments.contains("-openAlbum") { debugShowAlbum = true }
+        if arguments.contains("-openQueue") { debugShowQueue = true }
         // Seeds a believable playback position for design captures: the demo
         // stream never resolves a duration, so without this every frame shows
         // 0:01 and an empty arc.

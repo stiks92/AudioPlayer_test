@@ -48,7 +48,7 @@ struct SongRow: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(song.title)
-                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                    .font(.system(.subheadline).weight(.semibold))
                     .foregroundColor(isCurrent ? Theme.accentSoft : Theme.textPrimary)
                     .lineLimit(1)
                 HStack(spacing: Space.s) {
@@ -73,6 +73,14 @@ struct SongRow: View {
                 Image(systemName: "heart.fill")
                     .font(.system(.footnote))
                     .foregroundColor(Theme.destructive)
+            }
+
+            // The anchor's right column: the track's length, quiet and
+            // tabular. Absent when unknown rather than invented.
+            if !isCurrent, let duration = song.durationText {
+                Text(duration)
+                    .font(.system(.footnote).monospacedDigit())
+                    .foregroundColor(Theme.textSecondary)
             }
         }
         .padding(.vertical, 6)

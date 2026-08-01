@@ -16,11 +16,12 @@ struct QueueView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Theme.background.ignoresSafeArea()
-                AuroraBackground(colors: audio.currentSong?.gradient ?? [Theme.accent, Theme.background],
-                                 animated: false)
-                    .opacity(0.35)
-                    .ignoresSafeArea()
+                Color.black.ignoresSafeArea()
+                LinearGradient(stops: [
+                    .init(color: (audio.currentSong?.gradient.first ?? Theme.accent).opacity(0.5), location: 0),
+                    .init(color: .black, location: 0.55)
+                ], startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea()
 
                 List {
                     if let current = audio.currentSong {
