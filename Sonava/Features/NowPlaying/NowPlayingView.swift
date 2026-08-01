@@ -38,7 +38,16 @@ struct NowPlayingView: View {
             // screen, which meant a Blue Note sleeve and a Warp sleeve arrived
             // looking like the same purple record. Somebody with 12,431 files
             // needs the opposite: the sleeve doing the identifying.
-            Theme.background.ignoresSafeArea()
+            Color.black.ignoresSafeArea()
+            // The reference ground: the track's colour glows from the top
+            // and dissolves into pure black by mid-screen. Stops, not clips.
+            LinearGradient(stops: [
+                .init(color: (song?.gradient.first ?? Theme.accent).opacity(0.55), location: 0),
+                .init(color: (song?.gradient.last ?? Theme.accentDeep).opacity(0.28), location: 0.22),
+                .init(color: .black, location: 0.58)
+            ], startPoint: .top, endPoint: .bottom)
+            .ignoresSafeArea()
+            .animation(Motion.fade, value: song?.id)
 
             VStack(spacing: 0) {
                 header
@@ -46,10 +55,6 @@ struct NowPlayingView: View {
                 artwork
                 Spacer(minLength: 0)
                 info
-                    .padding(.top, Space.l)
-                scrubber
-                    .padding(.top, Space.xl)
-                visualizer
                     .padding(.top, Space.l)
                 controls
                     .padding(.top, 8)
@@ -99,9 +104,14 @@ struct NowPlayingView: View {
 
     private var header: some View {
         HStack {
-            CircleIconButton(systemName: "chevron.down", size: 42, iconSize: 16) {
-                onClose()
+            Button { onClose() } label: {
+                Image(systemName: "chevron.down")
+                    .font(.system(.body).weight(.semibold))
+                    .foregroundColor(.white.opacity(0.85))
+                    .frame(width: Space.hitTarget, height: Space.hitTarget)
+                    .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
             .identified("player.collapse", label: "Collapse player")
             Spacer()
             // Was "PLAYING FROM ALBUM" over the album name — a centred caps
@@ -114,34 +124,87 @@ struct NowPlayingView: View {
                 .foregroundColor(Theme.textTertiary)
                 .lineLimit(1)
             Spacer()
-            CircleIconButton(systemName: "list.bullet", size: 42, iconSize: 16) {
-                showQueue = true
+            Button { showQueue = true } label: {
+                Image(systemName: "ellipsis")
+                    .font(.system(.body).weight(.semibold))
+                    .foregroundColor(.white.opacity(0.85))
+                    .frame(width: Space.hitTarget, height: Space.hitTarget)
+                    .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
         }
     }
 
-    /// The sleeve: full bleed, square, radius 0, no shadow.
-    ///
-    /// It is the only object in the app permitted to touch the trim, which is
-    /// what stops it reading as a card the instant you see it. The 28pt radius
-    /// and the coloured drop shadow were the two things that made it one.
-    ///
-    /// The 0.86 scale on pause is gone as well. A deck does not shrink its
-    /// platter to tell you it stopped — the transport key does that, and it now
-    /// does it by morphing. What marks the paused state here is a 22% black
-    /// veil, which is a dimmed lamp rather than a shrinking record.
+    /// The disc: a circular cover inside a frosted lens, the progress as a
+    /// luminous arc around it, the remaining time seated inside the glass —
+    /// and the next records peeking from behind, the way the reference's
+    /// carousel implies depth. Replaces the full-bleed square sleeve.
     private var artwork: some View {
         ZStack {
+            // Neighbours peek out from behind the lens.
+            HStack {
+                if let left = audio.upNext.dropFirst().first {
+                    ArtworkImage(song: left, glyphSize: 20)
+                        .frame(width: 108, height: 108).clipShape(Circle())
+                        .offset(x: -46).opacity(0.85)
+                }
+                Spacer()
+                if let right = audio.upNext.first {
+                    ArtworkImage(song: right, glyphSize: 20)
+                        .frame(width: 108, height: 108).clipShape(Circle())
+                        .offset(x: 46).opacity(0.85)
+                }
+            }
+            // The lens.
+            Circle().fill(.ultraThinMaterial)
+                .frame(width: 316, height: 316)
+                .overlay(Circle().strokeBorder(.white.opacity(0.18), lineWidth: 1))
+                .shadow(color: .black.opacity(0.5), radius: 30, y: 18)
+            // The arc is the scrubber's truth, and it is dressed the way the
+            // reference dresses it: a luminous gradient trail from the track's
+            // own palette into white, glowing softly, with a bright head at
+            // its tip. When the duration is the unknown-sentinel (== 1) the
+            // arc draws nothing rather than a lie.
+            let arcProgress = clock.duration > 1 ? clock.progress : 0
+            Circle().stroke(.white.opacity(0.10), lineWidth: 4)
+                .frame(width: 272, height: 272)
+            Circle().trim(from: 0, to: max(0.003, arcProgress))
+                .stroke(
+                    AngularGradient(
+                        colors: [(song?.gradient.first ?? Theme.accentSoft).opacity(0.9),
+                                 (song?.gradient.last ?? Theme.accent),
+                                 .white],
+                        center: .center,
+                        startAngle: .degrees(0),
+                        endAngle: .degrees(360 * max(0.003, arcProgress))),
+                    style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+                .frame(width: 272, height: 272)
+                .shadow(color: (song?.gradient.first ?? Theme.accentSoft).opacity(0.7), radius: 7)
+            // The head: a bright point riding the tip of the trail.
+            if arcProgress > 0.004 {
+                let theta = 2 * Double.pi * arcProgress - .pi / 2
+                Circle().fill(.white)
+                    .frame(width: 10, height: 10)
+                    .shadow(color: .white.opacity(0.9), radius: 6)
+                    .offset(x: 136 * cos(theta), y: 136 * sin(theta))
+            }
+            // The record itself.
             if let song {
-                ArtworkImage(song: song, glyphSize: 72)
-                    .aspectRatio(1, contentMode: .fill)
-                    .frame(maxWidth: .infinity)
-                    .clipped()
-                    .overlay(Color.black.opacity(audio.isPlaying ? 0 : 0.22))
+                ArtworkImage(song: song, glyphSize: 54)
+                    .frame(width: 224, height: 224)
+                    .clipShape(Circle())
+                    .overlay(Circle().strokeBorder(.white.opacity(0.2), lineWidth: 1))
+                    .opacity(audio.isPlaying ? 1 : 0.75)
                     .animation(Motion.fade, value: audio.isPlaying)
             }
+            Text((clock.duration - clock.currentTime).asClock)
+                .font(.footnote.weight(.medium).monospacedDigit())
+                .foregroundColor(.white.opacity(0.85))
+                .offset(y: 122)
         }
-        .padding(.horizontal, -Space.xl)
+        .frame(maxWidth: .infinity)
+        .frame(height: 360)
     }
 
     private var info: some View {
@@ -151,14 +214,14 @@ struct NowPlayingView: View {
                 // enforces: a human named it, so it is set in a book face; the
                 // numbers below it are set in a machine face.
                 MarqueeText(text: song?.title ?? "",
-                            font: .system(.title, design: .serif).weight(.bold))
-                    .frame(height: 34)
+                            font: .system(.title).weight(.light))
+                    .frame(height: 36)
                 Button {
                     if song != nil { showArtist = true }
                 } label: {
                     HStack(spacing: 4) {
                         Text(song?.artist ?? "")
-                            .font(.sonavaAttribution)
+                            .font(.system(.callout))
                         Image(systemName: "chevron.right")
                             .font(.system(.caption2).weight(.semibold))
                             .opacity(0.6)
@@ -274,15 +337,19 @@ struct NowPlayingView: View {
             }
             .buttonStyle(BouncyButtonStyle())
             Spacer()
-            CircleIconButton(systemName: "backward.fill", size: 56, iconSize: 22) {
+            BareTransportButton(glyph: .previous, size: 30) {
                 audio.previous()
             }
             Spacer()
-            PlayPauseButton(isPlaying: audio.isPlaying) {
-                audio.togglePlayPause()
+            Button { audio.togglePlayPause() } label: {
+                PlayPauseGlyph(isPlaying: audio.isPlaying, size: 50)
+                    .frame(width: 84, height: 84)
+                    .contentShape(Rectangle())
             }
+            .buttonStyle(BouncyButtonStyle(scale: 0.9))
+            .accessibilityIdentifier("player.playPause")
             Spacer()
-            CircleIconButton(systemName: "forward.fill", size: 56, iconSize: 22) {
+            BareTransportButton(glyph: .next, size: 30) {
                 audio.next()
             }
             Spacer()

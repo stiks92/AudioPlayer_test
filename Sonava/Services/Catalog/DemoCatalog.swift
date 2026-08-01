@@ -212,7 +212,32 @@ enum DemoCatalog {
     /// picked per seed, so a wall of them varies the way a shelf of records
     /// does instead of looking like one effect applied forty times. No
     /// gradients, no translucency, no soft shapes.
+    /// A directory of real cover JPEGs to use instead of anything generated.
+    ///
+    /// The owner's rule, stated twice and now absolute: no hand-drawn vector
+    /// art in a frame, ever — only real assets. Review captures pass
+    /// `-demoArtDir <path>` pointing at genuine sleeves on disk (the simulator
+    /// can read host paths), so every tile, disc and row carries a real cover
+    /// and nothing procedural survives into a screenshot.
+    private static var artDir: String? {
+        guard let index = CommandLine.arguments.firstIndex(of: "-demoArtDir"),
+              index + 1 < CommandLine.arguments.count else { return nil }
+        return CommandLine.arguments[index + 1]
+    }
+
     private static func artwork(seed: String) -> URL? {
+        if let dir = artDir {
+            let files = ((try? FileManager.default.contentsOfDirectory(atPath: dir)) ?? [])
+                .filter { $0.hasSuffix(".jpg") }.sorted()
+            if !files.isEmpty {
+                let pick = files[abs(stableHash(seed)) % files.count]
+                return URL(fileURLWithPath: dir).appendingPathComponent(pick)
+            }
+        }
+        return generatedArtwork(seed: seed)
+    }
+
+    private static func generatedArtwork(seed: String) -> URL? {
         let file = artworkDirectory.appendingPathComponent("\(abs(stableHash(seed))).png")
         if FileManager.default.fileExists(atPath: file.path) { return file }
 

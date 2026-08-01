@@ -269,6 +269,14 @@ struct RootView: View {
         // Straight to the first record, for screenshots of the album screen —
         // simctl cannot tap, so a route is the only scriptable way in.
         if arguments.contains("-openAlbum") { debugShowAlbum = true }
+        // Seeds a believable playback position for design captures: the demo
+        // stream never resolves a duration, so without this every frame shows
+        // 0:01 and an empty arc.
+        if let index = arguments.firstIndex(of: "-demoProgress"),
+           index + 1 < arguments.count, let fraction = Double(arguments[index + 1]) {
+            audio.clock.reset(duration: 243, metered: true)
+            audio.clock.currentTime = 243 * min(max(fraction, 0), 1)
+        }
         // Forces any palette, including the review-only candidates, so a whole
         // screen can be looked at in each rather than compared as hex values.
         if let index = arguments.firstIndex(of: "-palette"), index + 1 < arguments.count {

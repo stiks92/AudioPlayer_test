@@ -164,3 +164,25 @@ struct PlayPauseGlyph: View {
 enum PlayerTransition {
     static let artwork = "player.artwork"
 }
+
+/// A transport key with nothing behind it: the reference's controls are bare
+/// white glyphs floating on black, and a circle would be chrome it never asked
+/// for.
+struct BareTransportButton: View {
+    let glyph: SonavaIcon.Glyph
+    var size: CGFloat = 28
+    let action: () -> Void
+
+    init(glyph: SonavaIcon.Glyph, size: CGFloat = 28, action: @escaping () -> Void) {
+        self.glyph = glyph; self.size = size; self.action = action
+    }
+
+    var body: some View {
+        Button(action: action) {
+            SonavaIcon(glyph: glyph, size: size)
+                .frame(width: Space.hitTarget + 8, height: Space.hitTarget + 8)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(BouncyButtonStyle(scale: 0.9))
+    }
+}
