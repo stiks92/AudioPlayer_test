@@ -99,7 +99,7 @@ struct UserPlaylistDetailView: View {
         .overlay(LinearGradient(colors: [.clear, Theme.background], startPoint: .center, endPoint: .bottom))
         .overlay(alignment: .bottomLeading) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(playlist.name).font(.system(.title, design: .rounded).weight(.heavy)).lineLimit(2)
+                Text(playlist.name).font(.system(.title).weight(.heavy)).lineLimit(2)
                 Text(playlist.subtitle).font(.subheadline).foregroundColor(Theme.textSecondary)
             }
             .padding(Space.screenMargin)

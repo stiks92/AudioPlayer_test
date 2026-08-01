@@ -84,7 +84,7 @@ struct ShazamView: View {
             .frame(height: 250)
 
             Text(statusText)
-                .font(.system(.title3, design: .rounded).weight(.semibold))
+                .font(.system(.title3).weight(.semibold))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
 
@@ -137,7 +137,7 @@ struct ShazamView: View {
 
             VStack(spacing: 6) {
                 Text(result.title)
-                    .font(.system(.title2, design: .rounded).weight(.bold))
+                    .font(.system(.title2).weight(.bold))
                     .multilineTextAlignment(.center)
                 Text(result.artist)
                     .font(.system(.callout))

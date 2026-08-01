@@ -291,7 +291,7 @@ struct EqualizerView: View {
                 .foregroundColor(.white)
                 .shadow(color: Theme.accent.opacity(0.6), radius: 18)
             Text("The equalizer is a Pro feature")
-                .font(.system(.title2, design: .rounded).weight(.bold))
+                .font(.system(.title2).weight(.bold))
                 .multilineTextAlignment(.center)
             Text("Ten bands, a pre-amp and a dozen presets to shape your sound exactly the way you like it.")
                 .font(.subheadline)

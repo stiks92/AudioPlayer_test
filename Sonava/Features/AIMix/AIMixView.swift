@@ -76,7 +76,7 @@ struct AIMixView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Space.screenMargin) {
                 Text("Describe a vibe")
-                    .font(.system(.title2, design: .rounded).weight(.bold))
+                    .font(.system(.title2).weight(.bold))
 
                 HStack(spacing: Space.m) {
                     SonavaIcon(glyph: .aiMix, size: 20, tint: Theme.accentSoft)
@@ -163,7 +163,7 @@ struct AIMixView: View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text(mix.title)
-                    .font(.system(.title3, design: .rounded).weight(.bold))
+                    .font(.system(.title3).weight(.bold))
                 Text("\(mix.songs.count) tracks · on-device AI")
                     .font(.caption).foregroundColor(.white.opacity(0.7))
             }
@@ -210,7 +210,7 @@ struct AIMixView: View {
             SonavaIcon(glyph: .aiMix, size: 60)
                 .shadow(color: .white.opacity(0.5), radius: 18)
             Text("AI Mix is a Pro feature")
-                .font(.system(.title2, design: .rounded).weight(.bold))
+                .font(.system(.title2).weight(.bold))
             Text("Describe any mood or moment and Sonava composes a\nmix for you — instantly, on your device.")
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.8))

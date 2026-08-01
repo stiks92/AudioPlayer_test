@@ -50,7 +50,7 @@ struct RemotePlaylistView: View {
 
             VStack(spacing: 6) {
                 Text(playlist.title)
-                    .font(.system(.title2, design: .rounded).weight(.bold))
+                    .font(.system(.title2).weight(.bold))
                     .multilineTextAlignment(.center)
                 Text(playlist.subtitle)
                     .font(.subheadline).foregroundColor(Theme.textSecondary)

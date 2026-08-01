@@ -27,7 +27,7 @@ struct NowPlayingShareCard: View {
 
                 VStack(spacing: 14) {
                     Text(song.title)
-                        .font(.system(size: 70, weight: .heavy, design: .rounded))
+                        .font(.system(size: 70, weight: .heavy))
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                     Text(song.artist)
@@ -51,7 +51,7 @@ struct NowPlayingShareCard: View {
                 HStack(spacing: 14) {
                     SonavaMark(height: 40)
                     Text("Now playing on Sonava")
-                        .font(.system(size: 36, weight: .semibold, design: .rounded))
+                        .font(.system(size: 36, weight: .semibold))
                 }
                 .foregroundColor(.white.opacity(0.95))
                 .padding(.bottom, 50)

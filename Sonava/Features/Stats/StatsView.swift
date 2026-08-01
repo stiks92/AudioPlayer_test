@@ -117,7 +117,7 @@ struct StatsView: View {
                 .font(.system(.footnote).weight(.medium))
                 .foregroundColor(Theme.textSecondary)
             Text(ListeningStats.duration(stats.totalSeconds))
-                .font(.system(size: heroSize, weight: .heavy, design: .rounded))
+                .font(.system(size: heroSize, weight: .heavy))
                 // Not `brandGradient`: it ends on accentDeep, which measures
                 // 2.25:1 on this ground, so the minutes half of the number
                 // dissolved into the background.
@@ -197,7 +197,7 @@ struct StatsView: View {
     private func tile(icon: String, value: String, caption: LocalizedStringKey, tint: Color) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Image(systemName: icon).font(.system(.body).weight(.bold)).foregroundColor(tint)
-            Text(value).font(.system(.title, design: .rounded).weight(.heavy))
+            Text(value).font(.system(.title).weight(.heavy))
                 .foregroundColor(Theme.textPrimary)
             Text(caption).font(.system(.caption)).foregroundColor(Theme.textTertiary)
         }
@@ -234,7 +234,7 @@ struct StatsView: View {
     private func row(rank: Int, entry: ListeningStats.Entry, showDetail: Bool) -> some View {
         HStack(spacing: Space.l) {
             Text(rank, format: .number)
-                .font(.system(.subheadline, design: .rounded).weight(.heavy))
+                .font(.system(.subheadline).weight(.heavy))
                 .foregroundColor(Theme.accentSoft)
                 .frame(width: 20, alignment: .leading)
             VStack(alignment: .leading, spacing: 2) {
@@ -307,7 +307,7 @@ struct StatsTeaserCard: View {
                     HStack(spacing: 3) {
                         SonavaIcon(glyph: .streak, size: 14, tint: Theme.accentPink)
                         Text(stats.streak, format: .number)
-                            .font(.system(.footnote, design: .rounded).weight(.heavy))
+                            .font(.system(.footnote).weight(.heavy))
                     }
                     .foregroundColor(Theme.accentPink)
                     .padding(.horizontal, Space.m)
@@ -351,13 +351,13 @@ struct StatsShareCard: View {
             VStack(spacing: Space.xxl) {
                 Spacer()
                 Text("MY SOUND")
-                    .font(.system(size: 40, weight: .black, design: .rounded))
+                    .font(.system(size: 40, weight: .black))
                     .tracking(10)
                     .foregroundColor(.white.opacity(0.85))
 
                 VStack(spacing: 6) {
                     Text(ListeningStats.duration(stats.totalSeconds))
-                        .font(.system(size: 130, weight: .black, design: .rounded))
+                        .font(.system(size: 130, weight: .black))
                     Text(range == .all ? "all time" : (range == .month ? "this month" : "this week"))
                         .font(.system(size: 38, weight: .medium))
                         .opacity(0.85)
@@ -369,7 +369,7 @@ struct StatsShareCard: View {
                         ForEach(Array(stats.topArtists.prefix(3).enumerated()), id: \.element.id) { index, entry in
                             HStack(spacing: Space.xl) {
                                 Text(index + 1, format: .number)
-                                    .font(.system(size: 44, weight: .black, design: .rounded))
+                                    .font(.system(size: 44, weight: .black))
                                     .foregroundColor(.white.opacity(0.55))
                                     .frame(width: 60, alignment: .leading)
                                 Text(entry.name)
@@ -395,7 +395,7 @@ struct StatsShareCard: View {
 
                 HStack(spacing: Space.l) {
                     SonavaMark(height: 34)
-                    Text("Sonava").font(.system(size: 40, weight: .heavy, design: .rounded))
+                    Text("Sonava").font(.system(size: 40, weight: .heavy))
                 }
                 .foregroundColor(.white.opacity(0.95))
                 .padding(.bottom, 60)

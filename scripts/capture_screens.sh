@@ -56,6 +56,12 @@ COMMON=(-hasOnboarded.v1 YES -pro.dev.override.v1 "$PRO"
         -AppleLanguages "($LANG_CODE)" -AppleLocale "$LOCALE"
         -seedDemoContent -seedStats -seedServers 3)
 
+# Real sleeves for every frame: the owner's rule is that no procedural art may
+# appear in a review capture. Point DEMO_ART at a folder of genuine JPEGs.
+if [ -n "${DEMO_ART:-}" ]; then
+  COMMON+=(-demoArtDir "$DEMO_ART" -demoProgress 0.42)
+fi
+
 shot() {
   local name="$1"; shift
   xcrun simctl terminate "$UDID" "$BUNDLE" >/dev/null 2>&1 || true

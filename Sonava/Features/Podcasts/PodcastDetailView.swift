@@ -50,7 +50,7 @@ struct PodcastDetailView: View {
 
             VStack(spacing: 6) {
                 Text(podcast.title)
-                    .font(.system(.title2, design: .rounded).weight(.bold))
+                    .font(.system(.title2).weight(.bold))
                     .multilineTextAlignment(.center)
                 Text(podcast.author)
                     .font(.subheadline)

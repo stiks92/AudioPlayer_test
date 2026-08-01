@@ -48,13 +48,13 @@ struct ArtistView: View {
                     .fill(LinearGradient(colors: gradient, startPoint: .topLeading, endPoint: .bottomTrailing))
                     .frame(width: 150, height: 150)
                 Text(String(artistName.prefix(1)).uppercased())
-                    .font(.system(size: 60, weight: .heavy, design: .rounded))
+                    .font(.system(size: 60, weight: .heavy))
                     .foregroundColor(.white)
             }
             .shadow(color: gradient.first?.opacity(0.5) ?? .clear, radius: 20, y: 10)
 
             Text(artistName)
-                .font(.system(.title2, design: .rounded).weight(.bold))
+                .font(.system(.title2).weight(.bold))
                 .multilineTextAlignment(.center)
 
             if feed.state == .loaded, let first = feed.songs.first {

@@ -45,7 +45,7 @@ struct ConnectScrobbleView: View {
                 .font(.system(size: 40, weight: .bold))
                 .foregroundColor(Theme.accentSoft)
             Text("ListenBrainz")
-                .font(.system(.title2, design: .rounded).weight(.bold))
+                .font(.system(.title2).weight(.bold))
             Text("Scrobble every play to your ListenBrainz history — the open, private alternative to Last.fm.")
                 .font(.subheadline)
                 .foregroundColor(Theme.textSecondary)

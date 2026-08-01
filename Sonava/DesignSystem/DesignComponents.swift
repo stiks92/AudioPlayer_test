@@ -251,7 +251,7 @@ struct SectionHeader: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             Text(title)
-                .font(.system(.title3, design: .rounded).weight(.bold))
+                .font(.system(.title3).weight(.bold))
                 .foregroundColor(Theme.textPrimary)
             Spacer()
             if let actionTitle, let action {
