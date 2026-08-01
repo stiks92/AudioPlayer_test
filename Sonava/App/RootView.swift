@@ -39,7 +39,6 @@ struct RootView: View {
     @State private var debugShowIcons = false
     @State private var debugShowAlbum = false
     @State private var debugShowQueue = false
-    @State private var debugCustomDock = false
     @State private var debugShowScrobble = false
     @State private var debugShowStats = false
     @State private var debugShowServers = false
@@ -47,16 +46,6 @@ struct RootView: View {
     #endif
 
     private let playerSpring = Animation.spring(response: 0.45, dampingFraction: 0.86)
-
-    /// True while the flag-gated dock candidate is on screen, so the system
-    /// bar and the mini capsule step aside for a clean comparison frame.
-    private var usesCustomDock: Bool {
-        #if DEBUG
-        return debugCustomDock
-        #else
-        return false
-        #endif
-    }
 
     var body: some View {
         ZStack {
@@ -67,7 +56,6 @@ struct RootView: View {
                     Tab(value: tab) {
                         view(for: tab)
                             .opaqueBottomScrollEdge()
-                            .toolbar(usesCustomDock ? .hidden : .visible, for: .tabBar)
                     } label: {
                         // The app's own glyphs, not the system's. A tab bar is
                         // the one row where five icons are read side by side,
@@ -90,45 +78,19 @@ struct RootView: View {
             // on the selection pill the accent measured 3.44:1, so the one tab
             // that must be identifiable was the least legible thing in the bar.
             .tint(Theme.accentSoft)
-            .modifier(MiniPlayerSlot(isHidden: showNowPlaying || usesCustomDock,
+            .modifier(MiniPlayerSlot(isHidden: showNowPlaying,
                                       namespace: playerTransition) {
                 withAnimation(playerSpring) { showNowPlaying = true }
             })
 
-            #if DEBUG
-            if debugCustomDock {
-                VStack {
-                    Spacer()
-                    CustomDockCandidate(selection: $selection) {
-                        withAnimation(playerSpring) { showNowPlaying = true }
-                    }
-                    .padding(.horizontal, Space.screenMargin)
-                    .padding(.bottom, Space.s)
-                }
-                .zIndex(1)
-            }
-            #endif
 
             if showNowPlaying {
-                NowPlayingView(namespace: playerTransition) {
-                    withAnimation(playerSpring) { showNowPlaying = false }
-                }
-                // Grows out of the bottom of the screen, where the mini
-                // player is, rather than sliding up as a finished sheet.
-                //
-                // This was a `matchedGeometryEffect` on the artwork, which is
-                // the obvious way to do it and does not work here. A frame
-                // captured mid-flight showed the cover missing from its
-                // destination and a fragment of it in the *top-left corner*,
-                // half off-screen: on iOS 26 the mini player lives inside
-                // `tabViewBottomAccessory`, a system-hosted container whose
-                // coordinate space does not resolve into this ZStack, so the
-                // match had a source rect but the wrong one. Removed rather
-                // than shipped — a transition that flies from the wrong place
-                // is worse than one that does not fly.
-                .transition(.scale(scale: 0.88, anchor: .bottom)
-                    .combined(with: .opacity))
-                .zIndex(2)
+                // The genie. The shell grows out of the capsule's spot and
+                // shrinks back into it — see PlayerShell for why this morphs
+                // one container instead of flying geometry across the
+                // accessory boundary.
+                PlayerShell { showNowPlaying = false }
+                    .zIndex(2)
             }
         }
         .environmentObject(audio)
@@ -303,12 +265,6 @@ struct RootView: View {
         // simctl cannot tap, so a route is the only scriptable way in.
         if arguments.contains("-openAlbum") { debugShowAlbum = true }
         if arguments.contains("-openQueue") { debugShowQueue = true }
-        // The owner's reference draws its own dock — a glass pill with the
-        // spinning record as the centre tab. Replacing the system bar costs
-        // its free gestures and scroll behaviour, so the trade is the owner's
-        // to make: this flag renders the candidate for a side-by-side frame
-        // without committing navigation to it.
-        if arguments.contains("-customDock") { debugCustomDock = true }
         // Seeds a believable playback position for design captures: the demo
         // stream never resolves a duration, so without this every frame shows
         // 0:01 and an empty arc.
@@ -412,50 +368,3 @@ private struct MiniPlayerSlot: ViewModifier {
     }
 }
 
-#if DEBUG
-/// The reference's dock, rendered for comparison only.
-///
-/// Four thin tabs and the playing record turning at the centre. It draws over
-/// the system bar rather than replacing it, so a frame can show the candidate
-/// while every test and gesture still runs through the real navigation.
-private struct CustomDockCandidate: View {
-    @Binding var selection: AppTab
-    let onExpand: () -> Void
-    @EnvironmentObject private var audio: AudioManager
-
-    var body: some View {
-        HStack(spacing: 0) {
-            slot(.home)
-            slot(.search)
-            Button(action: onExpand) {
-                Group {
-                    if let song = audio.currentSong {
-                        SpinningDisc(song: song, side: 46, isSpinning: audio.isPlaying)
-                    } else {
-                        Circle().fill(.white.opacity(0.12)).frame(width: 46, height: 46)
-                    }
-                }
-                .shadow(color: .black.opacity(0.5), radius: 10, y: 4)
-            }
-            .buttonStyle(BouncyButtonStyle(scale: 0.92))
-            .frame(maxWidth: .infinity)
-            slot(.radio)
-            slot(.library)
-        }
-        .padding(.vertical, 10)
-        .background(.ultraThinMaterial, in: Capsule())
-        .overlay(Capsule().strokeBorder(.white.opacity(0.14), lineWidth: 1))
-        .shadow(color: .black.opacity(0.45), radius: 24, y: 12)
-    }
-
-    private func slot(_ tab: AppTab) -> some View {
-        Button { selection = tab } label: {
-            SonavaIcon(glyph: tab.glyph, size: 21,
-                       tint: selection == tab ? Theme.accentSoft : .white.opacity(0.55))
-                .frame(maxWidth: .infinity, minHeight: Space.hitTarget)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-    }
-}
-#endif
