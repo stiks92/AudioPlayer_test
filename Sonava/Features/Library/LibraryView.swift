@@ -37,6 +37,7 @@ struct LibraryView: View {
     @State private var showImporter = false
     @State private var importError: String?
     @Namespace private var seg
+    @Namespace private var zoom
 
     var body: some View {
         NavigationStack {
@@ -373,7 +374,12 @@ extension LibraryView {
             LazyVGrid(columns: columns, alignment: .leading, spacing: Space.xl) {
                 ForEach(albums) { album in
                     NavigationLink {
+                        // The record opens out of its own sleeve — the system
+                        // zoom morph, which is the Wolt move done natively:
+                        // the tile is the source, the screen grows from it and
+                        // shrinks back into it on the way out.
                         AlbumView(album: album)
+                            .navigationTransition(.zoom(sourceID: album.id, in: zoom))
                     } label: {
                         VStack(alignment: .leading, spacing: Space.s) {
                             ZStack {
@@ -400,6 +406,7 @@ extension LibraryView {
                         }
                     }
                     .buttonStyle(.plain)
+                    .matchedTransitionSource(id: album.id, in: zoom)
                 }
             }
         }
