@@ -201,28 +201,48 @@ struct SearchView: View {
         }
     }
 
+    /// Moods as glass words, not painted tiles.
+    ///
+    /// The six tiles were gradient rectangles with the same note glyph
+    /// stamped on all of them at 25% — a review called it one glyph doing six
+    /// jobs, and the owner's rule since is harder: no drawn art in the frame
+    /// at all. A mood has no cover, so it gets no picture — it gets its word,
+    /// set large on glass, with the mood's own colour as a rim light. What
+    /// carries identity is the type and the tint, which are real; nothing is
+    /// pretending to be artwork.
     private var moodGrid: some View {
         VStack(alignment: .leading, spacing: Space.l) {
             Department(title: "Browse moods")
-            LazyVGrid(columns: [GridItem(.flexible(), spacing: Space.l), GridItem(.flexible(), spacing: Space.l)], spacing: Space.l) {
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: Space.m),
+                                GridItem(.flexible(), spacing: Space.m)], spacing: Space.m) {
                 ForEach(moods) { mood in
-                    ZStack(alignment: .topLeading) {
-                        LinearGradient(colors: mood.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
-                        Text(mood.title)
-                            .font(.system(.body).weight(.bold))
-                            .foregroundColor(.white)
-                            .padding(Space.l)
-                        SonavaIcon(glyph: .note, size: 24)
-                            .font(.system(.largeTitle).weight(.bold))
-                            .foregroundColor(.white.opacity(0.25))
-                            .rotationEffect(.degrees(25))
-                            .offset(x: 70, y: 40)
-                    }
-                    .frame(height: 96)
-                    .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
-                    .onTapGesture {
+                    Button {
                         query = mood.term
+                    } label: {
+                        Text(mood.title)
+                            .font(.system(.title3).weight(.semibold))
+                            .foregroundColor(.white)
+                            // Cyrillic runs wide: «Кинематографично» broke
+                            // with a hyphen inside its own capsule. One line,
+                            // shrinking — same rule as every other fixed slot.
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                            .padding(.horizontal, Space.m)
+                            .frame(maxWidth: .infinity, minHeight: 64)
+                            .background(.ultraThinMaterial,
+                                        in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                    .strokeBorder(
+                                        LinearGradient(colors: [mood.gradient.first?.opacity(0.9) ?? .white,
+                                                                mood.gradient.last?.opacity(0.25) ?? .clear],
+                                                       startPoint: .topLeading, endPoint: .bottomTrailing),
+                                        lineWidth: 1.5)
+                            )
+                            .shadow(color: (mood.gradient.first ?? .clear).opacity(0.35),
+                                    radius: 14, y: 6)
                     }
+                    .buttonStyle(BouncyButtonStyle(scale: 0.96))
                 }
             }
         }
