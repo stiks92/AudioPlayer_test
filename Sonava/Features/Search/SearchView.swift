@@ -216,38 +216,90 @@ struct SearchView: View {
     private var moodGrid: some View {
         VStack(alignment: .leading, spacing: Space.l) {
             Department(title: "Browse moods")
+            let sleeves = moodSleeves
             LazyVGrid(columns: [GridItem(.flexible(), spacing: Space.m),
                                 GridItem(.flexible(), spacing: Space.m)], spacing: Space.m) {
                 ForEach(moods) { mood in
                     Button {
                         query = mood.term
                     } label: {
-                        Text(mood.title)
-                            .font(.system(.title3).weight(.semibold))
-                            .foregroundColor(.white)
-                            // Cyrillic runs wide: «Кинематографично» broke
-                            // with a hyphen inside its own capsule. One line,
-                            // shrinking — same rule as every other fixed slot.
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
-                            .padding(.horizontal, Space.m)
-                            .frame(maxWidth: .infinity, minHeight: 64)
-                            .background(.ultraThinMaterial,
-                                        in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                    .strokeBorder(
-                                        LinearGradient(colors: [mood.gradient.first?.opacity(0.9) ?? .white,
-                                                                mood.gradient.last?.opacity(0.25) ?? .clear],
-                                                       startPoint: .topLeading, endPoint: .bottomTrailing),
-                                        lineWidth: 1.5)
-                            )
-                            .shadow(color: (mood.gradient.first ?? .clear).opacity(0.35),
-                                    radius: 14, y: 6)
+                        MoodCard(mood: mood, sleeve: sleeves[mood.term])
                     }
                     .buttonStyle(BouncyButtonStyle(scale: 0.96))
                 }
             }
+        }
+    }
+
+    /// One real sleeve per mood, chosen deterministically from the library
+    /// and spread so six moods show six different covers whenever the
+    /// library has that many. The owner's rule made flesh: a mood is a
+    /// record you might pull from the shelf, not a coloured rim.
+    private var moodSleeves: [String: Song] {
+        let pool = library.songs
+        guard !pool.isEmpty else { return [:] }
+        // Uniqueness is judged by the *sleeve*, not the track — several songs
+        // can share one cover, and a grid with the same record twice reads as
+        // a bug even when the songs differ.
+        func sleeveKey(_ song: Song) -> String {
+            song.artworkURL?.absoluteString ?? song.id
+        }
+        var usedSleeves = Set<String>()
+        var out: [String: Song] = [:]
+        for mood in moods {
+            let hash = mood.term.unicodeScalars.reduce(0) { $0 &* 31 &+ Int($1.value) }
+            var index = ((hash % pool.count) + pool.count) % pool.count
+            var steps = 0
+            while steps < pool.count && usedSleeves.contains(sleeveKey(pool[index])) {
+                index = (index + 1) % pool.count
+                steps += 1
+            }
+            usedSleeves.insert(sleeveKey(pool[index]))
+            out[mood.term] = pool[index]
+        }
+        return out
+    }
+
+    /// A mood tile is a record: the sleeve fills the card, a black scrim
+    /// carries the word, and the only line on it is the app-wide hairline.
+    /// The muted duo is the ground *only* when the library is empty and
+    /// there is no real sleeve to show.
+    private struct MoodCard: View {
+        let mood: Mood
+        let sleeve: Song?
+
+        var body: some View {
+            ZStack(alignment: .bottomLeading) {
+                Group {
+                    if let sleeve {
+                        ArtworkImage(song: sleeve, glyphSize: 36)
+                    } else {
+                        LinearGradient(colors: mood.gradient,
+                                       startPoint: .topLeading, endPoint: .bottomTrailing)
+                    }
+                }
+
+                LinearGradient(stops: [
+                    .init(color: .clear, location: 0),
+                    .init(color: .black.opacity(0.20), location: 0.52),
+                    .init(color: .black.opacity(0.86), location: 1)
+                ], startPoint: .top, endPoint: .bottom)
+
+                Text(mood.title)
+                    .font(.system(.title3).weight(.light))
+                    .foregroundColor(.white)
+                    // Cyrillic runs wide: «Кинематографично» must stay one
+                    // line — same rule as every other fixed slot.
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                    .padding(Space.m)
+            }
+            .frame(height: 172)
+            .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
+                    .strokeBorder(Theme.hairline, lineWidth: 1)
+            )
         }
     }
 

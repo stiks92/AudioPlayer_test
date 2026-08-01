@@ -113,7 +113,11 @@ enum DemoCatalog {
             ("Latitude", "Kestrel Bay", "Charts"),
             ("Meridian Line", "Kestrel Bay", "Charts"),
             ("The Owl Field", "The Owl Field", "The Owl Field"),
-            ("Long Way Down", "The Owl Field", "The Owl Field")
+            ("Long Way Down", "The Owl Field", "The Owl Field"),
+            // A sixth record: the mood shelf shows six sleeves, and a demo
+            // library one record short would force a repeat there.
+            ("Glass Coast", "Marlowe", "Glass Coast"),
+            ("Slow Tide", "Marlowe", "Glass Coast")
         ], source: .local)
     }
 
@@ -225,13 +229,32 @@ enum DemoCatalog {
         return CommandLine.arguments[index + 1]
     }
 
+    /// First-come assignment, not a hash: every *distinct* seed takes the
+    /// next free file, so sleeves never collide while files last. A hash put
+    /// two of five records on the same cover once, and a shelf with a
+    /// repeated sleeve reads as a bug regardless of how the songs differ.
+    /// Deterministic per launch because the catalogue is built in a fixed
+    /// order; cached so a seed keeps its sleeve across rebuilds of the list.
+    /// Lock-guarded rather than actor-isolated so the nonisolated builders
+    /// (and unit tests) can keep calling synchronously.
+    private static let artLock = NSLock()
+    private static nonisolated(unsafe) var artAssignments: [String: Int] = [:]
+
     private static func artwork(seed: String) -> URL? {
         if let dir = artDir {
             let files = ((try? FileManager.default.contentsOfDirectory(atPath: dir)) ?? [])
                 .filter { $0.hasSuffix(".jpg") }.sorted()
             if !files.isEmpty {
-                let pick = files[abs(stableHash(seed)) % files.count]
-                return URL(fileURLWithPath: dir).appendingPathComponent(pick)
+                artLock.lock()
+                let index: Int
+                if let assigned = artAssignments[seed] {
+                    index = assigned
+                } else {
+                    index = artAssignments.count % files.count
+                    artAssignments[seed] = index
+                }
+                artLock.unlock()
+                return URL(fileURLWithPath: dir).appendingPathComponent(files[index])
             }
         }
         return generatedArtwork(seed: seed)
