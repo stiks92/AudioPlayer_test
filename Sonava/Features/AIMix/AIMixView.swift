@@ -49,7 +49,7 @@ struct AIMixView: View {
                 // same ground as every other sheet; a free listener still gets
                 // the atmosphere, because there the screen *is* an offer.
                 if !proStore.isPro {
-                    AuroraBackground(colors: [Theme.accent, Theme.accentPink, Theme.accentDeep])
+                    AuroraBackground(colors: [Theme.accent, Theme.accentWarm, Theme.accentDeep])
                         .opacity(0.6)
                 }
 

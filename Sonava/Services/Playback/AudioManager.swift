@@ -23,6 +23,12 @@ final class AudioManager: NSObject, ObservableObject {
     // MARK: - Published state
 
     @Published private(set) var currentSong: Song?
+    /// The colours of the sleeve that is actually playing, read from the
+    /// artwork's pixels (see `ArtworkPalette`) — nil while extraction is in
+    /// flight or when the track has no art, in which case views fall back to
+    /// the song's stored pair. This is what makes the app's light honest: the
+    /// room takes the record's colour, never a template's.
+    @Published private(set) var sleeveHex: [UInt]?
     @Published private(set) var isPlaying = false
     @Published private(set) var queue: [Song] = []
     @Published var repeatMode: RepeatMode = .off
@@ -106,6 +112,37 @@ final class AudioManager: NSObject, ObservableObject {
         // Reshape the live engine whenever the EQ curve changes.
         effectsCancellable = effects.$equalizer
             .sink { [weak self] settings in self?.activeEngine?.apply(settings) }
+
+        // Re-read the sleeve whenever the *track* changes (not on every
+        // republish of the same song — hence the id-based dedup).
+        sleeveCancellable = $currentSong
+            .removeDuplicates { $0?.id == $1?.id }
+            .sink { [weak self] song in self?.refreshSleeve(for: song) }
+    }
+
+    // MARK: - Sleeve colour
+
+    private var sleeveCancellable: AnyCancellable?
+    private var sleeveTask: Task<Void, Never>?
+    /// Session cache so returning to a track doesn't re-decode its art.
+    private var sleeveCache: [String: [UInt]] = [:]
+
+    private func refreshSleeve(for song: Song?) {
+        sleeveTask?.cancel()
+        guard let song else { sleeveHex = nil; return }
+        if let cached = sleeveCache[song.id] { sleeveHex = cached; return }
+        sleeveHex = nil
+        guard let url = song.artworkURL else { return }
+        let id = song.id
+        sleeveTask = Task { [weak self] in
+            // `ArtworkPalette.load` is nonisolated-async, so the decode runs
+            // off the main actor; only the publish below hops back here.
+            guard let hex = await ArtworkPalette.load(from: url), !Task.isCancelled else { return }
+            guard let self, self.currentSong?.id == id else { return }
+            if self.sleeveCache.count > 128 { self.sleeveCache.removeAll() }
+            self.sleeveCache[id] = hex
+            self.sleeveHex = hex
+        }
     }
 
     // MARK: - Public transport

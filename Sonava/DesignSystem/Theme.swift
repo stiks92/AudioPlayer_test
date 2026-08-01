@@ -21,16 +21,22 @@ extension Color {
     }
 }
 
-/// Deterministic gradient palettes shared by local and remote tracks.
-/// Stored as hex so tracks stay `Codable` (see `Song`).
+/// Deterministic *fallback* pairs for tracks whose sleeve has not been read
+/// yet — the real colour of the app comes from the artwork's own pixels (see
+/// `ArtworkPalette`), and these only cover the moment before it loads or the
+/// track that has no art. Stored as hex so tracks stay `Codable` (see `Song`).
+///
+/// Muted, sleeve-like duos on purpose. The previous seventeen were stock neon
+/// gradients — half of them violet — and because they were assigned by title
+/// hash, they were the dominant colour story of the whole app: template light
+/// over real covers. A fallback should look like a record that hasn't been
+/// pulled from its shelf yet, not like a brand.
 enum Palette {
     static let gradientsHex: [[UInt]] = [
-        [0x7C5CFF, 0x3A1C71], [0xFF6FD8, 0x3813C2], [0x11998E, 0x38EF7D],
-        [0xF7971E, 0xFFD200], [0xFC466B, 0x3F5EFB], [0x00C6FF, 0x0072FF],
-        [0xFF512F, 0xDD2476], [0x8E2DE2, 0x4A00E0], [0xF953C6, 0xB91D73],
-        [0x43CEA2, 0x185A9D], [0xFF9966, 0xFF5E62], [0x36D1DC, 0x5B86E5],
-        [0xC33764, 0x1D2671], [0xFDC830, 0xF37335], [0x1FA2FF, 0x12D8FA],
-        [0xEC008C, 0xFC6767], [0x654EA3, 0xEAAFC8]
+        [0xC9A227, 0x5A3E1B], [0xB4552D, 0x3C1F14], [0x2E6E5E, 0x122A24],
+        [0x3E6E9E, 0x14263C], [0xA63A3A, 0x2E1010], [0xC77B4A, 0x4A2C18],
+        [0x5E8272, 0x1E2C26], [0x4A7E8C, 0x142E36], [0xB89B5E, 0x40351C],
+        [0x8C4A2E, 0x2E140A], [0x6E7E8C, 0x222A32], [0x3E8C6E, 0x102E22]
     ]
 
     static func hex(for index: Int) -> [UInt] {
@@ -63,7 +69,7 @@ enum Theme {
     @MainActor static var accent: Color { Color(hex: ThemeManager.shared.palette.accent) }
     @MainActor static var accentSoft: Color { Color(hex: ThemeManager.shared.palette.accentSoft) }
     @MainActor static var accentDeep: Color { Color(hex: ThemeManager.shared.palette.accentDeep) }
-    @MainActor static var accentPink: Color { Color(hex: ThemeManager.shared.palette.accentPink) }
+    @MainActor static var accentWarm: Color { Color(hex: ThemeManager.shared.palette.accentWarm) }
 
     /// The two-stop brand gradient for surfaces that sit *behind* content.
     ///
@@ -82,7 +88,7 @@ enum Theme {
 
     /// The richer three-stop gradient reserved for the paywall and Pro upsells.
     @MainActor static var proGradient: LinearGradient {
-        LinearGradient(colors: [accent, accentPink, accentDeep],
+        LinearGradient(colors: [accent, accentWarm, accentDeep],
                        startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 

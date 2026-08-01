@@ -18,10 +18,12 @@ struct QueueView: View {
             ZStack {
                 Color.black.ignoresSafeArea()
                 LinearGradient(stops: [
-                    .init(color: (audio.currentSong?.gradient.first ?? Theme.accent).opacity(0.5), location: 0),
+                    .init(color: ((audio.sleeveHex?.colors ?? audio.currentSong?.gradient)?.first
+                                  ?? Theme.accent).opacity(0.5), location: 0),
                     .init(color: .black, location: 0.55)
                 ], startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea()
+                .animation(Motion.fade, value: audio.sleeveHex)
 
                 List {
                     if let current = audio.currentSong {

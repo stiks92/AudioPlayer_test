@@ -52,7 +52,7 @@ struct PaywallView: View {
 
     var body: some View {
         ZStack {
-            AuroraBackground(colors: [Theme.accent, Theme.accentPink, Theme.accentDeep])
+            AuroraBackground(colors: [Theme.accent, Theme.accentWarm, Theme.accentDeep])
 
             ScrollView {
                 VStack(spacing: Space.xl) {

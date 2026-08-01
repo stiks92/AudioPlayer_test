@@ -36,7 +36,7 @@ struct OnboardingView: View {
         Slide(glyph: .aiMix,
               title: "AI Mix & Shazam",
               subtitle: "Describe a vibe and get an instant mix. Identify what's playing around you in a tap.",
-              colors: [Theme.accentPink, Color(hex: 0x8E2DE2)]),
+              colors: [Theme.accentWarm, Color(hex: 0xB4552D)]),
         Slide(glyph: .server,
               title: "Private by design",
               subtitle: "On-device intelligence, no tracking, no ads. Your taste stays yours.",

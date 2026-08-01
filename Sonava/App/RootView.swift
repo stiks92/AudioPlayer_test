@@ -273,8 +273,8 @@ struct RootView: View {
             audio.clock.reset(duration: 243, metered: true)
             audio.clock.currentTime = 243 * min(max(fraction, 0), 1)
         }
-        // Forces any palette, including the review-only candidates, so a whole
-        // screen can be looked at in each rather than compared as hex values.
+        // Forces any palette, including the paid ones, so a whole screen can
+        // be reviewed in each rather than compared as hex values.
         if let index = arguments.firstIndex(of: "-palette"), index + 1 < arguments.count {
             ThemeManager.shared.select(ThemePalette.palette(id: arguments[index + 1]))
         }

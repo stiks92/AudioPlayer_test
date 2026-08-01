@@ -32,7 +32,7 @@ struct ThemePaletteTests {
     func fullFamily() {
         for palette in ThemePalette.all {
             // Distinct stops make a real gradient, not a flat blob.
-            let stops = Set([palette.accent, palette.accentSoft, palette.accentDeep, palette.accentPink])
+            let stops = Set([palette.accent, palette.accentSoft, palette.accentDeep, palette.accentWarm])
             #expect(stops.count >= 3, "\(palette.id) has too few distinct stops")
             #expect(palette.swatch.count == 3)
         }

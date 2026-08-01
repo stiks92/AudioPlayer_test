@@ -140,7 +140,10 @@ struct AppBackground: View {
     @EnvironmentObject private var audio: AudioManager
 
     var body: some View {
-        NowPlayingTint(colors: audio.currentSong?.gradient)
+        // The sleeve's own colours when they have been read, the track's
+        // stored pair until then — never a template's.
+        NowPlayingTint(colors: audio.currentSong.map { audio.sleeveHex?.colors ?? $0.gradient })
             .animation(Motion.expressive, value: audio.currentSong?.id)
+            .animation(Motion.expressive, value: audio.sleeveHex)
     }
 }

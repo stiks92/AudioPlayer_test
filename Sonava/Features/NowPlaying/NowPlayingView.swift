@@ -30,6 +30,10 @@ struct NowPlayingView: View {
 
     private var song: Song? { audio.currentSong }
 
+    /// What the screen is lit with: the sleeve's own pixels once read
+    /// (`AudioManager.sleeveHex`), the track's stored fallback pair until then.
+    private var sleeve: [Color] { audio.sleeveHex?.colors ?? song?.gradient ?? [] }
+
     var body: some View {
         ZStack {
             // Flat ground, because the artwork is the colour.
@@ -42,12 +46,13 @@ struct NowPlayingView: View {
             // The reference ground: the track's colour glows from the top
             // and dissolves into pure black by mid-screen. Stops, not clips.
             LinearGradient(stops: [
-                .init(color: (song?.gradient.first ?? Theme.accent).opacity(0.55), location: 0),
-                .init(color: (song?.gradient.last ?? Theme.accentDeep).opacity(0.28), location: 0.22),
+                .init(color: (sleeve.first ?? Theme.accent).opacity(0.55), location: 0),
+                .init(color: (sleeve.last ?? Theme.accentDeep).opacity(0.28), location: 0.22),
                 .init(color: .black, location: 0.58)
             ], startPoint: .top, endPoint: .bottom)
             .ignoresSafeArea()
             .animation(Motion.fade, value: song?.id)
+            .animation(Motion.fade, value: audio.sleeveHex)
 
             VStack(spacing: 0) {
                 header
@@ -171,8 +176,8 @@ struct NowPlayingView: View {
             Circle().trim(from: 0, to: max(0.003, arcProgress))
                 .stroke(
                     AngularGradient(
-                        colors: [(song?.gradient.first ?? Theme.accentSoft).opacity(0.9),
-                                 (song?.gradient.last ?? Theme.accent),
+                        colors: [(sleeve.first ?? Theme.accentSoft).opacity(0.9),
+                                 (sleeve.last ?? Theme.accent),
                                  .white],
                         center: .center,
                         startAngle: .degrees(0),
@@ -180,7 +185,7 @@ struct NowPlayingView: View {
                     style: StrokeStyle(lineWidth: 4, lineCap: .round))
                 .rotationEffect(.degrees(-90))
                 .frame(width: 272, height: 272)
-                .shadow(color: (song?.gradient.first ?? Theme.accentSoft).opacity(0.7), radius: 7)
+                .shadow(color: (sleeve.first ?? Theme.accentSoft).opacity(0.7), radius: 7)
             // The head: a bright point riding the tip of the trail.
             if arcProgress > 0.004 {
                 let theta = 2 * Double.pi * arcProgress - .pi / 2

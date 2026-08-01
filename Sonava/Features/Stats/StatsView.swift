@@ -179,7 +179,7 @@ struct StatsView: View {
             tile(icon: "flame.fill",
                  value: "\(stats.streak)",
                  caption: "day streak",
-                 tint: Theme.accentPink)
+                 tint: Theme.accentWarm)
             tile(icon: "clock.fill",
                  value: peakHourText,
                  caption: "peak hour",
@@ -305,14 +305,14 @@ struct StatsTeaserCard: View {
                 Spacer()
                 if stats.streak > 1 {
                     HStack(spacing: 3) {
-                        SonavaIcon(glyph: .streak, size: 14, tint: Theme.accentPink)
+                        SonavaIcon(glyph: .streak, size: 14, tint: Theme.accentWarm)
                         Text(stats.streak, format: .number)
                             .font(.system(.footnote).weight(.heavy))
                     }
-                    .foregroundColor(Theme.accentPink)
+                    .foregroundColor(Theme.accentWarm)
                     .padding(.horizontal, Space.m)
                     .padding(.vertical, 5)
-                    .background(Capsule().fill(Theme.accentPink.opacity(0.14)))
+                    .background(Capsule().fill(Theme.accentWarm.opacity(0.14)))
                 }
                 Image(systemName: "chevron.right")
                     .font(.system(.caption).weight(.semibold))
@@ -343,7 +343,7 @@ struct StatsShareCard: View {
             LinearGradient(
                 colors: [Color(hex: ThemeManager.shared.palette.accentDeep),
                          Color(hex: ThemeManager.shared.palette.accent),
-                         Color(hex: ThemeManager.shared.palette.accentPink)],
+                         Color(hex: ThemeManager.shared.palette.accentWarm)],
                 startPoint: .topLeading, endPoint: .bottomTrailing
             )
             Color.black.opacity(0.18)
