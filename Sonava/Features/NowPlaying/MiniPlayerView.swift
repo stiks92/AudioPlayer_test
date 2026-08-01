@@ -41,10 +41,13 @@ struct MiniPlayerView: View {
         if let song = audio.currentSong {
             VStack(spacing: 0) {
                 HStack(spacing: Space.m) {
-                    ArtworkImage(song: song, glyphSize: 14)
-                        .frame(width: artworkSide, height: artworkSide)
-                        .clipShape(RoundedRectangle(cornerRadius: Radius.inner(Radius.control, inset: 3),
-                                                    style: .continuous))
+                    // The owner's reference: the mini capsule carries a
+                    // little spinning record, not a square thumbnail. It turns
+                    // only while something is actually playing, and rests for
+                    // Reduce Motion — a stopped disc still reads as a disc.
+                    SpinningDisc(song: song,
+                                 side: artworkSide,
+                                 isSpinning: audio.isPlaying && !reduceMotion)
 
                     VStack(alignment: .leading, spacing: 1) {
                         MarqueeText(text: song.title, font: .subheadline.weight(.semibold))

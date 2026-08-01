@@ -186,3 +186,28 @@ struct BareTransportButton: View {
         .buttonStyle(BouncyButtonStyle(scale: 0.9))
     }
 }
+
+/// A circular cover that turns like a record while playback runs.
+///
+/// One rotation every seven seconds — slow enough to feel mechanical rather
+/// than busy. The angle accumulates through a `TimelineView` so pausing
+/// freezes the disc where it is instead of snapping it back to twelve.
+struct SpinningDisc: View {
+    let song: Song
+    var side: CGFloat = 36
+    var isSpinning: Bool = false
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1 / 30, paused: !isSpinning)) { timeline in
+            let angle = isSpinning
+                ? timeline.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 7) / 7 * 360
+                : 0
+            ArtworkImage(song: song, glyphSize: side * 0.4)
+                .frame(width: side, height: side)
+                .clipShape(Circle())
+                .overlay(Circle().strokeBorder(.white.opacity(0.25), lineWidth: 1))
+                .overlay(Circle().fill(.black.opacity(0.9)).frame(width: side * 0.14))
+                .rotationEffect(.degrees(angle))
+        }
+    }
+}
