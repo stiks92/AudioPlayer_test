@@ -71,13 +71,17 @@ struct ShazamView: View {
                         shazam.start()
                     }
                 } label: {
-                    Image(systemName: shazam.isListening ? "waveform" : "waveform.circle.fill")
-                        .font(.system(size: 60, weight: .bold))
-                        .foregroundColor(.white)
+                    // A waveform that genuinely runs while the app is
+                    // listening and stands still when it is not. (The pack's
+                    // microphone was tried first: its loop is a mute toggle,
+                    // and a slash flashing over the mic mid-listen reads as
+                    // the exact opposite of "listening".)
+                    AnimatedIcon(glyph: .activity,
+                                 mode: .loop(shazam.isListening),
+                                 size: 72, tint: .white)
                         .frame(width: 140, height: 140)
                         .background(Circle().fill(.ultraThinMaterial))
                         .overlay(Circle().strokeBorder(Color.white.opacity(0.3), lineWidth: 1.5))
-                        .symbolEffectBounce(trigger: shazam.isListening)
                 }
                 .buttonStyle(BouncyButtonStyle(scale: 0.94))
             }

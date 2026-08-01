@@ -163,36 +163,17 @@ struct HeartButton: View {
     var size: CGFloat = 22
     let action: () -> Void
 
-    @State private var burst = false
-
     var body: some View {
-        Button {
-            action()
-            if !isOn {
-                burst = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { burst = false }
-            }
-        } label: {
-            ZStack {
-                Image(systemName: isOn ? "heart.fill" : "heart")
-                    .font(.system(size: size, weight: .semibold))
-                    .foregroundColor(isOn ? Theme.destructive : Theme.textSecondary)
-                    .symbolEffectBounce(trigger: isOn)
-
-                if burst {
-                    ForEach(0..<6, id: \.self) { i in
-                        Circle()
-                            .fill(Theme.destructive)
-                            .frame(width: 4, height: 4)
-                            .offset(y: -size)
-                            .rotationEffect(.degrees(Double(i) / 6 * 360))
-                            .scaleEffect(burst ? 1.6 : 0.1)
-                            .opacity(burst ? 0 : 1)
-                            .animation(.easeOut(duration: 0.5), value: burst)
-                    }
-                }
-            }
-            .frame(width: size + 16, height: size + 16)
+        Button(action: action) {
+            // The burst heart's canvas is mostly air — the heart itself is a
+            // third of it, the rest is room for the particle ring to fly —
+            // so the animation renders at ~3× the glyph slot and overflows
+            // it deliberately.
+            AnimatedIcon(glyph: .heartBurst,
+                         mode: .toggle(isOn),
+                         size: size * 3.6,
+                         tint: isOn ? Theme.destructive : Theme.textSecondary)
+                .frame(width: size + 16, height: size + 16)
         }
         .buttonStyle(BouncyButtonStyle())
     }

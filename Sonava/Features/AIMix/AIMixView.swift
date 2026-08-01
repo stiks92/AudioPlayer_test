@@ -127,7 +127,12 @@ struct AIMixView: View {
                 // the fix as a local comment.
                 Button(action: generate) {
                     HStack {
-                        if isGenerating { ProgressView() }
+                        if isGenerating {
+                            // The button ground is white, so the spinner
+                            // matches the label's ink, not the app's text.
+                            AnimatedIcon(glyph: .loading, mode: .loop(true),
+                                         size: 20, tint: Theme.background)
+                        }
                         Text(isGenerating ? "Composing…" : "Generate mix")
                     }
                 }

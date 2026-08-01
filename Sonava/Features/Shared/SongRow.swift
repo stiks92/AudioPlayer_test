@@ -68,11 +68,12 @@ struct SongRow: View {
             downloadIndicator
 
             if isCurrent {
-                NowPlayingBars(isAnimating: audio.isPlaying)
+                // A living pulse from the animation pack, not drawn bars —
+                // and it genuinely stills when playback pauses.
+                AnimatedIcon(glyph: .activity, mode: .loop(audio.isPlaying),
+                             size: 20, tint: Theme.accentSoft)
             } else if library.isFavorite(song) {
-                Image(systemName: "heart.fill")
-                    .font(.system(.footnote))
-                    .foregroundColor(Theme.destructive)
+                SonavaIcon(glyph: .heart, size: 14, tint: Theme.destructive)
             }
 
             // The anchor's right column: the track's length, quiet and

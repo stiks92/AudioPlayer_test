@@ -15,7 +15,8 @@ DerivedData/
 .build/
 .swiftpm/
 Packages/
-Package.resolved
+# Package.resolved is deliberately tracked: an app pins its dependency
+# versions so every checkout builds the same product.
 
 # macOS
 .DS_Store

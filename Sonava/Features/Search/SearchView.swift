@@ -31,13 +31,16 @@ struct SearchView: View {
         var id: String { term }
     }
 
+    /// Rim colours from the muted, sleeve-like register the whole app now
+    /// speaks (`Palette.gradientsHex`'s world) — a shelf of record tones, not
+    /// the neon rainbow this grid wore before the violet purge.
     private let moods: [Mood] = [
-        Mood(title: "Cinematic",  term: "Cinematic",  gradient: [Color(hex: 0x654EA3), Color(hex: 0xEAAFC8)]),
-        Mood(title: "Dark",       term: "Dark",       gradient: [Color(hex: 0x232526), Color(hex: 0x414345)]),
-        Mood(title: "Tense",      term: "Tense",      gradient: [Color(hex: 0xC33764), Color(hex: 0x1D2671)]),
-        Mood(title: "Uplifting",  term: "Uplifting",  gradient: [Color(hex: 0x11998E), Theme.positive]),
-        Mood(title: "Melancholy", term: "Melancholy", gradient: [Color(hex: 0x355C7D), Color(hex: 0x6C5B7B)]),
-        Mood(title: "Epic",       term: "Epic",       gradient: [Color(hex: 0xFF512F), Color(hex: 0xDD2476)])
+        Mood(title: "Cinematic",  term: "Cinematic",  gradient: [Color(hex: 0x3E6E9E), Color(hex: 0x14263C)]),
+        Mood(title: "Dark",       term: "Dark",       gradient: [Color(hex: 0x6E7E8C), Color(hex: 0x222A32)]),
+        Mood(title: "Tense",      term: "Tense",      gradient: [Color(hex: 0xA63A3A), Color(hex: 0x2E1010)]),
+        Mood(title: "Uplifting",  term: "Uplifting",  gradient: [Color(hex: 0x3E8C6E), Color(hex: 0x102E22)]),
+        Mood(title: "Melancholy", term: "Melancholy", gradient: [Color(hex: 0x4A7E8C), Color(hex: 0x142E36)]),
+        Mood(title: "Epic",       term: "Epic",       gradient: [Color(hex: 0xC77B4A), Color(hex: 0x4A2C18)])
     ]
 
     var body: some View {

@@ -37,6 +37,7 @@ struct RootView: View {
     @State private var debugShowPaywall = false
     @State private var debugShowAIMix = false
     @State private var debugShowIcons = false
+    @State private var debugShowAnimLab = false
     @State private var debugShowAlbum = false
     @State private var debugShowQueue = false
     @State private var debugShowScrobble = false
@@ -125,6 +126,11 @@ struct RootView: View {
                 .environmentObject(proStore)
         }
         .sheet(isPresented: $debugShowIcons) { IconGallery() }
+        .sheet(isPresented: $debugShowAnimLab) {
+            #if DEBUG
+            AnimatedIconLab()
+            #endif
+        }
         .sheet(isPresented: $debugShowQueue) {
             QueueView()
                 .environmentObject(audio)
@@ -261,6 +267,7 @@ struct RootView: View {
         // The icon set on one sheet, so the family can be judged as a
         // family rather than one glyph at a time on five screens.
         if arguments.contains("-openIcons") { debugShowIcons = true }
+        if arguments.contains("-openAnimLab") { debugShowAnimLab = true }
         // Straight to the first record, for screenshots of the album screen —
         // simctl cannot tap, so a route is the only scriptable way in.
         if arguments.contains("-openAlbum") { debugShowAlbum = true }
