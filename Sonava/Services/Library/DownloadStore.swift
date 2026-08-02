@@ -50,6 +50,10 @@ final class DownloadStore: ObservableObject {
 
     // MARK: - Queries
 
+    /// The ids the listener chose to keep offline. A backup carries these
+    /// rather than the audio: the files are re-fetchable, the *choice* is not.
+    var downloadedIDs: [String] { downloads.map(\.id) }
+
     func isDownloaded(_ song: Song) -> Bool {
         states[song.id] == .downloaded
     }

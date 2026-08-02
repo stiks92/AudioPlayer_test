@@ -42,6 +42,11 @@ final class AudioEffects: ObservableObject {
         equalizer.apply(preset)
     }
 
+    /// Installs a whole saved curve — used when restoring a backup.
+    func replace(_ settings: EqualizerSettings) {
+        equalizer = settings
+    }
+
     func reset() {
         equalizer.apply(.flat)
     }
