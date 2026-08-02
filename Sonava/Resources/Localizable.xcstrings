@@ -44,17 +44,45 @@
         }
       }
     },
+    "%lld albums": {
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld альбома"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld альбомов"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld альбом"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld альбомов"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld artists": {
       "localizations": {
         "ru": {
           "variations": {
             "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld артист"
-                }
-              },
               "few": {
                 "stringUnit": {
                   "state": "translated",
@@ -67,10 +95,84 @@
                   "value": "%lld артистов"
                 }
               },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld артист"
+                }
+              },
               "other": {
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld артиста"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld favourites": {
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld избранных"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld избранных"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld избранное"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld избранных"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld files aren't on this iPhone yet": {
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld файлов ещё нет на этом iPhone"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld файлов ещё нет на этом iPhone"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld файла ещё нет на этом iPhone"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld файлов ещё нет на этом iPhone"
                 }
               }
             }
@@ -83,12 +185,6 @@
         "ru": {
           "variations": {
             "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld минута"
-                }
-              },
               "few": {
                 "stringUnit": {
                   "state": "translated",
@@ -101,6 +197,12 @@
                   "value": "%lld минут"
                 }
               },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld минута"
+                }
+              },
               "other": {
                 "stringUnit": {
                   "state": "translated",
@@ -112,17 +214,55 @@
         }
       }
     },
+    "%lld playlists": {
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld плейлиста"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld плейлистов"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld плейлист"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld плейлистов"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld playlists · %lld favourites · %lld servers · %lld imported files": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Плейлистов: %1$lld · Избранного: %2$lld · Серверов: %3$lld · Своих файлов: %4$lld"
+          }
+        }
+      }
+    },
     "%lld servers": {
       "localizations": {
         "ru": {
           "variations": {
             "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld сервер"
-                }
-              },
               "few": {
                 "stringUnit": {
                   "state": "translated",
@@ -135,10 +275,50 @@
                   "value": "%lld серверов"
                 }
               },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld сервер"
+                }
+              },
               "other": {
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld сервера"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld servers restored": {
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld сервера восстановлено"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld серверов восстановлено"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld сервер восстановлен"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld серверов восстановлено"
                 }
               }
             }
@@ -151,12 +331,6 @@
         "ru": {
           "variations": {
             "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld трек"
-                }
-              },
               "few": {
                 "stringUnit": {
                   "state": "translated",
@@ -167,6 +341,12 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld треков"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld трек"
                 }
               },
               "other": {
@@ -185,12 +365,6 @@
         "ru": {
           "variations": {
             "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld трек · ИИ на устройстве"
-                }
-              },
               "few": {
                 "stringUnit": {
                   "state": "translated",
@@ -201,6 +375,12 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld треков · ИИ на устройстве"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld трек · ИИ на устройстве"
                 }
               },
               "other": {
@@ -219,12 +399,6 @@
         "ru": {
           "variations": {
             "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld день подряд"
-                }
-              },
               "few": {
                 "stringUnit": {
                   "state": "translated",
@@ -235,6 +409,12 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld дней подряд"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld день подряд"
                 }
               },
               "other": {
@@ -451,6 +631,16 @@
     "Apple Music": {
       "shouldTranslate": false
     },
+    "Artists": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Артисты"
+          }
+        }
+      }
+    },
     "Audius": {
       "shouldTranslate": false
     },
@@ -644,6 +834,16 @@
         }
       }
     },
+    "Connect a Navidrome, Airsonic or Subsonic server in Settings and your whole library appears here.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключите Navidrome, Airsonic или Subsonic в настройках — и вся ваша фонотека появится здесь."
+          }
+        }
+      }
+    },
     "Connect a server": {
       "localizations": {
         "ru": {
@@ -754,6 +954,16 @@
         }
       }
     },
+    "Couldn't reach %@.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось связаться с %@."
+          }
+        }
+      }
+    },
     "Couldn't reach Audius. Check your connection.": {
       "localizations": {
         "ru": {
@@ -790,6 +1000,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Не удалось прочитать %@."
+          }
+        }
+      }
+    },
+    "Couldn't read that file": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось прочитать файл"
           }
         }
       }
@@ -1117,6 +1337,16 @@
         }
       }
     },
+    "Even out volume": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выравнивать громкость"
+          }
+        }
+      }
+    },
     "Every source, unified": {
       "localizations": {
         "ru": {
@@ -1133,6 +1363,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Всё перечисленное уже готово и ждёт. Продажа ещё не открыта, так что решать сегодня нечего."
+          }
+        }
+      }
+    },
+    "Everything in that backup was already here.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Всё из этой копии здесь уже было."
           }
         }
       }
@@ -1377,6 +1617,16 @@
         }
       }
     },
+    "Import them and they'll rejoin your playlists automatically.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавьте их — и они сами вернутся в ваши плейлисты."
+          }
+        }
+      }
+    },
     "Import your own audio from Files or iCloud Drive. It stays on your device and plays offline.": {
       "localizations": {
         "ru": {
@@ -1403,6 +1653,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "В медиатеке"
+          }
+        }
+      }
+    },
+    "Install Sonava, bring your audio files over, then open the backup file here.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Установите Sonava, перенесите аудиофайлы, затем откройте здесь файл копии."
           }
         }
       }
@@ -1649,6 +1909,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Утренняя энергия"
+          }
+        }
+      }
+    },
+    "Move to a new iPhone": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перенос на новый iPhone"
           }
         }
       }
@@ -2013,6 +2283,26 @@
         }
       }
     },
+    "On the new iPhone": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На новом iPhone"
+          }
+        }
+      }
+    },
+    "On this iPhone": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На этом iPhone"
+          }
+        }
+      }
+    },
     "On-device": {
       "localizations": {
         "ru": {
@@ -2059,6 +2349,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Открыть в Apple Music"
+          }
+        }
+      }
+    },
+    "Output device": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Куда выводить звук"
           }
         }
       }
@@ -2436,6 +2736,26 @@
         }
       }
     },
+    "Random": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Случайно"
+          }
+        }
+      }
+    },
+    "Reading your library…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Читаем вашу фонотеку…"
+          }
+        }
+      }
+    },
     "Recently played": {
       "localizations": {
         "ru": {
@@ -2536,12 +2856,42 @@
         }
       }
     },
+    "Restore from a backup": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Восстановить из копии"
+          }
+        }
+      }
+    },
     "Restore purchases": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Восстановить покупки"
+          }
+        }
+      }
+    },
+    "Restored": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Восстановлено"
+          }
+        }
+      }
+    },
+    "Restoring adds to what's already here — it never replaces or deletes.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Восстановление добавляет к тому, что уже есть, — ничего не заменяет и не удаляет."
           }
         }
       }
@@ -2642,6 +2992,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Сохранить"
+          }
+        }
+      }
+    },
+    "Save a backup": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сохранить копию"
           }
         }
       }
@@ -2776,6 +3136,16 @@
         }
       }
     },
+    "Server": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сервер"
+          }
+        }
+      }
+    },
     "Server URL": {
       "localizations": {
         "ru": {
@@ -2792,6 +3162,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Сервер отклонил логин или пароль."
+          }
+        }
+      }
+    },
+    "Servers need their password entered again — passwords stay in the Keychain and never travel in a file.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Серверам нужно заново ввести пароль: пароли остаются в Связке ключей и никогда не едут в файле."
           }
         }
       }
@@ -3215,12 +3595,32 @@
         }
       }
     },
+    "That file isn't a Sonava backup, or it was made by a newer version.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Это не резервная копия Sonava — или она сделана более новой версией."
+          }
+        }
+      }
+    },
     "That token wasn't accepted. Check it and try again.": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Токен не принят. Проверь и попробуй снова."
+          }
+        }
+      }
+    },
+    "The backup couldn't be written. Check you have free space.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось записать копию. Проверьте свободное место."
           }
         }
       }
@@ -3251,6 +3651,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Единственный плеер для всей твоей музыки —\nоткрытый полностью."
+          }
+        }
+      }
+    },
+    "The server has no albums yet.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На сервере пока нет альбомов."
+          }
+        }
+      }
+    },
+    "The server has no artists yet.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На сервере пока нет артистов."
+          }
+        }
+      }
+    },
+    "The server has no playlists yet.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На сервере пока нет плейлистов."
           }
         }
       }
@@ -3351,6 +3781,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Тру-крайм"
+          }
+        }
+      }
+    },
+    "Try again": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ещё раз"
           }
         }
       }
@@ -3545,12 +3985,32 @@
         }
       }
     },
+    "Your audio files don't travel in the backup — they're yours and they're large. Bring them across the way you brought them in, and this file will find them again.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Аудиофайлы в копию не входят — они ваши и большие. Перенесите их тем же способом, каким добавляли, и файл снова их найдёт."
+          }
+        }
+      }
+    },
     "Your files": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Твои файлы"
+          }
+        }
+      }
+    },
+    "Your files, downloads, and servers that report levels. Radio plays as it comes.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ваши файлы, загрузки и серверы, которые сообщают уровень. Радио играет как есть."
           }
         }
       }
@@ -3571,6 +4031,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Пароль надёжно хранится в Keychain и используется только для подписи запросов к твоему серверу."
+          }
+        }
+      }
+    },
+    "Your playlists, favourites, servers and sound settings travel in one file. Save it somewhere you'll find it — Files, iCloud Drive, a message to yourself.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Плейлисты, избранное, серверы и настройки звука едут одним файлом. Сохраните его там, где найдёте: Файлы, iCloud Drive, сообщение самому себе."
           }
         }
       }
@@ -3611,6 +4081,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "за всё время"
+          }
+        }
+      }
+    },
+    "and %lld more": {
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "и ещё %lld"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "и ещё %lld"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "и ещё %lld"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "и ещё %lld"
+                }
+              }
+            }
           }
         }
       }

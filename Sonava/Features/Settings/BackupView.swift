@@ -120,7 +120,7 @@ struct BackupView: View {
     /// promise the listener has to take on faith.
     private var summaryLine: some View {
         let files = library.songs.filter { $0.source == .local }.count
-        return Text("\(playlistStore.playlists.count) playlists · \(library.favorites.count) favourites · \(serverStore.servers.count) servers · \(files) imported files")
+        return Text("\(playlistStore.playlists.count) playlists · \(library.favorites.count) favourites · \(serverStore.servers.count) servers · \(files) imported files" as LocalizedStringKey)
             .font(.system(.footnote).monospacedDigit())
             .foregroundColor(Theme.textTertiary)
     }
@@ -164,7 +164,7 @@ struct BackupView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     line("\(outcome.playlistsAdded) playlists")
                     line("\(outcome.favoritesAdded) favourites")
-                    line("\(outcome.serversAdded) servers")
+                    line("\(outcome.serversAdded) servers restored")
                     if outcome.serversAdded > 0 {
                         Text("Servers need their password entered again — passwords stay in the Keychain and never travel in a file.")
                             .font(.system(.caption2))
@@ -199,7 +199,7 @@ struct BackupView: View {
         }
     }
 
-    private func line(_ text: String) -> some View {
+    private func line(_ text: LocalizedStringKey) -> some View {
         Text(text)
             .font(.system(.subheadline).monospacedDigit())
             .foregroundColor(Theme.textPrimary)

@@ -15,7 +15,7 @@ struct LibraryView: View {
     @EnvironmentObject private var playlistStore: PlaylistStore
 
     enum Tab: String, CaseIterable {
-        case albums, playlists, songs, downloads, favorites
+        case albums, playlists, songs, downloads, favorites, server
 
         var title: LocalizedStringKey {
             switch self {
@@ -24,6 +24,7 @@ struct LibraryView: View {
             case .songs: return "Songs"
             case .downloads: return "Offline"
             case .favorites: return "Favorites"
+            case .server: return "Server"
             }
         }
     }
@@ -31,7 +32,17 @@ struct LibraryView: View {
     // Albums lead. The app had no album at all until this release — nothing
     // ever grouped `Song.album` — and for somebody who ripped their collection,
     // the record is the unit of memory, not the track.
-    @State private var tab: Tab = .albums
+    @State private var tab: Tab = {
+        #if DEBUG
+        // Lets a capture land on a specific shelf without driving the UI.
+        if let index = CommandLine.arguments.firstIndex(of: "-libraryTab"),
+           index + 1 < CommandLine.arguments.count,
+           let requested = Tab(rawValue: CommandLine.arguments[index + 1]) {
+            return requested
+        }
+        #endif
+        return .albums
+    }()
     @State private var showNewPlaylist = false
     @State private var newPlaylistName = ""
     @State private var showImporter = false
@@ -46,11 +57,17 @@ struct LibraryView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: Space.screenMargin) {
-                        HStack(alignment: .firstTextBaseline) {
+                        HStack(alignment: .firstTextBaseline, spacing: Space.m) {
                             Text("Your Library")
                                 .font(.sonavaMasthead)
                                 .foregroundColor(Theme.textPrimary)
-                            Spacer()
+                                // «Твоя медиатека» is half again as wide as
+                                // "Your Library" and wrapped to two lines the
+                                // moment anything shared the row with it.
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
+                                .layoutPriority(1)
+                            Spacer(minLength: 0)
                             randomAlbumButton
                         }
 
@@ -62,6 +79,7 @@ struct LibraryView: View {
                         case .songs:     songsSection
                         case .downloads: downloadsSection
                         case .favorites: favoritesSection
+                        case .server:    ServerBrowseView()
                         }
                     }
                     .padding(.horizontal, Space.screenMargin)
@@ -388,15 +406,9 @@ extension LibraryView {
                     audio.play(first, in: album.songs)
                 }
             } label: {
-                HStack(spacing: Space.xs) {
-                    SonavaIcon(glyph: .shuffle, size: 15, tint: Theme.accentSoft)
-                    Text("Random")
-                        .font(.system(.footnote).weight(.semibold))
-                        .foregroundColor(Theme.accentSoft)
-                }
-                .padding(.horizontal, Space.m)
-                .frame(height: 34)
-                .background(Capsule().fill(Color.white.opacity(0.08)))
+                SonavaIcon(glyph: .shuffle, size: 17, tint: Theme.accentSoft)
+                    .frame(width: 38, height: 38)
+                    .background(Circle().fill(Color.white.opacity(0.08)))
             }
             .buttonStyle(BouncyButtonStyle(scale: 0.94))
             .accessibilityIdentifier("library.randomAlbum")
