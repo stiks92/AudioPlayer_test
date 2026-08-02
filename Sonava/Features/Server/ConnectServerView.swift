@@ -195,12 +195,12 @@ struct ConnectServerView: View {
     /// need. VoiceOver gets the words spelled out instead.
     private func metaLine(_ connection: ServerConnection, _ health: ServerHealth) -> some View {
         HStack(spacing: Space.m) {
-            fact("person", connection.username)
+            fact(.person, connection.username)
             if let files = health.files {
-                fact("music.note", files.formatted(.number))
+                fact(.note, files.formatted(.number))
             }
             if let latency = health.latency {
-                fact("bolt", "\(Int((latency * 1000).rounded())) ms")
+                fact(.wave, "\(Int((latency * 1000).rounded())) ms")
             }
         }
         .font(.sonavaRowMeta.monospacedDigit())
@@ -210,9 +210,9 @@ struct ConnectServerView: View {
         .accessibilityLabel(metaDescription(connection, health))
     }
 
-    private func fact(_ symbol: String, _ value: String) -> some View {
+    private func fact(_ glyph: SonavaIcon.Glyph, _ value: String) -> some View {
         HStack(spacing: Space.xs) {
-            Image(systemName: symbol).font(.system(.caption2))
+            SonavaIcon(glyph: glyph, size: 12, tint: Theme.textSecondary)
             Text(value)
         }
     }
@@ -252,7 +252,7 @@ struct ConnectServerView: View {
             }
         } label: {
             HStack(spacing: 8) {
-                Image(systemName: serverStore.canAddServer ? "plus.circle.fill" : "lock.fill")
+                SonavaIcon(glyph: serverStore.canAddServer ? .plus : .lock, size: 18)
                 Text(serverStore.servers.isEmpty ? "Connect a server" : "Add another server")
                     .font(.headline)
             }

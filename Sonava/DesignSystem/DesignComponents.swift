@@ -96,39 +96,6 @@ struct PrimaryCapsuleButtonStyle: ButtonStyle {
     }
 }
 
-// MARK: - Circular icon button
-
-struct CircleIconButton: View {
-    let systemName: String
-    var size: CGFloat = 46
-    var iconSize: CGFloat = 18
-    var tint: Color = Theme.textPrimary
-    var filled: Bool = false
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: systemName)
-                .font(.system(size: iconSize, weight: .semibold))
-                .foregroundColor(filled ? Theme.background : tint)
-                .frame(width: size, height: size)
-                .background(
-                    Group {
-                        if filled {
-                            Circle().fill(Color.white)
-                        } else {
-                            Circle().fill(.ultraThinMaterial)
-                        }
-                    }
-                )
-                .overlay(
-                    Circle().strokeBorder(Color.white.opacity(filled ? 0 : 0.10), lineWidth: 1)
-                )
-        }
-        .buttonStyle(BouncyButtonStyle())
-    }
-}
-
 // MARK: - Big morphing play / pause button
 
 struct PlayPauseButton: View {
@@ -259,9 +226,7 @@ struct ShelfFailure: View {
         VStack(alignment: .leading, spacing: Space.m) {
             Department(title: title)
             HStack(spacing: Space.m) {
-                Image(systemName: "wifi.exclamationmark")
-                    .font(.system(.title3))
-                    .foregroundColor(Theme.textSecondary)
+                SonavaIcon(glyph: .radio, size: 20, tint: Theme.textSecondary)
                     .frame(width: Space.iconColumn, height: Space.iconColumn)
                 Text("Couldn't load this right now.")
                     .font(.sonavaRowMeta)

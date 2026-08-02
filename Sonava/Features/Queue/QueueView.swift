@@ -95,8 +95,8 @@ struct QueueView: View {
             Button {
                 withAnimation { audio.cycleRepeat() }
             } label: {
-                Image(systemName: audio.repeatMode.systemImage)
-                    .foregroundColor(audio.repeatMode.isActive ? Theme.accentSoft : Theme.textSecondary)
+                SonavaIcon(glyph: audio.repeatMode.glyph, size: 19,
+                           tint: audio.repeatMode.isActive ? Theme.accentSoft : Theme.textSecondary)
             }
         }
         .textCase(nil)

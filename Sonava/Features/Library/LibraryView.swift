@@ -160,7 +160,7 @@ struct LibraryView: View {
                     RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
                         .fill(Color.white.opacity(0.08))
                         .frame(width: 60, height: 60)
-                        .overlay(Image(systemName: "plus").font(.system(.title2).weight(.semibold)).foregroundColor(Theme.accentSoft))
+                        .overlay(SonavaIcon(glyph: .plus, size: 24, tint: Theme.accentSoft))
                     Text("New Playlist")
                         .font(.system(.callout).weight(.semibold))
                         .foregroundColor(Theme.textPrimary)
@@ -189,7 +189,7 @@ struct LibraryView: View {
                                 .foregroundColor(Theme.textSecondary)
                         }
                         Spacer()
-                        Image(systemName: "chevron.right")
+                        SonavaIcon(glyph: .chevronRight, size: 13, tint: Theme.textTertiary)
                             .font(.system(.footnote).weight(.semibold))
                             .foregroundColor(Theme.textTertiary)
                     }
@@ -241,7 +241,7 @@ struct LibraryView: View {
                     .fill(Color.white.opacity(0.08))
                     .frame(width: 44, height: 44)
                     .overlay(
-                        Image(systemName: "square.and.arrow.down")
+                        SonavaIcon(glyph: .download, size: 20, tint: Theme.textSecondary)
                             .font(.system(.body).weight(.semibold))
                             .foregroundColor(Theme.accentSoft)
                     )
@@ -260,7 +260,7 @@ struct LibraryView: View {
     /// first-run state — it has to explain itself and offer the way forward.
     private var emptyLibrary: some View {
         VStack(spacing: Space.l) {
-            Image(systemName: "folder.badge.plus")
+            SonavaIcon(glyph: .plus, size: 20, tint: Theme.textSecondary)
                 .font(.system(size: 46))
                 .foregroundColor(Theme.textTertiary)
             Text("No files yet")
@@ -327,7 +327,7 @@ struct LibraryView: View {
     private var favoritesSection: some View {
         if library.favoriteSongs.isEmpty {
             VStack(spacing: Space.m) {
-                Image(systemName: "heart.slash")
+                SonavaIcon(glyph: .heart, size: 40, tint: Theme.textTertiary)
                     .font(.system(size: 46))
                     .foregroundColor(Theme.textTertiary)
                 Text("No favourites yet")

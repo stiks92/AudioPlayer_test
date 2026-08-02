@@ -41,9 +41,7 @@ struct ConnectScrobbleView: View {
 
     private var header: some View {
         VStack(spacing: Space.m) {
-            Image(systemName: "waveform.badge.magnifyingglass")
-                .font(.system(size: 40, weight: .bold))
-                .foregroundColor(Theme.accentSoft)
+            SonavaIcon(glyph: .scrobble, size: 44, tint: Theme.accentSoft)
             Text("ListenBrainz")
                 .font(.system(.title2).weight(.bold))
             Text("Scrobble every play to your ListenBrainz history — the open, private alternative to Last.fm.")
@@ -57,8 +55,7 @@ struct ConnectScrobbleView: View {
     @ViewBuilder
     private var connectedCard: some View {
         HStack(spacing: Space.l) {
-            Image(systemName: "checkmark.seal.fill")
-                .font(.system(.title2)).foregroundColor(Theme.positive)
+            AnimatedIcon(glyph: .checkmark, mode: .toggle(true), size: 40, tint: Theme.positive)
             VStack(alignment: .leading, spacing: 2) {
                 Text("Connected").font(.system(.callout).weight(.bold))
                 Text("Plays are being scrobbled.")

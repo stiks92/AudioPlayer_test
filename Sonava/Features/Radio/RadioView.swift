@@ -65,11 +65,11 @@ struct RadioView: View {
             loading
         case .failed:
             Button { Task { await reload() } } label: {
-                message(icon: "wifi.slash", text: "Couldn't reach the radio directory.\nTap to retry.")
+                message(icon: .radio, text: "Couldn't reach the radio directory.\nTap to retry.")
             }
             .buttonStyle(.plain)
         case .empty:
-            message(icon: "magnifyingglass", text: "No stations found for this genre.")
+            message(icon: .search, text: "No stations found for this genre.")
         case .loaded:
             LazyVStack(spacing: 2) {
                 ForEach(feed.songs) { station in
@@ -96,11 +96,9 @@ struct RadioView: View {
         .padding(.top, 60)
     }
 
-    private func message(icon: String, text: LocalizedStringKey) -> some View {
+    private func message(icon: SonavaIcon.Glyph, text: LocalizedStringKey) -> some View {
         VStack(spacing: Space.m) {
-            Image(systemName: icon)
-                .font(.system(size: 42))
-                .foregroundColor(Theme.textTertiary)
+            SonavaIcon(glyph: icon, size: 42, tint: Theme.textTertiary)
             Text(text)
                 .font(.subheadline)
                 .foregroundColor(Theme.textSecondary)

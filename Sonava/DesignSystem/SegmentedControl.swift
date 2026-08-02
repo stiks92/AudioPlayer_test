@@ -61,7 +61,7 @@ struct SegmentedControl<Value: Hashable>: View {
             HStack(spacing: Space.xs) {
                 Text(segment.title)
                 if segment.isLocked {
-                    Image(systemName: "lock.fill").font(.system(.caption2).weight(.bold))
+                    SonavaIcon(glyph: .lock, size: 11, tint: .white.opacity(0.85))
                 }
             }
             .font(.sonavaRowMeta.weight(.semibold))

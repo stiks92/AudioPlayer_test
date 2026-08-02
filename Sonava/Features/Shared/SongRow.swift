@@ -140,9 +140,7 @@ struct SongRow: View {
     private var downloadIndicator: some View {
         switch downloadState {
         case .downloaded:
-            Image(systemName: "arrow.down.circle.fill")
-                .font(.system(.footnote))
-                .foregroundColor(Theme.accentSoft)
+            SonavaIcon(glyph: .download, size: 13, tint: Theme.positive)
         case .downloading:
             ProgressView().scaleEffect(0.7)
         case .none, .failed:

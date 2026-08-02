@@ -57,7 +57,7 @@ struct AddToPlaylistView: View {
 
     private var createRow: some View {
         HStack(spacing: Space.m) {
-            Image(systemName: "plus.circle.fill").foregroundColor(Theme.accentSoft)
+            SonavaIcon(glyph: .plus, size: 20, tint: Theme.accentSoft)
             TextField("New playlist name", text: $newName)
                 .foregroundColor(.white)
                 .submitLabel(.done)
@@ -84,15 +84,20 @@ struct AddToPlaylistView: View {
                 RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
                     .fill(LinearGradient(colors: playlist.gradient, startPoint: .topLeading, endPoint: .bottomTrailing))
                     .frame(width: 44, height: 44)
-                    .overlay(Image(systemName: "music.note.list").font(.system(.callout)).foregroundColor(.white))
+                    .overlay(SonavaIcon(glyph: .note, size: 18))
                 VStack(alignment: .leading, spacing: 2) {
                     Text(playlist.name).font(.system(.subheadline).weight(.semibold)).lineLimit(1)
                     Text(playlist.subtitle).font(.caption).foregroundColor(Theme.textSecondary)
                 }
                 Spacer()
-                Image(systemName: added ? "checkmark.circle.fill" : "plus.circle")
-                    .font(.system(.title2))
-                    .foregroundColor(added ? Theme.positive : Theme.textSecondary)
+                ZStack {
+                    if added {
+                        AnimatedIcon(glyph: .checkmark, mode: .toggle(true),
+                                     size: 22, tint: Theme.positive)
+                    } else {
+                        SonavaIcon(glyph: .plus, size: 20, tint: Theme.textSecondary)
+                    }
+                }
             }
             .contentShape(Rectangle())
         }

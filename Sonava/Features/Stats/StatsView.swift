@@ -72,7 +72,7 @@ struct StatsView: View {
                             Label("Clear history", systemImage: "trash")
                         }
                     } label: {
-                        Image(systemName: "ellipsis").foregroundColor(Theme.accentSoft)
+                        SonavaIcon(glyph: .more, size: 20, tint: Theme.accentSoft)
                     }
                     .identified(AccessibilityID.statsMenu, label: "More")
                 }
@@ -176,11 +176,11 @@ struct StatsView: View {
 
     private var tiles: some View {
         HStack(spacing: Space.m) {
-            tile(icon: "flame.fill",
+            tile(icon: .streak,
                  value: "\(stats.streak)",
                  caption: "day streak",
                  tint: Theme.accentWarm)
-            tile(icon: "clock.fill",
+            tile(icon: .sleep,
                  value: peakHourText,
                  caption: "peak hour",
                  tint: Theme.accentSoft)
@@ -194,9 +194,9 @@ struct StatsView: View {
         return date.formatted(.dateTime.hour())
     }
 
-    private func tile(icon: String, value: String, caption: LocalizedStringKey, tint: Color) -> some View {
+    private func tile(icon: SonavaIcon.Glyph, value: String, caption: LocalizedStringKey, tint: Color) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Image(systemName: icon).font(.system(.body).weight(.bold)).foregroundColor(tint)
+            SonavaIcon(glyph: icon, size: 19, tint: tint)
             Text(value).font(.system(.title).weight(.heavy))
                 .foregroundColor(Theme.textPrimary)
             Text(caption).font(.system(.caption)).foregroundColor(Theme.textTertiary)
@@ -261,9 +261,7 @@ struct StatsView: View {
 
     private var emptyState: some View {
         VStack(spacing: Space.m) {
-            Image(systemName: "chart.bar.xaxis")
-                .font(.system(size: 44))
-                .foregroundColor(Theme.accentSoft.opacity(0.7))
+            SonavaIcon(glyph: .stats, size: 44, tint: Theme.accentSoft.opacity(0.7))
             Text("Nothing here yet")
                 .font(.system(.body).weight(.bold))
                 .foregroundColor(Theme.textPrimary)
@@ -290,9 +288,7 @@ struct StatsTeaserCard: View {
             HStack(spacing: Space.l) {
                 ZStack {
                     Circle().fill(Theme.accent.opacity(0.18)).frame(width: 44, height: 44)
-                    Image(systemName: "chart.bar.fill")
-                        .font(.system(.body).weight(.bold))
-                        .foregroundColor(Theme.accentSoft)
+                    SonavaIcon(glyph: .stats, size: 20, tint: Theme.accentSoft)
                 }
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Your Sound")
@@ -314,9 +310,7 @@ struct StatsTeaserCard: View {
                     .padding(.vertical, 5)
                     .background(Capsule().fill(Theme.accentWarm.opacity(0.14)))
                 }
-                Image(systemName: "chevron.right")
-                    .font(.system(.caption).weight(.semibold))
-                    .foregroundColor(Theme.textTertiary)
+                SonavaIcon(glyph: .chevronRight, size: 13, tint: Theme.textTertiary)
             }
             .padding(Space.l)
             .card(cornerRadius: Radius.card)

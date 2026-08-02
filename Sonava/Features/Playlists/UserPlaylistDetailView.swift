@@ -66,7 +66,7 @@ struct UserPlaylistDetailView: View {
                         dismiss()
                     } label: { Label("Delete playlist", systemImage: "trash") }
                 } label: {
-                    Image(systemName: "ellipsis.circle").foregroundColor(.white)
+                    SonavaIcon(glyph: .more, size: 20)
                 }
             }
         }
@@ -91,9 +91,7 @@ struct UserPlaylistDetailView: View {
     private func hero(_ playlist: UserPlaylist) -> some View {
         ZStack {
             LinearGradient(colors: playlist.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
-            Image(systemName: "music.note.list")
-                .font(.system(size: 64, weight: .bold))
-                .foregroundColor(.white.opacity(0.9))
+            SonavaIcon(glyph: .note, size: 64, tint: .white.opacity(0.9))
         }
         .frame(height: 220)
         .overlay(LinearGradient(colors: [.clear, Theme.background], startPoint: .center, endPoint: .bottom))
@@ -157,8 +155,7 @@ struct UserPlaylistDetailView: View {
 
     private var emptyState: some View {
         VStack(spacing: Space.m) {
-            Image(systemName: "music.note.list")
-                .font(.system(size: 46)).foregroundColor(Theme.textTertiary)
+            SonavaIcon(glyph: .note, size: 46, tint: Theme.textTertiary)
             Text("This playlist is empty")
                 .font(.headline).foregroundColor(Theme.textSecondary)
             Text("Add tracks from the player or any track's menu.")

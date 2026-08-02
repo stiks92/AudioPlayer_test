@@ -26,10 +26,10 @@ struct PaywallView: View {
     /// makes the literals below both translatable and extractable — passing
     /// plain strings to `Text` silently skips translation.
     private struct Perk: Identifiable {
-        let icon: String
+        let icon: SonavaIcon.Glyph
         let title: LocalizedStringKey
         let subtitle: LocalizedStringKey
-        var id: String { icon }
+        let id: String
     }
 
     // Every perk here is a real, Pro-gated feature — no promises the app can't
@@ -38,16 +38,16 @@ struct PaywallView: View {
     /// Everything else that is gated is listed underneath rather than given a
     /// row of its own — a paywall that lists everything persuades of nothing.
     private let perks: [Perk] = [
-        Perk(icon: "arrow.down", title: "Offline downloads",
-             subtitle: "Save full tracks and listen with no signal."),
-        Perk(icon: "slider.vertical.3", title: "10-band equalizer",
-             subtitle: "Studio presets and per-band control."),
-        Perk(icon: "wand.and.stars", title: "AI Mix",
-             subtitle: "Describe a vibe, get an instant mix."),
-        Perk(icon: "paintpalette.fill", title: "Make it yours",
-             subtitle: "Six accent themes and six app icons."),
-        Perk(icon: "heart.fill", title: "Support indie dev",
-             subtitle: "No ads. No tracking. Ever.")
+        Perk(icon: .download, title: "Offline downloads",
+             subtitle: "Save full tracks and listen with no signal.", id: "offline"),
+        Perk(icon: .equalizer, title: "10-band equalizer",
+             subtitle: "Studio presets and per-band control.", id: "eq"),
+        Perk(icon: .aiMix, title: "AI Mix",
+             subtitle: "Describe a vibe, get an instant mix.", id: "aimix"),
+        Perk(icon: .palette, title: "Make it yours",
+             subtitle: "Six accent themes and six app icons.", id: "themes"),
+        Perk(icon: .heart, title: "Support indie dev",
+             subtitle: "No ads. No tracking. Ever.", id: "indie")
     ]
 
     var body: some View {
@@ -105,9 +105,7 @@ struct PaywallView: View {
             // bottom, so the top corner stays clean.
             if !isOnboarding {
                 Button { dismiss() } label: {
-                    Image(systemName: "xmark")
-                        .font(.system(.subheadline).weight(.bold))
-                        .foregroundColor(.white.opacity(0.8))
+                    SonavaIcon(glyph: .close, size: 16, tint: .white.opacity(0.8))
                         .frame(width: Space.hitTarget, height: Space.hitTarget)
                         .interactiveGlass(in: Circle())
                         .contentShape(Circle())
@@ -148,9 +146,7 @@ struct PaywallView: View {
         VStack(spacing: Space.l) {
             ForEach(perks) { perk in
                 HStack(alignment: .top, spacing: Space.l) {
-                    Image(systemName: perk.icon)
-                        .font(.system(.body).weight(.semibold))
-                        .foregroundColor(Theme.accentSoft)
+                    SonavaIcon(glyph: perk.icon, size: 19, tint: Theme.accentSoft)
                         .frame(width: 40, height: 40)
                         .background(Circle().fill(Theme.accent.opacity(0.22)))
                     VStack(alignment: .leading, spacing: 2) {
@@ -222,8 +218,15 @@ struct PaywallView: View {
             selectedID = product.id
         } label: {
             HStack(spacing: Space.m) {
-                Image(systemName: isSelected ? "largecircle.fill.circle" : "circle")
-                    .foregroundColor(isSelected ? .white : .white.opacity(0.5))
+                // The family's own radio dial: a ring, filled when chosen.
+                ZStack {
+                    Circle().strokeBorder(isSelected ? Color.white : .white.opacity(0.5),
+                                          lineWidth: 1.6)
+                    if isSelected {
+                        Circle().fill(Color.white).padding(4.5)
+                    }
+                }
+                .frame(width: 20, height: 20)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(product.displayName.isEmpty ? product.id : product.displayName)
                         .font(.system(.subheadline).weight(.semibold))

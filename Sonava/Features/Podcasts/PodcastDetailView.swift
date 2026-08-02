@@ -41,7 +41,7 @@ struct PodcastDetailView: View {
             } placeholder: {
                 ZStack {
                     LinearGradient(colors: podcast.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
-                    Image(systemName: "mic.fill").font(.system(size: 50)).foregroundColor(.white.opacity(0.85))
+                    SonavaIcon(glyph: .podcasts, size: 50, tint: .white.opacity(0.85))
                 }
             }
             .frame(width: 180, height: 180)

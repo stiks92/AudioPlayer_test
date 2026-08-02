@@ -41,7 +41,7 @@ struct RemotePlaylistView: View {
             } placeholder: {
                 ZStack {
                     LinearGradient(colors: playlist.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
-                    Image(systemName: "music.note.list").font(.system(size: 50)).foregroundColor(.white.opacity(0.85))
+                    SonavaIcon(glyph: .note, size: 50, tint: .white.opacity(0.85))
                 }
             }
             .frame(width: 200, height: 200)

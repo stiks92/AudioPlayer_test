@@ -79,18 +79,21 @@ struct PodcastsView: View {
 
     private var searchField: some View {
         HStack(spacing: Space.m) {
-            Image(systemName: "magnifyingglass").foregroundColor(Theme.textSecondary)
+            Button {
+                guard !query.isEmpty else { return }
+                query = ""
+            } label: {
+                AnimatedIcon(glyph: .searchToX, mode: .toggle(!query.isEmpty),
+                             size: 20, tint: Theme.textSecondary)
+            }
+            .buttonStyle(.plain)
+            .disabled(query.isEmpty)
             TextField("", text: $query,
                       prompt: Text("Search podcasts")
                         .foregroundColor(Theme.textSecondary))
                 .foregroundColor(.white)
                 .autocorrectionDisabled()
                 .submitLabel(.search)
-            if !query.isEmpty {
-                Button { query = "" } label: {
-                    Image(systemName: "xmark.circle.fill").foregroundColor(Theme.textSecondary)
-                }
-            }
         }
         .padding(.horizontal, Space.l).padding(.vertical, Space.m)
         .card(cornerRadius: Radius.card)
@@ -114,11 +117,11 @@ struct PodcastsView: View {
             Button {
                 Task { await feed.load { try await iTunesService.shared.podcasts(genre: selectedGenre) } }
             } label: {
-                message("wifi.slash", "Couldn't load podcasts.\nTap to retry.")
+                message(.radio, "Couldn't load podcasts.\nTap to retry.")
             }
             .buttonStyle(.plain)
         case .empty:
-            message("magnifyingglass", "No podcasts found.")
+            message(.search, "No podcasts found.")
         case .loaded:
             LazyVGrid(columns: columns, spacing: Space.screenMargin) {
                 ForEach(feed.podcasts) { podcast in
@@ -133,9 +136,9 @@ struct PodcastsView: View {
         }
     }
 
-    private func message(_ icon: String, _ text: LocalizedStringKey) -> some View {
+    private func message(_ icon: SonavaIcon.Glyph, _ text: LocalizedStringKey) -> some View {
         VStack(spacing: Space.m) {
-            Image(systemName: icon).font(.system(size: 42)).foregroundColor(Theme.textTertiary)
+            SonavaIcon(glyph: icon, size: 42, tint: Theme.textTertiary)
             Text(text).font(.subheadline).foregroundColor(Theme.textSecondary)
         }
         .frame(maxWidth: .infinity).padding(.top, 50)
@@ -152,7 +155,7 @@ struct PodcastCard: View {
             } placeholder: {
                 ZStack {
                     LinearGradient(colors: podcast.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
-                    Image(systemName: "mic.fill").font(.system(.title)).foregroundColor(.white.opacity(0.85))
+                    SonavaIcon(glyph: .podcasts, size: 30, tint: .white.opacity(0.85))
                 }
             }
             .aspectRatio(1, contentMode: .fit)

@@ -61,7 +61,8 @@ struct SonavaIcon: View {
         case play, pause, next, previous, shuffle
         case aiMix, equalizer, download, note, streak, heart, server, stats
         case chevronRight, chevronDown, more, sleep, infinity
-        case restore, shield, scrobble, wave, lock
+        case restore, shield, scrobble, wave, lock, close, plus
+        case repeatAll, repeatOne, person, palette
     }
 
     let glyph: Glyph
@@ -454,6 +455,80 @@ struct SonavaIcon: View {
             stroked.addCurve(to: p(21, 12),
                              control1: p(15, 19.4), control2: p(18, 19.4))
 
+        case .repeatAll, .repeatOne:
+            // One rounded loop with a gap at the top-left, the arrowhead
+            // sitting in the gap pointing along the direction of travel.
+            // `.repeatOne` adds the mark's short bar in the middle.
+            weight = 1.8
+            stroked.move(to: p(10.2, 5.5))
+            stroked.addLine(to: p(16, 5.5))
+            stroked.addArc(center: p(16, 8.25), radius: 2.75 / Icon.grid * s,
+                           startAngle: .degrees(270), endAngle: .degrees(0),
+                           clockwise: false)
+            stroked.addLine(to: p(18.75, 15.75))
+            stroked.addArc(center: p(16, 15.75), radius: 2.75 / Icon.grid * s,
+                           startAngle: .degrees(0), endAngle: .degrees(90),
+                           clockwise: false)
+            stroked.addLine(to: p(8, 18.5))
+            stroked.addArc(center: p(8, 15.75), radius: 2.75 / Icon.grid * s,
+                           startAngle: .degrees(90), endAngle: .degrees(180),
+                           clockwise: false)
+            stroked.addLine(to: p(5.25, 8.25))
+            stroked.addArc(center: p(8, 8.25), radius: 2.75 / Icon.grid * s,
+                           startAngle: .degrees(180), endAngle: .degrees(270),
+                           clockwise: false)
+            var head = Path()
+            head.move(to: p(8.1, 3.3))
+            head.addLine(to: p(10.4, 5.5))
+            head.addLine(to: p(8.1, 7.7))
+            stroked.addPath(head)
+            if glyph == .repeatOne {
+                bar(&stroked, x: 12, from: 10.4, to: 13.6)
+            }
+
+        case .person:
+            // Head and shoulders, both arcs.
+            stroked.addEllipse(in: CGRect(x: p(8.4, 3.6).x, y: p(8.4, 3.6).y,
+                                          width: 7.2 / Icon.grid * s, height: 7.2 / Icon.grid * s))
+            var shoulders = Path()
+            shoulders.addArc(center: p(12, 21.4), radius: 7.4 / Icon.grid * s,
+                             startAngle: .degrees(205), endAngle: .degrees(335),
+                             clockwise: false)
+            stroked.addPath(shoulders)
+
+        case .palette:
+            // An open ring with three paint dabs — the accent picker's own
+            // shape (a circle of colour) three times over.
+            var ring = Path()
+            ring.addArc(center: p(12, 12), radius: 8 / Icon.grid * s,
+                        startAngle: .degrees(0), endAngle: .degrees(360),
+                        clockwise: false)
+            stroked.addPath(ring)
+            var dabs = Path()
+            // Asymmetric on purpose: two dabs level with each other under a
+            // third read as a face at glyph sizes.
+            for (x, y) in [(8.6, 9.2), (10.4, 15.4), (15.4, 12.2)] {
+                dabs.addEllipse(in: CGRect(x: (x - 1.5) / Icon.grid * s,
+                                           y: (y - 1.5) / Icon.grid * s,
+                                           width: 3 / Icon.grid * s,
+                                           height: 3 / Icon.grid * s))
+            }
+            filled = dabs
+
+        case .close:
+            weight = 1.8
+            stroked.move(to: p(7.5, 7.5))
+            stroked.addLine(to: p(16.5, 16.5))
+            stroked.move(to: p(16.5, 7.5))
+            stroked.addLine(to: p(7.5, 16.5))
+
+        case .plus:
+            weight = 1.8
+            stroked.move(to: p(12, 5.5))
+            stroked.addLine(to: p(12, 18.5))
+            stroked.move(to: p(5.5, 12))
+            stroked.addLine(to: p(18.5, 12))
+
         case .lock:
             // Body as a rounded rect, shackle as an arc.
             stroked.addRoundedRect(in: CGRect(x: 5.5 / Icon.grid * s, y: 11 / Icon.grid * s,
@@ -479,7 +554,8 @@ struct SonavaIcon: View {
                                    .streak, .heart, .server, .stats,
                                    .chevronRight, .chevronDown, .more, .sleep,
                                    .infinity, .restore, .shield, .scrobble,
-                                   .wave, .lock]
+                                   .wave, .lock, .close, .plus,
+                                   .repeatAll, .repeatOne, .person, .palette]
     return ZStack {
         Theme.background.ignoresSafeArea()
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 28) {
@@ -510,7 +586,10 @@ struct IconGallery: View {
         (.chevronRight, "chevronRight"), (.chevronDown, "chevronDown"),
         (.more, "more"), (.sleep, "sleep"), (.infinity, "infinity"),
         (.restore, "restore"), (.shield, "shield"), (.scrobble, "scrobble"),
-        (.wave, "wave"), (.lock, "lock")
+        (.wave, "wave"), (.lock, "lock"),
+        (.close, "close"), (.plus, "plus"),
+        (.repeatAll, "repeatAll"), (.repeatOne, "repeatOne"),
+        (.person, "person"), (.palette, "palette")
     ]
 
     var body: some View {

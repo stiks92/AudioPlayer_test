@@ -92,8 +92,21 @@ struct SearchView: View {
 
     private var searchField: some View {
         HStack(spacing: Space.m) {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(Theme.textSecondary)
+            // The magnifier morphs into an × as soon as there is something to
+            // clear, and tapping it clears — one glyph, both jobs.
+            Button {
+                guard !query.isEmpty else { return }
+                query = ""
+                audiusFeed.clear()
+                appleFeed.clear()
+                deezerFeed.clear()
+                serverFeed.clear()
+            } label: {
+                AnimatedIcon(glyph: .searchToX, mode: .toggle(!query.isEmpty),
+                             size: 20, tint: Theme.textSecondary)
+            }
+            .buttonStyle(.plain)
+            .disabled(query.isEmpty)
             TextField("", text: $query,
                       prompt: Text("Songs, artists, stations…")
                         .foregroundColor(Theme.textSecondary))
@@ -102,18 +115,6 @@ struct SearchView: View {
                 .foregroundColor(.white)
                 .autocorrectionDisabled()
                 .submitLabel(.search)
-            if !query.isEmpty {
-                Button {
-                    query = ""
-                    audiusFeed.clear()
-                    appleFeed.clear()
-                    deezerFeed.clear()
-                    serverFeed.clear()
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(Theme.textSecondary)
-                }
-            }
         }
         .padding(.horizontal, Space.l)
         .padding(.vertical, Space.m)
@@ -305,9 +306,7 @@ struct SearchView: View {
 
     private var emptyState: some View {
         VStack(spacing: Space.m) {
-            Image(systemName: "waveform.slash")
-                .font(.system(size: 46))
-                .foregroundColor(Theme.textTertiary)
+            SonavaIcon(glyph: .wave, size: 46, tint: Theme.textTertiary)
             Text("No results for \u{201C}\(query)\u{201D}")
                 .font(.headline)
                 .foregroundColor(Theme.textSecondary)

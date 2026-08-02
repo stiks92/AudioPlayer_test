@@ -66,9 +66,9 @@ struct LyricsView: View {
         case .idle, .loading:
             ProgressView().tint(.white)
         case .failed:
-            message(icon: "wifi.slash", text: "Couldn't load lyrics.")
+            message(icon: .radio, text: "Couldn't load lyrics.")
         case .none:
-            message(icon: "text.quote", text: "No lyrics found for this track.")
+            message(icon: .note, text: "No lyrics found for this track.")
         case .loaded(let lyrics):
             if lyrics.isSynced {
                 SyncedLyricsList(lines: lyrics.synced)
@@ -81,16 +81,14 @@ struct LyricsView: View {
                         .padding(Space.xl)
                 }
             } else {
-                message(icon: "text.quote", text: "No lyrics found for this track.")
+                message(icon: .note, text: "No lyrics found for this track.")
             }
         }
     }
 
-    private func message(icon: String, text: String) -> some View {
+    private func message(icon: SonavaIcon.Glyph, text: String) -> some View {
         VStack(spacing: Space.m) {
-            Image(systemName: icon)
-                .font(.system(size: 42))
-                .foregroundColor(.white.opacity(0.4))
+            SonavaIcon(glyph: icon, size: 42, tint: .white.opacity(0.4))
             Text(text)
                 .font(.headline)
                 .foregroundColor(.white.opacity(0.7))

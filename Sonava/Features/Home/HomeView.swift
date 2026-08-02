@@ -200,7 +200,7 @@ struct HomeView: View {
                         .padding(.horizontal, 8).padding(.vertical, 3)
                         .background(Capsule().fill(Color.white))
                 }
-                Image(systemName: "chevron.right").foregroundColor(.white.opacity(0.8))
+                SonavaIcon(glyph: .chevronRight, size: 15, tint: .white.opacity(0.8))
             }
             .padding(Space.l)
             // The gradient peaks magenta mid-card, which put this copy at
@@ -232,7 +232,7 @@ struct HomeView: View {
                                     } placeholder: {
                                         ZStack {
                                             LinearGradient(colors: playlist.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
-                                            Image(systemName: "music.note.list").font(.system(.largeTitle)).foregroundColor(.white.opacity(0.85))
+                                            SonavaIcon(glyph: .note, size: 34, tint: .white.opacity(0.85))
                                         }
                                     }
                                     .frame(width: Tile.feature, height: Tile.feature)
@@ -281,7 +281,7 @@ struct HomeView: View {
                 // left one used to draw its circle *inside* the glyph
                 // (`waveform.circle.fill`), which rendered 26.7pt against the
                 // right one's 40 — a 33% break in a two-item cluster.
-                headerButtonFace("waveform", tint: Theme.accentSoft)
+                headerButtonFace(.wave, tint: Theme.accentSoft)
             }
             .buttonStyle(BouncyButtonStyle())
             .hitTarget()
@@ -292,7 +292,7 @@ struct HomeView: View {
             } label: {
                 // `sparkles` belongs to AI Mix; using it here too pointed one
                 // glyph at two unrelated destinations in the same viewport.
-                headerButtonFace(proStore.isPro ? "person.fill" : "person",
+                headerButtonFace(.person,
                                  tint: Theme.accentSoft)
             }
             .buttonStyle(BouncyButtonStyle())
@@ -302,15 +302,11 @@ struct HomeView: View {
     }
 
     /// One shape, one size, for every control in the header.
-    private func headerButtonFace(_ symbol: String, tint: Color) -> some View {
+    private func headerButtonFace(_ glyph: SonavaIcon.Glyph, tint: Color) -> some View {
         Circle()
             .fill(Theme.surfaceElevated)
             .frame(width: 40, height: 40)
-            .overlay(
-                Image(systemName: symbol)
-                    .font(.system(.body).weight(.semibold))
-                    .foregroundColor(tint)
-            )
+            .overlay(SonavaIcon(glyph: glyph, size: 19, tint: tint))
             .overlay(Circle().strokeBorder(Theme.hairline, lineWidth: 1))
     }
 

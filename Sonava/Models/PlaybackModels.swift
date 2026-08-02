@@ -17,11 +17,8 @@ enum RepeatMode: Int, CaseIterable {
         RepeatMode(rawValue: (rawValue + 1) % RepeatMode.allCases.count) ?? .off
     }
 
-    var systemImage: String {
-        switch self {
-        case .off, .all: return "repeat"
-        case .one:       return "repeat.1"
-        }
+    var glyph: SonavaIcon.Glyph {
+        self == .one ? .repeatOne : .repeatAll
     }
 
     var isActive: Bool { self != .off }

@@ -223,7 +223,7 @@ struct NowPlayingView: View {
                     HStack(spacing: 4) {
                         Text(song?.artist ?? "")
                             .font(.system(.callout))
-                        Image(systemName: "chevron.right")
+                        SonavaIcon(glyph: .chevronRight, size: 12, tint: Theme.textTertiary)
                             .font(.system(.caption2).weight(.semibold))
                             .opacity(0.6)
                     }
@@ -239,7 +239,7 @@ struct NowPlayingView: View {
                 Button {
                     showAddToPlaylist = true
                 } label: {
-                    Image(systemName: "plus.circle")
+                    SonavaIcon(glyph: .plus, size: 22)
                         .font(.system(.title2).weight(.semibold))
                         .foregroundColor(.white.opacity(0.85))
                 }
@@ -357,9 +357,8 @@ struct NowPlayingView: View {
             Button {
                 withAnimation { audio.cycleRepeat() }
             } label: {
-                Image(systemName: audio.repeatMode.systemImage)
-                    .font(.system(.body).weight(.semibold))
-                    .foregroundColor(audio.repeatMode.isActive ? Theme.accentSoft : .white.opacity(0.7))
+                SonavaIcon(glyph: audio.repeatMode.glyph, size: 21,
+                           tint: audio.repeatMode.isActive ? Theme.accentSoft : .white.opacity(0.7))
             }
             .buttonStyle(BouncyButtonStyle())
         }
@@ -367,9 +366,8 @@ struct NowPlayingView: View {
 
     private var volume: some View {
         HStack(spacing: Space.m) {
-            Image(systemName: "speaker.fill")
-                .font(.system(.footnote))
-                .foregroundColor(.white.opacity(0.6))
+            AnimatedIcon(glyph: .volume, mode: .toggle(false),
+                         size: 16, tint: .white.opacity(0.6))
             ScrubberView(
                 value: Binding(
                     get: { Double(audio.volume) },
@@ -377,9 +375,8 @@ struct NowPlayingView: View {
                 ),
                 onEditingChanged: { _ in }
             )
-            Image(systemName: "speaker.wave.3.fill")
-                .font(.system(.footnote))
-                .foregroundColor(.white.opacity(0.6))
+            AnimatedIcon(glyph: .volume, mode: .toggle(true),
+                         size: 16, tint: .white.opacity(0.6))
         }
     }
 
@@ -425,14 +422,6 @@ struct NowPlayingView: View {
         .buttonStyle(.plain)
     }
 
-    private func bottomButton(_ icon: String, active: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: icon)
-                .font(.system(.body).weight(.semibold))
-                .foregroundColor(active ? Theme.accentSoft : .white.opacity(0.7))
-        }
-        .buttonStyle(BouncyButtonStyle())
-    }
 
     // MARK: - Drag to dismiss
 
