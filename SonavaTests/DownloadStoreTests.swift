@@ -22,6 +22,9 @@ struct DownloadStoreTests {
             try? FileManager.default.removeItem(at: f)
         }
         JSONFileStore<[Song]>("downloads.json", default: []).write([])
+        // The pending index too: an entry left by an earlier case would make
+        // the store treat a fresh download as already in flight.
+        JSONFileStore<[Song]>("downloads_pending.json", default: []).write([])
     }
 
     /// A downloadable song whose "stream" is a local file we just wrote.
@@ -43,7 +46,7 @@ struct DownloadStoreTests {
         let song = try downloadableSong()
         defer { TestAudioFile.cleanUp(song.streamURL!) }
 
-        let store = DownloadStore()
+        let store = DownloadStore(useBackgroundSession: false)
         store.download(song)
         await waitForDownload(store, song)
 
@@ -59,7 +62,7 @@ struct DownloadStoreTests {
             let song = Song(id: "x:\(source.rawValue)", title: "T", artist: "A", album: "B",
                             source: source, streamURL: URL(string: "https://example.com/x"),
                             gradientHex: Palette.hex(for: 0))
-            let store = DownloadStore()
+            let store = DownloadStore(useBackgroundSession: false)
             store.download(song)
             #expect(store.state(for: song) == .none, "\(source) should not download")
         }
@@ -70,12 +73,12 @@ struct DownloadStoreTests {
         let song = try downloadableSong(id: "audius:persist")
         defer { TestAudioFile.cleanUp(song.streamURL!) }
 
-        let store = DownloadStore()
+        let store = DownloadStore(useBackgroundSession: false)
         store.download(song)
         await waitForDownload(store, song)
         #expect(store.downloads.contains { $0.id == song.id })
 
-        let relaunched = DownloadStore()
+        let relaunched = DownloadStore(useBackgroundSession: false)
         #expect(relaunched.isDownloaded(song))
         #expect(relaunched.downloads.contains { $0.id == song.id })
     }
@@ -85,7 +88,7 @@ struct DownloadStoreTests {
         let song = try downloadableSong(id: "audius:remove")
         defer { TestAudioFile.cleanUp(song.streamURL!) }
 
-        let store = DownloadStore()
+        let store = DownloadStore(useBackgroundSession: false)
         store.download(song)
         await waitForDownload(store, song)
         let local = try #require(store.localURL(for: song))
@@ -102,11 +105,11 @@ struct DownloadStoreTests {
         let song = try downloadableSong(id: "audius:ghost")
         defer { TestAudioFile.cleanUp(song.streamURL!) }
 
-        let store = DownloadStore()
+        let store = DownloadStore(useBackgroundSession: false)
         store.download(song)
         await waitForDownload(store, song)
         try FileManager.default.removeItem(at: #require(store.localURL(for: song)))
 
-        #expect(DownloadStore().isDownloaded(song) == false)
+        #expect(DownloadStore(useBackgroundSession: false).isDownloaded(song) == false)
     }
 }

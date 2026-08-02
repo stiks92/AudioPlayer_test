@@ -403,6 +403,16 @@ final class AudioManager: NSObject, ObservableObject {
                 if d.isFinite, d > 0 { clock.duration = d }
             }
             if autoplay { startTimer() } else { stopTimer() }
+
+            // A podcast episode resumes where the listener stopped. Music
+            // deliberately does not: coming back to an album mid-track is a
+            // surprise, coming back to a two-hour interview at 00:00 is a
+            // punishment. `restoreLastSession` handles the one track that was
+            // playing at quit; this covers every *other* episode on the go.
+            if song.source == .podcast, isResumingSession == false,
+               let saved = savedPosition(for: song), saved < engine.duration - 15 {
+                seek(to: saved)
+            }
         } else {
             isPlaying = false
             stopTimer()
@@ -435,26 +445,112 @@ final class AudioManager: NSObject, ObservableObject {
 
     // MARK: - Resume last session
 
+    /// The whole session, not one track.
+    ///
+    /// This used to persist a single song and a single position, so a
+    /// relaunch restored `queue = [song]` — the album you were three tracks
+    /// into became a queue of one, and "next" had nowhere to go. The feature
+    /// list called that queue persistence. It now is.
+    private struct SavedSession: Codable {
+        var queue: [Song]
+        var index: Int
+        var position: Double
+        var isShuffling: Bool
+        var repeatMode: Int
+    }
+
+    private let sessionStore = JSONFileStore<SavedSession?>("session.json", default: nil)
+
     private func persistNowPlaying(force: Bool) {
         guard let song = currentSong, !song.isLive else { return }
         if !force && Date().timeIntervalSince(lastPersist) < 5 { return }
         lastPersist = Date()
+
+        // Podcasts keep a position per episode: a listener with four shows on
+        // the go loses their place in three of them if only "the last thing
+        // played" is remembered.
+        if song.source == .podcast {
+            episodePositions[song.id] = clock.currentTime
+            trimEpisodePositions()
+            episodeStore.write(episodePositions)
+        }
+
+        sessionStore.write(SavedSession(queue: queue, index: currentIndex,
+                                        position: clock.currentTime,
+                                        isShuffling: isShuffling,
+                                        repeatMode: repeatMode.rawValue))
+        // The old single-slot keys stay written for one release so a build
+        // rolled back mid-migration still finds something to resume.
         if let data = try? JSONEncoder().encode(song) {
             UserDefaults.standard.set(data, forKey: resumeSongKey)
         }
         UserDefaults.standard.set(clock.currentTime, forKey: resumePositionKey)
     }
 
-    /// Reload the last played track (paused) so the mini player is ready on launch.
+    /// Reload the last session (paused) so the mini player — and the queue
+    /// behind it — are ready on launch.
     func restoreLastSession() {
-        guard currentSong == nil,
-              let data = UserDefaults.standard.data(forKey: resumeSongKey),
+        guard currentSong == nil else { return }
+        isResumingSession = true
+        defer { isResumingSession = false }
+
+        if let saved = sessionStore.read(), !saved.queue.isEmpty {
+            queue = saved.queue
+            baseQueue = saved.queue
+            currentIndex = min(max(saved.index, 0), saved.queue.count - 1)
+            isShuffling = saved.isShuffling
+            repeatMode = RepeatMode(rawValue: saved.repeatMode) ?? .off
+            load(autoplay: false)
+            if saved.position > 1 { seek(to: saved.position) }
+            return
+        }
+
+        // Pre-migration state: one track, one position.
+        guard let data = UserDefaults.standard.data(forKey: resumeSongKey),
               let song = try? JSONDecoder().decode(Song.self, from: data) else { return }
         let position = UserDefaults.standard.double(forKey: resumePositionKey)
         queue = [song]
+        baseQueue = [song]
         currentIndex = 0
         load(autoplay: false)
         if position > 1 { seek(to: position) }
+    }
+
+    #if DEBUG
+    /// Wipes the saved session. Tests that exercise the resume paths need to
+    /// choose which one they are testing; without this they inherit whatever
+    /// the previous case left behind.
+    static func clearSavedSessionForTesting() {
+        JSONFileStore<Data?>("session.json", default: nil).write(nil)
+    }
+    #endif
+
+    // MARK: - Podcast episode positions
+
+    /// True only while `restoreLastSession` is loading, so the per-episode
+    /// resume doesn't overwrite the position the session already knows.
+    private var isResumingSession = false
+
+    private let episodeStore = JSONFileStore<[String: Double]>("episode_positions.json", default: [:])
+    private lazy var episodePositions: [String: Double] = episodeStore.read()
+
+    /// Where the listener stopped in this episode, if they have heard it.
+    func savedPosition(for song: Song) -> Double? {
+        guard song.source == .podcast, let position = episodePositions[song.id],
+              position > 5 else { return nil }
+        return position
+    }
+
+    func clearSavedPosition(for song: Song) {
+        episodePositions[song.id] = nil
+        episodeStore.write(episodePositions)
+    }
+
+    /// Keeps the file from growing forever on a heavy podcast listener.
+    private func trimEpisodePositions() {
+        guard episodePositions.count > 300 else { return }
+        episodePositions = Dictionary(uniqueKeysWithValues:
+            episodePositions.sorted { $0.value > $1.value }.prefix(200).map { ($0.key, $0.value) })
     }
 
     // MARK: - Sleep timer

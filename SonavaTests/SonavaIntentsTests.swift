@@ -89,9 +89,12 @@ extension LibrarySuite {
 
         @Test("Resuming with nothing to resume leaves playback alone")
         func resumeWithNothing() async throws {
-            // Nothing loaded (the suite stops playback) and nothing saved.
+            // Nothing loaded (the suite stops playback) and nothing saved —
+            // in either the session file or the pre-migration keys.
+            AudioManager.clearSavedSessionForTesting()
             UserDefaults.standard.removeObject(forKey: "resume.song.v1")
             let audio = AudioManager.shared
+            audio.stop()
 
             _ = try await ResumeListeningIntent().perform()
 
@@ -99,9 +102,13 @@ extension LibrarySuite {
             #expect(audio.isPlaying == false)
         }
 
-        @Test("Resuming restores the last session and presses play")
+        @Test("Resuming restores a pre-migration single-track save")
         func resumeRestoresLastSession() async throws {
             let audio = AudioManager.shared
+            audio.stop()
+            // No session file: this is the path a listener takes when they
+            // update from a build that only ever saved one track.
+            AudioManager.clearSavedSessionForTesting()
             let saved = song("resume-me", artist: "Tycho")
             UserDefaults.standard.set(try JSONEncoder().encode(saved), forKey: "resume.song.v1")
 
