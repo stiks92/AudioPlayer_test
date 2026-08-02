@@ -54,6 +54,81 @@ struct SubsonicService {
         try? await get("getScanStatus", as: ScanStatusBody.self).scanStatus?.count
     }
 
+    /// Albums, the way a record collection is actually navigated.
+    ///
+    /// `type` is the server's own ordering vocabulary: `newest`, `random`,
+    /// `alphabeticalByName`, `frequent`, `recent`, `starred`. Without this the
+    /// app could only ever show a server as a flat bag of random songs — no
+    /// shelf, no "what did I add last month", and nothing for a CarPlay
+    /// browse tree to be built from.
+    func albums(type: String = "newest", count: Int = 60, offset: Int = 0) async throws -> [Album] {
+        let body = try await get("getAlbumList2", [
+            URLQueryItem(name: "type", value: type),
+            URLQueryItem(name: "size", value: String(count)),
+            URLQueryItem(name: "offset", value: String(offset)),
+        ], as: AlbumListBody.self)
+        return (body.albumList2?.album ?? []).map(map)
+    }
+
+    /// One album with its tracks, in the order the record has them.
+    func albumTracks(id: String) async throws -> [Song] {
+        let body = try await get("getAlbum", [URLQueryItem(name: "id", value: id)],
+                                 as: AlbumBody.self)
+        return (body.album?.song ?? []).map(map)
+    }
+
+    /// Every artist the server indexes, flattened out of its A–Z buckets.
+    func artists() async throws -> [ServerArtist] {
+        let body = try await get("getArtists", as: ArtistsBody.self)
+        return (body.artists?.index ?? []).flatMap { $0.artist ?? [] }.map {
+            ServerArtist(id: $0.id, name: $0.name ?? "Unknown artist",
+                         albumCount: $0.albumCount ?? 0,
+                         artworkURL: coverArtURL(id: $0.coverArt))
+        }
+    }
+
+    /// One artist's albums.
+    func artistAlbums(id: String) async throws -> [Album] {
+        let body = try await get("getArtist", [URLQueryItem(name: "id", value: id)],
+                                 as: ArtistBody.self)
+        return (body.artist?.album ?? []).map(map)
+    }
+
+    /// Playlists the listener made on the server itself — the ones every other
+    /// client of theirs can see, which is the whole point of keeping them
+    /// there rather than in one app.
+    func playlists() async throws -> [ServerPlaylist] {
+        let body = try await get("getPlaylists", as: PlaylistsBody.self)
+        return (body.playlists?.playlist ?? []).map {
+            ServerPlaylist(id: $0.id, name: $0.name ?? "Playlist",
+                           songCount: $0.songCount ?? 0,
+                           duration: $0.duration.map(Double.init),
+                           artworkURL: coverArtURL(id: $0.coverArt))
+        }
+    }
+
+    func playlistTracks(id: String) async throws -> [Song] {
+        let body = try await get("getPlaylist", [URLQueryItem(name: "id", value: id)],
+                                 as: PlaylistBody.self)
+        return (body.playlist?.entry ?? []).map(map)
+    }
+
+    /// Marks a track as starred on the server, so the listener's favourites
+    /// are the same set in every client they use.
+    func star(id: String, starred: Bool) async throws {
+        _ = try await get(starred ? "star" : "unstar",
+                          [URLQueryItem(name: "id", value: id)], as: StatusBody.self)
+    }
+
+    /// Server-side lyrics, when the server has them.
+    func lyrics(id: String) async throws -> String? {
+        let body = try await get("getLyricsBySongId", [URLQueryItem(name: "id", value: id)],
+                                 as: LyricsBody.self)
+        let lines = body.lyricsList?.structuredLyrics?.first?.line ?? []
+        let text = lines.compactMap(\.value).joined(separator: "\n")
+        return text.isEmpty ? nil : text
+    }
+
     func search(_ query: String) async throws -> [Song] {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
@@ -107,6 +182,17 @@ struct SubsonicService {
 
     // MARK: - Mapping
 
+    private func map(_ album: SubsonicAlbum) -> Album {
+        Album(id: "subsonic:\(libraryID):\(album.id)",
+              title: album.name ?? album.title ?? "Album",
+              artist: album.artist ?? "Unknown artist",
+              songs: (album.song ?? []).map(map),
+              year: album.year,
+              artworkURL: coverArtURL(id: album.coverArt),
+              serverID: album.id,
+              trackCountHint: album.songCount)
+    }
+
     private func map(_ song: SubsonicSong) -> Song {
         Song(
             id: "subsonic:\(libraryID):\(song.id)",
@@ -120,7 +206,12 @@ struct SubsonicService {
             durationSeconds: song.duration.map(Double.init),
             trackNumber: song.track,
             year: song.year,
-            bitRate: song.bitRate
+            bitRate: song.bitRate,
+            // OpenSubsonic servers publish this; using it means the app never
+            // has to analyse a file it can simply be told about.
+            replayGain: song.replayGain?.trackGain,
+            credits: song.artists?.map { TrackCredit(id: $0.id, name: $0.name) } ?? [],
+            isStarredOnServer: song.starred != nil
         )
     }
 }
@@ -169,6 +260,13 @@ private struct SubsonicSong: Decodable {
     let artist: String?
     let album: String?
     let coverArt: String?
+    let replayGain: SubsonicReplayGain?
+    /// OpenSubsonic's multi-artist list. A track credited to three people has
+    /// been collapsing into one comma-joined string, which is why tapping an
+    /// artist on a collaboration went nowhere useful.
+    let artists: [SubsonicArtistRef]?
+    /// Present (as a timestamp) when the listener starred it on the server.
+    let starred: String?
     // The API has been sending these on every track; the DTO was discarding
     // them, which is why no list row in the app could state a length, an
     // order, a year or a bit rate.
@@ -177,4 +275,154 @@ private struct SubsonicSong: Decodable {
     let year: Int?
     let bitRate: Int?
     let suffix: String?
+}
+
+#if DEBUG
+extension SubsonicService {
+    /// Decoding hooks for tests.
+    ///
+    /// The mapping from a server's JSON to the app's models is where a client
+    /// like this actually breaks — a field renamed, a list nested one level
+    /// deeper, a number arriving as a string. Exercising it against captured
+    /// payloads is worth more than any amount of testing against a fake, so
+    /// these expose the mapper without the network.
+    private func decode<T: Decodable>(_ json: String, as type: T.Type) throws -> T {
+        try JSONDecoder()
+            .decode(SubsonicWrapper<T>.self, from: Data(json.utf8)).response
+    }
+
+    func albumsForTesting(json: String) throws -> [Album] {
+        (try decode(json, as: AlbumListBody.self).albumList2?.album ?? []).map(map)
+    }
+
+    func albumTracksForTesting(json: String) throws -> [Song] {
+        (try decode(json, as: AlbumBody.self).album?.song ?? []).map(map)
+    }
+
+    func artistsForTesting(json: String) throws -> [ServerArtist] {
+        (try decode(json, as: ArtistsBody.self).artists?.index ?? [])
+            .flatMap { $0.artist ?? [] }
+            .map { ServerArtist(id: $0.id, name: $0.name ?? "Unknown artist",
+                                albumCount: $0.albumCount ?? 0,
+                                artworkURL: coverArtURL(id: $0.coverArt)) }
+    }
+
+    func playlistsForTesting(json: String) throws -> [ServerPlaylist] {
+        (try decode(json, as: PlaylistsBody.self).playlists?.playlist ?? [])
+            .map { ServerPlaylist(id: $0.id, name: $0.name ?? "Playlist",
+                                  songCount: $0.songCount ?? 0,
+                                  duration: $0.duration.map(Double.init),
+                                  artworkURL: coverArtURL(id: $0.coverArt)) }
+    }
+}
+#endif
+
+// MARK: - Browse DTOs
+
+private struct AlbumListBody: Decodable {
+    let albumList2: AlbumListContainer?
+}
+
+private struct AlbumListContainer: Decodable {
+    let album: [SubsonicAlbum]?
+}
+
+private struct AlbumBody: Decodable {
+    let album: SubsonicAlbum?
+}
+
+private struct SubsonicAlbum: Decodable {
+    let id: String
+    /// `getAlbumList2` sends `name`; `getAlbum` sends both. Taking either
+    /// keeps one DTO for both calls.
+    let name: String?
+    let title: String?
+    let artist: String?
+    let coverArt: String?
+    let songCount: Int?
+    let year: Int?
+    let song: [SubsonicSong]?
+}
+
+private struct ArtistsBody: Decodable {
+    let artists: ArtistIndexContainer?
+}
+
+private struct ArtistIndexContainer: Decodable {
+    /// The server groups artists under A, B, C… — a shape the app has no use
+    /// for, so it is flattened at the boundary rather than carried inward.
+    let index: [ArtistIndex]?
+}
+
+private struct ArtistIndex: Decodable {
+    let artist: [SubsonicArtist]?
+}
+
+private struct SubsonicArtist: Decodable {
+    let id: String
+    let name: String?
+    let albumCount: Int?
+    let coverArt: String?
+}
+
+private struct ArtistBody: Decodable {
+    let artist: ArtistDetail?
+}
+
+private struct ArtistDetail: Decodable {
+    let album: [SubsonicAlbum]?
+}
+
+private struct PlaylistsBody: Decodable {
+    let playlists: PlaylistContainer?
+}
+
+private struct PlaylistContainer: Decodable {
+    let playlist: [SubsonicPlaylist]?
+}
+
+private struct SubsonicPlaylist: Decodable {
+    let id: String
+    let name: String?
+    let songCount: Int?
+    let duration: Int?
+    let coverArt: String?
+}
+
+private struct PlaylistBody: Decodable {
+    let playlist: PlaylistDetail?
+}
+
+private struct PlaylistDetail: Decodable {
+    let entry: [SubsonicSong]?
+}
+
+/// A credited artist. Only what the app needs: the server sends roles,
+/// MusicBrainz ids and sort names that nothing here consumes.
+struct SubsonicArtistRef: Decodable, Equatable, Sendable {
+    let id: String
+    let name: String
+}
+
+private struct SubsonicReplayGain: Decodable {
+    let trackGain: Double?
+    let albumGain: Double?
+}
+
+private struct LyricsBody: Decodable {
+    let lyricsList: LyricsList?
+}
+
+private struct LyricsList: Decodable {
+    let structuredLyrics: [StructuredLyrics]?
+}
+
+private struct StructuredLyrics: Decodable {
+    let line: [SubsonicLyricLine]?
+}
+
+/// Named apart from the app's own `LyricLine`, which is a view model with an
+/// id and a timestamp — two different things that both describe a line.
+private struct SubsonicLyricLine: Decodable {
+    let value: String?
 }

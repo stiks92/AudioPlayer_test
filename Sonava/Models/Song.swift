@@ -83,6 +83,13 @@ struct Song: Identifiable, Equatable, Hashable, Codable {
     /// Saves the app measuring a file it can be told about — see
     /// `LoudnessAnalyzer.gain(fromReplayGain:)`.
     let replayGain: Double?
+    /// Everyone credited on the track, when the source distinguishes them.
+    /// A collaboration used to arrive as one comma-joined string, so tapping
+    /// "Burial & Four Tet" searched for a performer that does not exist.
+    let credits: [TrackCredit]
+    /// Starred on the server. Favourites should be one set across every
+    /// client the listener uses, not a per-app opinion.
+    let isStarredOnServer: Bool
 
     /// `3:47` for the margin, or nil when the length is unknown.
     var durationText: String? {
@@ -109,7 +116,9 @@ struct Song: Identifiable, Equatable, Hashable, Codable {
         trackNumber: Int? = nil,
         year: Int? = nil,
         bitRate: Int? = nil,
-        replayGain: Double? = nil
+        replayGain: Double? = nil,
+        credits: [TrackCredit] = [],
+        isStarredOnServer: Bool = false
     ) {
         self.id = id
         self.title = title
@@ -127,6 +136,8 @@ struct Song: Identifiable, Equatable, Hashable, Codable {
         self.year = year
         self.bitRate = bitRate
         self.replayGain = replayGain
+        self.credits = credits
+        self.isStarredOnServer = isStarredOnServer
     }
 
     /// Playable URL. Local tracks are files the user imported, which live in
@@ -153,4 +164,10 @@ struct Song: Identifiable, Equatable, Hashable, Codable {
 
     static func == (lhs: Song, rhs: Song) -> Bool { lhs.id == rhs.id }
     func hash(into hasher: inout Hasher) { hasher.combine(id) }
+}
+
+/// One credited artist on a track.
+struct TrackCredit: Codable, Equatable, Hashable, Sendable, Identifiable {
+    let id: String
+    let name: String
 }
