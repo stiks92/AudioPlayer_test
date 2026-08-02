@@ -18,37 +18,44 @@ struct AppIconOption: Identifiable, Equatable, Sendable {
     /// The asset-catalog name, or nil for the primary icon. UIKit wants nil —
     /// not the primary name — when switching back.
     let alternateName: String?
-    /// Preview colours, mirroring the icon's gradient.
+    /// Preview colours, mirroring the icon art: the glow behind the mark and
+    /// the near-black it dissolves into.
     let gradientHex: [UInt]
+    /// The mark's own colour in this icon — the settings miniature draws its
+    /// bars with it, so the preview shows the icon that will actually land.
+    let markHex: UInt
     let isPro: Bool
 
     var isDefault: Bool { alternateName == nil }
 }
 
 extension AppIconOption {
+    // The art is the owner-chosen "glow" language: the five-bar mark over a
+    // warm radial glow dissolving into near-black — the player's lit room in
+    // 1024 pixels. One variant per palette; ids stay stable.
     static let aurora = AppIconOption(
-        id: "aurora", name: "Aurora", alternateName: nil,
-        gradientHex: [0x4A00E0, 0x7C5CFF, 0xFF6FD8], isPro: false)
+        id: "aurora", name: "Ivory", alternateName: nil,
+        gradientHex: [0x3A3226, 0x08080C], markHex: 0xEDE4D3, isPro: false)
 
     static let sunset = AppIconOption(
         id: "sunset", name: "Sunset", alternateName: "AppIcon-Sunset",
-        gradientHex: [0xB4256B, 0xFF7A5A, 0xFFB03A], isPro: true)
+        gradientHex: [0x42160E, 0x08080C], markHex: 0xFF7A5A, isPro: true)
 
     static let ocean = AppIconOption(
         id: "ocean", name: "Ocean", alternateName: "AppIcon-Ocean",
-        gradientHex: [0x0E5BE0, 0x2BD3E8, 0x38EF9D], isPro: true)
+        gradientHex: [0x0C2A34, 0x08080C], markHex: 0x2BD3E8, isPro: true)
 
     static let forest = AppIconOption(
         id: "forest", name: "Forest", alternateName: "AppIcon-Forest",
-        gradientHex: [0x0E7A55, 0x3DD68C, 0xC6E85A], isPro: true)
+        gradientHex: [0x0E2C1C, 0x08080C], markHex: 0x3DD68C, isPro: true)
 
     static let rose = AppIconOption(
         id: "rose", name: "Rose", alternateName: "AppIcon-Rose",
-        gradientHex: [0xB01E5A, 0xFF5C8A, 0xFF8FB4], isPro: true)
+        gradientHex: [0x38121E, 0x08080C], markHex: 0xFF5C8A, isPro: true)
 
     static let mono = AppIconOption(
         id: "mono", name: "Mono", alternateName: "AppIcon-Mono",
-        gradientHex: [0x2A2A32, 0x6E6E7A, 0xC7C7D2], isPro: true)
+        gradientHex: [0x242430, 0x08080C], markHex: 0xC7C7D2, isPro: true)
 
     static let all: [AppIconOption] = [aurora, sunset, ocean, forest, rose, mono]
 

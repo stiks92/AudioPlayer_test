@@ -187,10 +187,13 @@ struct SettingsView: View {
         } label: {
             VStack(spacing: 6) {
                 ZStack {
-                    // A miniature of the real icon: same gradient, same mark.
+                    // A miniature of the real icon: the glow dissolving into
+                    // near-black, the mark in its own tint.
                     RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
-                        .fill(LinearGradient(colors: option.gradientHex.colors,
-                                             startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .fill(RadialGradient(colors: option.gradientHex.colors,
+                                             center: .center,
+                                             startRadius: 0,
+                                             endRadius: Swatch.size * 0.72))
                         .frame(width: Swatch.size, height: Swatch.size)
                         .overlay(
                             RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
@@ -200,7 +203,7 @@ struct SettingsView: View {
                     HStack(spacing: 2.5) {
                         ForEach([0.34, 0.62, 1.0, 0.70, 0.44], id: \.self) { height in
                             Capsule()
-                                .fill(Color.white.opacity(0.92))
+                                .fill(Color(hex: option.markHex))
                                 .frame(width: Swatch.size * 0.107, height: Swatch.size * 0.54 * height)
                         }
                     }
