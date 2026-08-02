@@ -168,6 +168,13 @@ final class AudioManager: NSObject, ObservableObject {
         load(autoplay: true)
     }
 
+    /// Called after the queue changes under a playing track, so the engine
+    /// doesn't join to a track that is no longer next.
+    private func invalidatePreload() {
+        activeEngine?.cancelPreload()
+        preloadNextTrack()
+    }
+
     func togglePlayPause() {
         isPlaying ? pause() : play()
     }
@@ -249,12 +256,14 @@ final class AudioManager: NSObject, ObservableObject {
     func playNext(_ song: Song) {
         guard !queue.isEmpty else { play(song, in: [song]); return }
         queue.insert(song, at: min(currentIndex + 1, queue.count))
+        invalidatePreload()
         Haptics.selection()
     }
 
     func addToQueue(_ song: Song) {
         guard !queue.isEmpty else { play(song, in: [song]); return }
         queue.append(song)
+        invalidatePreload()
         Haptics.selection()
     }
 
@@ -262,6 +271,7 @@ final class AudioManager: NSObject, ObservableObject {
         let base = currentIndex + 1
         let absolute = IndexSet(offsets.map { base + $0 }.filter { $0 < queue.count })
         queue.remove(atOffsets: absolute)
+        invalidatePreload()
     }
 
     func moveUpNext(from source: IndexSet, to destination: Int) {
@@ -270,16 +280,19 @@ final class AudioManager: NSObject, ObservableObject {
         var sub = Array(queue[base...])
         sub.move(fromOffsets: source, toOffset: destination)
         queue.replaceSubrange(base..<queue.count, with: sub)
+        invalidatePreload()
     }
 
     // MARK: - Modes
 
     func cycleRepeat() {
         repeatMode = repeatMode.next
+        invalidatePreload()
     }
 
     func toggleShuffle() {
         isShuffling.toggle()
+        defer { invalidatePreload() }
         guard let current = currentSong else { return }
         if isShuffling {
             let rest = Shuffle.ordered(baseQueue.filter { $0 != current },
@@ -382,6 +395,11 @@ final class AudioManager: NSObject, ObservableObject {
         engine.onFinish = { [weak self] in
             Task { @MainActor in self?.advance(auto: true) }
         }
+        // Gapless: the engine has already started the next track without
+        // pausing, so this only catches the app's state up.
+        engine.onAdvancedToNext = { [weak self] in
+            Task { @MainActor in self?.adoptGaplessAdvance() }
+        }
         engine.setVolume(volume)
         engine.apply(effects.equalizer)
 
@@ -420,6 +438,50 @@ final class AudioManager: NSObject, ObservableObject {
         updateNowPlayingInfo()
         persistNowPlaying(force: true)
         maybeExtendQueue()
+        preloadNextTrack()
+    }
+
+    // MARK: - Gapless
+
+    /// Hands the engine the next track so it can start on the sample after
+    /// this one ends.
+    ///
+    /// Only for files: a network stream cannot be queued this way, and radio
+    /// and podcasts have no "next" worth joining seamlessly. Repeat-one is
+    /// excluded because the next thing to play is this track again, which the
+    /// seek path handles.
+    private func preloadNextTrack() {
+        guard repeatMode != .one, !isLive,
+              queue.indices.contains(currentIndex + 1) else { return }
+        let next = queue[currentIndex + 1]
+        guard let url = downloads.localURL(for: next) ?? next.url, url.isFileURL else { return }
+        activeEngine?.preloadNext(url: url)
+    }
+
+    /// The engine started the queued track by itself. Everything that would
+    /// normally happen in `load` still has to happen — the listen is banked,
+    /// the sleeve changes, Now Playing updates — but no audio is touched,
+    /// because it is already playing.
+    private func adoptGaplessAdvance() {
+        guard queue.indices.contains(currentIndex + 1) else { return }
+        if let finished = currentSong { onTrackCompleted?(finished) }
+        beginListenSession()
+
+        currentIndex += 1
+        let song = queue[currentIndex]
+        currentSong = song
+        isPlaying = true
+
+        clock.reset(duration: 1, metered: true)
+        if let engine = activeEngine {
+            let d = engine.duration
+            if d.isFinite, d > 0 { clock.duration = d }
+        }
+        startTimer()
+        updateNowPlayingInfo()
+        persistNowPlaying(force: true)
+        maybeExtendQueue()
+        preloadNextTrack()
     }
 
     // MARK: - Endless autoplay

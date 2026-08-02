@@ -47,6 +47,35 @@ enum TestAudioFile {
         return url
     }
 
+    /// A tone at a *different* format, for testing what happens when the next
+    /// track cannot join the current one seamlessly.
+    static func makeToneAtOtherFormat(named name: String = "other.m4a",
+                                      seconds: Double = 0.5) throws -> URL {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("SonavaTests-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+
+        let url = directory.appendingPathComponent(name)
+        let sampleRate = 22_050.0        // half the standard fixture's rate
+        guard let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1),
+              let buffer = AVAudioPCMBuffer(pcmFormat: format,
+                                            frameCapacity: AVAudioFrameCount(sampleRate * seconds))
+        else { throw CocoaError(.fileWriteUnknown) }
+
+        buffer.frameLength = buffer.frameCapacity
+        let samples = buffer.floatChannelData![0]
+        for frame in 0..<Int(buffer.frameLength) {
+            samples[frame] = 0.25 * sinf(2.0 * .pi * 330.0 * Float(frame) / Float(sampleRate))
+        }
+        let file = try AVAudioFile(forWriting: url, settings: [
+            AVFormatIDKey: kAudioFormatMPEG4AAC,
+            AVSampleRateKey: sampleRate,
+            AVNumberOfChannelsKey: 1,
+        ])
+        try file.write(from: buffer)
+        return url
+    }
+
     static func cleanUp(_ url: URL) {
         try? FileManager.default.removeItem(at: url.deletingLastPathComponent())
     }

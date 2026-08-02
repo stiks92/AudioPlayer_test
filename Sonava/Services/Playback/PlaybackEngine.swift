@@ -23,6 +23,10 @@ import os
 @MainActor
 protocol PlaybackEngine: AnyObject {
     var onFinish: (() -> Void)? { get set }
+    /// The engine started the *preloaded* track without stopping — playback
+    /// never paused, so the app must catch its state up rather than load
+    /// anything. Only the local engine can do this; see `preloadNext`.
+    var onAdvancedToNext: (() -> Void)? { get set }
     var isPlaying: Bool { get }
     var currentTime: Double { get }
     var duration: Double { get }
@@ -39,6 +43,21 @@ protocol PlaybackEngine: AnyObject {
     func apply(_ equalizer: EqualizerSettings)
     func refresh()          // sampled by AudioManager's timer
     func teardown()
+
+    /// Queues the next track so it begins the sample after this one ends.
+    /// Returns whether the engine could do it — a format change, a stream, or
+    /// an unreadable file all mean "no", and the caller falls back to loading
+    /// the track the ordinary way.
+    @discardableResult
+    func preloadNext(url: URL) -> Bool
+    /// Forgets anything queued — the queue changed under us.
+    func cancelPreload()
+}
+
+extension PlaybackEngine {
+    @discardableResult
+    func preloadNext(url: URL) -> Bool { false }
+    func cancelPreload() {}
 }
 
 // MARK: - Local files (AVAudioEngine graph: player → EQ → timePitch → mixer)
@@ -46,6 +65,7 @@ protocol PlaybackEngine: AnyObject {
 final class LocalAudioEngine: PlaybackEngine {
 
     var onFinish: (() -> Void)?
+    var onAdvancedToNext: (() -> Void)?
 
     private let engine = AVAudioEngine()
     private let player = AVAudioPlayerNode()
@@ -60,9 +80,22 @@ final class LocalAudioEngine: PlaybackEngine {
     private var playing = false
     private var volume: Float = 0.75
     private var rate: Float = 1.0
-    /// Bumped on every (re)schedule so a stale completion callback — fired when
-    /// we stop to seek — cannot be mistaken for a track finishing.
+    /// Bumped whenever the node is *stopped* — seek, prepare, teardown — so a
+    /// completion callback from the discarded run cannot be mistaken for a
+    /// track finishing. It is deliberately not bumped when queueing the next
+    /// track, because that schedule must stay valid alongside the current one.
     private var scheduleGeneration = 0
+    /// Identifies one scheduled segment within a run.
+    private var lastSegmentID = 0
+    private var playingSegmentID = 0
+    /// The track queued to start the instant this one ends — the whole of
+    /// gapless playback.
+    private var preloaded: (id: Int, file: AVAudioFile)?
+    /// Frames of this uninterrupted run already spent on *earlier* tracks.
+    /// The node's clock keeps running across queued segments, so without this
+    /// the second track of a gapless pair would report the first track's
+    /// elapsed time as its own.
+    private var runOffsetFrames: AVAudioFramePosition = 0
     private var lastKnownTime: Double = 0
 
     /// Written by the render-thread metering tap, read on the main actor.
@@ -77,7 +110,8 @@ final class LocalAudioEngine: PlaybackEngine {
         if playing,
            let nodeTime = player.lastRenderTime,
            let playerTime = player.playerTime(forNodeTime: nodeTime) {
-            let played = max(0, Double(playerTime.sampleTime) / playerTime.sampleRate)
+            let ownFrames = max(0, playerTime.sampleTime - runOffsetFrames)
+            let played = Double(ownFrames) / playerTime.sampleRate
             lastKnownTime = min(Double(segmentStartFrame) / sampleRate + played, duration)
         }
         return lastKnownTime
@@ -192,6 +226,8 @@ final class LocalAudioEngine: PlaybackEngine {
 
     func teardown() {
         scheduleGeneration += 1
+        preloaded = nil
+        runOffsetFrames = 0
         player.stop()
         engine.mainMixerNode.removeTap(onBus: 0)
         engine.stop()
@@ -205,26 +241,88 @@ final class LocalAudioEngine: PlaybackEngine {
 
     private func scheduleFrom(_ startFrame: AVAudioFramePosition) {
         guard let file else { return }
+        // Any queued follow-on belonged to the schedule being replaced.
+        preloaded = nil
+        runOffsetFrames = 0
         let remaining = AVAudioFrameCount(max(0, totalFrames - startFrame))
         guard remaining > 0 else { return }
 
-        scheduleGeneration += 1
+        lastSegmentID += 1
+        playingSegmentID = lastSegmentID
+        schedule(file, from: startFrame, frames: remaining, id: playingSegmentID)
+    }
+
+    private func schedule(_ file: AVAudioFile, from startFrame: AVAudioFramePosition,
+                          frames: AVAudioFrameCount, id: Int) {
         let generation = scheduleGeneration
         player.scheduleSegment(
             file,
             startingFrame: startFrame,
-            frameCount: remaining,
+            frameCount: frames,
             at: nil,
             completionCallbackType: .dataPlayedBack
         ) { [weak self] _ in
-            Task { @MainActor in self?.handleCompletion(generation) }
+            Task { @MainActor in self?.handleCompletion(generation: generation, segment: id) }
         }
     }
 
-    private func handleCompletion(_ generation: Int) {
-        // Only a completion for the still-current schedule, while we believe we
-        // are playing, means the track actually reached its end.
+    /// Queues the next track behind the current one.
+    ///
+    /// `AVAudioPlayerNode` renders queued segments back to back with no gap at
+    /// all, which is the entire trick — but only while the format stays put,
+    /// because the node is connected to the graph with one format. A rate or
+    /// channel-count change means the ordinary load path has to run, and the
+    /// half-second it costs is honest: the hardware really is being
+    /// reconfigured.
+    @discardableResult
+    func preloadNext(url: URL) -> Bool {
+        guard let current = file, preloaded == nil else { return false }
+        guard let next = try? AVAudioFile(forReading: url) else { return false }
+
+        let a = current.processingFormat, b = next.processingFormat
+        guard a.sampleRate == b.sampleRate,
+              a.channelCount == b.channelCount,
+              a.commonFormat == b.commonFormat else { return false }
+
+        let frames = AVAudioFrameCount(next.length)
+        guard frames > 0 else { return false }
+
+        lastSegmentID += 1
+        preloaded = (id: lastSegmentID, file: next)
+        schedule(next, from: 0, frames: frames, id: lastSegmentID)
+        return true
+    }
+
+    func cancelPreload() {
+        // The scheduled segment cannot be un-queued without stopping the node,
+        // which would break the gapless join we are protecting. Dropping the
+        // reference is enough: when the current track ends, the completion
+        // finds nothing queued and reports a finish, and `AudioManager` loads
+        // whatever the queue now says — the extra audio is stopped by that
+        // load, not heard.
+        preloaded = nil
+    }
+
+    private func handleCompletion(generation: Int, segment: Int) {
+        // A completion from a discarded run (we stopped to seek) means nothing.
         guard generation == scheduleGeneration, playing else { return }
+        guard segment == playingSegmentID else { return }
+
+        if let next = preloaded {
+            // The node is already rendering the queued track: nothing to
+            // start, only bookkeeping to catch up.
+            runOffsetFrames += max(0, totalFrames - segmentStartFrame)
+            file = next.file
+            totalFrames = next.file.length
+            sampleRate = next.file.processingFormat.sampleRate
+            segmentStartFrame = 0
+            lastKnownTime = 0
+            playingSegmentID = next.id
+            preloaded = nil
+            onAdvancedToNext?()
+            return
+        }
+
         playing = false
         onFinish?()
     }
@@ -271,6 +369,10 @@ final class LocalAudioEngine: PlaybackEngine {
 
 final class RemoteAudioEngine: NSObject, PlaybackEngine {
     var onFinish: (() -> Void)?
+    /// Never called: AVPlayer item transitions are not gapless, so the remote
+    /// engine always reports a plain finish and lets the app load the next
+    /// track.
+    var onAdvancedToNext: (() -> Void)?
     private var player: AVPlayer?
     private var endObserver: NSObjectProtocol?
     private var playing = false
