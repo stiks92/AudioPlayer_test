@@ -70,10 +70,12 @@ struct ConnectScrobbleView: View {
         .card(cornerRadius: Radius.card)
 
         Toggle(isOn: $scrobble.isEnabled) {
-            Label("Scrobble my plays", systemImage: "dot.radiowaves.up.forward")
-                .font(.system(.subheadline))
+            HStack(spacing: Space.iconGap) {
+                SonavaIcon(glyph: .scrobble, size: 20, tint: Theme.textSecondary)
+                Text("Scrobble my plays").font(.system(.subheadline))
+            }
         }
-        .tint(Theme.accent)
+        .tint(Theme.accentDeep)
         .padding(Space.l)
         .card(cornerRadius: Radius.card)
 

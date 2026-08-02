@@ -97,7 +97,7 @@ struct EqualizerView: View {
                 .font(.system(.body).weight(.bold))
                 .accessibilityIdentifier("eq.selectedPreset")
         }
-        .tint(Theme.accent)
+        .tint(Theme.accentDeep)
         .accessibilityIdentifier(AccessibilityID.eqEnable)
     }
 
@@ -205,7 +205,7 @@ struct EqualizerView: View {
                 ),
                 in: Double(-EqualizerSettings.gainLimit)...Double(EqualizerSettings.gainLimit)
             )
-            .tint(Theme.accent)
+            .tint(Theme.accent)   // a slider's white knob stays distinct on the ivory fill
         }
         .padding(Space.l)
         .card(cornerRadius: Radius.card)

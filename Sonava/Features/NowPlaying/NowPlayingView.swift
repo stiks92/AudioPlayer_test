@@ -110,9 +110,7 @@ struct NowPlayingView: View {
     private var header: some View {
         HStack {
             Button { onClose() } label: {
-                Image(systemName: "chevron.down")
-                    .font(.system(.body).weight(.semibold))
-                    .foregroundColor(.white.opacity(0.85))
+                SonavaIcon(glyph: .chevronDown, size: 19, tint: .white.opacity(0.85))
                     .frame(width: Space.hitTarget, height: Space.hitTarget)
                     .contentShape(Rectangle())
             }
@@ -130,9 +128,7 @@ struct NowPlayingView: View {
                 .lineLimit(1)
             Spacer()
             Button { showQueue = true } label: {
-                Image(systemName: "ellipsis")
-                    .font(.system(.body).weight(.semibold))
-                    .foregroundColor(.white.opacity(0.85))
+                SonavaIcon(glyph: .more, size: 19, tint: .white.opacity(0.85))
                     .frame(width: Space.hitTarget, height: Space.hitTarget)
                     .contentShape(Rectangle())
             }

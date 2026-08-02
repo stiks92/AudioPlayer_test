@@ -84,21 +84,26 @@ struct SettingsView: View {
     @ViewBuilder
     private var proCard: some View {
         if proStore.isPro {
-            HStack(alignment: .top, spacing: Space.iconGap) {
-                Image(systemName: "checkmark.seal.fill")
-                    .font(.system(.title).weight(.bold))
-                    .foregroundColor(.white)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Sonava Pro").font(.system(.body).weight(.bold))
+            // Quiet, like a paid-up receipt should be: no gradient shouting
+            // about money already spent. The checkmark draws itself in on
+            // appear — the one place the status earns a little motion.
+            HStack(spacing: Space.l) {
+                AnimatedIcon(glyph: .checkmark, mode: .toggle(true),
+                             size: 22, tint: Theme.accentWarm)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Sonava Pro")
+                        .font(.system(.footnote).weight(.semibold))
+                        .textCase(.uppercase).tracking(2.2)
+                        .foregroundColor(Theme.accent)
                     Text("Active — thank you for your support!")
-                        .font(.caption).foregroundColor(.white)
+                        .font(.caption).foregroundColor(Theme.textSecondary)
                 }
                 Spacer()
             }
-            .padding(Space.l)
-            .background(Theme.brandGradient)
-            .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
+            .padding(.vertical, Space.m)
         } else {
+            // The upsell keeps the app's one warm gradient — it is the door
+            // to the paywall and allowed to look like one.
             Button { showPaywall = true } label: {
                 HStack(spacing: Space.l) {
                     SonavaIcon(glyph: .aiMix, size: 28)
@@ -108,7 +113,7 @@ struct SettingsView: View {
                             .font(.caption).foregroundColor(.white.opacity(0.85))
                     }
                     Spacer()
-                    Image(systemName: "chevron.right").foregroundColor(.white.opacity(0.8))
+                    SonavaIcon(glyph: .chevronRight, size: 16, tint: .white.opacity(0.8))
                 }
                 .padding(Space.l)
                 .background(Theme.proGradient)
@@ -203,9 +208,7 @@ struct SettingsView: View {
                         RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
                             .fill(Color.black.opacity(0.45))
                             .frame(width: Swatch.size, height: Swatch.size)
-                        Image(systemName: "lock.fill")
-                            .font(.system(.subheadline).weight(.bold))
-                            .foregroundColor(.white)
+                        SonavaIcon(glyph: .lock, size: 15)
                     }
                 }
                 Text(LocalizedStringKey(option.name))
@@ -234,23 +237,22 @@ struct SettingsView: View {
         } label: {
             VStack(spacing: 6) {
                 ZStack {
+                    // A flat disc of the accent itself, not a three-stop
+                    // gradient blob: the swatch answers "what colour will my
+                    // accents be", and a gradient answers a different
+                    // question nothing in the app asks any more.
                     Circle()
-                        .fill(LinearGradient(colors: palette.swatch, startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .fill(palette.accentColor)
                         .frame(width: Swatch.size, height: Swatch.size)
                         .overlay(
                             Circle().strokeBorder(selected ? Color.white : Color.white.opacity(0.15),
                                                   lineWidth: selected ? 3 : 1)
                         )
                     if locked {
-                        Image(systemName: "lock.fill")
-                            .font(.system(.subheadline).weight(.bold))
-                            .foregroundColor(.white)
-                            .shadow(radius: 2)
+                        SonavaIcon(glyph: .lock, size: 14, tint: .black.opacity(0.75))
                     } else if selected {
-                        Image(systemName: "checkmark")
-                            .font(.system(.callout).weight(.bold))
-                            .foregroundColor(.white)
-                            .shadow(radius: 2)
+                        AnimatedIcon(glyph: .checkmark, mode: .toggle(true),
+                                     size: 15, tint: .black.opacity(0.8))
                     }
                 }
                 Text(LocalizedStringKey(palette.name))
@@ -273,11 +275,11 @@ struct SettingsView: View {
 
     private var playbackSection: some View {
         section("Playback") {
-            row(icon: "slider.vertical.3", title: "Equalizer", value: equalizerValue) {
+            row(icon: .equalizer, title: "Equalizer", value: equalizerValue) {
                 showEqualizer = true
             }
             divider
-            row(icon: "moon.zzz.fill", title: "Sleep timer", value: sleepTimerValue) {
+            row(icon: .sleep, title: "Sleep timer", value: sleepTimerValue) {
                 showSleepOptions = true
             }
             divider
@@ -286,14 +288,12 @@ struct SettingsView: View {
             // card's left edge. It uses the same leading column as `row()`.
             Toggle(isOn: $audio.autoExtendEnabled) {
                 HStack(spacing: Space.iconGap) {
-                    Image(systemName: "infinity")
-                        .font(.sonavaRowTitle)
+                    SonavaIcon(glyph: .infinity, size: 20, tint: Theme.textSecondary)
                         .frame(width: Space.iconColumn, height: Space.iconColumn)
-                        .foregroundColor(Theme.textSecondary)
                     Text("Endless playback").font(.system(.subheadline))
                 }
             }
-            .tint(Theme.accent)
+            .tint(Theme.accentDeep)   // ivory knob on ivory track vanished; umber keeps the knob visible
             .padding(.vertical, 6)
         }
     }
@@ -318,22 +318,22 @@ struct SettingsView: View {
     private var sourcesSection: some View {
         section("Sources") {
             VStack(spacing: 0) {
-                staticRow(icon: "waveform", title: "Audius",
+                staticRow(icon: .wave, title: "Audius",
                           value: "Connected", valueColor: Theme.positive)
                 divider
-                staticRow(icon: "dot.radiowaves.left.and.right", title: "Internet Radio",
+                staticRow(icon: .radio, title: "Internet Radio",
                           value: "Connected", valueColor: Theme.positive)
                 divider
-                row(icon: "server.rack", title: "Self-hosted (Subsonic)", value: selfHostedValue) {
+                row(icon: .server, title: "Self-hosted (Subsonic)", value: selfHostedValue) {
                     showConnectServer = true
                 }
                 divider
-                row(icon: "waveform.badge.magnifyingglass", title: "Scrobble to ListenBrainz",
+                row(icon: .scrobble, title: "Scrobble to ListenBrainz",
                     value: scrobbleValue) {
                     if proStore.isPro { showScrobble = true } else { showPaywall = true }
                 }
                 divider
-                staticRow(icon: "music.note.list", title: "Spotify / Apple Music",
+                staticRow(icon: .note, title: "Spotify / Apple Music",
                           value: "Soon", valueColor: Theme.textTertiary)
             }
         }
@@ -348,11 +348,11 @@ struct SettingsView: View {
     private var supportSection: some View {
         section("Support") {
             VStack(spacing: 0) {
-                row(icon: "arrow.clockwise", title: "Restore purchases", value: nil) {
+                row(icon: .restore, title: "Restore purchases", value: nil) {
                     Task { await proStore.restore() }
                 }
                 divider
-                staticRow(icon: "lock.shield", title: "Privacy",
+                staticRow(icon: .shield, title: "Privacy",
                           value: "On-device", valueColor: Theme.textSecondary)
                 #if DEBUG
                 divider
@@ -361,14 +361,12 @@ struct SettingsView: View {
                     set: { proStore.setDeveloperOverride($0) }
                 )) {
                     HStack(spacing: Space.iconGap) {
-                        Image(systemName: "hammer")
-                            .font(.sonavaRowTitle)
+                        SonavaIcon(glyph: .server, size: 20, tint: Theme.textSecondary)
                             .frame(width: Space.iconColumn, height: Space.iconColumn)
-                            .foregroundColor(Theme.textSecondary)
                         Text("Developer: unlock Pro").font(.system(.subheadline))
                     }
                 }
-                .tint(Theme.accent)
+                .tint(Theme.accentDeep)   // ivory knob on ivory track vanished; umber keeps the knob visible
                 .padding(.vertical, Space.m)
                 #endif
             }
@@ -377,41 +375,40 @@ struct SettingsView: View {
 
     // MARK: - Building blocks
 
+    /// A section is a tracked-caps header over hairline-ruled rows on the
+    /// bare ground — the anchor's language. The boxed cards this screen wore
+    /// were the last of the old skeleton: a settings list is not elevated
+    /// content, it is the page itself.
     private func section<Content: View>(
         _ title: LocalizedStringKey,
         @ViewBuilder content: () -> Content
     ) -> some View {
-        VStack(alignment: .leading, spacing: Space.m) {
+        VStack(alignment: .leading, spacing: Space.s) {
             Text(title)
                 .textCase(.uppercase)
                 .font(.system(.caption).weight(.bold))
                 .tracking(1)
                 .foregroundColor(Theme.textTertiary)
             VStack(spacing: 0) { content() }
-                .padding(.horizontal, Space.l)
-                .padding(.vertical, 4)
-                .card(cornerRadius: Radius.card)
         }
     }
 
     private func row(
-        icon: String,
+        icon: SonavaIcon.Glyph,
         title: LocalizedStringKey,
         value: LocalizedStringKey?,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
             HStack(spacing: Space.l) {
-                Image(systemName: icon)
-                    .font(.sonavaRowTitle)
+                SonavaIcon(glyph: icon, size: 20, tint: Theme.textSecondary)
                     .frame(width: Space.iconColumn, height: Space.iconColumn)
-                    .foregroundColor(Theme.textSecondary)
                 Text(title).font(.system(.subheadline))
                 Spacer()
                 if let value {
                     Text(value).font(.system(.footnote)).foregroundColor(Theme.textSecondary)
                 }
-                Image(systemName: "chevron.right").font(.system(.caption)).foregroundColor(Theme.textTertiary)
+                SonavaIcon(glyph: .chevronRight, size: 13, tint: Theme.textTertiary)
             }
             .padding(.vertical, Space.m)
             .frame(minHeight: Space.hitTarget)
@@ -421,16 +418,14 @@ struct SettingsView: View {
     }
 
     private func staticRow(
-        icon: String,
+        icon: SonavaIcon.Glyph,
         title: LocalizedStringKey,
         value: LocalizedStringKey,
         valueColor: Color
     ) -> some View {
         HStack(spacing: Space.l) {
-            Image(systemName: icon)
-                    .font(.sonavaRowTitle)
-                    .frame(width: Space.iconColumn, height: Space.iconColumn)
-                    .foregroundColor(Theme.textSecondary)
+            SonavaIcon(glyph: icon, size: 20, tint: Theme.textSecondary)
+                .frame(width: Space.iconColumn, height: Space.iconColumn)
             Text(title).font(.system(.subheadline))
             Spacer()
             Text(value).font(.system(.footnote).weight(.semibold)).foregroundColor(valueColor)

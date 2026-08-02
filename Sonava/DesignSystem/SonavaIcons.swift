@@ -60,6 +60,8 @@ struct SonavaIcon: View {
         case home, search, radio, podcasts, library
         case play, pause, next, previous, shuffle
         case aiMix, equalizer, download, note, streak, heart, server, stats
+        case chevronRight, chevronDown, more, sleep, infinity
+        case restore, shield, scrobble, wave, lock
     }
 
     let glyph: Glyph
@@ -347,6 +349,122 @@ struct SonavaIcon: View {
             bar(&stroked, x: 5.5, from: 15.5, to: 20)
             bar(&stroked, x: 12, from: 8.5, to: 20)
             bar(&stroked, x: 18.5, from: 4, to: 20)
+
+        case .chevronRight:
+            // Disclosure. Drawn a hair lighter: two bare strokes read heavier
+            // than an arc-built glyph at the same weight.
+            weight = 1.8
+            stroked.move(to: p(10, 7))
+            stroked.addLine(to: p(15, 12))
+            stroked.addLine(to: p(10, 17))
+
+        case .chevronDown:
+            weight = 1.8
+            stroked.move(to: p(7, 10))
+            stroked.addLine(to: p(12, 15))
+            stroked.addLine(to: p(17, 10))
+
+        case .more:
+            // Three dots, the family's dot size (the radio source, the disc
+            // spindle) rather than the system's.
+            var dots = Path()
+            for x in [5.5, 12, 18.5] as [CGFloat] {
+                dots.addEllipse(in: CGRect(x: (x - 1.6) / Icon.grid * s,
+                                           y: (12 - 1.6) / Icon.grid * s,
+                                           width: 3.2 / Icon.grid * s,
+                                           height: 3.2 / Icon.grid * s))
+            }
+            filled = dots
+
+        case .sleep:
+            // A timer dial, not a crescent. Two crescent drafts failed on the
+            // gallery sheet — a hook, then a razor-thin ring that read as a
+            // plain circle — and the row this serves is literally "Sleep
+            // timer", so the dial is the truer glyph anyway. Face plus two
+            // hands at ten-past-ten, all strokes.
+            var face = Path()
+            face.addArc(center: p(12, 12), radius: 7.2 / Icon.grid * s,
+                        startAngle: .degrees(0), endAngle: .degrees(360),
+                        clockwise: false)
+            stroked.addPath(face)
+            stroked.move(to: p(12, 12))
+            stroked.addLine(to: p(12, 8))
+            stroked.move(to: p(12, 12))
+            stroked.addLine(to: p(15, 13.6))
+
+        case .infinity:
+            // A lemniscate as two teardrops meeting in the middle — arcs and
+            // round joins, no straight segments anywhere.
+            stroked.move(to: p(12, 12))
+            stroked.addCurve(to: p(12, 12),
+                             control1: p(20.5, 5.6), control2: p(20.5, 18.4))
+            stroked.addCurve(to: p(12, 12),
+                             control1: p(3.5, 5.6), control2: p(3.5, 18.4))
+
+        case .restore:
+            // An open circle with an arrowhead at its mouth.
+            var arc = Path()
+            arc.addArc(center: p(12, 12), radius: 7 / Icon.grid * s,
+                       startAngle: .degrees(80), endAngle: .degrees(400),
+                       clockwise: false)
+            stroked.addPath(arc)
+            let tip = CGPoint(x: (12 + 7 * cos(.pi * 40 / 180)) / Icon.grid * s,
+                              y: (12 + 7 * sin(.pi * 40 / 180)) / Icon.grid * s)
+            var head = Path()
+            head.move(to: CGPoint(x: tip.x - 3.6 / Icon.grid * s, y: tip.y - 0.4 / Icon.grid * s))
+            head.addLine(to: tip)
+            head.addLine(to: CGPoint(x: tip.x - 0.4 / Icon.grid * s, y: tip.y - 3.6 / Icon.grid * s))
+            stroked.addPath(head)
+
+        case .shield:
+            // Symmetric curves to a rounded point; the top edge dips like the
+            // mark's arcs rather than running flat.
+            stroked.move(to: p(12, 4.4))
+            stroked.addCurve(to: p(19, 7.2),
+                             control1: p(14.4, 5.6), control2: p(17, 6.6))
+            stroked.addCurve(to: p(12, 19.8),
+                             control1: p(19, 13.6), control2: p(16.4, 17.6))
+            stroked.addCurve(to: p(5, 7.2),
+                             control1: p(7.6, 17.6), control2: p(5, 13.6))
+            stroked.addCurve(to: p(12, 4.4),
+                             control1: p(7, 6.6), control2: p(9.6, 5.6))
+            stroked.closeSubpath()
+
+        case .scrobble:
+            // The radio glyph turned on its side: a source dot broadcasting
+            // to the right — listens leaving the building.
+            let source = p(5.4, 12)
+            filled = Path(ellipseIn: CGRect(x: source.x - 1.7 / Icon.grid * s,
+                                            y: source.y - 1.7 / Icon.grid * s,
+                                            width: 3.4 / Icon.grid * s,
+                                            height: 3.4 / Icon.grid * s))
+            for radius in [5.4, 10.8] as [CGFloat] {
+                var arc = Path()
+                arc.addArc(center: source, radius: radius / Icon.grid * s,
+                           startAngle: .degrees(-48), endAngle: .degrees(48),
+                           clockwise: false)
+                stroked.addPath(arc)
+            }
+
+        case .wave:
+            // One clean sine period — a stream, not the mark's bars.
+            stroked.move(to: p(3, 12))
+            stroked.addCurve(to: p(12, 12),
+                             control1: p(6, 4.6), control2: p(9, 4.6))
+            stroked.addCurve(to: p(21, 12),
+                             control1: p(15, 19.4), control2: p(18, 19.4))
+
+        case .lock:
+            // Body as a rounded rect, shackle as an arc.
+            stroked.addRoundedRect(in: CGRect(x: 5.5 / Icon.grid * s, y: 11 / Icon.grid * s,
+                                              width: 13 / Icon.grid * s, height: 9 / Icon.grid * s),
+                                   cornerSize: CGSize(width: 2.6 / Icon.grid * s,
+                                                      height: 2.6 / Icon.grid * s))
+            var shackle = Path()
+            shackle.addArc(center: p(12, 11), radius: 4 / Icon.grid * s,
+                           startAngle: .degrees(180), endAngle: .degrees(360),
+                           clockwise: false)
+            stroked.addPath(shackle)
         }
 
         return Drawing(stroked: stroked, filled: filled, weight: weight)
@@ -358,7 +476,10 @@ struct SonavaIcon: View {
     let all: [SonavaIcon.Glyph] = [.home, .search, .radio, .podcasts, .library,
                                    .play, .pause, .next, .previous, .shuffle,
                                    .aiMix, .equalizer, .download, .note,
-                                   .streak, .heart, .server, .stats]
+                                   .streak, .heart, .server, .stats,
+                                   .chevronRight, .chevronDown, .more, .sleep,
+                                   .infinity, .restore, .shield, .scrobble,
+                                   .wave, .lock]
     return ZStack {
         Theme.background.ignoresSafeArea()
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 28) {
@@ -385,7 +506,11 @@ struct IconGallery: View {
         (.previous, "previous"), (.shuffle, "shuffle"),
         (.aiMix, "aiMix"), (.equalizer, "equalizer"), (.download, "download"),
         (.note, "note"), (.streak, "streak"), (.heart, "heart"),
-        (.server, "server"), (.stats, "stats")
+        (.server, "server"), (.stats, "stats"),
+        (.chevronRight, "chevronRight"), (.chevronDown, "chevronDown"),
+        (.more, "more"), (.sleep, "sleep"), (.infinity, "infinity"),
+        (.restore, "restore"), (.shield, "shield"), (.scrobble, "scrobble"),
+        (.wave, "wave"), (.lock, "lock")
     ]
 
     var body: some View {

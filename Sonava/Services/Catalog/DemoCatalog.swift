@@ -185,7 +185,7 @@ enum DemoCatalog {
         Podcast(
             title: title,
             author: author,
-            artworkURL: artwork(seed: title),
+            artworkURL: artwork(seed: title, kind: "podcasts"),
             feedURL: URL(string: "https://demo.invalid/\(title.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "feed").xml")!
         )
     }
@@ -237,24 +237,34 @@ enum DemoCatalog {
     /// order; cached so a seed keeps its sleeve across rebuilds of the list.
     /// Lock-guarded rather than actor-isolated so the nonisolated builders
     /// (and unit tests) can keep calling synchronously.
+    ///
+    /// Assignment tables are per *kind* — podcasts draw from a `podcasts/`
+    /// subfolder of the art directory when one exists, so fictional shows
+    /// stop wearing famous record sleeves that the music shelves are wearing
+    /// on the next tab over. A kind falls back to the root pool (real art,
+    /// duplication risk) before it falls back to anything generated.
     private static let artLock = NSLock()
-    private static nonisolated(unsafe) var artAssignments: [String: Int] = [:]
+    private static nonisolated(unsafe) var artAssignments: [String: [String: Int]] = [:]
 
-    private static func artwork(seed: String) -> URL? {
+    private static func artwork(seed: String, kind: String = "") -> URL? {
         if let dir = artDir {
-            let files = ((try? FileManager.default.contentsOfDirectory(atPath: dir)) ?? [])
-                .filter { $0.hasSuffix(".jpg") }.sorted()
-            if !files.isEmpty {
+            let candidates = kind.isEmpty ? [dir] : [dir + "/" + kind, dir]
+            for candidate in candidates {
+                let files = ((try? FileManager.default.contentsOfDirectory(atPath: candidate)) ?? [])
+                    .filter { $0.hasSuffix(".jpg") }.sorted()
+                guard !files.isEmpty else { continue }
                 artLock.lock()
+                var table = artAssignments[candidate] ?? [:]
                 let index: Int
-                if let assigned = artAssignments[seed] {
+                if let assigned = table[seed] {
                     index = assigned
                 } else {
-                    index = artAssignments.count % files.count
-                    artAssignments[seed] = index
+                    index = table.count % files.count
+                    table[seed] = index
+                    artAssignments[candidate] = table
                 }
                 artLock.unlock()
-                return URL(fileURLWithPath: dir).appendingPathComponent(files[index])
+                return URL(fileURLWithPath: candidate).appendingPathComponent(files[index])
             }
         }
         return generatedArtwork(seed: seed)
