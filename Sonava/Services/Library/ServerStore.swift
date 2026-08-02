@@ -141,6 +141,34 @@ final class ServerStore: ObservableObject {
                                password: password, libraryID: connection.id)
     }
 
+    /// Rebuilds a track someone shared from *their* copy of a server this
+    /// listener also uses — with this listener's own credentials.
+    ///
+    /// A shared link carries only the host and the server's own track id
+    /// (see `PlaylistSharing`), never the sender's auth token. So the match
+    /// is by host: a family sharing one Navidrome each play through their own
+    /// login, and a link from a stranger's server resolves to nothing rather
+    /// than to a borrowed session.
+    func resolveSharedTrack(host: String, trackID: String,
+                            title: String, artist: String, album: String,
+                            duration: Double?) -> Song? {
+        guard let connection = usableServers.first(where: {
+            $0.url?.host?.caseInsensitiveCompare(host) == .orderedSame
+        }), let service = service(for: connection) else { return nil }
+
+        return Song(
+            id: "subsonic:\(connection.id):\(trackID)",
+            title: title,
+            artist: artist,
+            album: album,
+            source: .subsonic,
+            artworkURL: service.coverArtURL(id: trackID),
+            streamURL: service.streamURL(id: trackID),
+            gradientHex: Palette.hex(forSeed: trackID),
+            durationSeconds: duration
+        )
+    }
+
     // MARK: - Reachability
 
     func health(for connection: ServerConnection) -> ServerHealth {
@@ -223,6 +251,20 @@ final class ServerStore: ObservableObject {
         }
         Haptics.success()
         return true
+    }
+
+    /// Adds a connection carried by a backup.
+    ///
+    /// No password: it stayed in the source phone's Keychain, which is where
+    /// a password belongs. The row appears in Settings with its address and
+    /// username filled in, and asks for the password the first time it is
+    /// used — a restore that silently produced a broken server row would be
+    /// worse than one that says what it needs.
+    func addRestored(_ connection: ServerConnection) {
+        guard !servers.contains(where: { $0.urlString == connection.urlString }) else { return }
+        servers.append(connection)
+        if activeID == nil { activeID = connection.id }
+        persist()
     }
 
     /// Persists an already-validated connection and makes it active.

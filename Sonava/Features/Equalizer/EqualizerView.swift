@@ -293,7 +293,7 @@ struct EqualizerView: View {
             Text("The equalizer is a Pro feature")
                 .font(.system(.title2).weight(.bold))
                 .multilineTextAlignment(.center)
-            Text("Ten bands, a pre-amp and a dozen presets to shape your sound exactly the way you like it.")
+            Text("Ten bands, a pre-amp and a dozen presets to shape your sound exactly the way you like it — on your own files and offline downloads.")
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.8))
                 .multilineTextAlignment(.center)

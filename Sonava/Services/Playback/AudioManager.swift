@@ -49,6 +49,13 @@ final class AudioManager: NSObject, ObservableObject {
     /// the queue drifts toward what the listener likes.
     var tasteProfile: TasteProfile = .init(topArtists: [])
 
+    /// What this listener has heard lately, newest first — set by the app from
+    /// its library. `Shuffle` sinks these toward the back so a shuffled queue
+    /// stops replaying the same handful of tracks across sessions, which is
+    /// the single most common complaint about shuffle in every player's
+    /// reviews. Empty is fine: shuffle then behaves as plain random.
+    var recentlyHeard: [Song] = []
+
     /// Offline downloads, shared with the UI. Resolved ahead of the stream URL
     /// so a saved track plays with no network.
     let downloads = DownloadStore()
@@ -151,7 +158,7 @@ final class AudioManager: NSObject, ObservableObject {
     func play(_ song: Song, in context: [Song]) {
         baseQueue = context
         if isShuffling {
-            let rest = context.filter { $0 != song }.shuffled()
+            let rest = Shuffle.ordered(context.filter { $0 != song }, recent: recentlyHeard)
             queue = [song] + rest
             currentIndex = 0
         } else {
@@ -275,7 +282,8 @@ final class AudioManager: NSObject, ObservableObject {
         isShuffling.toggle()
         guard let current = currentSong else { return }
         if isShuffling {
-            let rest = baseQueue.filter { $0 != current }.shuffled()
+            let rest = Shuffle.ordered(baseQueue.filter { $0 != current },
+                                       recent: recentlyHeard)
             queue = [current] + rest
             currentIndex = 0
         } else {
@@ -527,13 +535,40 @@ final class AudioManager: NSObject, ObservableObject {
         if !song.isLive {
             info[MPMediaItemPropertyPlaybackDuration] = clock.duration
         }
-        // Lock-screen art comes from the track's extracted cover file, if it
-        // has one. Remote covers aren't fetched synchronously here.
-        if let cover = song.artworkURL, cover.isFileURL,
-           let image = UIImage(contentsOfFile: cover.path) {
-            info[MPMediaItemPropertyArtwork] = Self.artwork(for: image)
+        // Lock-screen art. Local covers load straight from disk; remote ones
+        // (server, Audius, podcasts — every track that isn't an imported
+        // file) are fetched once and cached, because until now the lock
+        // screen, CarPlay and every AirPlay receiver showed a blank square
+        // for the majority of what this app plays.
+        if let cover = song.artworkURL {
+            if cover.isFileURL, let image = UIImage(contentsOfFile: cover.path) {
+                info[MPMediaItemPropertyArtwork] = Self.artwork(for: image)
+            } else if let cached = Self.remoteArtCache.object(forKey: cover as NSURL) {
+                info[MPMediaItemPropertyArtwork] = Self.artwork(for: cached)
+            } else {
+                fetchRemoteArtwork(cover, for: song.id)
+            }
         }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+    }
+
+    /// Remote cover art, keyed by URL. An `NSCache` so the system can evict it
+    /// under memory pressure — album art is worth showing, never worth an OOM.
+    private static let remoteArtCache = NSCache<NSURL, UIImage>()
+
+    /// Downloads a remote cover, then re-publishes Now Playing so the lock
+    /// screen picks it up. Silent on failure: missing art is a blank square,
+    /// not an error worth telling anyone about.
+    private func fetchRemoteArtwork(_ url: URL, for songID: String) {
+        Task { [weak self] in
+            guard let (data, _) = try? await URLSession.shared.data(from: url),
+                  let image = UIImage(data: data) else { return }
+            Self.remoteArtCache.setObject(image, forKey: url as NSURL)
+            guard let self, self.currentSong?.id == songID else { return }
+            var info = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
+            info[MPMediaItemPropertyArtwork] = Self.artwork(for: image)
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+        }
     }
 
     /// MediaPlayer invokes the artwork request handler on an arbitrary thread.

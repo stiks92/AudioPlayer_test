@@ -46,9 +46,13 @@ struct LibraryView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: Space.screenMargin) {
-                        Text("Your Library")
-                            .font(.sonavaMasthead)
-                            .foregroundColor(Theme.textPrimary)
+                        HStack(alignment: .firstTextBaseline) {
+                            Text("Your Library")
+                                .font(.sonavaMasthead)
+                                .foregroundColor(Theme.textPrimary)
+                            Spacer()
+                            randomAlbumButton
+                        }
 
                         segmentedControl
 
@@ -358,6 +362,47 @@ struct LibraryView: View {
 // MARK: - Albums (the record wall)
 
 extension LibraryView {
+
+    /// "Play a random album" — pulling a sleeve off the shelf without
+    /// deciding which one, which is what people with large collections
+    /// actually do and the most-asked-for missing button across the client
+    /// trackers (+22 across three of them; tempo's own top request).
+    ///
+    /// Albums, not tracks: a random *track* is what shuffle already does, and
+    /// the request is specifically for the record as a unit. It avoids the
+    /// album playing right now, because "random" that hands you the same
+    /// thing again reads as broken.
+    @ViewBuilder
+    var randomAlbumButton: some View {
+        let albums = library.albums
+        if albums.count > 1 {
+            Button {
+                let current = audio.currentSong
+                let pool = albums.filter { album in
+                    guard let current else { return true }
+                    return !(album.artist == current.artist && album.title == current.album)
+                }
+                if let album = (pool.isEmpty ? albums : pool).randomElement(),
+                   let first = album.songs.first {
+                    Haptics.impact(.medium)
+                    audio.play(first, in: album.songs)
+                }
+            } label: {
+                HStack(spacing: Space.xs) {
+                    SonavaIcon(glyph: .shuffle, size: 15, tint: Theme.accentSoft)
+                    Text("Random")
+                        .font(.system(.footnote).weight(.semibold))
+                        .foregroundColor(Theme.accentSoft)
+                }
+                .padding(.horizontal, Space.m)
+                .frame(height: 34)
+                .background(Capsule().fill(Color.white.opacity(0.08)))
+            }
+            .buttonStyle(BouncyButtonStyle(scale: 0.94))
+            .accessibilityIdentifier("library.randomAlbum")
+            .accessibilityLabel(Text("Play a random album"))
+        }
+    }
     /// A wall of sleeves, two across, edge to edge of the content column.
     ///
     /// The unit is the record. Tapping one plays it from the top in its own

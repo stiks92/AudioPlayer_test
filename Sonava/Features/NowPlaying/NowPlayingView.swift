@@ -377,6 +377,10 @@ struct NowPlayingView: View {
             )
             AnimatedIcon(glyph: .volume, mode: .toggle(true),
                          size: 16, tint: .white.opacity(0.6))
+            // Where the sound goes, next to how loud it is.
+            RoutePickerButton(tint: .white.opacity(0.6), size: 18)
+                .frame(width: 30, height: 30)
+                .accessibilityLabel(Text("Output device"))
         }
     }
 

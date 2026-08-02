@@ -12,6 +12,8 @@ struct SettingsView: View {
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var serverStore: ServerStore
     @EnvironmentObject private var scrobble: ScrobbleStore
+    @EnvironmentObject private var library: MusicLibrary
+    @EnvironmentObject private var playlistStore: PlaylistStore
     @ObservedObject private var theme = ThemeManager.shared
     @ObservedObject private var appIcon = AppIconManager.shared
     @Environment(\.dismiss) private var dismiss
@@ -21,6 +23,7 @@ struct SettingsView: View {
     @State private var showConnectServer = false
     @State private var showEqualizer = false
     @State private var showScrobble = false
+    @State private var showBackup = false
 
     private var version: String {
         let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -65,6 +68,13 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $showScrobble) {
                 ConnectScrobbleView().environmentObject(scrobble)
+            }
+            .sheet(isPresented: $showBackup) {
+                BackupView()
+                    .environmentObject(library)
+                    .environmentObject(playlistStore)
+                    .environmentObject(serverStore)
+                    .environmentObject(audio)
             }
             .confirmationDialog("Sleep timer", isPresented: $showSleepOptions, titleVisibility: .visible) {
                 ForEach(Self.sleepTimerChoices, id: \.self) { minutes in
@@ -331,9 +341,13 @@ struct SettingsView: View {
                     showConnectServer = true
                 }
                 divider
+                // Free, deliberately. Every competitor either ships
+                // scrobbling free or bundles it in the base price, and a gate
+                // on "log the plays of music I already own" is the shape of
+                // complaint that costs a rating without earning a sale.
                 row(icon: .scrobble, title: "Scrobble to ListenBrainz",
                     value: scrobbleValue) {
-                    if proStore.isPro { showScrobble = true } else { showPaywall = true }
+                    showScrobble = true
                 }
                 divider
                 staticRow(icon: .note, title: "Spotify / Apple Music",
@@ -351,6 +365,10 @@ struct SettingsView: View {
     private var supportSection: some View {
         section("Support") {
             VStack(spacing: 0) {
+                row(icon: .download, title: "Move to a new iPhone", value: nil) {
+                    showBackup = true
+                }
+                divider
                 row(icon: .restore, title: "Restore purchases", value: nil) {
                     Task { await proStore.restore() }
                 }

@@ -41,7 +41,7 @@ struct PaywallView: View {
         Perk(icon: .download, title: "Offline downloads",
              subtitle: "Save full tracks and listen with no signal.", id: "offline"),
         Perk(icon: .equalizer, title: "10-band equalizer",
-             subtitle: "Studio presets and per-band control.", id: "eq"),
+             subtitle: "Studio presets and per-band control, on your files and downloads.", id: "eq"),
         Perk(icon: .aiMix, title: "AI Mix",
              subtitle: "Describe a vibe, get an instant mix.", id: "aimix"),
         Perk(icon: .palette, title: "Make it yours",
@@ -156,7 +156,7 @@ struct PaywallView: View {
                     Spacer()
                 }
             }
-            Text("Plus unlimited self-hosted servers searched together, scrobbling to ListenBrainz, and your full listening history.")
+            Text("Plus every self-hosted server you own searched together, and your full listening history.")
                 .font(.system(.caption))
                 .foregroundColor(.white.opacity(0.7))
                 .frame(maxWidth: .infinity, alignment: .leading)

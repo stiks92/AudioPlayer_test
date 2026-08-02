@@ -75,6 +75,102 @@ struct PlaylistSharingTests {
         let decoded = try #require(PlaylistSharing.playlist(from: link))
         #expect(decoded.name == "Ночная поездка 🌙")
     }
+
+    // MARK: - Credentials never travel
+
+    /// A Subsonic track exactly as `SubsonicService.map` builds one: the
+    /// stream and cover URLs carry `u` (username), `t` (salted MD5 of the
+    /// password) and `s` (salt), and that token replays forever.
+    private func serverSong() -> Song {
+        let auth = "u=alice&t=6f1ed002ab5595859014ebf0951522d9&s=abc123&v=1.16.1&c=Sonava&f=json"
+        return Song(
+            id: "subsonic:F1E2-LOCAL-UUID:842",
+            title: "Rumours", artist: "Fleetwood Mac", album: "Rumours",
+            source: .subsonic,
+            artworkURL: URL(string: "https://music.home.arpa/rest/getCoverArt?id=842&\(auth)"),
+            streamURL: URL(string: "https://music.home.arpa/rest/stream?id=842&\(auth)"),
+            gradientHex: Palette.hex(for: 0),
+            durationSeconds: 257)
+    }
+
+    @Test("A share link never carries server credentials")
+    func linkCarriesNoCredentials() throws {
+        let link = try #require(PlaylistSharing.link(for:
+            UserPlaylist(name: "Home server", tracks: [serverSong()])))
+        // The whole link, decoded — the payload is base64url, so a substring
+        // check on the URL alone would miss the leak it is meant to catch.
+        let raw = link.absoluteString
+        let encoded = try #require(URLComponents(url: link, resolvingAgainstBaseURL: false)?
+            .queryItems?.first(where: { $0.name == "d" })?.value)
+        var padded = encoded.replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        while padded.count % 4 != 0 { padded.append("=") }
+        let payload = String(data: try #require(Data(base64Encoded: padded)), encoding: .utf8) ?? ""
+
+        for secret in ["6f1ed002ab5595859014ebf0951522d9", "abc123", "u=alice", "/rest/stream"] {
+            #expect(!payload.contains(secret), "the payload leaks \(secret)")
+            #expect(!raw.contains(secret), "the link leaks \(secret)")
+        }
+        // Identity still travels, or the link would be pointless.
+        #expect(payload.contains("Fleetwood Mac"))
+        #expect(payload.contains("music.home.arpa"))   // host only, no auth
+    }
+
+    @Test("A server track imports unplayable when the recipient has no such server")
+    func serverTrackWithoutResolver() throws {
+        let link = try #require(PlaylistSharing.link(for:
+            UserPlaylist(name: "Home server", tracks: [serverSong()])))
+        let decoded = try #require(PlaylistSharing.playlist(from: link))
+        let track = try #require(decoded.tracks.first)
+
+        #expect(track.streamURL == nil, "a stranger's server track must not resolve")
+        #expect(track.artworkURL == nil)
+        #expect(track.title == "Rumours")       // still shows in the list
+        #expect(track.durationSeconds == 257)
+    }
+
+    @Test("A server track is rebuilt with the recipient's own credentials")
+    func serverTrackWithResolver() throws {
+        let link = try #require(PlaylistSharing.link(for:
+            UserPlaylist(name: "Home server", tracks: [serverSong()])))
+        var seenHost: String?
+        var seenID: String?
+        let decoded = try #require(PlaylistSharing.playlist(from: link, resolver: {
+            host, trackID, title, artist, album, duration in
+            seenHost = host; seenID = trackID
+            return Song(id: "subsonic:MY-UUID:\(trackID)", title: title, artist: artist,
+                        album: album, source: .subsonic,
+                        streamURL: URL(string: "https://music.home.arpa/rest/stream?id=\(trackID)&u=bob"),
+                        gradientHex: Palette.hex(for: 1), durationSeconds: duration)
+        }))
+
+        #expect(seenHost == "music.home.arpa")
+        #expect(seenID == "842")
+        let track = try #require(decoded.tracks.first)
+        #expect(track.streamURL?.absoluteString.contains("u=bob") == true)
+        #expect(track.id == "subsonic:MY-UUID:842")
+    }
+
+    @Test("A legacy link's embedded credentials are stripped on the way in")
+    func legacyLinkIsRedacted() throws {
+        // The v1 wire format: the whole `Song`, auth token and all.
+        struct LegacyPayload: Codable { let name: String; let tracks: [Song] }
+        let data = try JSONEncoder().encode(
+            LegacyPayload(name: "Old link", tracks: [serverSong(), song("a")]))
+        let encoded = data.base64EncodedString()
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
+        let url = try #require(URL(string: "sonava://playlist?d=\(encoded)"))
+
+        let decoded = try #require(PlaylistSharing.playlist(from: url))
+        #expect(decoded.name == "Old link")
+        #expect(decoded.tracks.count == 2)
+        let server = try #require(decoded.tracks.first)
+        #expect(server.streamURL == nil, "a legacy link must not inject a borrowed session")
+        // The public track in the same playlist keeps working.
+        #expect(decoded.tracks[1].streamURL?.absoluteString == "https://example.com/a")
+    }
 }
 
 @MainActor

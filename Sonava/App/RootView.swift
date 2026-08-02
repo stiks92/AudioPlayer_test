@@ -163,6 +163,8 @@ struct RootView: View {
                 .environmentObject(proStore)
                 .environmentObject(serverStore)
                 .environmentObject(scrobbleStore)
+                .environmentObject(library)
+                .environmentObject(playlistStore)
         }
         .task { applyDebugLaunchRoute() }
         #endif
@@ -171,6 +173,7 @@ struct RootView: View {
                 library.markPlayed(song)
                 reviewPrompt.record(.trackFinished)   // active listening is a good signal
                 audio.tasteProfile = library.tasteProfile   // keep endless radio on-taste
+                audio.recentlyHeard = library.recents       // so shuffle stops replaying them
                 scrobbleStore.scrobbleNowPlaying(song)
             }
         }
@@ -205,13 +208,27 @@ struct RootView: View {
         }
         .onOpenURL { url in
             // A shared playlist link: import it and take the user to Library.
-            if let shared = PlaylistSharing.playlist(from: url) {
+            // Server tracks come back through *this* device's own credentials
+            // for that host — the link never carried the sender's.
+            if let shared = PlaylistSharing.playlist(from: url, resolver: {
+                host, trackID, title, artist, album, duration in
+                serverStore.resolveSharedTrack(host: host, trackID: trackID,
+                                               title: title, artist: artist,
+                                               album: album, duration: duration)
+            }) {
                 playlistStore.importShared(shared)
                 selection = .library
             }
         }
         .task {
             audio.restoreLastSession()
+            // Endless radio and "Made for you" build from the listener's own
+            // server first — the best station material they have is the one
+            // they already own.
+            StationService.serverSearch = { [weak serverStore] query in
+                guard let service = await MainActor.run(body: { serverStore?.service }) else { return [] }
+                return (try? await service.search(query)) ?? []
+            }
         }
         .onChange(of: proStore.isPro, initial: true) { _, pro in
             theme.enforceFreeIfNeeded(isPro: pro)   // don't keep a paid palette if Pro lapses

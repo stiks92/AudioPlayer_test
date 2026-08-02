@@ -3,7 +3,7 @@
   "nonRenewingSubscriptions" : [],
   "products" : [
     {
-      "displayPrice" : "79.99",
+      "displayPrice" : "34.99",
       "familyShareable" : false,
       "internalID" : "5A000000-LIFETIME",
       "localizations" : [
@@ -35,7 +35,7 @@
         {
           "adHocOffers" : [],
           "codeOffers" : [],
-          "displayPrice" : "4.99",
+          "displayPrice" : "2.99",
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "5A000000-MONTHLY",
@@ -60,7 +60,7 @@
         {
           "adHocOffers" : [],
           "codeOffers" : [],
-          "displayPrice" : "24.99",
+          "displayPrice" : "19.99",
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "5A000000-YEARLY",
