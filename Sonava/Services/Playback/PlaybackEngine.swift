@@ -39,6 +39,11 @@ protocol PlaybackEngine: AnyObject {
     func pause()
     func seek(to time: Double)
     func setVolume(_ volume: Float)
+    /// Per-track levelling, dB. Kept apart from `setVolume` on purpose: the
+    /// listener's volume and the track's correction are different facts, and
+    /// folding them together would make the slider mean something different
+    /// on every track.
+    func setLoudnessGain(_ decibels: Double)
     func setRate(_ rate: Float)   // playback speed (podcasts)
     func apply(_ equalizer: EqualizerSettings)
     func refresh()          // sampled by AudioManager's timer
@@ -58,6 +63,10 @@ extension PlaybackEngine {
     @discardableResult
     func preloadNext(url: URL) -> Bool { false }
     func cancelPreload() {}
+    /// Streams play at their own level: an `AVPlayer` item cannot be re-gained
+    /// without an audio processing tap. Settings says so plainly rather than
+    /// implying a levelling the app isn't doing.
+    func setLoudnessGain(_ decibels: Double) {}
 }
 
 // MARK: - Local files (AVAudioEngine graph: player → EQ → timePitch → mixer)
@@ -80,6 +89,11 @@ final class LocalAudioEngine: PlaybackEngine {
     private var playing = false
     private var volume: Float = 0.75
     private var rate: Float = 1.0
+    /// Per-track levelling in dB, and the listener's own pre-amp. The EQ unit
+    /// offers a single `globalGain`, so these are summed rather than
+    /// overwriting each other.
+    private var loudnessGain: Double = 0
+    private var preamp: Float = 0
     /// Bumped whenever the node is *stopped* — seek, prepare, teardown — so a
     /// completion callback from the discarded run cannot be mistaken for a
     /// track finishing. It is deliberately not bumped when queueing the next
@@ -206,13 +220,26 @@ final class LocalAudioEngine: PlaybackEngine {
         timePitch.rate = clampRate(rate)
     }
 
+    func setLoudnessGain(_ decibels: Double) {
+        loudnessGain = decibels
+        applyGlobalGain()
+    }
+
     func apply(_ equalizer: EqualizerSettings) {
         let bypass = !equalizer.isEnabled
-        eq.globalGain = bypass ? 0 : equalizer.preamp
+        preamp = bypass ? 0 : equalizer.preamp
+        applyGlobalGain()
         for (index, band) in eq.bands.enumerated() where index < EqualizerBand.count {
             band.bypass = bypass
             band.gain = bypass ? 0 : equalizer.gains[index]
         }
+    }
+
+    /// Clamped to the unit's own ±24 dB range. Writing the levelling straight
+    /// to the node instead would work until the next EQ change silently
+    /// undid it.
+    private func applyGlobalGain() {
+        eq.globalGain = Float(min(max(Double(preamp) + loudnessGain, -24), 24))
     }
 
     func refresh() {

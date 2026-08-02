@@ -308,6 +308,26 @@ struct SettingsView: View {
             }
             .tint(Theme.accentDeep)   // ivory knob on ivory track vanished; umber keeps the knob visible
             .padding(.vertical, 6)
+            divider
+            // Free, and stated honestly: levelling works where the app can
+            // measure the audio or be told its level — files, downloads, and
+            // servers that publish ReplayGain. A live stream plays as it comes.
+            VStack(alignment: .leading, spacing: 2) {
+                Toggle(isOn: Binding(get: { audio.loudness.isEnabled },
+                                     set: { audio.loudness.isEnabled = $0 })) {
+                    HStack(spacing: Space.iconGap) {
+                        SonavaIcon(glyph: .wave, size: 20, tint: Theme.textSecondary)
+                            .frame(width: Space.iconColumn, height: Space.iconColumn)
+                        Text("Even out volume").font(.system(.subheadline))
+                    }
+                }
+                .tint(Theme.accentDeep)
+                Text("Your files, downloads, and servers that report levels. Radio plays as it comes.")
+                    .font(.system(.caption2))
+                    .foregroundColor(Theme.textTertiary)
+                    .padding(.leading, Space.textRail)
+            }
+            .padding(.vertical, 6)
         }
     }
 

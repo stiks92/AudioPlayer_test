@@ -79,6 +79,10 @@ struct Song: Identifiable, Equatable, Hashable, Codable {
     let year: Int?
     /// Encoded bit rate, kbit/s.
     let bitRate: Int?
+    /// Track ReplayGain in dB, when the source publishes one (Subsonic does).
+    /// Saves the app measuring a file it can be told about — see
+    /// `LoudnessAnalyzer.gain(fromReplayGain:)`.
+    let replayGain: Double?
 
     /// `3:47` for the margin, or nil when the length is unknown.
     var durationText: String? {
@@ -104,7 +108,8 @@ struct Song: Identifiable, Equatable, Hashable, Codable {
         durationSeconds: Double? = nil,
         trackNumber: Int? = nil,
         year: Int? = nil,
-        bitRate: Int? = nil
+        bitRate: Int? = nil,
+        replayGain: Double? = nil
     ) {
         self.id = id
         self.title = title
@@ -121,6 +126,7 @@ struct Song: Identifiable, Equatable, Hashable, Codable {
         self.trackNumber = trackNumber
         self.year = year
         self.bitRate = bitRate
+        self.replayGain = replayGain
     }
 
     /// Playable URL. Local tracks are files the user imported, which live in

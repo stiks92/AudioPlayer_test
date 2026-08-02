@@ -60,6 +60,11 @@ final class AudioManager: NSObject, ObservableObject {
     /// so a saved track plays with no network.
     let downloads = DownloadStore()
 
+    /// Volume levelling across sources. An aggregator plays a 1978 transfer
+    /// and a modern master from one queue; without this the listener spends
+    /// the evening on the volume knob.
+    let loudness = LoudnessStore()
+
     var isLive: Bool { currentSong?.isLive ?? false }
 
     /// Speed control is only meaningful for spoken-word content (podcasts).
@@ -402,6 +407,9 @@ final class AudioManager: NSObject, ObservableObject {
         }
         engine.setVolume(volume)
         engine.apply(effects.equalizer)
+        // Order matters: `apply` writes the pre-amp, and the levelling is
+        // summed on top of it inside the engine.
+        engine.setLoudnessGain(loudness.gain(for: song, fileURL: url.isFileURL ? url : nil))
 
         // `isFileURL` is the same test that picks the engine, so the meter's
         // honesty and the engine's capability can never drift apart.
@@ -471,6 +479,12 @@ final class AudioManager: NSObject, ObservableObject {
         let song = queue[currentIndex]
         currentSong = song
         isPlaying = true
+
+        // Gapless means no `load`, so the new track's levelling has to be
+        // applied here or it would inherit the previous track's correction —
+        // audibly wrong in exactly the case this feature exists for.
+        activeEngine?.setLoudnessGain(
+            loudness.gain(for: song, fileURL: downloads.localURL(for: song) ?? song.url))
 
         clock.reset(duration: 1, metered: true)
         if let engine = activeEngine {
