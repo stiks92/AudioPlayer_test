@@ -112,7 +112,10 @@ struct ConnectScrobbleView: View {
                 Task { _ = await scrobble.connect(token: token) }
             } label: {
                 HStack {
-                    if scrobble.isConnecting { ProgressView() }
+                    if scrobble.isConnecting {
+                        AnimatedIcon(glyph: .loading, mode: .loop(true),
+                                     size: 20, tint: Theme.background)
+                    }
                     Text(scrobble.isConnecting ? "Connecting…" : "Connect")
                 }
             }

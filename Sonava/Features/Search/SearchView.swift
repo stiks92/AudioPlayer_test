@@ -137,7 +137,8 @@ struct SearchView: View {
                 HStack(spacing: 8) {
                     Department(title: "Audius · full tracks")
                     if audiusFeed.state == .loading {
-                        ProgressView().tint(Theme.accentSoft)
+                        AnimatedIcon(glyph: .loading, mode: .loop(true),
+                                     size: 16, tint: Theme.accentSoft)
                     }
                 }
                 audiusResults

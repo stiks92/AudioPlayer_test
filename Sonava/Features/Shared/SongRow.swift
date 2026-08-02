@@ -142,7 +142,9 @@ struct SongRow: View {
         case .downloaded:
             SonavaIcon(glyph: .download, size: 13, tint: Theme.positive)
         case .downloading:
-            ProgressView().scaleEffect(0.7)
+            // The pack's arrow-into-tray, looping while the bytes move.
+            AnimatedIcon(glyph: .download, mode: .loop(true),
+                         size: 16, tint: Theme.accentSoft)
         case .none, .failed:
             EmptyView()
         }
