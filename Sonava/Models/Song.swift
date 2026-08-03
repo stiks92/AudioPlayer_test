@@ -20,6 +20,9 @@ enum TrackSource: String, Codable {
     case jamendo
     case archive
     case podcast
+    /// A file on the listener's own cloud drive — Yandex.Disk, Mail.ru Cloud,
+    /// Nextcloud, a NAS. Their file, their storage, their credentials.
+    case webdav
 
     var badge: String? {
         switch self {
@@ -32,6 +35,9 @@ enum TrackSource: String, Codable {
         case .jamendo:  return "JAMENDO"
         case .archive:  return "ARCHIVE"
         case .podcast:  return "PODCAST"
+        // The listener's own drive. "CLOUD" rather than "WEBDAV": the badge
+        // tells them where the file is, not which protocol fetched it.
+        case .webdav:   return "CLOUD"
         }
     }
 
@@ -40,7 +46,7 @@ enum TrackSource: String, Codable {
     /// previews, never live radio, and local files are already offline.
     var isDownloadable: Bool {
         switch self {
-        case .audius, .subsonic, .jamendo, .archive: return true
+        case .audius, .subsonic, .jamendo, .archive, .webdav: return true
         case .local, .radio, .itunes, .deezer, .podcast: return false
         }
     }
