@@ -568,6 +568,16 @@
         }
       }
     },
+    "Address": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Адрес"
+          }
+        }
+      }
+    },
     "Albums": {
       "localizations": {
         "ru": {
@@ -614,6 +624,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Иконка приложения"
+          }
+        }
+      }
+    },
+    "App password": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пароль приложения"
           }
         }
       }
@@ -804,6 +824,16 @@
         }
       }
     },
+    "Cloud drive": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Облако"
+          }
+        }
+      }
+    },
     "Comedy": {
       "localizations": {
         "ru": {
@@ -844,6 +874,16 @@
         }
       }
     },
+    "Connect a drive": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключить облако"
+          }
+        }
+      }
+    },
     "Connect a server": {
       "localizations": {
         "ru": {
@@ -860,6 +900,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Подключено"
+          }
+        }
+      }
+    },
+    "Connecting more than one drive needs Sonava Pro.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключение больше одного облака — в Sonava Pro."
           }
         }
       }
@@ -970,6 +1020,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Не удалось связаться с Audius. Проверь соединение."
+          }
+        }
+      }
+    },
+    "Couldn't reach the drive. Check the address and your network.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось связаться с облаком. Проверьте адрес и сеть."
           }
         }
       }
@@ -1677,6 +1737,16 @@
         }
       }
     },
+    "Invalid drive address.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Неверный адрес облака."
+          }
+        }
+      }
+    },
     "Invalid server URL.": {
       "localizations": {
         "ru": {
@@ -2043,6 +2113,16 @@
         }
       }
     },
+    "No cloud drive connected": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Облако не подключено"
+          }
+        }
+      }
+    },
     "No episodes found.": {
       "localizations": {
         "ru": {
@@ -2349,6 +2429,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Открыть в Apple Music"
+          }
+        }
+      }
+    },
+    "Other (WebDAV)": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Другое (WebDAV)"
           }
         }
       }
@@ -2742,6 +2832,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Случайно"
+          }
+        }
+      }
+    },
+    "Reading the folder…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Читаем папку…"
           }
         }
       }
@@ -3605,6 +3705,16 @@
         }
       }
     },
+    "That folder isn't there.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Такой папки нет."
+          }
+        }
+      }
+    },
     "That token wasn't accepted. Check it and try again.": {
       "localizations": {
         "ru": {
@@ -3615,12 +3725,32 @@
         }
       }
     },
+    "The address of your Nextcloud, ownCloud or NAS, including https://.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Адрес вашего Nextcloud, ownCloud или NAS, вместе с https://."
+          }
+        }
+      }
+    },
     "The backup couldn't be written. Check you have free space.": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Не удалось записать копию. Проверьте свободное место."
+          }
+        }
+      }
+    },
+    "The drive answered with an error (%lld).": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Облако ответило ошибкой (%lld)."
           }
         }
       }
@@ -3705,12 +3835,32 @@
         }
       }
     },
+    "This folder is empty.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эта папка пуста."
+          }
+        }
+      }
+    },
     "This playlist is empty": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Плейлист пуст"
+          }
+        }
+      }
+    },
+    "Those credentials weren't accepted. Yandex and Mail.ru need an app password, not your account password.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Данные не приняты. Яндексу и Mail.ru нужен пароль приложения, а не пароль от аккаунта."
           }
         }
       }
@@ -3875,6 +4025,26 @@
         }
       }
     },
+    "Use an app password from Yandex ID — not your account password.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нужен пароль приложения из Яндекс ID, а не пароль от аккаунта."
+          }
+        }
+      }
+    },
+    "Use an app password from your Mail.ru account settings.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нужен пароль приложения из настроек аккаунта Mail.ru."
+          }
+        }
+      }
+    },
     "User token": {
       "localizations": {
         "ru": {
@@ -3941,6 +4111,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "ТВОИ ПЛЕЙЛИСТЫ"
+          }
+        }
+      }
+    },
+    "Yandex.Disk, Mail.ru Cloud, Nextcloud or any NAS that speaks WebDAV. Your files stay yours — Sonava just plays them.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Яндекс.Диск, Облако Mail.ru, Nextcloud или любой NAS с WebDAV. Файлы остаются вашими — Sonava их просто играет."
           }
         }
       }
@@ -4021,6 +4201,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Музыка останется на сервере — забудется только подключение."
+          }
+        }
+      }
+    },
+    "Your password is kept in the iPhone's Keychain and never leaves it — not in a backup, not in a shared link.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пароль хранится в Связке ключей iPhone и не покидает её — ни в резервной копии, ни в присланной ссылке."
           }
         }
       }

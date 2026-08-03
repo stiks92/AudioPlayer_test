@@ -17,6 +17,7 @@ struct RootView: View {
     @StateObject private var playlistStore = PlaylistStore()
     @StateObject private var reviewPrompt = ReviewPrompt()
     @StateObject private var scrobbleStore = ScrobbleStore()
+    @StateObject private var cloudStore = CloudStore()
     @StateObject private var history = ListeningHistory()
 
     /// Observed so the whole tree re-renders (and re-reads Theme.accent) when
@@ -101,6 +102,7 @@ struct RootView: View {
         .environmentObject(serverStore)
         .environmentObject(playlistStore)
         .environmentObject(scrobbleStore)
+        .environmentObject(cloudStore)
         .environmentObject(history)
         .preferredColorScheme(.dark)
         .fullScreenCover(isPresented: Binding(get: { !hasOnboarded }, set: { hasOnboarded = !$0 })) {
@@ -233,6 +235,7 @@ struct RootView: View {
         .onChange(of: proStore.isPro, initial: true) { _, pro in
             theme.enforceFreeIfNeeded(isPro: pro)   // don't keep a paid palette if Pro lapses
             serverStore.isPro = pro                 // extra servers stay saved, just unreachable
+            cloudStore.isPro = pro                  // same rule for cloud drives
             AppIconManager.shared.enforceFreeIfNeeded(isPro: pro)
         }
     }

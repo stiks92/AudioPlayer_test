@@ -15,7 +15,7 @@ struct LibraryView: View {
     @EnvironmentObject private var playlistStore: PlaylistStore
 
     enum Tab: String, CaseIterable {
-        case albums, playlists, songs, downloads, favorites, server
+        case albums, playlists, songs, downloads, favorites, sources
 
         var title: LocalizedStringKey {
             switch self {
@@ -24,7 +24,11 @@ struct LibraryView: View {
             case .songs: return "Songs"
             case .downloads: return "Offline"
             case .favorites: return "Favorites"
-            case .server: return "Server"
+            // One tab, not two: a server and a cloud drive are the same
+            // idea — music that lives somewhere the listener owns. Seven
+            // segments truncated «Плейлисты» and «Избранное» to ellipses,
+            // which is the control telling you it has one job too many.
+            case .sources: return "Sources"
             }
         }
     }
@@ -79,7 +83,7 @@ struct LibraryView: View {
                         case .songs:     songsSection
                         case .downloads: downloadsSection
                         case .favorites: favoritesSection
-                        case .server:    ServerBrowseView()
+                        case .sources:   RemoteSourcesView()
                         }
                     }
                     .padding(.horizontal, Space.screenMargin)

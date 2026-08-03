@@ -62,6 +62,15 @@ struct LocalizationCatalogTests {
             "Play my favorites", "Start my radio", "Resume listening",
             "Playing your favorites.", "Starting your radio.",
             "Play my favorites in ${applicationName}",
+            // This release's new surfaces. Each of these shipped in English
+            // on a Russian build at least once during development, which is
+            // exactly why they are named here rather than trusted.
+            "Server", "Sources", "Cloud drive", "Artists",
+            "No cloud drive connected", "Connect a drive", "App password",
+            "Move to a new iPhone", "Save a backup", "Restore from a backup",
+            "Even out volume", "Random", "Try again", "Reading your library…",
+            "The server has no albums yet.",
+            "Those credentials weren't accepted. Yandex and Mail.ru need an app password, not your account password.",
         ]
     )
     func stringsAreTranslatedToRussian(key: String) throws {

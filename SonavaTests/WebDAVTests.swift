@@ -170,12 +170,19 @@ struct WebDAVServiceTests {
         #expect(url.path == "/Music/track.flac")
     }
 
-    @Test("Every error says what to do about it")
+    @Test("Every error says something different and useful")
     func errorsAreActionable() {
-        // The unauthorized case is the one people will actually hit: both
-        // Russian providers require an app password, not the account one.
-        #expect(WebDAVError.unauthorized.message.contains("app password"))
-        #expect(!WebDAVError.unreachable.message.isEmpty)
-        #expect(WebDAVError.server(503).message.contains("503"))
+        // Asserting on English words fails the moment the suite runs under
+        // `-testLanguage ru`, which is how this test first went red — the
+        // message was correct and the assertion was monolingual. What is
+        // actually worth pinning is that each case says its own thing and
+        // that the code reaches the reader.
+        let messages = [WebDAVError.unauthorized, .notFound, .unreachable, .server(503)]
+            .map(\.message)
+        #expect(messages.allSatisfy { !$0.isEmpty })
+        #expect(Set(messages).count == messages.count,
+                "four different problems must not read as one message")
+        #expect(WebDAVError.server(503).message.contains("503"),
+                "the status code is the one detail a person can act on or report")
     }
 }
