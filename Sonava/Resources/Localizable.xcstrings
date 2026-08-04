@@ -214,6 +214,16 @@
         }
       }
     },
+    "%lld of %lld found": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Найдено %1$lld из %2$lld"
+          }
+        }
+      }
+    },
     "%lld playlists": {
       "localizations": {
         "ru": {
@@ -704,6 +714,16 @@
         }
       }
     },
+    "Bring a playlist from anywhere — a file you exported, or a list you copied.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перенесите плейлист откуда угодно — из выгруженного файла или скопированного списка."
+          }
+        }
+      }
+    },
     "Browse moods": {
       "localizations": {
         "ru": {
@@ -734,6 +754,16 @@
         }
       }
     },
+    "CSV from Exportify or TuneMyMusic, or an M3U from a desktop player.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CSV из Exportify или TuneMyMusic либо M3U из настольного плеера."
+          }
+        }
+      }
+    },
     "Cancel": {
       "localizations": {
         "ru": {
@@ -760,6 +790,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Чиллаут"
+          }
+        }
+      }
+    },
+    "Choose a file": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выбрать файл"
           }
         }
       }
@@ -1347,6 +1387,16 @@
         }
       }
     },
+    "Empty": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пусто"
+          }
+        }
+      }
+    },
     "Endless listening built from your own taste.": {
       "localizations": {
         "ru": {
@@ -1497,6 +1547,36 @@
         }
       }
     },
+    "From Spotify, Yandex, a file or a pasted list": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Из Spotify, Яндекса, файла или списка"
+          }
+        }
+      }
+    },
+    "From a file": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Из файла"
+          }
+        }
+      }
+    },
+    "From a list": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Из списка"
+          }
+        }
+      }
+    },
     "From your server": {
       "localizations": {
         "ru": {
@@ -1637,6 +1717,26 @@
         }
       }
     },
+    "Import": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Импортировать"
+          }
+        }
+      }
+    },
+    "Import a playlist": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Импорт плейлиста"
+          }
+        }
+      }
+    },
     "Import failed": {
       "localizations": {
         "ru": {
@@ -1693,6 +1793,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Импортируй свои аудиофайлы из Файлов или iCloud Drive. Они останутся на устройстве и будут играть офлайн."
+          }
+        }
+      }
+    },
+    "Imported playlist": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Импортированный плейлист"
           }
         }
       }
@@ -2243,6 +2353,16 @@
         }
       }
     },
+    "Not found": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не найдено"
+          }
+        }
+      }
+    },
     "Nothing downloaded yet": {
       "localizations": {
         "ru": {
@@ -2259,6 +2379,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Пока пусто"
+          }
+        }
+      }
+    },
+    "Nothing in that list matched anything Sonava can reach.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ничего из этого списка не совпало с тем, до чего Sonava дотягивается."
           }
         }
       }
@@ -2409,6 +2539,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Один запрос ищет сразу в Audius, Apple, Deezer и твоей медиатеке — полные треки и превью вместе."
+          }
+        }
+      }
+    },
+    "One track per line, as “Artist — Title”.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "По треку в строке, в виде «Артист — Название»."
           }
         }
       }
@@ -2662,6 +2802,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Включаю избранное."
+          }
+        }
+      }
+    },
+    "Playlist name": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Название плейлиста"
           }
         }
       }
@@ -3106,6 +3256,16 @@
         }
       }
     },
+    "Save as “%@”": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сохранить как «%@»"
+          }
+        }
+      }
+    },
     "Save full tracks and listen with no signal.": {
       "localizations": {
         "ru": {
@@ -3422,6 +3582,16 @@
         }
       }
     },
+    "Sonava searches your files, your server and its streaming sources for each track, and tells you exactly which ones it couldn't find.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sonava ищет каждый трек в ваших файлах, на вашем сервере и в своих источниках — и честно называет те, которых не нашла."
+          }
+        }
+      }
+    },
     "Songs": {
       "localizations": {
         "ru": {
@@ -3531,6 +3701,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Включи моё радио в ${applicationName}"
+          }
+        }
+      }
+    },
+    "Start over": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Начать заново"
           }
         }
       }
@@ -3705,6 +3885,16 @@
         }
       }
     },
+    "That file isn't text Sonava can read.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Это не текстовый файл, который Sonava может прочитать."
+          }
+        }
+      }
+    },
     "That folder isn't there.": {
       "localizations": {
         "ru": {
@@ -3821,6 +4011,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Продолжать пока нечего."
+          }
+        }
+      }
+    },
+    "These aren't in your library, on your server, or in any source Sonava searches. Import the files and they'll join automatically.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Этих треков нет ни в вашей фонотеке, ни на сервере, ни в источниках, где ищет Sonava. Добавьте файлы — они присоединятся сами."
           }
         }
       }

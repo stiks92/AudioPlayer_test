@@ -13,6 +13,7 @@ struct LibraryView: View {
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var library: MusicLibrary
     @EnvironmentObject private var playlistStore: PlaylistStore
+    @EnvironmentObject private var serverStore: ServerStore
 
     enum Tab: String, CaseIterable {
         case albums, playlists, songs, downloads, favorites, sources
@@ -48,6 +49,7 @@ struct LibraryView: View {
         return .albums
     }()
     @State private var showNewPlaylist = false
+    @State private var showImportPlaylist = false
     @State private var newPlaylistName = ""
     @State private var showImporter = false
     @State private var importError: String?
@@ -112,6 +114,12 @@ struct LibraryView: View {
             } message: {
                 Text(importError ?? "")
             }
+            .sheet(isPresented: $showImportPlaylist) {
+                ImportPlaylistView()
+                    .environmentObject(library)
+                    .environmentObject(playlistStore)
+                    .environmentObject(serverStore)
+            }
             .alert("New playlist", isPresented: $showNewPlaylist) {
                 TextField("Name", text: $newPlaylistName)
                 Button("Create") {
@@ -168,6 +176,22 @@ struct LibraryView: View {
                 .padding(.horizontal, Space.xl)
             }
             .buttonStyle(PrimaryCapsuleButtonStyle(expands: false))
+
+            // The import lived only in the populated list, which put it
+            // exactly where it is least needed: somebody arriving from
+            // another app has no playlists yet, and migrating theirs is the
+            // first thing they want to do.
+            Button {
+                Haptics.impact()
+                showImportPlaylist = true
+            } label: {
+                HStack(spacing: Space.s) {
+                    SonavaIcon(glyph: .download, size: 16, tint: Theme.accentSoft)
+                    Text("Import a playlist")
+                }
+            }
+            .buttonStyle(QuietButtonStyle())
+            .accessibilityIdentifier("library.importPlaylist")
         }
         .frame(maxWidth: .infinity)
         .centredEmptyState()
@@ -186,6 +210,29 @@ struct LibraryView: View {
                     Text("New Playlist")
                         .font(.system(.callout).weight(.semibold))
                         .foregroundColor(Theme.textPrimary)
+                    Spacer()
+                }
+                .padding(.vertical, 4)
+            }
+            .buttonStyle(.plain)
+
+            Button {
+                showImportPlaylist = true
+            } label: {
+                HStack(spacing: Space.l) {
+                    RoundedRectangle(cornerRadius: Radius.control, style: .continuous)
+                        .fill(Color.white.opacity(0.08))
+                        .frame(width: 60, height: 60)
+                        .overlay(SonavaIcon(glyph: .download, size: 22, tint: Theme.accentSoft))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Import a playlist")
+                            .font(.system(.callout).weight(.semibold))
+                            .foregroundColor(Theme.textPrimary)
+                        Text("From Spotify, Yandex, a file or a pasted list")
+                            .font(.caption)
+                            .foregroundColor(Theme.textSecondary)
+                            .lineLimit(1)
+                    }
                     Spacer()
                 }
                 .padding(.vertical, 4)

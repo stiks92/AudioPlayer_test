@@ -70,6 +70,8 @@ struct LocalizationCatalogTests {
             "Move to a new iPhone", "Save a backup", "Restore from a backup",
             "Even out volume", "Random", "Try again", "Reading your library…",
             "The server has no albums yet.",
+            "Import a playlist", "Choose a file", "Not found", "Start over",
+            "From a file", "From a list", "Playlist name",
             "Those credentials weren't accepted. Yandex and Mail.ru need an app password, not your account password.",
         ]
     )
