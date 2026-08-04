@@ -46,14 +46,9 @@ struct CloudBrowseView: View {
                 Haptics.impact()
                 showConnect = true
             } label: {
-                Text("Connect a drive")
-                    .font(.subheadline.weight(.bold))
-                    .foregroundColor(Theme.background)
-                    .padding(.horizontal, Space.xl)
-                    .frame(minHeight: Space.hitTarget)
-                    .background(Capsule().fill(Color.white))
+                Text("Connect a drive").padding(.horizontal, Space.xl)
             }
-            .buttonStyle(BouncyButtonStyle(scale: 0.96))
+            .buttonStyle(PrimaryCapsuleButtonStyle(expands: false))
             .accessibilityIdentifier("cloud.connect")
         }
         .frame(maxWidth: .infinity)
@@ -92,8 +87,7 @@ struct CloudFolderView: View {
                         .foregroundColor(Theme.textSecondary)
                         .multilineTextAlignment(.center)
                     Button("Try again") { Task { await load() } }
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(Theme.accentSoft)
+                        .buttonStyle(QuietButtonStyle())
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.top, 50)

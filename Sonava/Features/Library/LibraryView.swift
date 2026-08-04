@@ -161,17 +161,13 @@ struct LibraryView: View {
                 Haptics.impact()
                 showNewPlaylist = true
             } label: {
-                Label("New Playlist", systemImage: "plus")
-                    .font(.subheadline.weight(.bold))
-                    .foregroundColor(Theme.background)
-                    .padding(.horizontal, Space.xl)
-                    // Height rather than vertical padding: at `Space.m` this
-                    // measured 42pt, under Apple's 44 minimum, on the one
-                    // control an empty Library offers.
-                    .frame(minHeight: Space.hitTarget)
-                    .background(Capsule().fill(Color.white))
+                HStack(spacing: Space.s) {
+                    SonavaIcon(glyph: .plus, size: 16, tint: Theme.background)
+                    Text("New Playlist")
+                }
+                .padding(.horizontal, Space.xl)
             }
-            .buttonStyle(BouncyButtonStyle(scale: 0.96))
+            .buttonStyle(PrimaryCapsuleButtonStyle(expands: false))
         }
         .frame(maxWidth: .infinity)
         .centredEmptyState()
@@ -411,8 +407,9 @@ extension LibraryView {
                 }
             } label: {
                 SonavaIcon(glyph: .shuffle, size: 17, tint: Theme.accentSoft)
-                    .frame(width: 38, height: 38)
+                    .frame(width: Space.hitTarget, height: Space.hitTarget)
                     .background(Circle().fill(Color.white.opacity(0.08)))
+                    .overlay(Circle().strokeBorder(Theme.hairline, lineWidth: 1))
             }
             .buttonStyle(BouncyButtonStyle(scale: 0.94))
             .accessibilityIdentifier("library.randomAlbum")

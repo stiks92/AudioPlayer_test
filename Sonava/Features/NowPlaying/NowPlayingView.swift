@@ -366,8 +366,7 @@ struct NowPlayingView: View {
 
     private var volume: some View {
         HStack(spacing: Space.m) {
-            AnimatedIcon(glyph: .volume, mode: .toggle(false),
-                         size: 16, tint: .white.opacity(0.6))
+            SonavaIcon(glyph: .volumeLow, size: 16, tint: .white.opacity(0.6))
             ScrubberView(
                 value: Binding(
                     get: { Double(audio.volume) },
@@ -375,8 +374,7 @@ struct NowPlayingView: View {
                 ),
                 onEditingChanged: { _ in }
             )
-            AnimatedIcon(glyph: .volume, mode: .toggle(true),
-                         size: 16, tint: .white.opacity(0.6))
+            SonavaIcon(glyph: .volumeHigh, size: 16, tint: .white.opacity(0.6))
             // Where the sound goes, next to how loud it is.
             RoutePickerButton(tint: .white.opacity(0.6), size: 18)
                 .frame(width: 30, height: 30)

@@ -131,8 +131,7 @@ struct ServerBrowseView: View {
                 .foregroundColor(Theme.textSecondary)
                 .multilineTextAlignment(.center)
             Button("Try again") { Task { await load(force: true) } }
-                .font(.subheadline.weight(.semibold))
-                .foregroundColor(Theme.accentSoft)
+                .buttonStyle(QuietButtonStyle())
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 50)

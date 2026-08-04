@@ -196,18 +196,54 @@ struct SpinningDisc: View {
     let song: Song
     var side: CGFloat = 36
     var isSpinning: Bool = false
+    /// 0…1, or nil when there is nothing honest to draw — a live stream, or a
+    /// track whose length the source never stated.
+    var progress: Double? = nil
+    /// The ring's colour. Passed in rather than read from the song so the
+    /// caller can use the sleeve's extracted palette.
+    var ringColors: [Color] = []
+
+    /// How much bigger the ring's circle is than the record it surrounds.
+    private var ringInset: CGFloat { max(3, side * 0.085) }
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1 / 30, paused: !isSpinning)) { timeline in
-            let angle = isSpinning
-                ? timeline.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 7) / 7 * 360
-                : 0
-            ArtworkImage(song: song, glyphSize: side * 0.4)
-                .frame(width: side, height: side)
-                .clipShape(Circle())
-                .overlay(Circle().strokeBorder(.white.opacity(0.25), lineWidth: 1))
-                .overlay(Circle().fill(.black.opacity(0.9)).frame(width: side * 0.14))
-                .rotationEffect(.degrees(angle))
+        ZStack {
+            TimelineView(.animation(minimumInterval: 1 / 30, paused: !isSpinning)) { timeline in
+                let angle = isSpinning
+                    ? timeline.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 7) / 7 * 360
+                    : 0
+                ArtworkImage(song: song, glyphSize: side * 0.4)
+                    .frame(width: side - ringInset * 2, height: side - ringInset * 2)
+                    .clipShape(Circle())
+                    .overlay(Circle().strokeBorder(.white.opacity(0.25), lineWidth: 1))
+                    .overlay(Circle().fill(.black.opacity(0.9)).frame(width: side * 0.13))
+                    .rotationEffect(.degrees(angle))
+            }
+
+            // The app's signature, at the size it fits: the same luminous arc
+            // that rings the full player's lens. It makes the mini player the
+            // big one seen from far away rather than a different component
+            // that happens to be about the same track — and it replaces a
+            // seven-bar meter that was, on any stream, seven bars of nothing.
+            if let progress {
+                let stops = ringColors.isEmpty ? song.gradient : ringColors
+                Circle()
+                    .stroke(.white.opacity(0.14), lineWidth: 2.5)
+                Circle()
+                    .trim(from: 0, to: max(0.004, min(progress, 1)))
+                    .stroke(
+                        AngularGradient(
+                            colors: [(stops.first ?? Theme.accentSoft).opacity(0.9),
+                                     stops.last ?? Theme.accent,
+                                     .white],
+                            center: .center,
+                            startAngle: .degrees(0),
+                            endAngle: .degrees(360 * max(0.004, min(progress, 1)))),
+                        style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .shadow(color: (stops.first ?? Theme.accentSoft).opacity(0.6), radius: 3)
+            }
         }
+        .frame(width: side, height: side)
     }
 }

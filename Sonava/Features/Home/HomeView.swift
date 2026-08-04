@@ -154,7 +154,12 @@ struct HomeView: View {
                                 // baseline. A rail whose first item is larger
                                 // cannot be mistaken for a stock carousel — and
                                 // the old one had twenty identical tiles.
-                                let side: CGFloat = index == 0 ? Tile.feature : Tile.standard * 0.84
+                                // Two tokens, not a token times a fudge. The
+                                // followers were `Tile.standard * 0.84` —
+                                // 117.6pt, a number that is in the design
+                                // system only in the sense that it was derived
+                                // from something that is.
+                                let side: CGFloat = index == 0 ? Tile.feature : Tile.standard
                                 VStack(alignment: .leading, spacing: Space.s) {
                                     ArtworkThumbnail(song: song, size: side,
                                                      cornerRadius: 2, showBadge: false)

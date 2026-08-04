@@ -14,6 +14,16 @@
 //  tint belongs to the choice the user made, and it is the only way the paid
 //  accent palette reaches these screens at all.
 //
+//  ## Why it scrolls instead of squeezing
+//
+//  It used to divide the width equally and let each label shrink to fit its
+//  share. With six Russian segments that produced a row where «Песни» sat at
+//  full size and «Плейлисты» at 72% of it — different type sizes in one
+//  control, which reads as broken because it is. A segment now takes the
+//  width its own word needs, at one size, and the row scrolls when the words
+//  do not fit. Nothing is ever truncated, nothing is ever shrunk, and the
+//  selected segment scrolls itself into view.
+//
 
 import SwiftUI
 
@@ -38,14 +48,30 @@ struct SegmentedControl<Value: Hashable>: View {
     @Namespace private var indicator
 
     var body: some View {
-        HStack(spacing: Space.xs) {
-            ForEach(segments) { segment in
-                segmentView(segment)
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal) {
+                HStack(spacing: Space.xs) {
+                    ForEach(segments) { segment in
+                        segmentView(segment).id(segment.value)
+                    }
+                }
+                .padding(Space.xs)
             }
+            // Only scrolls when it has to: a three-segment control still sits
+            // still under a finger, which is what makes the scrolling one feel
+            // like the same component rather than a different one.
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+            .scrollIndicators(.hidden)
+            .background(Capsule().fill(Theme.surfaceElevated))
+            .overlay(Capsule().strokeBorder(Theme.hairline, lineWidth: 1))
+            .clipShape(Capsule())
+            // A selection changed from elsewhere — a deep link, a restored
+            // state — must not leave its pill off-screen.
+            .onChange(of: selection) { _, value in
+                withAnimation(Motion.standard) { proxy.scrollTo(value, anchor: .center) }
+            }
+            .onAppear { proxy.scrollTo(selection, anchor: .center) }
         }
-        .padding(Space.xs)
-        .background(Capsule().fill(Theme.surfaceElevated))
-        .overlay(Capsule().strokeBorder(Theme.hairline, lineWidth: 1))
     }
 
     private func segmentView(_ segment: Segment) -> some View {
@@ -65,12 +91,13 @@ struct SegmentedControl<Value: Hashable>: View {
                 }
             }
             .font(.sonavaRowMeta.weight(.semibold))
-                // Russian labels — "Плейлисты", "Избранное" — hyphenated into
-                // two lines inside the pill. A segment shrinks, never wraps.
+                // One line, one size, always. The label decides the width;
+                // the control decides whether the row scrolls.
                 .lineLimit(1)
-                .minimumScaleFactor(0.72)
+                .fixedSize(horizontal: true, vertical: false)
             .foregroundColor(isSelected ? .white : Theme.textSecondary)
-            .frame(maxWidth: .infinity, minHeight: Space.hitTarget - Space.s)
+            .padding(.horizontal, Space.l)
+            .frame(minHeight: Space.hitTarget - Space.s)
             .background {
                 if isSelected {
                     Capsule()

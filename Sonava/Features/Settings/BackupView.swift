@@ -137,14 +137,9 @@ struct BackupView: View {
                 HStack(spacing: Space.s) {
                     SonavaIcon(glyph: .restore, size: 18, tint: Theme.accentSoft)
                     Text("Restore from a backup")
-                        .font(.system(.subheadline).weight(.semibold))
-                        .foregroundColor(Theme.accentSoft)
                 }
-                .frame(maxWidth: .infinity)
-                .frame(minHeight: Space.hitTarget)
-                .background(Capsule().fill(Color.white.opacity(0.08)))
             }
-            .buttonStyle(BouncyButtonStyle(scale: 0.97))
+            .buttonStyle(SecondaryCapsuleButtonStyle())
             .accessibilityIdentifier("backup.import")
 
             Text("Restoring adds to what's already here — it never replaces or deletes.")

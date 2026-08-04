@@ -63,6 +63,7 @@ struct SonavaIcon: View {
         case chevronRight, chevronDown, more, sleep, infinity
         case restore, shield, scrobble, wave, lock, close, plus
         case repeatAll, repeatOne, person, palette
+        case volumeLow, volumeHigh
     }
 
     let glyph: Glyph
@@ -515,6 +516,31 @@ struct SonavaIcon: View {
             }
             filled = dabs
 
+        case .volumeLow, .volumeHigh:
+            // A cone and one or two arcs. Drawn here rather than taken from
+            // the animation pack: the pack's volume glyph *ends* on a muted
+            // speaker, so the loud end of the volume slider was showing a
+            // crossed-out speaker — caught on the contact sheet, which is
+            // what the contact sheet is for.
+            var cone = Path()
+            cone.move(to: p(4, 9.5))
+            cone.addLine(to: p(7.5, 9.5))
+            cone.addLine(to: p(11.5, 5.5))
+            cone.addLine(to: p(11.5, 18.5))
+            cone.addLine(to: p(7.5, 14.5))
+            cone.addLine(to: p(4, 14.5))
+            cone.closeSubpath()
+            filled = cone
+
+            let radii: [CGFloat] = glyph == .volumeHigh ? [3.4, 6.2] : [3.4]
+            for radius in radii {
+                var arc = Path()
+                arc.addArc(center: p(11.5, 12), radius: radius / Icon.grid * s,
+                           startAngle: .degrees(-52), endAngle: .degrees(52),
+                           clockwise: false)
+                stroked.addPath(arc)
+            }
+
         case .close:
             weight = 1.8
             stroked.move(to: p(7.5, 7.5))
@@ -555,7 +581,8 @@ struct SonavaIcon: View {
                                    .chevronRight, .chevronDown, .more, .sleep,
                                    .infinity, .restore, .shield, .scrobble,
                                    .wave, .lock, .close, .plus,
-                                   .repeatAll, .repeatOne, .person, .palette]
+                                   .repeatAll, .repeatOne, .person, .palette,
+                                   .volumeLow, .volumeHigh]
     return ZStack {
         Theme.background.ignoresSafeArea()
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 28) {
@@ -589,7 +616,8 @@ struct IconGallery: View {
         (.wave, "wave"), (.lock, "lock"),
         (.close, "close"), (.plus, "plus"),
         (.repeatAll, "repeatAll"), (.repeatOne, "repeatOne"),
-        (.person, "person"), (.palette, "palette")
+        (.person, "person"), (.palette, "palette"),
+        (.volumeLow, "volumeLow"), (.volumeHigh, "volumeHigh")
     ]
 
     var body: some View {

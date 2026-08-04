@@ -42,6 +42,13 @@ enum AnimatedGlyph: String {
     case volume
     case loading = "loading3"
     case checkmark, star, bookmark, share, radioButton, explore
+    case trash = "trash2"
+    case warning = "alertTriangle"
+    case bell = "notification2"
+    case folder, edit, copy
+    case expand = "maximizeMinimize2"
+    case scrollDown, thumbUp
+    case lock
 }
 
 /// How an `AnimatedIcon` is driven.
@@ -125,9 +132,12 @@ struct AnimatedIconLab: View {
     @State private var fires = 0
 
     private let toggles: [AnimatedGlyph] = [.heart, .heartBurst, .plusToX, .searchToX,
-                                            .checkmark, .star, .bookmark, .radioButton]
+                                            .checkmark, .star, .bookmark, .radioButton,
+                                            .trash, .folder, .edit, .expand,
+                                            .thumbUp, .lock]
     private let loops: [AnimatedGlyph] = [.activity, .microphone, .loading, .infinity,
-                                          .settings, .volume, .explore, .download]
+                                          .settings, .volume, .explore, .download,
+                                          .bell, .scrollDown, .warning, .copy]
 
     var body: some View {
         ZStack {

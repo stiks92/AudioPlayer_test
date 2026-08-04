@@ -31,6 +31,21 @@ struct MiniPlayerView: View {
     /// row keeps its shape.
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    /// The sleeve's own colours once read, the track's stored pair until
+    /// then — the same source every other surface now takes its colour from.
+    private var sleeve: [Color] {
+        let extracted = audio.sleeveHex?.colors ?? []
+        return extracted.isEmpty ? (audio.currentSong?.gradient ?? []) : extracted
+    }
+
+    /// What the ring should show, or nil when there is nothing honest to draw:
+    /// a live stream has no position, and an unknown duration is the sentinel
+    /// `1` rather than a real length.
+    private var ringProgress: Double? {
+        guard !(audio.currentSong?.isLive ?? false), clock.duration > 1 else { return nil }
+        return clock.progress
+    }
+
     /// The accessory slot is short and the system owns its chrome, so the
     /// docked layout's artwork and padding do not fit it.
     private var artworkSide: CGFloat { style == .accessory ? 36 : 44 }
@@ -45,9 +60,14 @@ struct MiniPlayerView: View {
                     // little spinning record, not a square thumbnail. It turns
                     // only while something is actually playing, and rests for
                     // Reduce Motion — a stopped disc still reads as a disc.
+                    // The ring is the app's signature at this size: the same
+                    // luminous arc that circles the full player's lens, so the
+                    // mini player reads as the big one seen from far away.
                     SpinningDisc(song: song,
                                  side: artworkSide,
-                                 isSpinning: audio.isPlaying && !reduceMotion)
+                                 isSpinning: audio.isPlaying && !reduceMotion,
+                                 progress: ringProgress,
+                                 ringColors: sleeve)
 
                     VStack(alignment: .leading, spacing: 1) {
                         MarqueeText(text: song.title, font: .subheadline.weight(.semibold))
@@ -70,11 +90,23 @@ struct MiniPlayerView: View {
                     // commit — on a stream they were breathing a sine wave, and
                     // motion that means nothing is precisely what makes an
                     // interface feel machine-made.
+                    // The meter stays, and it earns its place twice over.
+                    //
+                    // Honestly: `clock.isMetered` keeps it dark on anything
+                    // streamed, so it never animates a synthesised sine.
+                    // Structurally: it is the one fixed-width child between
+                    // the marquee title and the controls, and removing it let
+                    // the title's width float. In iOS 26's tab accessory that
+                    // is fatal — the slot re-measures itself continuously and
+                    // drops out of the accessibility tree entirely, which the
+                    // UI tests reported as the mini player never appearing.
+                    // Four bisecting builds to find; recorded so the next
+                    // "simplification" here starts from the answer.
                     AudioVisualizerView(
                         level: clock.audioLevel,
                         isActive: audio.isPlaying && clock.isMetered && !reduceMotion,
                         barCount: 7,
-                        tint: song.gradient.first ?? Theme.accentSoft
+                        tint: sleeve.first ?? Theme.accentSoft
                     )
                     .frame(width: 34, height: 20)
                     .accessibilityHidden(true)

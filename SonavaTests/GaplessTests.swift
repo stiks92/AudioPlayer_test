@@ -123,8 +123,14 @@ struct GaplessTests {
         // The node's clock runs straight through queued segments, so a naive
         // implementation shows the second track starting at the first one's
         // duration. Half a second of tone each keeps this quick.
-        let first = try TestAudioFile.makeTone(named: "a.m4a", seconds: 0.5)
-        let second = try TestAudioFile.makeTone(named: "b.m4a", seconds: 0.9)
+        // A second of lead-in, so the two answers are far apart: a working
+        // hand-off reports a fraction of a second, a broken one reports the
+        // whole of track one. The margin has to survive a loaded machine —
+        // the completion callback comes off the render thread and can be a
+        // few hundred milliseconds late under parallel test load, which is
+        // what made a 0.3 threshold flaky.
+        let first = try TestAudioFile.makeTone(named: "a.m4a", seconds: 1.0)
+        let second = try TestAudioFile.makeTone(named: "b.m4a", seconds: 1.4)
         defer { TestAudioFile.cleanUp(first); TestAudioFile.cleanUp(second) }
 
         let engine = LocalAudioEngine()
@@ -142,12 +148,12 @@ struct GaplessTests {
         engine.prepare(url: first, isLive: false, autoplay: true)
         engine.preloadNext(url: second)
 
-        for _ in 0..<60 where timeAtJoin == nil {
+        for _ in 0..<80 where timeAtJoin == nil {
             try? await Task.sleep(for: .milliseconds(25))
         }
         let joined = try #require(timeAtJoin, "the engine must report the hand-off it performed")
-        #expect(joined < 0.3,
-                "position must restart with the new track, not continue the old one's clock")
-        #expect(abs((durationAtJoin ?? 0) - 0.9) < 0.2, "duration follows the new track")
+        #expect(joined < 0.7,
+                "position must restart with the new track, not continue the old one's clock (which would read ≥1.0)")
+        #expect(abs((durationAtJoin ?? 0) - 1.4) < 0.25, "duration follows the new track")
     }
 }

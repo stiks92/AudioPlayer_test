@@ -79,20 +79,70 @@ extension View {
 /// inherits them instead of having to remember them.
 struct PrimaryCapsuleButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
+    /// Full width in a form; hugging when it sits in an empty state beside
+    /// nothing else. The height never changes — a 44pt target is a floor, not
+    /// a preference, and it was being met by three different means.
+    var expands = true
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.headline)
             .foregroundColor(isEnabled ? Theme.background : .white.opacity(0.55))
             .tint(isEnabled ? Theme.background : .white)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, Space.l)
+            .frame(maxWidth: expands ? .infinity : nil, minHeight: Space.hitTarget)
+            .padding(.vertical, expands ? Space.s : 0)
             .background(
                 Capsule().fill(isEnabled ? Color.white : Color.white.opacity(0.14))
             )
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(Motion.press, value: configuration.isPressed)
             .animation(Motion.fade, value: isEnabled)
+    }
+}
+
+// MARK: - The rest of the button ladder
+
+/// The second rung: an action that matters but isn't *the* action.
+///
+/// Sixteen files had each invented this — an ivory word on a
+/// `Color.white.opacity(0.08)` capsule, or a hairline border, or bare accent
+/// text — at different heights and radii. A screen carrying two of those
+/// reads as two screens. There are three rungs now and nothing else: white
+/// capsule, bordered capsule, bare word.
+struct SecondaryCapsuleButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+    /// Full width for a form's second action; hugging for a row's.
+    var expands = true
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(.subheadline).weight(.semibold))
+            .foregroundColor(isEnabled ? Theme.accentSoft : Theme.textTertiary)
+            .padding(.horizontal, Space.xl)
+            .frame(maxWidth: expands ? .infinity : nil, minHeight: Space.hitTarget)
+            .background(Capsule().fill(Color.white.opacity(0.08)))
+            .overlay(Capsule().strokeBorder(Theme.hairline, lineWidth: 1))
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(Motion.press, value: configuration.isPressed)
+            .animation(Motion.fade, value: isEnabled)
+    }
+}
+
+/// The third rung: a word that acts, with no surface at all — Retry, Cancel,
+/// "See all". Sized to the same 44pt target as the other two, because a
+/// borderless control still has to be hittable.
+struct QuietButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(.subheadline).weight(.semibold))
+            .foregroundColor(isEnabled ? Theme.accentSoft : Theme.textTertiary)
+            .padding(.horizontal, Space.m)
+            .frame(minHeight: Space.hitTarget)
+            .contentShape(Rectangle())
+            .opacity(configuration.isPressed ? 0.6 : 1)
+            .animation(Motion.press, value: configuration.isPressed)
     }
 }
 
