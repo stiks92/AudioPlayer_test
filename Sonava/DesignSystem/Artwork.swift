@@ -50,10 +50,33 @@ struct ArtworkImage: View {
 /// Small badge (AUDIUS / LIVE …) shown on remote artwork.
 struct SourceBadge: View {
     let source: TrackSource
+    /// The artwork this badge sits on. Below `compactThreshold` the word does
+    /// not fit and the badge becomes a dot.
+    var artworkSide: CGFloat = 200
+
+    /// A 52pt row thumbnail cannot hold the word "AUDIUS": it wrapped to two
+    /// lines reading "AU / DI…" over the sleeve — a caption arguing with the
+    /// picture it is captioning. Above this size the word fits; below it, the
+    /// provenance is a dot, and the word lives in the accessibility label
+    /// where it is still readable by anyone who needs it.
+    private static let compactThreshold: CGFloat = 96
 
     var body: some View {
         if let text = source.badge {
-            Text(text)
+            if artworkSide < Self.compactThreshold {
+                Circle()
+                    .fill(source == .radio ? Theme.live : Theme.accentSoft)
+                    .frame(width: 6, height: 6)
+                    .overlay(Circle().strokeBorder(Theme.background.opacity(0.6), lineWidth: 1.5))
+                    .accessibilityLabel(Text(text))
+            } else {
+                word(text)
+            }
+        }
+    }
+
+    private func word(_ text: String) -> some View {
+        Text(text)
                 // Was `.heavy` with tracking, which made a third-party
                 // catalogue's name heavier than the track title beneath it —
                 // the loudest thing on the artwork was the name of the
@@ -71,6 +94,7 @@ struct SourceBadge: View {
                     Capsule().fill(source == .radio ? Theme.destructive
                                                     : Theme.background.opacity(0.78))
                 )
-        }
+                .lineLimit(1)
+                .fixedSize()
     }
 }

@@ -40,6 +40,7 @@ struct RootView: View {
     @State private var debugShowIcons = false
     @State private var debugShowAnimLab = false
     @State private var debugShowAlbum = false
+    @State private var debugShowArtist = false
     @State private var debugShowQueue = false
     @State private var debugShowScrobble = false
     @State private var debugShowStats = false
@@ -138,6 +139,14 @@ struct RootView: View {
                 .environmentObject(audio)
                 .environmentObject(library)
                 .environmentObject(proStore)
+        }
+        .sheet(isPresented: $debugShowArtist) {
+            if let song = library.songs.first {
+                ArtistView(artistName: song.artist, gradient: song.gradient)
+                    .environmentObject(audio)
+                    .environmentObject(library)
+                    .environmentObject(playlistStore)
+            }
         }
         .sheet(isPresented: $debugShowAlbum) {
             if let album = library.albums.first {
@@ -291,6 +300,7 @@ struct RootView: View {
         // Straight to the first record, for screenshots of the album screen —
         // simctl cannot tap, so a route is the only scriptable way in.
         if arguments.contains("-openAlbum") { debugShowAlbum = true }
+        if arguments.contains("-openArtist") { debugShowArtist = true }
         if arguments.contains("-openQueue") { debugShowQueue = true }
         // Seeds a believable playback position for design captures: the demo
         // stream never resolves a duration, so without this every frame shows

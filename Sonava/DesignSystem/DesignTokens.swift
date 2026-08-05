@@ -99,9 +99,9 @@ enum Motion {
 
 // MARK: - Type
 
-/// Three families, one rule each, so the ramp can be checked in a sentence:
-/// **if a human named it, it is serif; if a machine measured it, it is
-/// monospaced; everything else is the system face.**
+/// Two families and one exception, checkable in a sentence: **facts are
+/// monospaced, everything else is the system face, and the app's own word is
+/// the single serif in the product.**
 ///
 /// The previous ramp put `design: .rounded` on the display, metric, card-title
 /// and section-header roles. Two independent design reviews named it, without
@@ -109,25 +109,36 @@ enum Motion {
 /// than designed — SF Rounded is the friendliness default of every template.
 /// It appears in exactly zero roles now.
 ///
-/// Serif is New York, which the system ships and which optically sizes itself.
-/// It carries names — track titles, artists, the app's own word — because a
-/// name is written by a person. Monospaced carries facts, and the reason is
-/// mechanical as well as editorial: a tabular numeral does not twitch when the
-/// value under it changes thirty times a second.
+/// The serif used to carry every name — track titles, artists, album titles —
+/// on the argument that a name is written by a person. Rendered on screen
+/// beside the owner's own reference, which is set entirely in a grotesque,
+/// it read as bookish rather than authored: the two were shown side by side
+/// as identical frames and the editorial voice was the thing that made the
+/// app feel like it belonged to a different decade.
+///
+/// So New York now appears exactly once, on the word SONAVA, where serifs do
+/// the job serifs are actually good at — making a wordmark recognisable —
+/// rather than setting the interface's tone. Everything a person named is the
+/// system face; everything a machine measured is monospaced, which is also
+/// mechanical rather than decorative: a tabular numeral does not twitch when
+/// the value under it changes thirty times a second.
 ///
 /// Every role is anchored to a text style, never `Font.system(size:)`, so it
 /// still answers Dynamic Type.
 extension Font {
     /// The app's own word, and nothing else. Once per screen at most.
     static let sonavaMasthead = Font.system(.largeTitle, design: .serif).weight(.black)
-    /// The one hero figure on a screen: a duration, a count, a streak.
-    static let sonavaFigure = Font.system(.largeTitle, design: .serif).weight(.black)
+    /// The one hero figure on a screen: a duration, a count, a streak. It was
+    /// the weakest use of the serif in the product — by the app's own rule a
+    /// figure is a measured fact, and setting one in a book face argued the
+    /// opposite.
+    static let sonavaFigure = Font.system(.largeTitle).weight(.bold)
     /// A title someone chose: a track, an album, a playlist.
-    static let sonavaTitle = Font.system(.title, design: .serif).weight(.bold)
+    static let sonavaTitle = Font.system(.title).weight(.regular)
     /// A row's primary line — the name of the thing.
-    static let sonavaName = Font.system(.callout, design: .serif).weight(.semibold)
+    static let sonavaName = Font.system(.callout).weight(.semibold)
     /// An attribution: the artist, set the way a credit is set.
-    static let sonavaAttribution = Font.system(.body, design: .serif).italic()
+    static let sonavaAttribution = Font.system(.body)
     /// A row's secondary line.
     static let sonavaByline = Font.system(.footnote)
     /// The department label above a rule. Set in caps and tracked.

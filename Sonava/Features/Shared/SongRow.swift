@@ -24,7 +24,7 @@ struct ArtworkThumbnail: View {
             )
             .overlay(alignment: .bottomLeading) {
                 if showBadge {
-                    SourceBadge(source: song.source).padding(Space.s)
+                    SourceBadge(source: song.source, artworkSide: size).padding(Space.s)
                 }
             }
     }
