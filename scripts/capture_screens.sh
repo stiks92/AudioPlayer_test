@@ -57,7 +57,9 @@ COMMON=(-hasOnboarded.v1 YES -pro.dev.override.v1 "$PRO"
         -seedDemoContent -seedStats -seedServers 3)
 
 # Real sleeves for every frame: the owner's rule is that no procedural art may
-# appear in a review capture. Point DEMO_ART at a folder of genuine JPEGs.
+# appear in a review capture. Build the folder with `scripts/fetch_demo_art.sh`
+# — public-domain paintings, which look like sleeves and, unlike the famous
+# covers this used to borrow, can appear in a screenshot anyone might publish.
 if [ -n "${DEMO_ART:-}" ]; then
   COMMON+=(-demoArtDir "$DEMO_ART" -demoProgress 0.42)
 fi

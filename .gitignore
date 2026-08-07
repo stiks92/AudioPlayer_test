@@ -29,3 +29,7 @@ Packages/
 *.wav
 *.aac
 .claude/settings.local.json
+
+# Review-capture sleeves. Fetched, not committed: they are 8 MB of paintings
+# that `scripts/fetch_demo_art.sh` rebuilds in one command.
+.demo-art/
