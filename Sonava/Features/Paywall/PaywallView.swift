@@ -41,7 +41,7 @@ struct PaywallView: View {
         Perk(icon: .download, title: "Offline downloads",
              subtitle: "Save full tracks and listen with no signal.", id: "offline"),
         Perk(icon: .equalizer, title: "10-band equalizer",
-             subtitle: "Studio presets and per-band control, on your files and downloads.", id: "eq"),
+             subtitle: "Studio presets and per-band control — on files and streams alike.", id: "eq"),
         Perk(icon: .aiMix, title: "AI Mix",
              subtitle: "Describe a vibe, get an instant mix.", id: "aimix"),
         Perk(icon: .palette, title: "Make it yours",
@@ -85,7 +85,12 @@ struct PaywallView: View {
         .foregroundColor(.white)
         .task {
             if proStore.products.isEmpty { await proStore.loadProducts() }
-            selectedID = selectedID ?? proStore.trialProduct?.id ?? proStore.products.first?.id
+            // Lifetime is the default selection everywhere, onboarding
+            // included. Defaulting to the yearly trial was the "quiet
+            // subscription-first" pattern the whole pricing model exists to
+            // avoid; the trial stays one tap away, unselected.
+            selectedID = selectedID ?? proStore.lifetimeProduct?.id
+                ?? proStore.trialProduct?.id ?? proStore.products.first?.id
         }
         .onChange(of: proStore.isPro) { _, pro in
             if pro { finish() }
@@ -135,7 +140,7 @@ struct PaywallView: View {
                 .shadow(color: .white.opacity(0.35), radius: 16)
             Text("Sonava Pro")
                 .font(.sonavaMasthead)
-            Text("The one player for all your music —\nunlocked to the fullest.")
+            Text("Pay once. No subscription, no ads.")
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.85))
                 .multilineTextAlignment(.center)
@@ -156,11 +161,16 @@ struct PaywallView: View {
                     Spacer()
                 }
             }
-            Text("Plus every self-hosted server you own searched together, and your full listening history.")
-                .font(.system(.caption))
-                .foregroundColor(.white.opacity(0.7))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.top, 2)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Plus every self-hosted server you own searched together, and your full listening history.")
+                // Trust, stated where the money is asked for: the things
+                // competitors charge for that Sonava deliberately doesn't.
+                Text("Gapless, loudness levelling and scrobbling are free for everyone — Pro is the extras.")
+            }
+            .font(.system(.caption))
+            .foregroundColor(.white.opacity(0.7))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, 2)
         }
         .padding(Space.l)
         .card(cornerRadius: Radius.card)
@@ -230,9 +240,23 @@ struct PaywallView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(product.displayName.isEmpty ? product.id : product.displayName)
                         .font(.system(.subheadline).weight(.semibold))
-                    Text(proStore.period(for: product))
-                        .font(.system(.caption))
-                        .foregroundColor(.white.opacity(0.7))
+                    if product.subscription == nil {
+                        Text("Pay once — yours forever")
+                            .font(.system(.caption))
+                            .foregroundColor(.white.opacity(0.7))
+                        // Appears by itself the day the owner flips the
+                        // Family Sharing switch in App Store Connect; until
+                        // then the card promises nothing.
+                        if product.isFamilyShareable {
+                            Text("Family Sharing included")
+                                .font(.system(.caption))
+                                .foregroundColor(Theme.accentSoft)
+                        }
+                    } else {
+                        Text(proStore.period(for: product))
+                            .font(.system(.caption))
+                            .foregroundColor(.white.opacity(0.7))
+                    }
                 }
                 Spacer()
                 Text(product.displayPrice)

@@ -200,6 +200,7 @@ struct SubsonicService {
             artist: song.artist ?? "Unknown artist",
             album: song.album ?? "Library",
             source: .subsonic,
+            fileExtension: song.suffix ?? "",
             artworkURL: coverArtURL(id: song.coverArt),
             streamURL: streamURL(id: song.id),
             gradientHex: Palette.hex(forSeed: song.id),

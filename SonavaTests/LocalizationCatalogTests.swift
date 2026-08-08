@@ -71,6 +71,24 @@ struct LocalizationCatalogTests {
             "Even out volume", "Random", "Try again", "Reading your library…",
             "The server has no albums yet.",
             "Import a playlist", "Choose a file", "Not found", "Start over",
+            // The stream-EQ honesty footnotes: the words that state whether a
+            // stream is actually being processed.
+            "Shapes files and network streams alike.",
+            "Applied to this stream too.",
+            "This stream's format doesn't allow processing — it plays flat.",
+            // The growth-scan batch: the paywall's pay-once framing and the
+            // Monday Mix ritual.
+            "Pay once. No subscription, no ads.",
+            "Pay once — yours forever",
+            "Monday Mix", "Monday Mix reminder",
+            "A fresh weekly mix, announced once on Monday morning.",
+            "Your Monday Mix is ready",
+            "A fresh week of music, picked from what you love.",
+            "Gapless, loudness levelling and scrobbling are free for everyone — Pro is the extras.",
+            // Caught untranslated on a RU paywall frame while shipping the
+            // batch above — the fifth such catch, and the reason this list
+            // only ever grows.
+            "Plus every self-hosted server you own searched together, and your full listening history.",
             "From a file", "From a list", "Playlist name",
             "Those credentials weren't accepted. Yandex and Mail.ru need an app password, not your account password.",
         ]

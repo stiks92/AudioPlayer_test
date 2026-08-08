@@ -37,6 +37,10 @@ final class AudioManager: NSObject, ObservableObject {
         didSet { activeEngine?.setVolume(volume) }
     }
     @Published private(set) var playbackRate: Float = 1.0
+    /// True while the current *stream* is running through the processing tap
+    /// (EQ + loudness). Local files are always processed; this exists so the
+    /// EQ screen can state what is happening to a stream instead of guessing.
+    @Published private(set) var streamProcessingActive = false
 
     /// Live time/level updates — observed only by Now Playing / mini / lyrics.
     let clock = PlaybackClock()
@@ -79,6 +83,12 @@ final class AudioManager: NSObject, ObservableObject {
 
     private let localEngine = LocalAudioEngine()
     private let remoteEngine = RemoteAudioEngine()
+
+    private func wireRemoteProcessingState() {
+        remoteEngine.onProcessingChange = { [weak self] attached in
+            Task { @MainActor in self?.streamProcessingActive = attached }
+        }
+    }
     private var activeEngine: PlaybackEngine?
     private var timer: Timer?
     private var baseQueue: [Song] = []
@@ -120,6 +130,7 @@ final class AudioManager: NSObject, ObservableObject {
         super.init()
         configureSession()
         setupRemoteCommands()
+        wireRemoteProcessingState()
 
         // Reshape the live engine whenever the EQ curve changes.
         effectsCancellable = effects.$equalizer

@@ -230,6 +230,24 @@ struct NowPlayingView: View {
                     .foregroundColor(.white.opacity(0.7))
                 }
                 .buttonStyle(.plain)
+                // "FLAC · 320" — the audiophile's one question, answered in
+                // the machine face because it is a measured fact. Absent
+                // entirely when the source didn't report it: a quality badge
+                // that guesses is worse than none.
+                if let song, song.qualityParts.format != nil || song.qualityParts.kbps != nil {
+                    HStack(spacing: 4) {
+                        if let format = song.qualityParts.format {
+                            Text(verbatim: format)
+                        }
+                        if let rate = song.qualityParts.kbps {
+                            if song.qualityParts.format != nil { Text(verbatim: "·") }
+                            Text("\(rate) kbps")
+                        }
+                    }
+                    .font(.sonavaFact)
+                    .foregroundColor(Theme.textTertiary)
+                    .padding(.top, 2)
+                }
             }
             Spacer(minLength: 8)
             if audio.supportsPlaybackRate {

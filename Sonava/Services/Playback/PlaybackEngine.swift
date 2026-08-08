@@ -63,9 +63,9 @@ extension PlaybackEngine {
     @discardableResult
     func preloadNext(url: URL) -> Bool { false }
     func cancelPreload() {}
-    /// Streams play at their own level: an `AVPlayer` item cannot be re-gained
-    /// without an audio processing tap. Settings says so plainly rather than
-    /// implying a levelling the app isn't doing.
+    /// Both engines implement this now — the local one through its EQ node's
+    /// global gain, the remote one through the stream processing tap — so the
+    /// default is only a formality for tests' stub engines.
     func setLoudnessGain(_ decibels: Double) {}
 }
 
@@ -408,6 +408,18 @@ final class RemoteAudioEngine: NSObject, PlaybackEngine {
     private var rate: Float = 1.0
     private(set) var level: CGFloat = 0
 
+    /// The EQ + loudness processor for AVPlayer content. Attached per item;
+    /// reports whether it actually landed so the UI can tell the truth.
+    private let tap = StreamProcessingTap()
+    private var equalizer = EqualizerSettings()
+    private var loudnessGainDB: Double = 0
+    /// Forwarded to AudioManager: true while the current stream is actually
+    /// being processed (progressive HTTP yes, HLS no).
+    var onProcessingChange: ((Bool) -> Void)? {
+        get { tap.onAttachChange }
+        set { tap.onAttachChange = newValue }
+    }
+
     var isLive: Bool { live }
     var isPlaying: Bool { playing }
 
@@ -432,6 +444,11 @@ final class RemoteAudioEngine: NSObject, PlaybackEngine {
         let p = AVPlayer(playerItem: item)
         p.volume = volume
         player = p
+        // The curve must be in the DSP before the first buffer, not after:
+        // a stream that opens flat and snaps into shape a second later is
+        // exactly the kind of seam a listener notices once and distrusts.
+        tap.dsp.update(settings: equalizer, loudnessGainDB: loudnessGainDB)
+        MainActor.assumeIsolated { tap.attach(to: item) }
         endObserver = NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,
             object: item,
@@ -469,17 +486,32 @@ final class RemoteAudioEngine: NSObject, PlaybackEngine {
         if playing && !live { player?.rate = rate }
     }
 
-    /// AVPlayer exposes no insertable EQ node; equalizing a live stream needs an
-    /// MTAudioProcessingTap, which is a separate piece of work. Streams play
-    /// flat for now, and the EQ screen says so.
-    func apply(_ equalizer: EqualizerSettings) {}
+    func apply(_ equalizer: EqualizerSettings) {
+        self.equalizer = equalizer
+        tap.dsp.update(settings: equalizer, loudnessGainDB: loudnessGainDB)
+    }
+
+    func setLoudnessGain(_ decibels: Double) {
+        loudnessGainDB = decibels
+        tap.dsp.update(settings: equalizer, loudnessGainDB: decibels)
+    }
 
     func refresh() {
-        // AVPlayer exposes no metering; synthesise a gentle animated level.
         guard playing else { level = 0; return }
-        let t = CACurrentMediaTime()
-        let synthetic = 0.45 + 0.22 * sin(t * 3.1) + 0.12 * sin(t * 7.3)
-        level = level * 0.6 + CGFloat(synthetic) * 0.4
+        let measured = tap.dsp.drainLevel()
+        if tap.isAttached, measured > 0 {
+            // The real level, measured in the tap — same scaling and smoothing
+            // as the local engine, so the meter doesn't change personality
+            // when the source does.
+            let normalized = min(1, CGFloat(measured) * 3.2)
+            level = level * 0.55 + normalized * 0.45
+        } else {
+            // No tap on this stream (HLS): synthesise a gentle level rather
+            // than freeze the meter — but only then.
+            let t = CACurrentMediaTime()
+            let synthetic = 0.45 + 0.22 * sin(t * 3.1) + 0.12 * sin(t * 7.3)
+            level = level * 0.6 + CGFloat(synthetic) * 0.4
+        }
     }
 
     func teardown() {
@@ -487,6 +519,7 @@ final class RemoteAudioEngine: NSObject, PlaybackEngine {
             NotificationCenter.default.removeObserver(endObserver)
             self.endObserver = nil
         }
+        MainActor.assumeIsolated { tap.detach() }
         player?.pause()
         player = nil
         playing = false

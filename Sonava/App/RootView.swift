@@ -117,7 +117,7 @@ struct RootView: View {
         // Lets a launch argument deep-link straight to a screen, so a specific
         // view can be driven or screenshotted without walking the UI.
         .sheet(isPresented: $debugShowEqualizer) {
-            EqualizerView(effects: audio.effects).environmentObject(proStore)
+            EqualizerView(effects: audio.effects).environmentObject(proStore).environmentObject(audio)
         }
         .sheet(isPresented: $debugShowPaywall) {
             PaywallView().environmentObject(proStore)

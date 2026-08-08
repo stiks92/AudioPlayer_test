@@ -97,6 +97,21 @@ struct Song: Identifiable, Equatable, Hashable, Codable {
     /// client the listener uses, not a per-app opinion.
     let isStarredOnServer: Bool
 
+    /// "FLAC" / "MP3 · 320" — what the audiophile row actually asks about a
+    /// recording, shown only when the source truthfully knows it. The format
+    /// comes from the file's own extension (import or stream URL); the rate
+    /// only from a source that reported one. Nothing here is guessed.
+    var qualityParts: (format: String?, kbps: Int?) {
+        var format: String? = fileExtension.isEmpty ? nil : fileExtension.uppercased()
+        if format == nil || source != .local {
+            let known = ["mp3", "flac", "ogg", "opus", "m4a", "aac", "wav", "alac", "aiff"]
+            if let ext = streamURL?.pathExtension.lowercased(), known.contains(ext) {
+                format = ext.uppercased()
+            }
+        }
+        return (format, bitRate)
+    }
+
     /// `3:47` for the margin, or nil when the length is unknown.
     var durationText: String? {
         guard let seconds = durationSeconds, seconds > 0 else { return nil }

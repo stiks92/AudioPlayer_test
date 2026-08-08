@@ -20,6 +20,7 @@ struct SettingsView: View {
 
     @State private var showPaywall = false
     @State private var showSleepOptions = false
+    @State private var mondayMixReminder = UserDefaults.standard.bool(forKey: MondayMix.reminderDefaultsKey)
     @State private var showConnectServer = false
     @State private var showEqualizer = false
     @State private var showScrobble = false
@@ -65,6 +66,7 @@ struct SettingsView: View {
             .sheet(isPresented: $showEqualizer) {
                 EqualizerView(effects: audio.effects)
                     .environmentObject(proStore)
+                    .environmentObject(audio)
             }
             .sheet(isPresented: $showScrobble) {
                 ConnectScrobbleView().environmentObject(scrobble)
@@ -309,6 +311,22 @@ struct SettingsView: View {
             .tint(Theme.accentDeep)   // ivory knob on ivory track vanished; umber keeps the knob visible
             .padding(.vertical, 6)
             divider
+            VStack(alignment: .leading, spacing: 2) {
+                Toggle(isOn: mondayMixBinding) {
+                    HStack(spacing: Space.iconGap) {
+                        SonavaIcon(glyph: .note, size: 20, tint: Theme.textSecondary)
+                            .frame(width: Space.iconColumn, height: Space.iconColumn)
+                        Text("Monday Mix reminder").font(.system(.subheadline))
+                    }
+                }
+                .tint(Theme.accentDeep)
+                Text("A fresh weekly mix, announced once on Monday morning.")
+                    .font(.system(.caption2))
+                    .foregroundColor(Theme.textTertiary)
+                    .padding(.leading, Space.textRail)
+            }
+            .padding(.vertical, 6)
+            divider
             // Free, and stated honestly: levelling works where the app can
             // measure the audio or be told its level — files, downloads, and
             // servers that publish ReplayGain. A live stream plays as it comes.
@@ -322,13 +340,29 @@ struct SettingsView: View {
                     }
                 }
                 .tint(Theme.accentDeep)
-                Text("Your files, downloads, and servers that report levels. Radio plays as it comes.")
+                Text("Files, downloads and level-reporting servers — applied to streams too. Live radio plays as it comes.")
                     .font(.system(.caption2))
                     .foregroundColor(Theme.textTertiary)
                     .padding(.leading, Space.textRail)
             }
             .padding(.vertical, 6)
         }
+    }
+
+    /// The toggle reflects what will actually happen: flipping it on asks for
+    /// notification permission, and a declined prompt snaps it back off
+    /// rather than leaving an "on" that will never fire.
+    private var mondayMixBinding: Binding<Bool> {
+        Binding(
+            get: { mondayMixReminder },
+            set: { wanted in
+                mondayMixReminder = wanted
+                Task {
+                    let actual = await MondayMix.setReminder(wanted)
+                    if actual != wanted { mondayMixReminder = actual }
+                }
+            }
+        )
     }
 
     private var equalizerValue: LocalizedStringKey {

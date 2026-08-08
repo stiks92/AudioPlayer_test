@@ -20,6 +20,7 @@ struct HomeView: View {
     @StateObject private var charts = SongFeed()
     @StateObject private var serverFeed = SongFeed()
     @StateObject private var madeForYou = SongFeed()
+    private let mixStore = MondayMix.Store()
     @State private var editorial: [RemotePlaylist] = []
     @State private var tasteSeed: [String] = []
     @State private var showSettings = false
@@ -124,16 +125,29 @@ struct HomeView: View {
 
     // MARK: - Made for you (taste-based)
 
-    /// Loads recommendations from the on-device taste profile. Only refetches
-    /// when the taste actually changed, so it doesn't hammer the network.
+    /// Loads the week's pinned mix, building it only when the week rolled or
+    /// the taste changed. It used to refetch on every cold launch — a shelf
+    /// that was different at breakfast and at lunch, which is a feed, not a
+    /// mix. Pinned for the week, it becomes something Monday delivers.
     private func loadMadeForYou(force: Bool = false) async {
         let profile = library.tasteProfile
         guard !profile.isEmpty else { madeForYou.clear(); return }
-        guard force || profile.seedQueries != tasteSeed else { return }
-        tasteSeed = profile.seedQueries
+        let week = MondayMix.weekStamp()
+        let seed = profile.seedQueries
+        if !force, let pinned = mixStore.songs(week: week, seed: seed) {
+            guard tasteSeed != seed || madeForYou.state != .loaded else { return }
+            tasteSeed = seed
+            await madeForYou.load { pinned }
+            return
+        }
+        guard force || seed != tasteSeed || madeForYou.state != .loaded else { return }
+        tasteSeed = seed
         let known = library.knownTrackIDs
         await madeForYou.load {
             Array(await StationService.recommendations(for: profile, excluding: known).prefix(20))
+        }
+        if case .loaded = madeForYou.state, !madeForYou.songs.isEmpty {
+            mixStore.pin(madeForYou.songs, week: week, seed: seed)
         }
     }
 
@@ -141,7 +155,7 @@ struct HomeView: View {
     private var madeForYouSection: some View {
         if madeForYou.state == .loaded, !madeForYou.songs.isEmpty {
             VStack(alignment: .leading, spacing: Space.m) {
-                Department(title: "Made for you",
+                Department(title: "Monday Mix",
                            fact: "\(madeForYou.songs.count) \(String(localized: "TRACKS"))")
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(alignment: .bottom, spacing: Space.m) {

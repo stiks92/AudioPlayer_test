@@ -31,10 +31,14 @@ final class ProStore: ObservableObject {
     /// Configure these to match your App Store Connect subscription group.
     /// The monthly and yearly products should carry a 7-day free-trial
     /// introductory offer — the onboarding paywall surfaces it automatically.
+    /// Lifetime leads: the growth scan's one non-negotiable pricing call is
+    /// that "pay once" is the hero of the whole model and subscriptions are a
+    /// quiet option — the reverse ordering is the exact pattern competitors
+    /// collect one-star "scam" reviews for.
     let productIDs = [
+        "com.sonava.pro.lifetime",
         "com.sonava.pro.monthly",
-        "com.sonava.pro.yearly",
-        "com.sonava.pro.lifetime"
+        "com.sonava.pro.yearly"
     ]
 
     private let overrideKey = "pro.dev.override.v1"
@@ -57,7 +61,7 @@ final class ProStore: ObservableObject {
         defer { isLoadingProducts = false }
         do {
             let loaded = try await Product.products(for: productIDs)
-            // Keep a stable order: monthly, yearly, lifetime.
+            // Keep a stable order: lifetime first, then the quiet plans.
             products = productIDs.compactMap { id in loaded.first { $0.id == id } }
         } catch {
             lastError = error.localizedDescription
@@ -141,6 +145,11 @@ final class ProStore: ObservableObject {
     func period(for product: Product) -> String {
         guard let sub = product.subscription else { return "one-time" }
         return "per \(unitName(sub.subscriptionPeriod))"
+    }
+
+    /// The one-time purchase — the paywall's default selection.
+    var lifetimeProduct: Product? {
+        products.first { $0.subscription == nil }
     }
 
     /// The product whose trial the onboarding CTA should offer — the yearly

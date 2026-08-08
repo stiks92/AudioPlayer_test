@@ -12,6 +12,7 @@ import SwiftUI
 struct EqualizerView: View {
     @ObservedObject var effects: AudioEffects
     @EnvironmentObject private var proStore: ProStore
+    @EnvironmentObject private var audio: AudioManager
     @Environment(\.dismiss) private var dismiss
 
     @State private var showPaywall = false
@@ -252,13 +253,26 @@ struct EqualizerView: View {
         }
     }
 
+    /// States what is actually happening, per source. Streams used to play
+    /// flat and this footnote admitted it; now they run through the same
+    /// curve via the processing tap, except HLS, which no tap can reach —
+    /// and for that one case the old honest sentence remains.
     private var footnote: some View {
-        Text("The equalizer shapes playback of your imported files. Streaming sources play flat.")
+        Text(footnoteText)
             .font(.footnote)
             .foregroundColor(Theme.textTertiary)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
             .padding(.top, 4)
+    }
+
+    private var footnoteText: LocalizedStringKey {
+        guard let song = audio.currentSong, song.source != .local else {
+            return "Shapes files and network streams alike."
+        }
+        return audio.streamProcessingActive
+            ? "Applied to this stream too."
+            : "This stream's format doesn't allow processing — it plays flat."
     }
 
     private func gainText(_ gain: Float) -> String {

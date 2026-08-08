@@ -264,6 +264,13 @@ final class DownloadStore: ObservableObject {
         }
 
         states[id] = .downloaded
+        // A downloaded track should have downloaded lyrics: warm the cache
+        // now, while there is still a network to warm it from.
+        Task { [song] in
+            await LyricsService.shared.prefetch(
+                artist: song.artist, title: song.title,
+                album: song.album, duration: song.durationSeconds)
+        }
         if !downloads.contains(where: { $0.id == id }) {
             downloads.insert(song, at: 0)
         }
