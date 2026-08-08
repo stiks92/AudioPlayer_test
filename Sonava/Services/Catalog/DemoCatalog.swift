@@ -11,9 +11,24 @@
 //  the design. It also makes App Store screenshots reproducible — the same
 //  tracks, in the same order, every time.
 //
-//  Artwork is drawn procedurally into the app's container rather than bundled,
-//  so nothing here reaches a Release build. Names are invented: a debug fixture
-//  should never imply a catalogue licence the app doesn't have.
+//  Two modes, chosen by what `-demoArtDir` points at:
+//
+//  * The directory carries a `manifest.json` (written by
+//    `scripts/fetch_demo_art.sh`): nothing is invented. Albums, track titles,
+//    durations, artists, podcast shows and every sleeve come from real,
+//    legally redistributable releases — Creative-Commons netlabel records
+//    from the Internet Archive and the public podcast directory. A cover can
+//    never sit on the wrong record, because the record is the cover's own.
+//    This exists because the fixture wore famous copyrighted sleeves on
+//    invented tracks for a fortnight ("Field Recordings by Peral" dressed as
+//    Tame Impala's *Currents*), and after that, public-domain paintings that
+//    the owner rightly said still looked like странные картинки. Real music
+//    was the answer both times.
+//
+//  * No manifest: the invented-name catalogue below, with sleeves dealt from
+//    the directory's loose JPEGs (or drawn procedurally as the last resort).
+//    Names are invented on purpose there: a debug fixture must never imply a
+//    catalogue licence the app doesn't have.
 //
 
 #if DEBUG
@@ -28,7 +43,8 @@ enum DemoCatalog {
     // MARK: - Shelves
 
     static var trending: [Song] {
-        songs(from: [
+        if let real = manifestSlice(source: .audius, from: 0, count: 8) { return real }
+        return songs(from: [
             ("Halcyon Drift", "Vaelo", "Nightfold"),
             ("Paper Lanterns", "Mira Sund", "Slow Country"),
             ("Cassette Sun", "The Owl Field", "Cassette Sun"),
@@ -41,7 +57,8 @@ enum DemoCatalog {
     }
 
     static var charts: [Song] {
-        songs(from: [
+        if let real = manifestSlice(source: .deezer, from: 8, count: 6) { return real }
+        return songs(from: [
             ("Golden Static", "Peral", "Golden Static"),
             ("Every Little Ghost", "Sable Youth", "Hollow Season"),
             ("Undertow", "Kestrel Bay", "Saltwater"),
@@ -52,7 +69,8 @@ enum DemoCatalog {
     }
 
     static var madeForYou: [Song] {
-        songs(from: [
+        if let real = manifestSlice(source: .audius, from: 11, count: 6) { return real }
+        return songs(from: [
             ("Second Light", "Ansel Ro", "Blue Hour"),
             ("Glasshouse", "Iri", "Fieldwork"),
             ("Northbound", "Nord Atlas", "Crossings"),
@@ -63,7 +81,8 @@ enum DemoCatalog {
     }
 
     static var searchResults: [Song] {
-        songs(from: [
+        if let real = manifestSlice(source: .audius, from: 3, count: 5) { return real }
+        return songs(from: [
             ("Halcyon Drift", "Vaelo", "Nightfold"),
             ("Halcyon Drift (Live)", "Vaelo", "Nightfold Sessions"),
             ("Halcyon", "Sable Youth", "Hollow Season"),
@@ -97,7 +116,8 @@ enum DemoCatalog {
     /// design-review captures showed "0 files" and an empty record wall, and
     /// every screen about owning music was being judged with nothing owned.
     static var localFiles: [Song] {
-        songs(from: [
+        if let m = manifest { return manifestSongs(m, source: .local) }
+        return songs(from: [
             ("First Light", "Vaelo", "Nightfold"),
             ("Halcyon Drift", "Vaelo", "Nightfold"),
             ("Undertow", "Vaelo", "Nightfold"),
@@ -122,7 +142,19 @@ enum DemoCatalog {
     }
 
     static var podcasts: [Podcast] {
-        [
+        if let m = manifest, let dir = artDir, !m.podcasts.isEmpty {
+            return m.podcasts.enumerated().map { index, entry in
+                Podcast(
+                    title: entry.title,
+                    author: entry.author,
+                    artworkURL: URL(fileURLWithPath: dir).appendingPathComponent(entry.file),
+                    // Podcast.id IS the feed URL: one shared URL collapsed all
+                    // six shows into a single row on first capture.
+                    feedURL: URL(string: "https://demo.invalid/manifest-show-\(index).xml")!
+                )
+            }
+        }
+        return [
             show("The Quiet Part", "Field Notes Media"),
             show("Signal & Noise", "Halcyon Studios"),
             show("Long Player", "Nord Atlas Media"),
@@ -130,6 +162,75 @@ enum DemoCatalog {
             show("Third Coast", "Kestrel Bay Radio"),
             show("Nightshift", "Owl Field Productions")
         ]
+    }
+
+    // MARK: - The real-release manifest
+
+    /// `manifest.json` beside the sleeves: real albums with their own tracks,
+    /// and real shows. See the header comment for why this mode exists.
+    private struct Manifest: Decodable {
+        struct AlbumTrack: Decodable {
+            let title: String
+            let duration: Double?
+        }
+        struct Album: Decodable {
+            let file: String
+            let title: String
+            let artist: String
+            let year: Int?
+            let tracks: [AlbumTrack]
+        }
+        struct Show: Decodable {
+            let file: String
+            let title: String
+            let author: String
+        }
+        let albums: [Album]
+        let podcasts: [Show]
+    }
+
+    private static let manifest: Manifest? = {
+        guard let dir = artDir else { return nil }
+        let url = URL(fileURLWithPath: dir).appendingPathComponent("manifest.json")
+        guard let data = try? Data(contentsOf: url) else { return nil }
+        return try? JSONDecoder().decode(Manifest.self, from: data)
+    }()
+
+    /// Every album's tracks, flattened in manifest order. Each song wears its
+    /// own album's cover — there is no dealer in this mode, so a sleeve can
+    /// neither repeat across records nor drift onto someone else's.
+    private static func manifestSongs(_ m: Manifest, source: TrackSource) -> [Song] {
+        guard let dir = artDir else { return [] }
+        var songs: [Song] = []
+        for album in m.albums {
+            let cover = URL(fileURLWithPath: dir).appendingPathComponent(album.file)
+            for (position, track) in album.tracks.enumerated() {
+                songs.append(Song(
+                    id: "demo:\(source.rawValue):\(album.title)-\(position)",
+                    title: track.title,
+                    artist: album.artist,
+                    album: album.title,
+                    source: source,
+                    artworkURL: cover,
+                    streamURL: URL(string: "https://demo.invalid/\(songs.count).mp3"),
+                    gradientHex: Palette.hex(forSeed: album.title),
+                    durationSeconds: track.duration ?? Double(172 + (position * 37) % 191),
+                    trackNumber: position + 1,
+                    year: album.year ?? 2021
+                ))
+            }
+        }
+        return songs
+    }
+
+    /// A rotating window over the flattened pool, so the home shelves show
+    /// different (overlapping) selections of the same real catalogue — which
+    /// is what shelves over one library actually do.
+    private static func manifestSlice(source: TrackSource, from offset: Int, count: Int) -> [Song]? {
+        guard let m = manifest else { return nil }
+        let pool = manifestSongs(m, source: source)
+        guard !pool.isEmpty else { return nil }
+        return (0..<min(count, pool.count)).map { pool[(offset + $0) % pool.count] }
     }
 
     // MARK: - Builders
