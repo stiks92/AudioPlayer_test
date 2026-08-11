@@ -184,6 +184,28 @@ struct ImportHistoryView: View {
 struct JourneyTimelineView: View {
     @EnvironmentObject private var journeyStore: JourneyStore
     @Environment(\.dismiss) private var dismiss
+    @State private var flyerURL: URL?
+
+    /// The day-zero artifact: top-10 most-lived-with tracks as a flyer that
+    /// plays for whoever receives it.
+    private func buildFlyer() {
+        let top = journeyStore.journey.tracks.values
+            .sorted { $0.plays > $1.plays }
+            .prefix(10)
+        let entries = top.map { track in
+            let year = Calendar.current.component(.year,
+                from: Date(timeIntervalSince1970: track.firstListen))
+            return FlyerEntry(
+                artist: track.artist, title: track.title,
+                note: String(localized: "with me since \(String(year))"))
+        }
+        flyerURL = FlyerBuilder.writeFile(
+            entries: Array(entries),
+            heading: String(localized: "Records I live with"),
+            subtitle: String(localized: "A flyer from my Sonava library"),
+            openHint: String(localized: "Open in a browser and tap a row to hear 30 seconds."),
+            creditText: String(localized: "Previews courtesy of"))
+    }
 
     var body: some View {
         NavigationStack {
@@ -221,7 +243,26 @@ struct JourneyTimelineView: View {
             .navigationTitle("Your years in music")
             .navigationBarTitleDisplayMode(.inline)
             .doneToolbar { dismiss() }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        buildFlyer()
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.system(.body).weight(.medium))
+                            .foregroundColor(Theme.accentSoft)
+                    }
+                    .identified("journey.flyer", label: "Share a flyer")
+                }
+            }
+            .sheet(item: $flyerURL) { url in
+                ShareSheet(items: [url])
+            }
         }
         .preferredColorScheme(.dark)
     }
+}
+
+extension URL: @retroactive Identifiable {
+    public var id: String { absoluteString }
 }

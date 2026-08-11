@@ -293,6 +293,28 @@ struct RootView: View {
             }
             journeyStore.add(events: events, source: "fixture")
         }
+        if arguments.contains("-dumpFlyer") {
+            // Review fixture: writes the flyer where the host can reach it,
+            // so the artifact can be opened in the simulator's own Safari
+            // and judged as the receiver will see it.
+            let top = journeyStore.journey.tracks.values
+                .sorted { $0.plays > $1.plays }.prefix(10)
+            let entries = top.map {
+                FlyerEntry(artist: $0.artist, title: $0.title,
+                           note: String(localized: "with me since \(String(Calendar.current.component(.year, from: Date(timeIntervalSince1970: $0.firstListen))))"))
+            }
+            if let url = FlyerBuilder.writeFile(
+                entries: Array(entries),
+                heading: String(localized: "Records I live with"),
+                subtitle: String(localized: "A flyer from my Sonava library"),
+                openHint: String(localized: "Open in a browser and tap a row to hear 30 seconds."),
+                creditText: String(localized: "Previews courtesy of")) {
+                let out = URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("tmp/flyer.html")
+                try? FileManager.default.removeItem(at: out)
+                try? FileManager.default.copyItem(at: url, to: out)
+                print("FLYER-DUMP: \(out.path)")
+            }
+        }
         if arguments.contains("-seedPassports") {
             // Review fixture: the Backroom line on Now Playing needs a
             // passport to exist, and demo tracks are not files the scanner

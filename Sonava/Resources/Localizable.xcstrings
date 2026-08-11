@@ -531,6 +531,16 @@
         }
       }
     },
+    "A flyer from my Sonava library": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Флаер из моей библиотеки Sonava"
+          }
+        }
+      }
+    },
     "A fresh week of music, picked from what you love.": {
       "localizations": {
         "ru": {
@@ -2942,6 +2952,16 @@
         }
       }
     },
+    "Open in a browser and tap a row to hear 30 seconds.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Откройте в браузере и нажмите на строку — заиграют 30 секунд."
+          }
+        }
+      }
+    },
     "Open the timeline": {
       "localizations": {
         "ru": {
@@ -3329,6 +3349,16 @@
         }
       }
     },
+    "Previews courtesy of": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Превью предоставлены"
+          }
+        }
+      }
+    },
     "Privacy": {
       "localizations": {
         "ru": {
@@ -3451,6 +3481,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Недавно играли"
+          }
+        }
+      }
+    },
+    "Records I live with": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пластинки, с которыми я живу"
           }
         }
       }
@@ -3937,6 +3977,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Поделиться"
+          }
+        }
+      }
+    },
+    "Share a flyer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поделиться флаером"
           }
         }
       }
@@ -5179,6 +5229,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "за неделю"
+          }
+        }
+      }
+    },
+    "with me since %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "со мной с %@"
           }
         }
       }
