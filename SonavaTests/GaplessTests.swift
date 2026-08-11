@@ -148,12 +148,28 @@ struct GaplessTests {
         engine.prepare(url: first, isLive: false, autoplay: true)
         engine.preloadNext(url: second)
 
-        for _ in 0..<80 where timeAtJoin == nil {
+        // The previous assertion compared the callback-time position against
+        // a fixed threshold — which measures the render thread's latency,
+        // not the engine: under a loaded parallel run the hand-off callback
+        // arrived 1.4 s late and the clock had honestly reached the end of
+        // track two. The invariant that is actually latency-immune: at no
+        // sampled instant may the reported position exceed the reported
+        // duration. A clock that runs straight through the join reaches
+        // first+second (2.4 s) against a duration of 1.4 s and violates this
+        // by a full second, no matter when any callback lands.
+        var worstOverrun = -Double.infinity
+        for _ in 0..<160 {   // up to 4 s, longer than both tones plus slack
             try? await Task.sleep(for: .milliseconds(25))
+            let time = engine.currentTime
+            let duration = engine.duration
+            if timeAtJoin != nil, duration > 1.2 {   // the new track is in charge
+                worstOverrun = max(worstOverrun, time - duration)
+            }
+            if timeAtJoin != nil, !engine.isPlaying { break }
         }
-        let joined = try #require(timeAtJoin, "the engine must report the hand-off it performed")
-        #expect(joined < 0.7,
-                "position must restart with the new track, not continue the old one's clock (which would read ≥1.0)")
+        #expect(timeAtJoin != nil, "the engine must report the hand-off it performed")
+        #expect(worstOverrun < 0.35,
+                "position must live inside the new track's own clock; a join-through clock overruns the duration by the length of track one")
         #expect(abs((durationAtJoin ?? 0) - 1.4) < 0.25, "duration follows the new track")
     }
 }

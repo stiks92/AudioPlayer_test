@@ -119,7 +119,11 @@ final class MusicLibrary: ObservableObject {
 
     @discardableResult
     func importFiles(at urls: [URL]) async -> [Song] {
-        await localFiles.importFiles(at: urls)
+        let imported = await localFiles.importFiles(at: urls)
+        // The Backroom starts measuring the moment a file arrives; nothing
+        // user-facing waits on it.
+        PassportScanner.shared.ensureScanned(imported) { $0.url }
+        return imported
     }
 
     func remove(_ song: Song) {

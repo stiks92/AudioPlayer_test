@@ -14,6 +14,7 @@ struct NowPlayingView: View {
     let onClose: () -> Void
 
     @EnvironmentObject private var audio: AudioManager
+    @ObservedObject private var scanner = PassportScanner.shared
     @EnvironmentObject private var clock: PlaybackClock
     @EnvironmentObject private var library: MusicLibrary
     @EnvironmentObject private var playlistStore: PlaylistStore
@@ -208,6 +209,22 @@ struct NowPlayingView: View {
         .frame(height: 360)
     }
 
+    /// "124 BPM · F♯m" from the track's passport — facts, so the machine
+    /// face; absent until the Backroom has actually measured them. Reading
+    /// `scanner.revision` keeps the line live as scans complete.
+    private func passportLine(for song: Song) -> String? {
+        _ = scanner.revision
+        guard let passport = PassportStore.shared.passport(for: song.id) else { return nil }
+        var parts: [String] = []
+        if let bpm = passport.bpm, (passport.bpmConfidence ?? 0) >= 0.4 {
+            parts.append(String(localized: "\(Int(bpm.rounded())) BPM"))
+        }
+        if let key = passport.musicalKey, key.confidence >= 0.15 {
+            parts.append(key.label)
+        }
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
+    }
+
     private var info: some View {
         HStack(alignment: .center, spacing: Space.m) {
             VStack(alignment: .leading, spacing: 4) {
@@ -234,19 +251,30 @@ struct NowPlayingView: View {
                 // the machine face because it is a measured fact. Absent
                 // entirely when the source didn't report it: a quality badge
                 // that guesses is worse than none.
-                if let song, song.qualityParts.format != nil || song.qualityParts.kbps != nil {
-                    HStack(spacing: 4) {
-                        if let format = song.qualityParts.format {
-                            Text(verbatim: format)
+                if let song {
+                    let passport = passportLine(for: song)
+                    if song.qualityParts.format != nil || song.qualityParts.kbps != nil || passport != nil {
+                        HStack(spacing: 4) {
+                            if let format = song.qualityParts.format {
+                                Text(verbatim: format)
+                            }
+                            if let rate = song.qualityParts.kbps {
+                                if song.qualityParts.format != nil { Text(verbatim: "·") }
+                                Text("\(rate) kbps")
+                            }
+                            // The Backroom's first visible dividend: measured
+                            // tempo and key, shown only once measured.
+                            if let passport {
+                                if song.qualityParts.format != nil || song.qualityParts.kbps != nil {
+                                    Text(verbatim: "·")
+                                }
+                                Text(verbatim: passport)
+                            }
                         }
-                        if let rate = song.qualityParts.kbps {
-                            if song.qualityParts.format != nil { Text(verbatim: "·") }
-                            Text("\(rate) kbps")
-                        }
+                        .font(.sonavaFact)
+                        .foregroundColor(Theme.textTertiary)
+                        .padding(.top, 2)
                     }
-                    .font(.sonavaFact)
-                    .foregroundColor(Theme.textTertiary)
-                    .padding(.top, 2)
                 }
             }
             Spacer(minLength: 8)

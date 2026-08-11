@@ -273,6 +273,21 @@ struct RootView: View {
             selection = tab
         }
 
+        if arguments.contains("-seedPassports") {
+            // Review fixture: the Backroom line on Now Playing needs a
+            // passport to exist, and demo tracks are not files the scanner
+            // can measure. Values are plausible, marked as fixture data.
+            for song in library.songs.prefix(24) {
+                PassportStore.shared.save(TrackPassport(
+                    contentKey: "demo-fixture",
+                    durationSeconds: song.durationSeconds ?? 200,
+                    loudnessLUFS: -11.2,
+                    bpm: 124, bpmConfidence: 0.9,
+                    beatGrid: nil,
+                    musicalKey: MusicalKey(tonic: 6, isMinor: true, confidence: 0.5),
+                    analyzedAt: Date()), for: song.id)
+            }
+        }
         if arguments.contains("-demoPlay") {
             // Prefer the user's own files; fall back to the demo catalogue so
             // the player is reviewable on a device with an empty library.

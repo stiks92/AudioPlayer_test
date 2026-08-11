@@ -57,6 +57,16 @@
         }
       }
     },
+    "%lld BPM": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld BPM"
+          }
+        }
+      }
+    },
     "%lld albums": {
       "localizations": {
         "ru": {
