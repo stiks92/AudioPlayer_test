@@ -135,6 +135,16 @@
         }
       }
     },
+    "%lld bands · preamp %@ dB": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld полос · преамп %@ дБ"
+          }
+        }
+      }
+    },
     "%lld favourites": {
       "localizations": {
         "ru": {
@@ -735,12 +745,32 @@
     "Apple Music": {
       "shouldTranslate": false
     },
+    "Applied to files and streams alike, before your own EQ. One profile for both ears for now.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Работает на файлах и стримах, до вашего эквалайзера. Пока один профиль на оба уха."
+          }
+        }
+      }
+    },
     "Applied to this stream too.": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Применяется и к этому стриму."
+          }
+        }
+      }
+    },
+    "Apply profile": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Применить профиль"
           }
         }
       }
@@ -888,6 +918,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Выбрать файл"
+          }
+        }
+      }
+    },
+    "Choose “Parametric Equalizer” and copy the result.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выберите «Parametric Equalizer» и скопируйте результат."
           }
         }
       }
@@ -1087,6 +1127,16 @@
         }
       }
     },
+    "Correction on": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Коррекция включена"
+          }
+        }
+      }
+    },
     "Couldn't build a mix. Try another vibe or check your connection.": {
       "localizations": {
         "ru": {
@@ -1203,6 +1253,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Не удалось прочитать файл"
+          }
+        }
+      }
+    },
+    "Couldn't read this profile — check it's a Parametric EQ export.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось прочитать профиль — проверьте, что это экспорт Parametric EQ."
           }
         }
       }
@@ -1772,6 +1832,16 @@
         }
       }
     },
+    "Headphone correction": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Коррекция наушников"
+          }
+        }
+      }
+    },
     "Health": {
       "extractionState": "stale",
       "localizations": {
@@ -2290,6 +2360,16 @@
         }
       }
     },
+    "My headphones": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Мои наушники"
+          }
+        }
+      }
+    },
     "My radio": {
       "localizations": {
         "ru": {
@@ -2752,6 +2832,26 @@
         }
       }
     },
+    "Open a file instead": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Или открыть файл"
+          }
+        }
+      }
+    },
+    "Open autoeq.app and pick your headphone model.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Откройте autoeq.app и найдите свою модель наушников."
+          }
+        }
+      }
+    },
     "Open in Apple Music": {
       "localizations": {
         "ru": {
@@ -2816,6 +2916,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Пароль"
+          }
+        }
+      }
+    },
+    "Paste it below.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вставьте его сюда."
           }
         }
       }
@@ -3341,6 +3451,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Переименовать плейлист"
+          }
+        }
+      }
+    },
+    "Replace": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Заменить"
           }
         }
       }
@@ -4047,6 +4167,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Студийные пресеты и настройка по полосам."
+          }
+        }
+      }
+    },
+    "Studio-grade correction for your exact headphones — from a measurement of your model, not a generic bass boost.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Студийная коррекция под вашу модель наушников — по её измерению, а не «усилению басов» на глаз."
           }
         }
       }

@@ -89,6 +89,10 @@ struct LocalizationCatalogTests {
             // batch above — the fifth such catch, and the reason this list
             // only ever grows.
             "Plus every self-hosted server you own searched together, and your full listening history.",
+            // Stage 1 of the Backroom: the headphone-correction screen.
+            "Headphone correction", "Apply profile",
+            "Studio-grade correction for your exact headphones — from a measurement of your model, not a generic bass boost.",
+            "Applied to files and streams alike, before your own EQ. One profile for both ears for now.",
             "From a file", "From a list", "Playlist name",
             "Those credentials weren't accepted. Yandex and Mail.ru need an app password, not your account password.",
         ]

@@ -84,6 +84,12 @@ struct TrackPassport: Codable, Equatable, Sendable {
 
     var musicalKey: MusicalKey?
 
+    /// Seconds where the arrangement audibly changes — verse/chorus-scale
+    /// boundaries from a self-similarity novelty curve. Optional and sparse:
+    /// a through-composed or ambient piece legitimately has none, and Crate
+    /// Mix would rather transition on a real boundary or not at all.
+    var sectionBounds: [Double]?
+
     var analyzedAt: Date
 }
 

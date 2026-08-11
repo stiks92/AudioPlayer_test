@@ -21,6 +21,7 @@ struct SettingsView: View {
     @State private var showPaywall = false
     @State private var showSleepOptions = false
     @State private var mondayMixReminder = UserDefaults.standard.bool(forKey: MondayMix.reminderDefaultsKey)
+    @State private var showCorrection = false
     @State private var showConnectServer = false
     @State private var showEqualizer = false
     @State private var showScrobble = false
@@ -62,6 +63,9 @@ struct SettingsView: View {
                 ConnectServerView()
                     .environmentObject(serverStore)
                     .environmentObject(proStore)
+            }
+            .sheet(isPresented: $showCorrection) {
+                HeadphoneCorrectionView().environmentObject(audio)
             }
             .sheet(isPresented: $showEqualizer) {
                 EqualizerView(effects: audio.effects)
@@ -294,6 +298,10 @@ struct SettingsView: View {
                 showEqualizer = true
             }
             divider
+            row(icon: .wave, title: "Headphone correction", value: correctionValue) {
+                showCorrection = true
+            }
+            divider
             row(icon: .sleep, title: "Sleep timer", value: sleepTimerValue) {
                 showSleepOptions = true
             }
@@ -363,6 +371,11 @@ struct SettingsView: View {
                 }
             }
         )
+    }
+
+    private var correctionValue: LocalizedStringKey {
+        guard let profile = audio.correction.profile else { return "Off" }
+        return profile.isEnabled ? LocalizedStringKey(profile.name) : "Off"
     }
 
     private var equalizerValue: LocalizedStringKey {

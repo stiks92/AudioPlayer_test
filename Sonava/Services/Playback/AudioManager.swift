@@ -68,6 +68,9 @@ final class AudioManager: NSObject, ObservableObject {
     /// and a modern master from one queue; without this the listener spends
     /// the evening on the volume knob.
     let loudness = LoudnessStore()
+    /// Headphone correction — stage 1 of the Backroom. Owned here because
+    /// both engines must be told about every change, like the EQ.
+    let correction = CorrectionStore()
 
     var isLive: Bool { currentSong?.isLive ?? false }
 
@@ -101,6 +104,7 @@ final class AudioManager: NSObject, ObservableObject {
     }
     private var isExtending = false
     private var effectsCancellable: AnyCancellable?
+    private var correctionCancellable: AnyCancellable?
 
     // Resume last session
     private let resumeSongKey = "resume.song.v1"
@@ -135,6 +139,9 @@ final class AudioManager: NSObject, ObservableObject {
         // Reshape the live engine whenever the EQ curve changes.
         effectsCancellable = effects.$equalizer
             .sink { [weak self] settings in self?.activeEngine?.apply(settings) }
+
+        correctionCancellable = correction.$profile
+            .sink { [weak self] profile in self?.activeEngine?.applyCorrection(profile) }
 
         // Re-read the sleeve whenever the *track* changes (not on every
         // republish of the same song — hence the id-based dedup).
@@ -418,6 +425,7 @@ final class AudioManager: NSObject, ObservableObject {
         }
         engine.setVolume(volume)
         engine.apply(effects.equalizer)
+        engine.applyCorrection(correction.profile)
         // Order matters: `apply` writes the pre-amp, and the levelling is
         // summed on top of it inside the engine.
         engine.setLoudnessGain(loudness.gain(for: song, fileURL: url.isFileURL ? url : nil))

@@ -127,6 +127,28 @@ struct PassportTests {
         #expect(MusicalKey(tonic: 3, isMinor: false, confidence: 1).label == "E♭")
     }
 
+    // MARK: - Sections
+
+    @Test func boundaryIsFoundWhereTheArrangementTurns() {
+        // 40 s of a C-major arpeggio, then 40 s of an F-minor one an octave
+        // up: harmony, register and texture all change at exactly 40 s.
+        let a = arpeggio(midiNotes: [48, 52, 55, 60], seconds: 40)
+        let b = arpeggio(midiNotes: [65, 68, 72, 77], seconds: 40)
+        let bounds = PassportAnalyzer.sectionBoundaries(samples: a + b)
+        #expect(!bounds.isEmpty, "a hard section change must be reported")
+        if let nearest = bounds.min(by: { abs($0 - 40) < abs($1 - 40) }) {
+            #expect(abs(nearest - 40) <= 3, "boundary should sit at the 40 s turn, got \(bounds)")
+        }
+    }
+
+    @Test func uniformMaterialReportsNoForest() {
+        // One texture throughout: whatever is reported must be sparse —
+        // an 80-second loop is not an eight-section suite.
+        let uniform = arpeggio(midiNotes: [60, 64, 67, 72], seconds: 80)
+        let bounds = PassportAnalyzer.sectionBoundaries(samples: uniform)
+        #expect(bounds.count <= 2, "uniform material grew \(bounds.count) sections")
+    }
+
     // MARK: - Content key
 
     @Test func contentKeyIsDeterministic() {

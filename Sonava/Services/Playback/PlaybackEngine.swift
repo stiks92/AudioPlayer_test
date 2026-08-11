@@ -46,6 +46,8 @@ protocol PlaybackEngine: AnyObject {
     func setLoudnessGain(_ decibels: Double)
     func setRate(_ rate: Float)   // playback speed (podcasts)
     func apply(_ equalizer: EqualizerSettings)
+    /// Headphone-correction profile, applied before the user's EQ.
+    func applyCorrection(_ profile: CorrectionProfile?)
     func refresh()          // sampled by AudioManager's timer
     func teardown()
 
@@ -67,6 +69,7 @@ extension PlaybackEngine {
     /// global gain, the remote one through the stream processing tap — so the
     /// default is only a formality for tests' stub engines.
     func setLoudnessGain(_ decibels: Double) {}
+    func applyCorrection(_ profile: CorrectionProfile?) {}
 }
 
 // MARK: - Local files (AVAudioEngine graph: player → EQ → timePitch → mixer)
@@ -78,7 +81,12 @@ final class LocalAudioEngine: PlaybackEngine {
 
     private let engine = AVAudioEngine()
     private let player = AVAudioPlayerNode()
-    private let eq = AVAudioUnitEQ(numberOfBands: EqualizerBand.count)
+    /// 10 user bands + up to 14 correction slots (12 peaks + 2 shelves).
+    /// AVAudioUnitEQ's band count is fixed at init, so the headroom is
+    /// allocated up front and unused slots stay bypassed.
+    private static let correctionSlots = 14
+    private let eq = AVAudioUnitEQ(numberOfBands: EqualizerBand.count + LocalAudioEngine.correctionSlots)
+    private var correctionPreampDB: Double = 0
     private let timePitch = AVAudioUnitTimePitch()
 
     private var file: AVAudioFile?
@@ -139,14 +147,50 @@ final class LocalAudioEngine: PlaybackEngine {
     }
 
     private func configureBands() {
-        for (index, band) in eq.bands.enumerated() where index < EqualizerBand.count {
-            band.filterType = .parametric
-            band.frequency = EqualizerBand.frequencies[index]
-            band.bandwidth = 0.5   // octaves
+        for (index, band) in eq.bands.enumerated() {
+            if index < EqualizerBand.count {
+                band.filterType = .parametric
+                band.frequency = EqualizerBand.frequencies[index]
+                band.bandwidth = 0.5   // octaves
+            }
             band.bypass = true
             band.gain = 0
         }
         eq.globalGain = 0
+    }
+
+    /// Correction lives in the slots after the user's ten. The remote tap
+    /// runs the same profile through exact RBJ shelves; AVAudioUnitEQ's
+    /// shelf filters take no Q, so the two paths differ slightly in shelf
+    /// slope — a known, inaudible-in-practice seam, documented rather than
+    /// hidden.
+    func applyCorrection(_ profile: CorrectionProfile?) {
+        let slots = EqualizerBand.count..<eq.bands.count
+        for index in slots {
+            eq.bands[index].bypass = true
+            eq.bands[index].gain = 0
+        }
+        correctionPreampDB = 0
+        if let profile, profile.isEnabled {
+            correctionPreampDB = profile.preampDB
+            for (offset, band) in profile.bands.prefix(Self.correctionSlots).enumerated() {
+                let slot = eq.bands[EqualizerBand.count + offset]
+                switch band.kind {
+                case .peaking:
+                    slot.filterType = .parametric
+                    // AVAudioUnitEQ wants bandwidth in octaves; convert Q.
+                    slot.bandwidth = Float((2 / log(2)) * asinh(1 / (2 * max(band.q, 0.1))))
+                case .lowShelf:
+                    slot.filterType = .lowShelf
+                case .highShelf:
+                    slot.filterType = .highShelf
+                }
+                slot.frequency = Float(min(band.frequency, 20_000))
+                slot.gain = Float(band.gainDB)
+                slot.bypass = false
+            }
+        }
+        applyGlobalGain()
     }
 
     // MARK: Transport
@@ -239,7 +283,7 @@ final class LocalAudioEngine: PlaybackEngine {
     /// to the node instead would work until the next EQ change silently
     /// undid it.
     private func applyGlobalGain() {
-        eq.globalGain = Float(min(max(Double(preamp) + loudnessGain, -24), 24))
+        eq.globalGain = Float(min(max(Double(preamp) + loudnessGain + correctionPreampDB, -24), 24))
     }
 
     func refresh() {
@@ -489,6 +533,10 @@ final class RemoteAudioEngine: NSObject, PlaybackEngine {
     func apply(_ equalizer: EqualizerSettings) {
         self.equalizer = equalizer
         tap.dsp.update(settings: equalizer, loudnessGainDB: loudnessGainDB)
+    }
+
+    func applyCorrection(_ profile: CorrectionProfile?) {
+        tap.dsp.updateCorrection(profile)
     }
 
     func setLoudnessGain(_ decibels: Double) {

@@ -35,7 +35,9 @@ import os
 
 // MARK: - Filter arithmetic
 
-/// One RBJ "peaking EQ" biquad, normalised so a0 = 1.
+/// One RBJ biquad, normalised so a0 = 1. Peaking for the tone controls,
+/// shelves for the ends of the spectrum — the three shapes a headphone
+/// correction profile is written in.
 struct BiquadCoefficients: Equatable {
     var b0: Float, b1: Float, b2: Float, a1: Float, a2: Float
 
@@ -55,6 +57,47 @@ struct BiquadCoefficients: Equatable {
         a1 = (-2 * cosOmega) / a0
         a2 = (1 - alpha / amp) / a0
     }
+
+    /// RBJ shelf (lowShelf when `low`, highShelf otherwise), Q form —
+    /// AutoEq's LSC/HSC lines carry exactly (Fc, gain, Q).
+    init(shelfLow low: Bool, frequency: Float, gainDB: Float, q: Float, sampleRate: Float) {
+        let amp = pow(10, gainDB / 40)
+        let omega = 2 * Float.pi * min(frequency, sampleRate * 0.45) / sampleRate
+        let cosOmega = cos(omega)
+        let alpha = sin(omega) / (2 * max(q, 0.1))
+        let twoRootAAlpha = 2 * sqrt(amp) * alpha
+        let plus = (amp + 1), minus = (amp - 1)
+        if low {
+            let a0 = plus + minus * cosOmega + twoRootAAlpha
+            b0 = (amp * (plus - minus * cosOmega + twoRootAAlpha)) / a0
+            b1 = (2 * amp * (minus - plus * cosOmega)) / a0
+            b2 = (amp * (plus - minus * cosOmega - twoRootAAlpha)) / a0
+            a1 = (-2 * (minus + plus * cosOmega)) / a0
+            a2 = (plus + minus * cosOmega - twoRootAAlpha) / a0
+        } else {
+            let a0 = plus - minus * cosOmega + twoRootAAlpha
+            b0 = (amp * (plus + minus * cosOmega + twoRootAAlpha)) / a0
+            b1 = (-2 * amp * (minus + plus * cosOmega)) / a0
+            b2 = (amp * (plus + minus * cosOmega - twoRootAAlpha)) / a0
+            a1 = (2 * (minus - plus * cosOmega)) / a0
+            a2 = (plus - minus * cosOmega - twoRootAAlpha) / a0
+        }
+    }
+
+    /// Peaking in Q form — AutoEq's PK lines carry (Fc, gain, Q), not
+    /// bandwidth.
+    init(peakingFrequency frequency: Float, gainDB: Float, q: Float, sampleRate: Float) {
+        let amp = pow(10, gainDB / 40)
+        let omega = 2 * Float.pi * min(frequency, sampleRate * 0.45) / sampleRate
+        let alpha = sin(omega) / (2 * max(q, 0.1))
+        let cosOmega = cos(omega)
+        let a0 = 1 + alpha / amp
+        b0 = (1 + alpha * amp) / a0
+        b1 = (-2 * cosOmega) / a0
+        b2 = (1 - alpha * amp) / a0
+        a1 = (-2 * cosOmega) / a0
+        a2 = (1 - alpha / amp) / a0
+    }
 }
 
 /// The ten-band cascade plus a linear make-up gain, processing float32 PCM in
@@ -66,12 +109,20 @@ final class EqualizerDSP {
 
     // Everything below the lock line is guarded by it.
     private var coefficients: [BiquadCoefficients] = []
+    /// Headphone-correction cascade, per channel — the per-ear seam: v1
+    /// fills both channels identically, and an audiogram later only has to
+    /// fill them differently. Runs BEFORE the user's tone controls: correct
+    /// the transducer first, taste second.
+    private var correction: [[BiquadCoefficients]] = [[], []]
+    private var correctionPreampDB: Double = 0
     private var linearGain: Float = 1
     /// Per channel, per band: lanes are x[n-1], x[n-2], y[n-1], y[n-2].
     private var memory: [[SIMD4<Float>]] = []
+    private var correctionMemory: [[SIMD4<Float>]] = []
     private var sampleRate: Float = 44_100
     private var settings = EqualizerSettings()
     private var loudnessGainDB: Double = 0
+    private var correctionProfile: CorrectionProfile?
     private var levelEnergy: Float = 0
     private var levelFrames: Int = 0
 
@@ -97,6 +148,14 @@ final class EqualizerDSP {
         os_unfair_lock_unlock(&lock)
     }
 
+    /// Installs (or clears) the headphone-correction profile.
+    func updateCorrection(_ profile: CorrectionProfile?) {
+        os_unfair_lock_lock(&lock)
+        correctionProfile = profile
+        rebuildLocked()
+        os_unfair_lock_unlock(&lock)
+    }
+
     private func rebuildLocked() {
         var bands: [BiquadCoefficients] = []
         if settings.isEnabled {
@@ -111,14 +170,43 @@ final class EqualizerDSP {
                     bandwidthOctaves: 0.5, sampleRate: sampleRate))
             }
         }
+        // The correction cascade: same coefficients both channels in v1;
+        // the per-channel shape exists so per-ear only has to change THIS
+        // function, nothing downstream.
+        var correctionBands: [BiquadCoefficients] = []
+        correctionPreampDB = 0
+        if let profile = correctionProfile, profile.isEnabled {
+            correctionPreampDB = profile.preampDB
+            for band in profile.bands {
+                guard Float(band.frequency) < sampleRate * 0.45, abs(band.gainDB) > 0.05 else { continue }
+                switch band.kind {
+                case .peaking:
+                    correctionBands.append(BiquadCoefficients(
+                        peakingFrequency: Float(band.frequency), gainDB: Float(band.gainDB),
+                        q: Float(band.q), sampleRate: sampleRate))
+                case .lowShelf:
+                    correctionBands.append(BiquadCoefficients(
+                        shelfLow: true, frequency: Float(band.frequency), gainDB: Float(band.gainDB),
+                        q: Float(band.q), sampleRate: sampleRate))
+                case .highShelf:
+                    correctionBands.append(BiquadCoefficients(
+                        shelfLow: false, frequency: Float(band.frequency), gainDB: Float(band.gainDB),
+                        q: Float(band.q), sampleRate: sampleRate))
+                }
+            }
+        }
+        correction = [correctionBands, correctionBands]
+
         let preamp = settings.isEnabled ? Double(settings.preamp) : 0
         // The same ±24 dB clamp the local engine applies to its globalGain.
-        let totalDB = min(max(preamp + loudnessGainDB, -24), 24)
+        let totalDB = min(max(preamp + loudnessGainDB + correctionPreampDB, -24), 24)
         coefficients = bands
         linearGain = pow(10, Float(totalDB) / 20)
         for channel in memory.indices {
             memory[channel] = Array(repeating: .zero, count: bands.count)
         }
+        correctionMemory = Array(repeating: Array(repeating: .zero, count: correctionBands.count),
+                                 count: max(2, memory.count))
     }
 
     // MARK: Processing (audio thread)
@@ -134,7 +222,10 @@ final class EqualizerDSP {
         var energy: Float = 0
         var index = 0
 
-        if coefficients.isEmpty && gain == 1 {
+        let ear = min(channel, correction.count - 1)
+        let hasCorrection = !correction[ear].isEmpty && channel < correctionMemory.count
+
+        if coefficients.isEmpty && !hasCorrection && gain == 1 {
             for _ in 0..<frames {
                 let sample = samples[index]
                 energy += sample * sample
@@ -143,6 +234,16 @@ final class EqualizerDSP {
         } else {
             for _ in 0..<frames {
                 var sample = samples[index]
+                if hasCorrection {
+                    for band in correction[ear].indices {
+                        let c = correction[ear][band]
+                        let m = correctionMemory[channel][band]
+                        let filtered = c.b0 * sample + c.b1 * m.x + c.b2 * m.y
+                                     - c.a1 * m.z - c.a2 * m.w
+                        correctionMemory[channel][band] = SIMD4(sample, m.x, filtered, m.z)
+                        sample = filtered
+                    }
+                }
                 for band in coefficients.indices {
                     let c = coefficients[band]
                     let m = memory[channel][band]

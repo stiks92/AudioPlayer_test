@@ -41,6 +41,7 @@ struct RootView: View {
     @State private var debugShowAnimLab = false
     @State private var debugShowAlbum = false
     @State private var debugShowArtist = false
+    @State private var debugShowCorrection = false
     @State private var debugShowQueue = false
     @State private var debugShowScrobble = false
     @State private var debugShowStats = false
@@ -139,6 +140,9 @@ struct RootView: View {
                 .environmentObject(audio)
                 .environmentObject(library)
                 .environmentObject(proStore)
+        }
+        .sheet(isPresented: $debugShowCorrection) {
+            HeadphoneCorrectionView().environmentObject(audio)
         }
         .sheet(isPresented: $debugShowArtist) {
             if let song = library.songs.first {
@@ -300,6 +304,7 @@ struct RootView: View {
         }
 
         if arguments.contains("-openEqualizer") { debugShowEqualizer = true }
+        if arguments.contains("-openCorrection") { debugShowCorrection = true }
         // Lets a screenshot show a real curve instead of a flat line.
         if let index = arguments.firstIndex(of: "-eqPreset"),
            index + 1 < arguments.count,

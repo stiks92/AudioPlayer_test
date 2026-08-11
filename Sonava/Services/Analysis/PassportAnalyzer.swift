@@ -55,6 +55,7 @@ enum PassportAnalyzer {
         var grid: BeatGrid?
         if let tempo { grid = beatGrid(flux: flux, bpm: tempo.bpm) }
         let musicalKey = keyEstimate(samples: samples)
+        let sections = sectionBoundaries(samples: samples)
         let loudness = LoudnessAnalyzer.analyse(url: url)?.loudness
 
         return TrackPassport(
@@ -65,6 +66,7 @@ enum PassportAnalyzer {
             bpmConfidence: tempo?.confidence,
             beatGrid: grid,
             musicalKey: musicalKey,
+            sectionBounds: sections.isEmpty ? nil : sections,
             analyzedAt: Date()
         )
     }
@@ -366,6 +368,117 @@ enum PassportAnalyzer {
         let margin = second.isFinite ? max(0, winner.score - second) : winner.score
         let confidence = min(1, margin / max(abs(winner.score), 1e-9))
         return MusicalKey(tonic: winner.tonic, isMinor: winner.minor, confidence: confidence)
+    }
+
+    // MARK: - Sections
+
+    /// Verse/chorus-scale boundaries via the standard novelty recipe (Foote,
+    /// 2000): one feature frame per second (12 chroma bins + RMS), cosine
+    /// self-similarity, a checkerboard kernel slid along the diagonal, peaks
+    /// that stand clear of the curve's own noise floor. Sparse by intent —
+    /// a boundary is only reported where the arrangement audibly turns.
+    static func sectionBoundaries(samples: [Float]) -> [Double] {
+        let frames = featureFrames(samples: samples)
+        guard frames.count >= 24 else { return [] }   // under ~24 s has no sections
+
+        let count = frames.count
+        // Cosine similarity between every pair of seconds.
+        var similarity = [[Double]](repeating: [Double](repeating: 0, count: count), count: count)
+        for a in 0..<count {
+            for b in a..<count {
+                let s = cosine(frames[a], frames[b])
+                similarity[a][b] = s
+                similarity[b][a] = s
+            }
+        }
+
+        // Checkerboard novelty along the diagonal: high where "before" is
+        // self-similar, "after" is self-similar, and the two disagree.
+        let kernel = 8
+        var novelty = [Double](repeating: 0, count: count)
+        for centre in kernel..<(count - kernel) {
+            var score = 0.0
+            for i in 1...kernel {
+                for j in 1...kernel {
+                    score += similarity[centre - i][centre - j]   // past ↔ past
+                    score += similarity[centre + i][centre + j]   // future ↔ future
+                    score -= 2 * similarity[centre - i][centre + j]   // past ↔ future
+                }
+            }
+            novelty[centre] = max(0, score / Double(kernel * kernel))
+        }
+
+        let mean = novelty.reduce(0, +) / Double(count)
+        let variance = novelty.reduce(0) { $0 + ($1 - mean) * ($1 - mean) } / Double(count)
+        let threshold = mean + 1.5 * variance.squareRoot()
+
+        var bounds: [Double] = []
+        for centre in kernel..<(count - kernel) {
+            guard novelty[centre] > threshold,
+                  novelty[centre] >= novelty[centre - 1],
+                  novelty[centre] >= novelty[centre + 1] else { continue }
+            let second = Double(centre)
+            // Two boundaries inside eight seconds is oscillation, not form.
+            if let last = bounds.last, second - last < 8 { continue }
+            bounds.append(second)
+        }
+        return bounds
+    }
+
+    /// One 13-dimensional frame per second: 12 chroma bins + overall RMS.
+    private static func featureFrames(samples: [Float]) -> [[Double]] {
+        guard samples.count >= fftSize,
+              let dft = vDSP.DFT(count: fftSize, direction: .forward,
+                                 transformType: .complexReal, ofType: Float.self) else { return [] }
+        let window = vDSP.window(ofType: Float.self, usingSequence: .hanningDenormalized,
+                                 count: fftSize, isHalfWindow: false)
+        let bins = fftSize / 2
+        let binWidth = workRate / Double(fftSize)
+        let secondLength = Int(workRate)
+
+        var real = [Float](repeating: 0, count: fftSize)
+        var imaginary = [Float](repeating: 0, count: fftSize)
+        var outReal = [Float](repeating: 0, count: fftSize)
+        var outImaginary = [Float](repeating: 0, count: fftSize)
+
+        var frames: [[Double]] = []
+        var secondStart = 0
+        while secondStart + secondLength <= samples.count {
+            var chroma = [Double](repeating: 0, count: 12)
+            var energy = 0.0
+            var start = secondStart
+            while start + fftSize <= secondStart + secondLength {
+                for index in 0..<fftSize { real[index] = samples[start + index] * window[index] }
+                for index in 0..<fftSize { imaginary[index] = 0 }
+                dft.transform(inputReal: real, inputImaginary: imaginary,
+                              outputReal: &outReal, outputImaginary: &outImaginary)
+                for bin in 1..<bins {
+                    let frequency = Double(bin) * binWidth
+                    guard frequency >= 60, frequency <= 5_000 else { continue }
+                    let magnitude = Double(sqrt(outReal[bin] * outReal[bin] + outImaginary[bin] * outImaginary[bin]))
+                    let midi = 69 + 12 * log2(frequency / 440)
+                    chroma[((Int(midi.rounded()) % 12) + 12) % 12] += magnitude
+                    energy += magnitude * magnitude
+                }
+                start += fftSize
+            }
+            let total = chroma.reduce(0, +)
+            if total > 0 { for index in 0..<12 { chroma[index] /= total } }
+            frames.append(chroma + [sqrt(energy)])
+            secondStart += secondLength
+        }
+        return frames
+    }
+
+    private static func cosine(_ a: [Double], _ b: [Double]) -> Double {
+        var dot = 0.0, normA = 0.0, normB = 0.0
+        for index in a.indices {
+            dot += a[index] * b[index]
+            normA += a[index] * a[index]
+            normB += b[index] * b[index]
+        }
+        let denominator = (normA * normB).squareRoot()
+        return denominator > 0 ? dot / denominator : 0
     }
 
     private static func pearson(_ a: [Double], _ b: [Double]) -> Double {
