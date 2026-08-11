@@ -15,6 +15,7 @@ struct NowPlayingView: View {
 
     @EnvironmentObject private var audio: AudioManager
     @ObservedObject private var scanner = PassportScanner.shared
+    @EnvironmentObject private var journeyStore: JourneyStore
     @EnvironmentObject private var clock: PlaybackClock
     @EnvironmentObject private var library: MusicLibrary
     @EnvironmentObject private var playlistStore: PlaylistStore
@@ -209,6 +210,16 @@ struct NowPlayingView: View {
         .frame(height: 360)
     }
 
+    /// "In your life since 2014 · 312 plays" — the imported biography's
+    /// stitch to this exact song. The single line that makes twenty years of
+    /// history feel attached to the file rather than trapped in a service.
+    private func provenanceLine(for song: Song) -> String? {
+        guard let entry = journeyStore.entry(for: song) else { return nil }
+        let year = Calendar.current.component(.year,
+            from: Date(timeIntervalSince1970: entry.firstListen))
+        return String(localized: "In your life since \(String(year)) · \(entry.plays) plays")
+    }
+
     /// "124 BPM · F♯m" from the track's passport — facts, so the machine
     /// face; absent until the Backroom has actually measured them. Reading
     /// `scanner.revision` keeps the line live as scans complete.
@@ -274,6 +285,14 @@ struct NowPlayingView: View {
                         .font(.sonavaFact)
                         .foregroundColor(Theme.textTertiary)
                         .padding(.top, 2)
+                    }
+                    if let provenance = provenanceLine(for: song) {
+                        Text(verbatim: provenance)
+                            .font(.sonavaFact)
+                            .foregroundColor(Theme.textTertiary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .padding(.top, 1)
                     }
                 }
             }

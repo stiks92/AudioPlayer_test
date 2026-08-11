@@ -10,6 +10,7 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var proStore: ProStore
     @EnvironmentObject private var audio: AudioManager
+    @EnvironmentObject private var journeyStore: JourneyStore
     @EnvironmentObject private var serverStore: ServerStore
     @EnvironmentObject private var scrobble: ScrobbleStore
     @EnvironmentObject private var library: MusicLibrary
@@ -22,6 +23,7 @@ struct SettingsView: View {
     @State private var showSleepOptions = false
     @State private var mondayMixReminder = UserDefaults.standard.bool(forKey: MondayMix.reminderDefaultsKey)
     @State private var showCorrection = false
+    @State private var showHistoryImport = false
     @State private var showConnectServer = false
     @State private var showEqualizer = false
     @State private var showScrobble = false
@@ -63,6 +65,9 @@ struct SettingsView: View {
                 ConnectServerView()
                     .environmentObject(serverStore)
                     .environmentObject(proStore)
+            }
+            .sheet(isPresented: $showHistoryImport) {
+                ImportHistoryView().environmentObject(journeyStore)
             }
             .sheet(isPresented: $showCorrection) {
                 HeadphoneCorrectionView().environmentObject(audio)
@@ -373,6 +378,10 @@ struct SettingsView: View {
         )
     }
 
+    private var historyValue: LocalizedStringKey {
+        journeyStore.journey.tracks.isEmpty ? "Import" : "\(journeyStore.journey.totalPlays) plays"
+    }
+
     private var correctionValue: LocalizedStringKey {
         guard let profile = audio.correction.profile else { return "Off" }
         return profile.isEnabled ? LocalizedStringKey(profile.name) : "Off"
@@ -406,6 +415,10 @@ struct SettingsView: View {
                 divider
                 row(icon: .server, title: "Self-hosted (Subsonic)", value: selfHostedValue) {
                     showConnectServer = true
+                }
+                divider
+                row(icon: .restore, title: "Listening history", value: historyValue) {
+                    showHistoryImport = true
                 }
                 divider
                 // Free, deliberately. Every competitor either ships

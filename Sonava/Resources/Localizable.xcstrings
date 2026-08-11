@@ -315,6 +315,16 @@
         }
       }
     },
+    "%lld plays": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld прослушиваний"
+          }
+        }
+      }
+    },
     "%lld servers": {
       "localizations": {
         "ru": {
@@ -662,6 +672,16 @@
         }
       }
     },
+    "Added %lld listens.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавлено прослушиваний: %lld."
+          }
+        }
+      }
+    },
     "Address": {
       "localizations": {
         "ru": {
@@ -837,6 +857,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Перенесите плейлист откуда угодно — из выгруженного файла или скопированного списка."
+          }
+        }
+      }
+    },
+    "Bring your listening past with you — every year of it, stitched to the music you own.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Заберите с собой всю историю прослушиваний — каждый её год, пришитый к музыке, которой вы владеете."
           }
         }
       }
@@ -1153,6 +1183,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Не удалось сменить иконку."
+          }
+        }
+      }
+    },
+    "Couldn't import that — check the username or the files.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось импортировать — проверьте имя пользователя или файлы."
           }
         }
       }
@@ -2034,6 +2074,16 @@
         }
       }
     },
+    "In your life since %@ · %lld plays": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "С вами с %@ · %lld прослушиваний"
+          }
+        }
+      }
+    },
     "Install Sonava, bring your audio files over, then open the backup file here.": {
       "localizations": {
         "ru": {
@@ -2127,6 +2177,26 @@
     },
     "ListenBrainz": {
       "shouldTranslate": false
+    },
+    "ListenBrainz — instant": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ListenBrainz — мгновенно"
+          }
+        }
+      }
+    },
+    "Listening history": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "История прослушиваний"
+          }
+        }
+      }
     },
     "Listening…": {
       "localizations": {
@@ -2852,12 +2922,32 @@
         }
       }
     },
+    "Open export files": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Открыть файлы экспорта"
+          }
+        }
+      }
+    },
     "Open in Apple Music": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Открыть в Apple Music"
+          }
+        }
+      }
+    },
+    "Open the timeline": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Открыть таймлайн"
           }
         }
       }
@@ -3465,6 +3555,16 @@
         }
       }
     },
+    "Request your extended streaming history at privacy.spotify.com — Spotify takes up to 30 days to prepare it. When the JSON files arrive, open them here.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Запросите расширенную историю на privacy.spotify.com — Spotify готовит её до 30 дней. Когда JSON-файлы придут, откройте их здесь."
+          }
+        }
+      }
+    },
     "Restore from a backup": {
       "localizations": {
         "ru": {
@@ -4035,6 +4135,16 @@
     },
     "Spotify / Apple Music": {
       "shouldTranslate": false
+    },
+    "Spotify archive — the deep past": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Архив Spotify — глубокое прошлое"
+          }
+        }
+      }
     },
     "Start Free Trial": {
       "localizations": {
@@ -4926,6 +5036,16 @@
         }
       }
     },
+    "Your years in music": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ваши годы в музыке"
+          }
+        }
+      }
+    },
     "all time": {
       "localizations": {
         "ru": {
@@ -5013,12 +5133,32 @@
         }
       }
     },
+    "plays across %lld tracks": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "прослушиваний · треков: %lld"
+          }
+        }
+      }
+    },
     "response %lld milliseconds": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Отклик: %lld мс"
+          }
+        }
+      }
+    },
+    "since %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "с %@"
           }
         }
       }

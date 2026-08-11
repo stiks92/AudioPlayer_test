@@ -16,6 +16,7 @@ struct RootView: View {
     @StateObject private var serverStore = ServerStore()
     @StateObject private var playlistStore = PlaylistStore()
     @StateObject private var reviewPrompt = ReviewPrompt()
+    @StateObject private var journeyStore = JourneyStore()
     @StateObject private var scrobbleStore = ScrobbleStore()
     @StateObject private var cloudStore = CloudStore()
     @StateObject private var history = ListeningHistory()
@@ -103,6 +104,7 @@ struct RootView: View {
         .environmentObject(proStore)
         .environmentObject(serverStore)
         .environmentObject(playlistStore)
+            .environmentObject(journeyStore)
         .environmentObject(scrobbleStore)
         .environmentObject(cloudStore)
         .environmentObject(history)
@@ -180,6 +182,7 @@ struct RootView: View {
                 .environmentObject(scrobbleStore)
                 .environmentObject(library)
                 .environmentObject(playlistStore)
+                .environmentObject(journeyStore)
         }
         .task { applyDebugLaunchRoute() }
         #endif
@@ -277,6 +280,19 @@ struct RootView: View {
             selection = tab
         }
 
+        if arguments.contains("-seedJourney") {
+            // Review fixture: provenance lines need a biography to exist.
+            var events: [ListenEvent] = []
+            for (index, song) in library.songs.prefix(12).enumerated() {
+                let first = 1_393_794_873 + TimeInterval(index * 86_400 * 40)
+                for play in 0..<(8 + index * 3) {
+                    events.append(ListenEvent(
+                        timestamp: first + TimeInterval(play) * 86_400 * 30,
+                        artist: song.artist, title: song.title, milliseconds: 210_000))
+                }
+            }
+            journeyStore.add(events: events, source: "fixture")
+        }
         if arguments.contains("-seedPassports") {
             // Review fixture: the Backroom line on Now Playing needs a
             // passport to exist, and demo tracks are not files the scanner

@@ -89,6 +89,9 @@ struct LocalizationCatalogTests {
             // batch above — the fifth such catch, and the reason this list
             // only ever grows.
             "Plus every self-hosted server you own searched together, and your full listening history.",
+            // Stage 2: the listening-history import.
+            "Listening history", "Open the timeline", "Your years in music",
+            "Bring your listening past with you — every year of it, stitched to the music you own.",
             // Stage 1 of the Backroom: the headphone-correction screen.
             "Headphone correction", "Apply profile",
             "Studio-grade correction for your exact headphones — from a measurement of your model, not a generic bass boost.",
