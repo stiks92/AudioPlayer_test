@@ -304,6 +304,38 @@ final class AudioManager: NSObject, ObservableObject {
         sub.move(fromOffsets: source, toOffset: destination)
         queue.replaceSubrange(base..<queue.count, with: sub)
         invalidatePreload()
+        // A hand-reordered queue is the listener's statement; a stale plan's
+        // chips would contradict it.
+        if isCrateMixActive { crateMixTransitions = [:]; isCrateMixActive = false }
+    }
+
+    // MARK: - Crate Mix (stage 3: the planner half)
+
+    /// song.id → how it is entered from its predecessor, for the queue chips.
+    @Published private(set) var crateMixTransitions: [String: CrateMix.Transition] = [:]
+    @Published private(set) var isCrateMixActive = false
+
+    /// Reorders everything after the playing track into the smoothest
+    /// no-stretch path the passports allow. One tap, reversible only by
+    /// reordering again — the plan is applied to the real queue, not to a
+    /// parallel fantasy of it.
+    func toggleCrateMix() {
+        if isCrateMixActive {
+            crateMixTransitions = [:]
+            isCrateMixActive = false
+            return
+        }
+        let steps = CrateMix.plan(anchor: currentSong, songs: upNext) {
+            PassportStore.shared.passport(for: $0.id)
+        }
+        guard !steps.isEmpty else { return }
+        let base = currentIndex + 1
+        queue.replaceSubrange(base..<queue.count, with: steps.map(\.song))
+        crateMixTransitions = Dictionary(uniqueKeysWithValues:
+            steps.compactMap { step in step.transition.map { (step.song.id, $0) } })
+        isCrateMixActive = true
+        invalidatePreload()
+        Haptics.selection()
     }
 
     // MARK: - Modes

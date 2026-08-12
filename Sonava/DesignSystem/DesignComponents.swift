@@ -131,6 +131,16 @@ struct SecondaryCapsuleButtonStyle: ButtonStyle {
 /// The third rung: a word that acts, with no surface at all — Retry, Cancel,
 /// "See all". Sized to the same 44pt target as the other two, because a
 /// borderless control still has to be hittable.
+/// Type-erased button style, so a view can switch styles on state without
+/// duplicating the whole button.
+struct AnyButtonStyle: ButtonStyle {
+    private let make: (Configuration) -> AnyView
+    init<S: ButtonStyle>(_ style: S) {
+        make = { AnyView(style.makeBody(configuration: $0)) }
+    }
+    func makeBody(configuration: Configuration) -> some View { make(configuration) }
+}
+
 struct QuietButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
 

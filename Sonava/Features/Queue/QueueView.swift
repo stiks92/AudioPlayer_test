@@ -37,12 +37,32 @@ struct QueueView: View {
                     }
 
                     if !audio.upNext.isEmpty {
+                        Button {
+                            withAnimation(Motion.expressive) { audio.toggleCrateMix() }
+                        } label: {
+                            HStack(spacing: Space.s) {
+                                SonavaIcon(glyph: .shuffle, size: 14,
+                                           tint: audio.isCrateMixActive ? Theme.background : Theme.accentSoft)
+                                Text("Crate Mix")
+                            }
+                        }
+                        .buttonStyle(audio.isCrateMixActive
+                                     ? AnyButtonStyle(PrimaryCapsuleButtonStyle(expands: false))
+                                     : AnyButtonStyle(SecondaryCapsuleButtonStyle(expands: false)))
+                        .accessibilityIdentifier("queue.crateMix")
                         Section {
                             ForEach(audio.upNext) { song in
+                                let transition = audio.isCrateMixActive
+                                    ? audio.crateMixTransitions[song.id] : nil
                                 Button {
                                     audio.playFromQueue(song)
                                 } label: {
-                                    SongRow(song: song)
+                                    HStack(spacing: Space.s) {
+                                        SongRow(song: song)
+                                        if let transition {
+                                            TransitionChip(transition: transition)
+                                        }
+                                    }
                                 }
                                 .buttonStyle(.plain)
                                 .listRowBackground(Color.clear)
@@ -101,5 +121,39 @@ struct QueueView: View {
         }
         .textCase(nil)
         .font(.system(.subheadline).weight(.semibold))
+    }
+}
+
+
+/// The planner's verdict on how this row will be entered — quiet, machine
+/// face, honest about the no-stretch bands.
+private struct TransitionChip: View {
+    let transition: CrateMix.Transition
+
+    var body: some View {
+        Text(label)
+            .font(.sonavaFact)
+            .foregroundColor(tint)
+            .padding(.horizontal, Space.s)
+            .padding(.vertical, 3)
+            .background(Capsule().strokeBorder(tint.opacity(0.45), lineWidth: 1))
+            .lineLimit(1)
+            .fixedSize()
+    }
+
+    private var label: LocalizedStringKey {
+        switch transition {
+        case .beatMatched: return "beat-matched"
+        case .shortBlend: return "short blend"
+        case .plainFade: return "fade"
+        }
+    }
+
+    private var tint: Color {
+        switch transition {
+        case .beatMatched: return Theme.accentSoft
+        case .shortBlend: return Theme.textSecondary
+        case .plainFade: return Theme.textTertiary
+        }
     }
 }

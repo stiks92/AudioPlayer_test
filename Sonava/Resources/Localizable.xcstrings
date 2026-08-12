@@ -1358,6 +1358,16 @@
         }
       }
     },
+    "Crate Mix": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crate Mix"
+          }
+        }
+      }
+    },
     "Create": {
       "localizations": {
         "ru": {
@@ -5230,6 +5240,16 @@
         }
       }
     },
+    "beat-matched": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "в бит"
+          }
+        }
+      }
+    },
     "day streak": {
       "localizations": {
         "ru": {
@@ -5246,6 +5266,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "напр. дождливое воскресенье, фокус, без вокала"
+          }
+        }
+      }
+    },
+    "fade": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "фейд"
           }
         }
       }
@@ -5309,6 +5339,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Отклик: %lld мс"
+          }
+        }
+      }
+    },
+    "short blend": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "коротко"
           }
         }
       }

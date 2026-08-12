@@ -326,14 +326,21 @@ struct RootView: View {
             // Review fixture: the Backroom line on Now Playing needs a
             // passport to exist, and demo tracks are not files the scanner
             // can measure. Values are plausible, marked as fixture data.
-            for song in library.songs.prefix(24) {
+            // Varied tempos and keys so the Crate Mix planner has real
+            // decisions to make on the review frame.
+            let fixtures: [(Double, Int, Bool)] = [
+                (124, 6, true), (124.3, 9, false), (126, 6, true), (140, 0, false),
+                (118, 11, true), (124.8, 1, false), (132, 4, true), (125.5, 6, true)
+            ]
+            for (index, song) in library.songs.prefix(24).enumerated() {
+                let f = fixtures[index % fixtures.count]
                 PassportStore.shared.save(TrackPassport(
                     contentKey: "demo-fixture",
                     durationSeconds: song.durationSeconds ?? 200,
                     loudnessLUFS: -11.2,
-                    bpm: 124, bpmConfidence: 0.9,
+                    bpm: f.0, bpmConfidence: 0.9,
                     beatGrid: nil,
-                    musicalKey: MusicalKey(tonic: 6, isMinor: true, confidence: 0.5),
+                    musicalKey: MusicalKey(tonic: f.1, isMinor: f.2, confidence: 0.5),
                     analyzedAt: Date()), for: song.id)
             }
         }
@@ -344,6 +351,11 @@ struct RootView: View {
             if let first = queue.first { audio.play(first, in: queue) }
         }
 
+        if arguments.contains("-crateMix") {
+            // After -demoPlay has queued the library: apply the plan so the
+            // review frame shows the chips, not just the button.
+            audio.toggleCrateMix()
+        }
         if arguments.contains("-openNowPlaying"), audio.currentSong != nil {
             showNowPlaying = true
         }
