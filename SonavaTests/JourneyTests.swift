@@ -118,6 +118,33 @@ struct JourneyTests {
         }
     }
 
+    @Test func recapTellsTheYearsStory() async {
+        await MainActor.run {
+            let store = JourneyStore(filename: "journey-test-\(UUID().uuidString).json")
+            // 2014: Vaelo ×3. 2015: Iri ×5, Vaelo ×2, Newcomer ×4 (first ever).
+            var events: [ListenEvent] = []
+            let y2014 = 1_400_000_000.0, y2015 = 1_430_000_000.0
+            for i in 0..<3 { events.append(ListenEvent(timestamp: y2014 + Double(i), artist: "Vaelo", title: "T\(i)", milliseconds: nil)) }
+            for i in 0..<5 { events.append(ListenEvent(timestamp: y2015 + Double(i), artist: "Iri", title: "I\(i)", milliseconds: nil)) }
+            for i in 0..<2 { events.append(ListenEvent(timestamp: y2015 + 100 + Double(i), artist: "Vaelo", title: "T\(i)", milliseconds: nil)) }
+            for i in 0..<4 { events.append(ListenEvent(timestamp: y2015 + 200 + Double(i), artist: "Newcomer", title: "N\(i)", milliseconds: nil)) }
+            store.add(events: events, source: "test")
+
+            let recap = store.recap(year: "2015")
+            #expect(recap != nil)
+            guard let recap else { return }
+            #expect(recap.plays == 11)
+            #expect(recap.topArtists.first?.name == "Iri")
+            #expect(recap.discoveries.contains("Newcomer"))
+            #expect(!recap.discoveries.contains("Vaelo"),
+                    "an artist first heard in 2014 is rotation, not a 2015 discovery")
+            #expect(recap.oldestCompanion?.name == "Vaelo")
+            #expect(recap.oldestCompanion?.since == "2014")
+            #expect(recap.previousYearPlays == 3)
+            #expect(store.recap(year: "2019") == nil, "an empty year has no story")
+        }
+    }
+
     @Test func timelineRanksArtistsWithinYears() async {
         await MainActor.run {
             let store = JourneyStore(filename: "journey-test-\(UUID().uuidString).json")

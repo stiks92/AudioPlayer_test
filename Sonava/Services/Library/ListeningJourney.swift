@@ -254,6 +254,81 @@ final class JourneyStore: ObservableObject {
         journey = Journey()
     }
 
+    /// One year's story, computed for the Recap screen and its share card.
+    struct Recap: Equatable {
+        var year: String
+        var plays: Int
+        var topArtists: [(name: String, plays: Int)]
+        var topTracks: [(artist: String, title: String, plays: Int)]
+        /// Artists whose very first listen in the whole biography falls in
+        /// this year — the year's discoveries, not merely its rotation.
+        var discoveries: [String]
+        /// The oldest companion still in this year's rotation: the artist
+        /// with the earliest first listen who was also played this year.
+        var oldestCompanion: (name: String, since: String)?
+        var previousYearPlays: Int?
+
+        static func == (a: Recap, b: Recap) -> Bool {
+            a.year == b.year && a.plays == b.plays
+        }
+    }
+
+    /// Builds the recap for a year, or nil if that year holds no listening.
+    func recap(year: String) -> Recap? {
+        var plays = 0
+        var artistPlays: [String: Int] = [:]
+        var trackRows: [(artist: String, title: String, plays: Int)] = []
+        var artistFirstEver: [String: TimeInterval] = [:]
+        var artistPlayedThisYear = Set<String>()
+        var previous = 0
+        let previousYear = (Int(year) ?? 0) - 1
+
+        for track in journey.tracks.values {
+            let inYear = track.yearCounts[year] ?? 0
+            previous += track.yearCounts[String(previousYear)] ?? 0
+            let known = artistFirstEver[track.artist]
+            if known == nil || track.firstListen < known! {
+                artistFirstEver[track.artist] = track.firstListen
+            }
+            guard inYear > 0 else { continue }
+            plays += inYear
+            artistPlays[track.artist, default: 0] += inYear
+            artistPlayedThisYear.insert(track.artist)
+            trackRows.append((track.artist, track.title, inYear))
+        }
+        guard plays > 0 else { return nil }
+
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        let discoveries = artistPlayedThisYear.filter { artist in
+            guard let first = artistFirstEver[artist] else { return false }
+            return String(calendar.component(.year, from: Date(timeIntervalSince1970: first))) == year
+        }.sorted { (artistPlays[$0] ?? 0) > (artistPlays[$1] ?? 0) }
+
+        let companion = artistPlayedThisYear
+            .compactMap { name in artistFirstEver[name].map { (name, $0) } }
+            .min { $0.1 < $1.1 }
+            .map { (name: $0.0,
+                    since: String(calendar.component(.year, from: Date(timeIntervalSince1970: $0.1)))) }
+
+        return Recap(
+            year: year,
+            plays: plays,
+            topArtists: artistPlays.sorted { $0.value > $1.value }.prefix(5).map { ($0.key, $0.value) },
+            topTracks: trackRows.sorted { $0.plays > $1.plays }.prefix(5).map { $0 },
+            discoveries: Array(discoveries.prefix(5)),
+            oldestCompanion: (companion?.since == year) ? nil : companion,
+            previousYearPlays: previous > 0 ? previous : nil)
+    }
+
+    /// The year the Recap button should open: the current year if it holds
+    /// listening, else the latest year that does.
+    func recapYear(now: Date = .now) -> String? {
+        let current = String(Calendar.current.component(.year, from: now))
+        if recap(year: current) != nil { return current }
+        return timeline().first?.year
+    }
+
     /// Years with listening, newest first, each with its top artists.
     func timeline(topPerYear: Int = 3) -> [(year: String, plays: Int, topArtists: [(name: String, plays: Int)])] {
         var perYear: [String: (plays: Int, artists: [String: Int])] = [:]

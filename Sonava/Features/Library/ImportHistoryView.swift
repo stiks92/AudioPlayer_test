@@ -207,12 +207,27 @@ struct JourneyTimelineView: View {
             creditText: String(localized: "Previews courtesy of"))
     }
 
+    @State private var recapYear: String?
+
     var body: some View {
         NavigationStack {
             ZStack {
                 Theme.background.ignoresSafeArea()
                 ScrollView {
                     VStack(alignment: .leading, spacing: Space.xl) {
+                        if let year = journeyStore.recapYear() {
+                            Button {
+                                recapYear = year
+                            } label: {
+                                HStack {
+                                    Text("Your \(year) recap")
+                                    Spacer()
+                                    SonavaIcon(glyph: .chevronRight, size: 14, tint: Theme.accentSoft)
+                                }
+                            }
+                            .buttonStyle(SecondaryCapsuleButtonStyle())
+                            .accessibilityIdentifier("journey.recap")
+                        }
                         ForEach(journeyStore.timeline(), id: \.year) { entry in
                             VStack(alignment: .leading, spacing: Space.m) {
                                 Department(title: LocalizedStringKey(entry.year),
@@ -258,6 +273,9 @@ struct JourneyTimelineView: View {
             .sheet(item: $flyerURL) { url in
                 ShareSheet(items: [url])
             }
+            .sheet(item: $recapYear) { year in
+                RecapView(year: year).environmentObject(journeyStore)
+            }
         }
         .preferredColorScheme(.dark)
     }
@@ -265,4 +283,8 @@ struct JourneyTimelineView: View {
 
 extension URL: @retroactive Identifiable {
     public var id: String { absoluteString }
+}
+
+extension String: @retroactive Identifiable {
+    public var id: String { self }
 }

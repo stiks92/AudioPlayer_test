@@ -43,6 +43,7 @@ struct RootView: View {
     @State private var debugShowAlbum = false
     @State private var debugShowArtist = false
     @State private var debugShowCorrection = false
+    @State private var debugRecapYear: String?
     @State private var debugShowQueue = false
     @State private var debugShowScrobble = false
     @State private var debugShowStats = false
@@ -142,6 +143,9 @@ struct RootView: View {
                 .environmentObject(audio)
                 .environmentObject(library)
                 .environmentObject(proStore)
+        }
+        .sheet(item: $debugRecapYear) { year in
+            RecapView(year: year).environmentObject(journeyStore)
         }
         .sheet(isPresented: $debugShowCorrection) {
             HeadphoneCorrectionView().environmentObject(audio)
@@ -292,6 +296,9 @@ struct RootView: View {
                 }
             }
             journeyStore.add(events: events, source: "fixture")
+        }
+        if arguments.contains("-openRecap") {
+            debugRecapYear = journeyStore.recapYear()
         }
         if arguments.contains("-dumpFlyer") {
             // Review fixture: writes the flyer where the host can reach it,
