@@ -329,6 +329,40 @@ final class JourneyStore: ObservableObject {
         return timeline().first?.year
     }
 
+    /// The streaming→ownership bridge, measured: how much of the listened
+    /// biography is covered by files the listener actually owns. Weighted by
+    /// plays — owning one obscurity is not parity with owning the top 100.
+    struct Ownership: Equatable {
+        var ownedPlays: Int
+        var totalPlays: Int
+        var topMissing: [(artist: String, title: String, plays: Int)]
+
+        var fraction: Double { totalPlays > 0 ? Double(ownedPlays) / Double(totalPlays) : 0 }
+
+        static func == (a: Ownership, b: Ownership) -> Bool {
+            a.ownedPlays == b.ownedPlays && a.totalPlays == b.totalPlays
+        }
+    }
+
+    func ownership(library: [Song], topCount: Int = 5) -> Ownership {
+        let owned = Set(library.map { Journey.key(artist: $0.artist, title: $0.title) })
+        var ownedPlays = 0
+        var total = 0
+        var missing: [(String, String, Int)] = []
+        for (key, track) in journey.tracks {
+            total += track.plays
+            if owned.contains(key) {
+                ownedPlays += track.plays
+            } else {
+                missing.append((track.artist, track.title, track.plays))
+            }
+        }
+        return Ownership(
+            ownedPlays: ownedPlays,
+            totalPlays: total,
+            topMissing: missing.sorted { $0.2 > $1.2 }.prefix(topCount).map { $0 })
+    }
+
     /// Years with listening, newest first, each with its top artists.
     func timeline(topPerYear: Int = 3) -> [(year: String, plays: Int, topArtists: [(name: String, plays: Int)])] {
         var perYear: [String: (plays: Int, artists: [String: Int])] = [:]

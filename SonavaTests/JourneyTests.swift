@@ -145,6 +145,31 @@ struct JourneyTests {
         }
     }
 
+    @Test func ownershipIsWeightedByPlaysAndMatchesEditions() async {
+        await MainActor.run {
+            let store = JourneyStore(filename: "journey-test-\(UUID().uuidString).json")
+            store.add(events: [
+                // Owned (as a remaster in the library): 6 plays.
+                ListenEvent(timestamp: 1_400_000_000, artist: "Vaelo", title: "Halcyon Drift", milliseconds: nil),
+                ListenEvent(timestamp: 1_400_000_100, artist: "Vaelo", title: "Halcyon Drift", milliseconds: nil),
+                ListenEvent(timestamp: 1_400_000_200, artist: "Vaelo", title: "Halcyon Drift", milliseconds: nil),
+                ListenEvent(timestamp: 1_400_000_300, artist: "Vaelo", title: "Halcyon Drift", milliseconds: nil),
+                ListenEvent(timestamp: 1_400_000_400, artist: "Vaelo", title: "Halcyon Drift", milliseconds: nil),
+                ListenEvent(timestamp: 1_400_000_500, artist: "Vaelo", title: "Halcyon Drift", milliseconds: nil),
+                // Not owned: 2 plays.
+                ListenEvent(timestamp: 1_400_001_000, artist: "Iri", title: "Drift", milliseconds: nil),
+                ListenEvent(timestamp: 1_400_001_100, artist: "Iri", title: "Drift", milliseconds: nil),
+            ], source: "test")
+            let library = [Song(id: "l:1", title: "Halcyon Drift (Remastered 2011)",
+                                artist: "Vaelo", album: "N", gradientHex: [0, 1])]
+            let ownership = store.ownership(library: library)
+            #expect(ownership.totalPlays == 8)
+            #expect(ownership.ownedPlays == 6, "the remaster edition must count as owning the history's plain title")
+            #expect(abs(ownership.fraction - 0.75) < 1e-9)
+            #expect(ownership.topMissing.first?.title == "Drift")
+        }
+    }
+
     @Test func timelineRanksArtistsWithinYears() async {
         await MainActor.run {
             let store = JourneyStore(filename: "journey-test-\(UUID().uuidString).json")

@@ -16,6 +16,7 @@ import UniformTypeIdentifiers
 
 struct ImportHistoryView: View {
     @EnvironmentObject private var journeyStore: JourneyStore
+    @EnvironmentObject private var library: MusicLibrary
     @Environment(\.dismiss) private var dismiss
 
     @State private var username = ""
@@ -140,6 +141,59 @@ struct ImportHistoryView: View {
             }
             .buttonStyle(PrimaryCapsuleButtonStyle())
             .accessibilityIdentifier("history.timeline")
+
+            ownershipBlock
+        }
+    }
+
+    /// The bridge, stated as a number: how much of the listened life the
+    /// listener already owns as files — and the most-played gaps, each one
+    /// tap from the store where buying it funds the artist.
+    @ViewBuilder
+    private var ownershipBlock: some View {
+        let ownership = journeyStore.ownership(library: library.songs)
+        if ownership.totalPlays > 0 {
+            VStack(alignment: .leading, spacing: Space.m) {
+                Department(title: "Owned", fact: "")
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(verbatim: "\(Int((ownership.fraction * 100).rounded()))%")
+                        .font(.sonavaFigure)
+                    Text("of your listened history is in your files")
+                        .font(.sonavaFact)
+                        .foregroundColor(Theme.textSecondary)
+                }
+                if !ownership.topMissing.isEmpty {
+                    Text("Most played, not yet owned")
+                        .font(.sonavaDepartment)
+                        .foregroundColor(Theme.accentSoft)
+                        .padding(.top, Space.s)
+                    ForEach(Array(ownership.topMissing.enumerated()), id: \.offset) { _, row in
+                        Button {
+                            let query = "\(row.artist) \(row.title)"
+                                .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+                            if let url = URL(string: "https://bandcamp.com/search?q=\(query)") {
+                                UIApplication.shared.open(url)
+                            }
+                        } label: {
+                            HStack(spacing: Space.m) {
+                                VStack(alignment: .leading, spacing: 1) {
+                                    Text(row.title).font(.sonavaRowTitle).lineLimit(1)
+                                    Text(row.artist).font(.sonavaByline)
+                                        .foregroundColor(Theme.textSecondary).lineLimit(1)
+                                }
+                                Spacer()
+                                Text(verbatim: "\(row.plays)")
+                                    .font(.sonavaFact).foregroundColor(Theme.textTertiary)
+                                SonavaIcon(glyph: .chevronRight, size: 12, tint: Theme.textTertiary)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    Text("Buying on Bandcamp pays the artist directly. Sonava earns nothing from these links.")
+                        .font(.system(.caption2))
+                        .foregroundColor(Theme.textTertiary)
+                }
+            }
         }
     }
 

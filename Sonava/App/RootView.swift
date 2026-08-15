@@ -44,6 +44,7 @@ struct RootView: View {
     @State private var debugShowArtist = false
     @State private var debugShowCorrection = false
     @State private var debugRecapYear: String?
+    @State private var debugShowHistory = false
     @State private var debugShowQueue = false
     @State private var debugShowScrobble = false
     @State private var debugShowStats = false
@@ -143,6 +144,11 @@ struct RootView: View {
                 .environmentObject(audio)
                 .environmentObject(library)
                 .environmentObject(proStore)
+        }
+        .sheet(isPresented: $debugShowHistory) {
+            ImportHistoryView()
+                .environmentObject(journeyStore)
+                .environmentObject(library)
         }
         .sheet(item: $debugRecapYear) { year in
             RecapView(year: year).environmentObject(journeyStore)
@@ -295,8 +301,18 @@ struct RootView: View {
                         artist: song.artist, title: song.title, milliseconds: 210_000))
                 }
             }
+            // Three artists the demo library does NOT own, so the ownership
+            // figure on the frame is a real fraction, not a smug 100%.
+            for (index, name) in ["Boards of Canada", "Burial", "Nils Frahm"].enumerated() {
+                for play in 0..<(20 - index * 5) {
+                    events.append(ListenEvent(
+                        timestamp: 1_500_000_000 + Double(index * 999 + play) * 86_400,
+                        artist: name, title: "Deep Cut \(index + 1)", milliseconds: 210_000))
+                }
+            }
             journeyStore.add(events: events, source: "fixture")
         }
+        if arguments.contains("-openHistory") { debugShowHistory = true }
         if arguments.contains("-openRecap") {
             debugRecapYear = journeyStore.recapYear()
         }

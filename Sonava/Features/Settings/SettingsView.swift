@@ -67,7 +67,9 @@ struct SettingsView: View {
                     .environmentObject(proStore)
             }
             .sheet(isPresented: $showHistoryImport) {
-                ImportHistoryView().environmentObject(journeyStore)
+                ImportHistoryView()
+                    .environmentObject(journeyStore)
+                    .environmentObject(library)
             }
             .sheet(isPresented: $showCorrection) {
                 HeadphoneCorrectionView().environmentObject(audio)
