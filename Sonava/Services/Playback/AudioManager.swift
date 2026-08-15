@@ -514,6 +514,26 @@ final class AudioManager: NSObject, ObservableObject {
               queue.indices.contains(currentIndex + 1) else { return }
         let next = queue[currentIndex + 1]
         guard let url = downloads.localURL(for: next) ?? next.url, url.isFileURL else { return }
+
+        // Crate Mix part two: when the planner promised a blend, the ending
+        // is an overlap, not a joint. Every guard that fails falls through
+        // to the gapless path — a worse transition is better than a broken
+        // promise about a good one.
+        if isCrateMixActive,
+           let engine = activeEngine as? LocalAudioEngine,
+           let transition = crateMixTransitions[next.id], transition != .plainFade,
+           let current = currentSong,
+           let outgoing = PassportStore.shared.passport(for: current.id),
+           let incoming = PassportStore.shared.passport(for: next.id),
+           let plan = CrateMix.overlapPlan(outgoing: outgoing, incoming: incoming,
+                                           outgoingDuration: engine.duration,
+                                           transition: transition),
+           engine.scheduleOverlap(.init(url: url,
+                                        startInOutgoing: plan.startInOutgoing,
+                                        incomingOffset: plan.incomingOffset,
+                                        fadeDuration: plan.fadeDuration)) {
+            return
+        }
         activeEngine?.preloadNext(url: url)
     }
 

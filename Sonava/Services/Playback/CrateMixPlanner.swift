@@ -105,6 +105,52 @@ enum CrateMix {
         return (.plainFade, max(0.05, 0.45 - tempoDistance - keyPenalty * 0.2))
     }
 
+    // MARK: - The overlap plan (part two's arithmetic)
+
+    struct OverlapPlan: Equatable, Sendable {
+        /// Seconds into the outgoing track when the incoming one starts —
+        /// snapped exactly onto the outgoing beat grid.
+        var startInOutgoing: Double
+        /// Seconds into the incoming file to begin from (its first beat, so
+        /// its intro air doesn't smear the alignment).
+        var incomingOffset: Double
+        /// 16 outgoing beats for a matched pair, 4 for a short blend.
+        var fadeDuration: Double
+    }
+
+    /// Where and how the two tracks cross, phase-aligned and never
+    /// tempo-converted. Returns nil when the outgoing track has no grid —
+    /// an unmeasured ending cannot be aligned to, only faded from.
+    static func overlapPlan(outgoing: TrackPassport, incoming: TrackPassport,
+                            outgoingDuration: Double,
+                            transition: Transition) -> OverlapPlan? {
+        guard transition != .plainFade, let grid = outgoing.beatGrid else { return nil }
+        let beats = transition == .beatMatched ? 16.0 : 4.0
+        let fade = beats * grid.interval
+        let tailGuard = 0.4   // never plan into the file's final samples
+
+        // The musical moment to leave on: the last section boundary that
+        // still leaves room for the fade; otherwise just the fade's length
+        // before the end.
+        let latestUsable = outgoingDuration - fade - tailGuard
+        guard latestUsable > grid.firstBeatOffset + grid.interval else { return nil }
+        let wish = outgoing.sectionBounds?.last(where: { $0 <= latestUsable }) ?? latestUsable
+
+        // Snap DOWN onto the beat grid — arriving early to a boundary is
+        // musical; overshooting the room for the fade is not.
+        let steps = ((wish - grid.firstBeatOffset) / grid.interval).rounded(.down)
+        var start = grid.firstBeatOffset + steps * grid.interval
+        while start > latestUsable {
+            start -= grid.interval
+        }
+        guard start > 1 else { return nil }
+
+        return OverlapPlan(
+            startInOutgoing: start,
+            incomingOffset: incoming.beatGrid?.firstBeatOffset ?? 0,
+            fadeDuration: fade)
+    }
+
     // MARK: - The route
 
     /// Reorders `songs` (after the fixed `anchor`, usually the playing

@@ -72,7 +72,17 @@ extension PlaybackEngine {
     func applyCorrection(_ profile: CorrectionProfile?) {}
 }
 
-// MARK: - Local files (AVAudioEngine graph: player → EQ → timePitch → mixer)
+// MARK: - Local files
+// Graph: playerA ─┐
+//                 ├─ blend (AVAudioMixerNode) → EQ → timePitch → mainMixer
+//        playerB ─┘
+//
+// Two player nodes because Crate Mix overlaps two tracks in time. One of
+// them is always the *primary* (the track the app calls current); the other
+// stands by, silent, until an overlap is scheduled — then it starts at a
+// beat-aligned host time, the two cross on an equal-power fade, and the
+// roles swap. Gapless stays what it always was: back-to-back segments on
+// the primary node alone.
 
 final class LocalAudioEngine: PlaybackEngine {
 
@@ -80,7 +90,13 @@ final class LocalAudioEngine: PlaybackEngine {
     var onAdvancedToNext: (() -> Void)?
 
     private let engine = AVAudioEngine()
-    private let player = AVAudioPlayerNode()
+    private let playerA = AVAudioPlayerNode()
+    private let playerB = AVAudioPlayerNode()
+    private let blend = AVAudioMixerNode()
+    /// Which node is the track the app calls current.
+    private var primaryIsA = true
+    private var primary: AVAudioPlayerNode { primaryIsA ? playerA : playerB }
+    private var standby: AVAudioPlayerNode { primaryIsA ? playerB : playerA }
     /// 10 user bands + up to 14 correction slots (12 peaks + 2 shelves).
     /// AVAudioUnitEQ's band count is fixed at init, so the headroom is
     /// allocated up front and unused slots stay bypassed.
@@ -130,8 +146,8 @@ final class LocalAudioEngine: PlaybackEngine {
 
     var currentTime: Double {
         if playing,
-           let nodeTime = player.lastRenderTime,
-           let playerTime = player.playerTime(forNodeTime: nodeTime) {
+           let nodeTime = primary.lastRenderTime,
+           let playerTime = primary.playerTime(forNodeTime: nodeTime) {
             let ownFrames = max(0, playerTime.sampleTime - runOffsetFrames)
             let played = Double(ownFrames) / playerTime.sampleRate
             lastKnownTime = min(Double(segmentStartFrame) / sampleRate + played, duration)
@@ -141,7 +157,9 @@ final class LocalAudioEngine: PlaybackEngine {
 
     init() {
         configureBands()
-        engine.attach(player)
+        engine.attach(playerA)
+        engine.attach(playerB)
+        engine.attach(blend)
         engine.attach(eq)
         engine.attach(timePitch)
     }
@@ -207,9 +225,14 @@ final class LocalAudioEngine: PlaybackEngine {
             segmentStartFrame = 0
             lastKnownTime = 0
 
-            engine.connect(player, to: eq, format: format)
+            engine.connect(playerA, to: blend, format: format)
+            engine.connect(playerB, to: blend, format: format)
+            engine.connect(blend, to: eq, format: format)
             engine.connect(eq, to: timePitch, format: format)
             engine.connect(timePitch, to: engine.mainMixerNode, format: format)
+            playerA.volume = 1
+            playerB.volume = 1
+            primaryIsA = true
             engine.mainMixerNode.outputVolume = volume
             timePitch.rate = clampRate(rate)
 
@@ -219,7 +242,7 @@ final class LocalAudioEngine: PlaybackEngine {
 
             scheduleFrom(0)
             playing = autoplay
-            if autoplay { player.play() }
+            if autoplay { primary.play() }
             return true
         } catch {
             print("LocalAudioEngine: \(error)")
@@ -230,13 +253,17 @@ final class LocalAudioEngine: PlaybackEngine {
 
     func play() {
         if !engine.isRunning { try? engine.start() }
-        player.play()
+        primary.play()
         playing = true
     }
 
     func pause() {
         _ = currentTime            // latch position before the node stops advancing
-        player.pause()
+        // A scheduled overlap fires at a host time; a paused primary would
+        // let the incoming track start on top of silence. Cancel honestly —
+        // resume re-plans or falls back to the ordinary advance.
+        cancelOverlap()
+        primary.pause()
         playing = false
     }
 
@@ -247,11 +274,12 @@ final class LocalAudioEngine: PlaybackEngine {
         let startFrame = AVAudioFramePosition(clamped * sampleRate)
 
         scheduleGeneration += 1
-        player.stop()
+        cancelOverlap()
+        primary.stop()
         segmentStartFrame = startFrame
         lastKnownTime = clamped
         scheduleFrom(startFrame)
-        if wasPlaying { player.play(); playing = true }
+        if wasPlaying { primary.play(); playing = true }
     }
 
     func setVolume(_ volume: Float) {
@@ -297,9 +325,14 @@ final class LocalAudioEngine: PlaybackEngine {
 
     func teardown() {
         scheduleGeneration += 1
+        cancelOverlap()
         preloaded = nil
         runOffsetFrames = 0
-        player.stop()
+        playerA.stop()
+        playerB.stop()
+        playerA.volume = 1
+        playerB.volume = 1
+        primaryIsA = true
         engine.mainMixerNode.removeTap(onBus: 0)
         engine.stop()
         file = nil
@@ -324,9 +357,9 @@ final class LocalAudioEngine: PlaybackEngine {
     }
 
     private func schedule(_ file: AVAudioFile, from startFrame: AVAudioFramePosition,
-                          frames: AVAudioFrameCount, id: Int) {
+                          frames: AVAudioFrameCount, id: Int, on node: AVAudioPlayerNode? = nil) {
         let generation = scheduleGeneration
-        player.scheduleSegment(
+        (node ?? primary).scheduleSegment(
             file,
             startingFrame: startFrame,
             frameCount: frames,
@@ -363,6 +396,113 @@ final class LocalAudioEngine: PlaybackEngine {
         schedule(next, from: 0, frames: frames, id: lastSegmentID)
         return true
     }
+
+    // MARK: Overlap (Crate Mix part two)
+
+    /// One planned crossing between the primary and the standby player.
+    struct OverlapRequest {
+        var url: URL
+        /// Seconds into the outgoing track when the incoming one starts —
+        /// already snapped to the outgoing beat grid by the planner.
+        var startInOutgoing: Double
+        /// Seconds into the incoming file to start from (its first beat).
+        var incomingOffset: Double
+        /// Equal-power fade length in seconds (16 or 4 outgoing beats).
+        var fadeDuration: Double
+    }
+
+    private var overlap: (file: AVAudioFile, request: OverlapRequest,
+                          segmentID: Int, fire: DispatchWorkItem)?
+    private var fadeTimer: Timer?
+
+    /// Schedules the incoming track to start, beat-aligned, while this one
+    /// is still playing. Returns false when the moment is too close, the
+    /// formats disagree, or a gapless preload already owns the ending — the
+    /// caller falls back to the ordinary path, honestly.
+    @discardableResult
+    func scheduleOverlap(_ request: OverlapRequest) -> Bool {
+        guard let current = file, overlap == nil, preloaded == nil, playing else { return false }
+        guard let next = try? AVAudioFile(forReading: request.url) else { return false }
+        let a = current.processingFormat, b = next.processingFormat
+        guard a.sampleRate == b.sampleRate, a.channelCount == b.channelCount else { return false }
+
+        let lead = request.startInOutgoing - currentTime
+        guard lead > 0.35, request.startInOutgoing + 0.25 < duration else { return false }
+
+        let offsetFrames = AVAudioFramePosition(request.incomingOffset * b.sampleRate)
+        let frames = AVAudioFrameCount(max(0, next.length - offsetFrames))
+        guard frames > 0 else { return false }
+
+        lastSegmentID += 1
+        let segmentID = lastSegmentID
+        standby.stop()
+        standby.volume = 0
+        schedule(next, from: offsetFrames, frames: frames, id: segmentID, on: standby)
+
+        // Sample-true start: the incoming first beat lands on an outgoing
+        // beat instant. Host time is the one clock both nodes share.
+        let startHost = AVAudioTime.hostTime(forSeconds:
+            AVAudioTime.seconds(forHostTime: mach_absolute_time()) + lead)
+        standby.play(at: AVAudioTime(hostTime: startHost))
+
+        let fire = DispatchWorkItem { [weak self] in self?.beginCrossing() }
+        overlap = (next, request, segmentID, fire)
+        DispatchQueue.main.asyncAfter(deadline: .now() + lead, execute: fire)
+        return true
+    }
+
+    /// The moment the incoming track becomes the current one: swap roles,
+    /// hand the app its advance, and drive the equal-power fade. The
+    /// *alignment* was fixed earlier by `play(at:)`; this only moves volume
+    /// and bookkeeping, so main-queue jitter cannot smear the beat.
+    private func beginCrossing() {
+        guard let (nextFile, request, segmentID, _) = overlap else { return }
+        overlap = nil
+
+        let outgoing = primary
+        primaryIsA.toggle()
+
+        file = nextFile
+        totalFrames = nextFile.length
+        sampleRate = nextFile.processingFormat.sampleRate
+        segmentStartFrame = AVAudioFramePosition(request.incomingOffset * sampleRate)
+        runOffsetFrames = 0
+        lastKnownTime = request.incomingOffset
+        playingSegmentID = segmentID
+        preloaded = nil
+        onAdvancedToNext?()
+
+        let incoming = primary
+        let fadeSeconds = max(0.3, request.fadeDuration)
+        let started = CACurrentMediaTime()
+        fadeTimer?.invalidate()
+        fadeTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30, repeats: true) { [weak self] timer in
+            let x = min(1, (CACurrentMediaTime() - started) / fadeSeconds)
+            // Equal-power: the crossing keeps constant perceived energy.
+            incoming.volume = Float(sin(x * .pi / 2))
+            outgoing.volume = Float(cos(x * .pi / 2))
+            if x >= 1 {
+                timer.invalidate()
+                outgoing.stop()
+                outgoing.volume = 1
+                Task { @MainActor in self?.fadeTimer = nil }
+            }
+        }
+    }
+
+    /// Forgets a planned crossing: the standby stops, volumes restore, and
+    /// the ordinary end-of-track path takes over.
+    private func cancelOverlap() {
+        overlap?.fire.cancel()
+        overlap = nil
+        fadeTimer?.invalidate()
+        fadeTimer = nil
+        standby.stop()
+        standby.volume = 1
+        primary.volume = 1
+    }
+
+    var hasScheduledOverlap: Bool { overlap != nil }
 
     func cancelPreload() {
         // The scheduled segment cannot be un-queued without stopping the node,
