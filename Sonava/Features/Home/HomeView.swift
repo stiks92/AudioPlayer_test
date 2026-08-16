@@ -13,6 +13,7 @@ struct HomeView: View {
     @EnvironmentObject private var library: MusicLibrary
     @EnvironmentObject private var proStore: ProStore
     @EnvironmentObject private var serverStore: ServerStore
+    @EnvironmentObject private var journeyStore: JourneyStore
     @EnvironmentObject private var scrobble: ScrobbleStore
     @EnvironmentObject private var history: ListeningHistory
 
@@ -27,6 +28,10 @@ struct HomeView: View {
     @State private var showAIMix = false
     @State private var showShazam = false
     @State private var showStats = false
+    @State private var showImportFiles = false
+    @State private var showConnectServer = false
+    @State private var showHistoryImport = false
+    @StateObject private var radioRail = SongFeed()
 
     private var greeting: LocalizedStringKey {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -54,13 +59,28 @@ struct HomeView: View {
                     // largest change here.
                     VStack(alignment: .leading, spacing: Space.xxl) {
                         masthead
-                        figure
-                        yourFilesSection
-                        serverSection
-                        madeForYouSection
-                        popularSection
-                        trendingSection
-                        indexSection
+                        // Day zero is a different newspaper. A person with a
+                        // library opens on their own time and their own
+                        // files; a person without one used to open on «0 с»,
+                        // «0 файлов» and a feature index — an empty shop
+                        // with the lights off. Now the empty state leads
+                        // with things that PLAY this minute (live radio,
+                        // Audius trending) and one quiet card of beginnings.
+                        if libraryIsEmpty {
+                            startHereSection
+                            radioNowSection
+                            trendingSection
+                            popularSection
+                            indexSection
+                        } else {
+                            figure
+                            yourFilesSection
+                            serverSection
+                            madeForYouSection
+                            popularSection
+                            trendingSection
+                            indexSection
+                        }
                     }
                     .padding(.horizontal, Space.screenMargin)
                     .padding(.top, 8)
@@ -69,6 +89,9 @@ struct HomeView: View {
             }
             .navigationBarHidden(true)
             .task {
+                if libraryIsEmpty, radioRail.state == .idle {
+                    await radioRail.load { try await RadioBrowserService.shared.trending() }
+                }
                 if charts.state == .idle {
                     await charts.load { try await DeezerService.shared.chartTracks() }
                 }
@@ -93,6 +116,23 @@ struct HomeView: View {
                     .environmentObject(proStore)
                     .environmentObject(serverStore)
                     .environmentObject(scrobble)
+            }
+            .fileImporter(isPresented: $showImportFiles,
+                          allowedContentTypes: [.audio],
+                          allowsMultipleSelection: true) { result in
+                if case .success(let urls) = result {
+                    Task { await library.importFiles(at: urls) }
+                }
+            }
+            .sheet(isPresented: $showConnectServer) {
+                ConnectServerView()
+                    .environmentObject(serverStore)
+                    .environmentObject(proStore)
+            }
+            .sheet(isPresented: $showHistoryImport) {
+                ImportHistoryView()
+                    .environmentObject(journeyStore)
+                    .environmentObject(library)
             }
             .sheet(isPresented: $showAIMix) {
                 AIMixView()
@@ -568,6 +608,61 @@ extension HomeView {
         chart("Trending", fact: "AUDIUS", feed: trending)
     }
 
+    // MARK: - Day zero
+
+    private var libraryIsEmpty: Bool {
+        library.songs.isEmpty && serverStore.servers.isEmpty
+    }
+
+    /// Three honest beginnings, set as index rows — not banners, not a
+    /// wizard. Each one is the real door, not a tour of it.
+    private var startHereSection: some View {
+        VStack(alignment: .leading, spacing: Space.m) {
+            Department(title: "Start here")
+            indexRow(1, "Import your music files", fact: nil,
+                     id: "home.start.import") { showImportFiles = true }
+            RowRule(inset: Rail.text)
+            indexRow(2, "Connect your server", fact: nil,
+                     id: "home.start.server") { showConnectServer = true }
+            RowRule(inset: Rail.text)
+            indexRow(3, "Bring your listening history", fact: nil,
+                     id: "home.start.history") { showHistoryImport = true }
+        }
+    }
+
+    /// Live stations, playable on the first tap of the first minute.
+    @ViewBuilder
+    private var radioNowSection: some View {
+        if radioRail.state == .loaded, !radioRail.songs.isEmpty {
+            VStack(alignment: .leading, spacing: Space.m) {
+                Department(title: "Radio, right now",
+                           fact: String(localized: "LIVE"))
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: Space.m) {
+                        ForEach(radioRail.songs.prefix(8)) { station in
+                            Button {
+                                audio.play(station, in: [station])
+                            } label: {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    ArtworkImage(song: station, glyphSize: 22)
+                                        .frame(width: 104, height: 104)
+                                        .clipShape(RoundedRectangle(cornerRadius: Radius.card,
+                                                                    style: .continuous))
+                                    Text(station.title)
+                                        .font(.sonavaByline)
+                                        .foregroundColor(Theme.textSecondary)
+                                        .lineLimit(1)
+                                        .frame(width: 104, alignment: .leading)
+                                }
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /// The app's own features, set as an index rather than as banners.
     var indexSection: some View {
         VStack(alignment: .leading, spacing: Space.m) {
@@ -595,7 +690,7 @@ extension HomeView {
                     .foregroundColor(Theme.textTertiary)
                     .frame(width: Rail.ordinal, alignment: .trailing)
                 Text(title)
-                    .font(.system(.title3, design: .serif))
+                    .font(.system(.title3))
                     .foregroundColor(Theme.textPrimary)
                 Spacer(minLength: Space.s)
                 if let fact {

@@ -89,6 +89,9 @@ struct LocalizationCatalogTests {
             // batch above — the fifth such catch, and the reason this list
             // only ever grows.
             "Plus every self-hosted server you own searched together, and your full listening history.",
+            // Day zero and the recognition screen.
+            "Start here", "Import your music files", "Connect your server",
+            "Bring your listening history", "Radio, right now", "What's playing?",
             // Stage 2: the recap ritual.
             "Your year", "Share the card", "Discovered this year", "Still with you",
             "Counted on this phone. Your listening never leaves it.",

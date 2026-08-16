@@ -45,6 +45,7 @@ struct RootView: View {
     @State private var debugShowCorrection = false
     @State private var debugRecapYear: String?
     @State private var debugShowHistory = false
+    @State private var debugShowShazam = false
     @State private var debugShowQueue = false
     @State private var debugShowScrobble = false
     @State private var debugShowStats = false
@@ -144,6 +145,9 @@ struct RootView: View {
                 .environmentObject(audio)
                 .environmentObject(library)
                 .environmentObject(proStore)
+        }
+        .sheet(isPresented: $debugShowShazam) {
+            ShazamView().environmentObject(audio)
         }
         .sheet(isPresented: $debugShowHistory) {
             ImportHistoryView()
@@ -313,6 +317,7 @@ struct RootView: View {
             journeyStore.add(events: events, source: "fixture")
         }
         if arguments.contains("-openHistory") { debugShowHistory = true }
+        if arguments.contains("-openShazam") { debugShowShazam = true }
         if arguments.contains("-openRecap") {
             debugRecapYear = journeyStore.recapYear()
         }
@@ -480,13 +485,20 @@ private struct MiniPlayerSlot: ViewModifier {
     @ViewBuilder
     func body(content: Content) -> some View {
         if #available(iOS 26, *) {
-            content
-                .tabViewBottomAccessory {
-                    if isVisible {
+            // The accessory SLOT renders as an empty capsule even when its
+            // builder returns nothing — the day-zero frame showed a blank
+            // pill floating over the tab bar. Branch the modifier itself:
+            // no song, no slot.
+            if isVisible {
+                content
+                    .tabViewBottomAccessory {
                         MiniPlayerView(style: .accessory, namespace: namespace, onExpand: onExpand)
                     }
-                }
-                .tabBarMinimizeBehavior(.onScrollDown)
+                    .tabBarMinimizeBehavior(.onScrollDown)
+            } else {
+                content
+                    .tabBarMinimizeBehavior(.onScrollDown)
+            }
         } else {
             content.safeAreaInset(edge: .bottom) {
                 if isVisible {

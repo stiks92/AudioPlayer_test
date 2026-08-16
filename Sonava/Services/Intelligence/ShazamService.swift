@@ -78,6 +78,15 @@ final class ShazamService: NSObject, ObservableObject {
 
             let input = audioEngine.inputNode
             let format = input.outputFormat(forBus: 0)
+            // The simulator (and any device with no capture route) reports a
+            // 0-channel, 0 Hz input format — and installTap throws an
+            // Objective-C exception on it, which is a crash, not an error.
+            // Refuse honestly instead.
+            guard format.sampleRate > 0, format.channelCount > 0 else {
+                state = .failed("This device has no working microphone.")
+                restoreSession()
+                return
+            }
             let capturedSession = session
             input.removeTap(onBus: 0)
             input.installTap(onBus: 0, bufferSize: 4096, format: format) { buffer, time in

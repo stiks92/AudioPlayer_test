@@ -18,14 +18,22 @@ struct ShazamView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                AuroraBackground(colors: [Color(hex: 0x00C6FF), Color(hex: 0x0072FF), Theme.accent],
-                                 animated: shazam.isListening)
-                    .overlay(Theme.background.opacity(0.25))
+                // The last screen wearing the pre-redesign blue aurora — the
+                // exact «нейрослоп» the rest of the app buried. Now it
+                // stands on the same ground as every other screen: black,
+                // with the sleeve's warmth once a match brings one.
+                Color.black.ignoresSafeArea()
+                LinearGradient(stops: [
+                    .init(color: matchTint.opacity(shazam.isListening ? 0.35 : 0.22), location: 0),
+                    .init(color: .black, location: 0.55)
+                ], startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea()
+                .animation(Motion.fade, value: shazam.isListening)
 
                 content
             }
             .foregroundColor(.white)
-            .navigationTitle("Discover")
+            .navigationTitle("What's playing?")
             .navigationBarTitleDisplayMode(.inline)
             .doneToolbar { shazam.stop(); dismiss() }
             .onDisappear { shazam.stop() }
@@ -43,18 +51,27 @@ struct ShazamView: View {
         }
     }
 
+    /// Warmth for the ground: the matched sleeve's own colour once there is
+    /// one, the app's quiet accent until then.
+    private var matchTint: Color {
+        if case .matched = shazam.state { return Theme.accent }
+        return Theme.accentDeep
+    }
+
     // MARK: - Listen
 
     private var listenView: some View {
-        VStack(spacing: Space.xxl) {
+        VStack(spacing: Space.xl) {
             Spacer()
             ZStack {
+                // The pulse reads as the lens breathing — hairline ivory
+                // rings, not blue chrome.
                 ForEach(0..<3, id: \.self) { i in
                     Circle()
-                        .stroke(Color.white.opacity(0.22), lineWidth: 2)
-                        .frame(width: 150 + CGFloat(i) * 46, height: 150 + CGFloat(i) * 46)
-                        .scaleEffect(shazam.isListening ? 1.18 : 1)
-                        .opacity(shazam.isListening ? 0 : 0.5)
+                        .stroke(Theme.accentSoft.opacity(0.35), lineWidth: 1)
+                        .frame(width: 168 + CGFloat(i) * 52, height: 168 + CGFloat(i) * 52)
+                        .scaleEffect(shazam.isListening ? 1.22 : 1)
+                        .opacity(shazam.isListening ? 0 : 0.35)
                         .animation(
                             shazam.isListening
                                 ? .easeOut(duration: 1.8).repeatForever(autoreverses: false).delay(Double(i) * 0.45)
@@ -78,17 +95,22 @@ struct ShazamView: View {
                     // the exact opposite of "listening".)
                     AnimatedIcon(glyph: .activity,
                                  mode: .loop(shazam.isListening),
-                                 size: 72, tint: .white)
-                        .frame(width: 140, height: 140)
-                        .background(Circle().fill(.ultraThinMaterial))
-                        .overlay(Circle().strokeBorder(Color.white.opacity(0.3), lineWidth: 1.5))
+                                 size: 64, tint: Theme.textPrimary)
+                        .frame(width: 152, height: 152)
+                        .background(Circle().fill(Color.white.opacity(0.06)))
+                        .overlay(Circle().strokeBorder(Color.white.opacity(0.16), lineWidth: 1))
+                        .shadow(color: matchTint.opacity(shazam.isListening ? 0.5 : 0),
+                                radius: 26)
                 }
                 .buttonStyle(BouncyButtonStyle(scale: 0.94))
             }
-            .frame(height: 250)
+            .frame(height: 280)
 
             Text(statusText)
-                .font(.system(.title3).weight(.semibold))
+                .font(.sonavaFact)
+                .tracking(1.2)
+                .textCase(.uppercase)
+                .foregroundColor(Theme.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
 
@@ -127,25 +149,29 @@ struct ShazamView: View {
     private func matchView(_ result: ShazamService.Result) -> some View {
         VStack(spacing: Space.xl) {
             Spacer()
+            // A record, found: square sleeve with the hairline border every
+            // other sleeve in the product wears.
             AsyncImage(url: result.artworkURL) { image in
                 image.resizable().aspectRatio(contentMode: .fill)
             } placeholder: {
                 ZStack {
-                    LinearGradient(colors: [Color(hex: 0x00C6FF), Theme.accent], startPoint: .top, endPoint: .bottom)
-                    SonavaIcon(glyph: .note, size: 64, tint: .white.opacity(0.8))
+                    Color.white.opacity(0.06)
+                    SonavaIcon(glyph: .note, size: 56, tint: Theme.textTertiary)
                 }
             }
-            .frame(width: 220, height: 220)
-            .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
-            .shadow(color: .black.opacity(0.4), radius: 24, y: 12)
+            .frame(width: 232, height: 232)
+            .clipShape(RoundedRectangle(cornerRadius: 3, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 3, style: .continuous)
+                .strokeBorder(.white.opacity(0.14), lineWidth: 1))
+            .shadow(color: .black.opacity(0.5), radius: 24, y: 12)
 
-            VStack(spacing: 6) {
+            VStack(spacing: 4) {
                 Text(result.title)
-                    .font(.system(.title2).weight(.bold))
+                    .font(.system(.title2).weight(.semibold))
                     .multilineTextAlignment(.center)
                 Text(result.artist)
                     .font(.system(.callout))
-                    .foregroundColor(.white.opacity(0.8))
+                    .foregroundColor(Theme.textSecondary)
             }
             .padding(.horizontal, Space.xxl)
 
@@ -153,34 +179,25 @@ struct ShazamView: View {
                 Button {
                     findOnAudius(result)
                 } label: {
-                    HStack {
+                    HStack(spacing: Space.s) {
                         if isFindingOnAudius { ProgressView().tint(Theme.background) }
-                        SonavaIcon(glyph: .play, size: 16, tint: Theme.background)
+                        SonavaIcon(glyph: .play, size: 15, tint: Theme.background)
                         Text(isFindingOnAudius ? "Searching…" : "Play on Sonava")
                     }
-                    .font(.headline)
-                    .foregroundColor(Theme.background)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, Space.l)
-                    .background(Capsule().fill(Color.white))
                 }
-                .buttonStyle(BouncyButtonStyle(scale: 0.97))
+                .buttonStyle(PrimaryCapsuleButtonStyle())
                 .disabled(isFindingOnAudius)
 
                 if let appleURL = result.appleMusicURL {
                     Link(destination: appleURL) {
                         Text("Open in Apple Music")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 13)
-                            .card(cornerRadius: Radius.hero)
                     }
+                    .buttonStyle(SecondaryCapsuleButtonStyle())
                 }
 
                 Button("Identify another") { shazam.reset() }
-                    .font(.footnote.weight(.semibold))
-                    .foregroundColor(.white.opacity(0.8))
+                    .buttonStyle(QuietButtonStyle())
             }
             .padding(.horizontal, Space.xxl)
             Spacer()
