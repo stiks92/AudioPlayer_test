@@ -23,6 +23,10 @@ enum TrackSource: String, Codable {
     /// A file on the listener's own cloud drive — Yandex.Disk, Mail.ru Cloud,
     /// Nextcloud, a NAS. Their file, their storage, their credentials.
     case webdav
+    /// The listener's own Apple Music subscription, played through MusicKit.
+    /// Full catalogue, Apple's DRM player — which means our DSP (EQ,
+    /// correction, levelling) cannot touch it, and the UI says so.
+    case appleMusic
 
     var badge: String? {
         switch self {
@@ -38,6 +42,7 @@ enum TrackSource: String, Codable {
         // The listener's own drive. "CLOUD" rather than "WEBDAV": the badge
         // tells them where the file is, not which protocol fetched it.
         case .webdav:   return "CLOUD"
+        case .appleMusic: return "APPLE MUSIC"
         }
     }
 
@@ -47,7 +52,9 @@ enum TrackSource: String, Codable {
     var isDownloadable: Bool {
         switch self {
         case .audius, .subsonic, .jamendo, .archive, .webdav: return true
-        case .local, .radio, .itunes, .deezer, .podcast: return false
+        // Apple Music is DRM inside Apple's own player — there is no file
+        // to save, and pretending otherwise would be a lie with a progress bar.
+        case .local, .radio, .itunes, .deezer, .podcast, .appleMusic: return false
         }
     }
 }

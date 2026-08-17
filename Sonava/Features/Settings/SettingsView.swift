@@ -11,6 +11,7 @@ struct SettingsView: View {
     @EnvironmentObject private var proStore: ProStore
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var journeyStore: JourneyStore
+    @ObservedObject private var appleMusic = AppleMusicService.shared
     @EnvironmentObject private var serverStore: ServerStore
     @EnvironmentObject private var scrobble: ScrobbleStore
     @EnvironmentObject private var library: MusicLibrary
@@ -380,6 +381,15 @@ struct SettingsView: View {
         )
     }
 
+    private var appleMusicValue: LocalizedStringKey {
+        switch appleMusic.availability {
+        case .ready: return "Connected"
+        case .noSubscription: return "No subscription"
+        case .notConfigured: return "Needs App Store Connect setup"
+        case .notConnected: return "Connect"
+        }
+    }
+
     private var historyValue: LocalizedStringKey {
         journeyStore.journey.tracks.isEmpty ? "Import" : "\(journeyStore.journey.totalPlays) plays"
     }
@@ -409,6 +419,10 @@ struct SettingsView: View {
     private var sourcesSection: some View {
         section("Sources") {
             VStack(spacing: 0) {
+                row(icon: .note, title: "Apple Music", value: appleMusicValue) {
+                    Task { await AppleMusicService.shared.connect() }
+                }
+                divider
                 staticRow(icon: .wave, title: "Audius",
                           value: "Connected", valueColor: Theme.positive)
                 divider

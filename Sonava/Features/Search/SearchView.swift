@@ -16,6 +16,8 @@ struct SearchView: View {
     @State private var query = ""
     @FocusState private var focused: Bool
     @StateObject private var audiusFeed = SongFeed()
+    @StateObject private var appleMusicFeed = SongFeed()
+    @ObservedObject private var appleMusic = AppleMusicService.shared
     @StateObject private var appleFeed = SongFeed()
     @StateObject private var deezerFeed = SongFeed()
     @StateObject private var serverFeed = SongFeed()
@@ -83,6 +85,9 @@ struct SearchView: View {
                 if serverStore.isConnected {
                     await serverFeed.load { try await serverStore.search(trimmed) }
                 }
+                if appleMusic.isReady {
+                    await appleMusicFeed.load { try await AppleMusicService.shared.search(trimmed) }
+                }
                 await deezerFeed.load { try await DeezerService.shared.search(trimmed) }
                 await appleFeed.load { try await iTunesService.shared.searchMusic(trimmed) }
                 await audiusFeed.load { try await AudiusService.shared.search(trimmed) }
@@ -132,6 +137,11 @@ struct SearchView: View {
             }
             if serverStore.isConnected, serverFeed.state == .loaded {
                 sourceSection("Your server", songs: serverFeed.songs)
+            }
+            // The subscriber's whole catalogue — full tracks, so it sits with
+            // the full tracks, above the preview fold.
+            if appleMusic.isReady, appleMusicFeed.state == .loaded, !appleMusicFeed.songs.isEmpty {
+                sourceSection("Apple Music · your subscription", songs: appleMusicFeed.songs)
             }
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 8) {

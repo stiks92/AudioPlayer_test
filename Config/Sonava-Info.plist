@@ -10,6 +10,9 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Sonava uses the microphone to recognize music playing around you.</string>
 
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Sonava plays your Apple Music subscription inside its own player.</string>
+
 	<!-- Lets the user import their own audio files from Files / iCloud Drive
 	     and re-open them on later launches via security-scoped bookmarks. -->
 	<key>UIFileSharingEnabled</key>

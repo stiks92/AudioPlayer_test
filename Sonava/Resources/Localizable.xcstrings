@@ -786,6 +786,16 @@
     "Apple Music": {
       "shouldTranslate": false
     },
+    "Apple Music · your subscription": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Music · ваша подписка"
+          }
+        }
+      }
+    },
     "Applied to files and streams alike, before your own EQ. One profile for both ears for now.": {
       "localizations": {
         "ru": {
@@ -2586,6 +2596,16 @@
         }
       }
     },
+    "Needs App Store Connect setup": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нужна настройка в App Store Connect"
+          }
+        }
+      }
+    },
     "New Playlist": {
       "localizations": {
         "ru": {
@@ -2786,6 +2806,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Станций в этом жанре не найдено."
+          }
+        }
+      }
+    },
+    "No subscription": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нет подписки"
           }
         }
       }

@@ -86,6 +86,7 @@ final class AudioManager: NSObject, ObservableObject {
 
     private let localEngine = LocalAudioEngine()
     private let remoteEngine = RemoteAudioEngine()
+    private let appleEngine = AppleMusicEngine()
 
     private func wireRemoteProcessingState() {
         remoteEngine.onProcessingChange = { [weak self] attached in
@@ -434,6 +435,24 @@ final class AudioManager: NSObject, ObservableObject {
         let song = queue[currentIndex]
         beginListenSession()        // closes out the outgoing track's listen
         currentSong = song
+
+        // Apple Music rides its own DRM player: no URL, no DSP, its own door.
+        if song.source == .appleMusic, let catalogID = AppleMusicService.catalogID(of: song) {
+            if activeEngine !== appleEngine { activeEngine?.teardown() }
+            activeEngine = appleEngine
+            appleEngine.onFinish = { [weak self] in
+                Task { @MainActor in self?.advance(auto: true) }
+            }
+            streamProcessingActive = false
+            Task { [weak self] in
+                let started = await self?.appleEngine.prepareCatalogSong(
+                    id: catalogID, autoplay: autoplay) ?? false
+                if started { self?.isPlaying = autoplay }
+            }
+            isPlaying = autoplay
+            updateNowPlayingInfo()
+            return
+        }
 
         // Prefer an offline copy — it plays with no network and, being a file,
         // runs through the local engine (so it gets the equalizer too).

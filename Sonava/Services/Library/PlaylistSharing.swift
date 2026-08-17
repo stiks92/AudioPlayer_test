@@ -39,7 +39,10 @@ enum PlaylistSharing {
     /// Sources whose stream URL is a plain public link — safe to carry.
     /// `.subsonic` is deliberately absent: its URLs are authenticated.
     private static let publicSources: Set<TrackSource> = [
-        .audius, .deezer, .itunes, .radio, .podcast, .jamendo, .archive
+        // Apple Music ships identity only (a catalogue id, no stream, no
+        // credentials): the receiver's own subscription resolves it — the
+        // same recipient-side re-resolution the server tracks use.
+        .audius, .deezer, .itunes, .radio, .podcast, .jamendo, .archive, .appleMusic
     ]
 
     // MARK: - Wire format

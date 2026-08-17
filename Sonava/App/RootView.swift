@@ -199,6 +199,7 @@ struct RootView: View {
                 .environmentObject(journeyStore)
         }
         .task { applyDebugLaunchRoute() }
+        .task { await AppleMusicService.shared.restoreIfAuthorized() }
         #endif
         .onChange(of: audio.currentSong) { _, song in
             if let song {
