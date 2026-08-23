@@ -46,6 +46,7 @@ struct RootView: View {
     @State private var debugRecapYear: String?
     @State private var debugShowHistory = false
     @State private var debugShowShazam = false
+    @State private var debugShowHub = false
     @State private var debugShowQueue = false
     @State private var debugShowScrobble = false
     @State private var debugShowStats = false
@@ -146,6 +147,16 @@ struct RootView: View {
                 .environmentObject(library)
                 .environmentObject(proStore)
         }
+        .sheet(isPresented: $debugShowHub) {
+            SourcesHubView()
+                .environmentObject(library)
+                .environmentObject(serverStore)
+                .environmentObject(cloudStore)
+                .environmentObject(proStore)
+                .environmentObject(journeyStore)
+                .environmentObject(playlistStore)
+                .environmentObject(audio)
+        }
         .sheet(isPresented: $debugShowShazam) {
             ShazamView().environmentObject(audio)
         }
@@ -197,6 +208,7 @@ struct RootView: View {
                 .environmentObject(library)
                 .environmentObject(playlistStore)
                 .environmentObject(journeyStore)
+                .environmentObject(cloudStore)
         }
         .task { applyDebugLaunchRoute() }
         .task { await AppleMusicService.shared.restoreIfAuthorized() }
@@ -319,6 +331,7 @@ struct RootView: View {
         }
         if arguments.contains("-openHistory") { debugShowHistory = true }
         if arguments.contains("-openShazam") { debugShowShazam = true }
+        if arguments.contains("-openHub") { debugShowHub = true }
         if arguments.contains("-openRecap") {
             debugRecapYear = journeyStore.recapYear()
         }

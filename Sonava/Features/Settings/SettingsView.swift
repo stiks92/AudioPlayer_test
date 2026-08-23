@@ -16,6 +16,7 @@ struct SettingsView: View {
     @EnvironmentObject private var scrobble: ScrobbleStore
     @EnvironmentObject private var library: MusicLibrary
     @EnvironmentObject private var playlistStore: PlaylistStore
+    @EnvironmentObject private var cloudStore: CloudStore
     @ObservedObject private var theme = ThemeManager.shared
     @ObservedObject private var appIcon = AppIconManager.shared
     @Environment(\.dismiss) private var dismiss
@@ -25,6 +26,7 @@ struct SettingsView: View {
     @State private var mondayMixReminder = UserDefaults.standard.bool(forKey: MondayMix.reminderDefaultsKey)
     @State private var showCorrection = false
     @State private var showHistoryImport = false
+    @State private var showSourcesHub = false
     @State private var showConnectServer = false
     @State private var showEqualizer = false
     @State private var showScrobble = false
@@ -66,6 +68,16 @@ struct SettingsView: View {
                 ConnectServerView()
                     .environmentObject(serverStore)
                     .environmentObject(proStore)
+            }
+            .sheet(isPresented: $showSourcesHub) {
+                SourcesHubView()
+                    .environmentObject(library)
+                    .environmentObject(serverStore)
+                    .environmentObject(cloudStore)
+                    .environmentObject(proStore)
+                    .environmentObject(journeyStore)
+                    .environmentObject(playlistStore)
+                    .environmentObject(audio)
             }
             .sheet(isPresented: $showHistoryImport) {
                 ImportHistoryView()
@@ -419,6 +431,10 @@ struct SettingsView: View {
     private var sourcesSection: some View {
         section("Sources") {
             VStack(spacing: 0) {
+                row(icon: .shuffle, title: "All sources", value: "Hub") {
+                    showSourcesHub = true
+                }
+                divider
                 row(icon: .note, title: "Apple Music", value: appleMusicValue) {
                     Task { await AppleMusicService.shared.connect() }
                 }

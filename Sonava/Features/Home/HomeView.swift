@@ -14,6 +14,8 @@ struct HomeView: View {
     @EnvironmentObject private var proStore: ProStore
     @EnvironmentObject private var serverStore: ServerStore
     @EnvironmentObject private var journeyStore: JourneyStore
+    @EnvironmentObject private var playlistStore: PlaylistStore
+    @EnvironmentObject private var cloudStore: CloudStore
     @EnvironmentObject private var scrobble: ScrobbleStore
     @EnvironmentObject private var history: ListeningHistory
 
@@ -116,6 +118,10 @@ struct HomeView: View {
                     .environmentObject(proStore)
                     .environmentObject(serverStore)
                     .environmentObject(scrobble)
+                    .environmentObject(library)
+                    .environmentObject(playlistStore)
+                    .environmentObject(journeyStore)
+                    .environmentObject(cloudStore)
             }
             .fileImporter(isPresented: $showImportFiles,
                           allowedContentTypes: [.audio],

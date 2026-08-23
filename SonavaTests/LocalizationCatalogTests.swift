@@ -89,6 +89,10 @@ struct LocalizationCatalogTests {
             // batch above — the fifth such catch, and the reason this list
             // only ever grows.
             "Plus every self-hosted server you own searched together, and your full listening history.",
+            // The sources hub.
+            "All sources", "Plays here", "Moving in", "Your files", "Cloud drives",
+            "Full catalogue, your subscription",
+            "Playlists by pasted text · files via Yandex.Disk",
             // Day zero and the recognition screen.
             "Start here", "Import your music files", "Connect your server",
             "Bring your listening history", "Radio, right now", "What's playing?",

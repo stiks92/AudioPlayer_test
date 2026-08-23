@@ -542,6 +542,16 @@
         }
       }
     },
+    "100 million tracks with your subscription": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "100 миллионов треков с вашей подпиской"
+          }
+        }
+      }
+    },
     "A flyer from my Sonava library": {
       "localizations": {
         "ru": {
@@ -719,6 +729,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Альбомы"
+          }
+        }
+      }
+    },
+    "All sources": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Все источники"
           }
         }
       }
@@ -1079,6 +1099,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Облако"
+          }
+        }
+      }
+    },
+    "Cloud drives": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Облачные диски"
           }
         }
       }
@@ -1882,6 +1912,16 @@
         }
       }
     },
+    "From a file or pasted text": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Из файла или текста"
+          }
+        }
+      }
+    },
     "From a list": {
       "localizations": {
         "ru": {
@@ -1899,6 +1939,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "С твоего сервера"
+          }
+        }
+      }
+    },
+    "Full catalogue, your subscription": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Весь каталог — ваша подписка"
           }
         }
       }
@@ -2021,6 +2071,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Домашний сервер"
+          }
+        }
+      }
+    },
+    "Hub": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Хаб"
           }
         }
       }
@@ -2235,6 +2295,26 @@
         }
       }
     },
+    "Key saved — link import next": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ключ сохранён — импорт по ссылке следующим шагом"
+          }
+        }
+      }
+    },
+    "Key saved — player integration next": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ключ сохранён — плеер следующим шагом"
+          }
+        }
+      }
+    },
     "LIVE": {
       "localizations": {
         "ru": {
@@ -2278,6 +2358,16 @@
     },
     "ListenBrainz": {
       "shouldTranslate": false
+    },
+    "ListenBrainz · Spotify archive": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ListenBrainz · архив Spotify"
+          }
+        }
+      }
     },
     "ListenBrainz — instant": {
       "localizations": {
@@ -2531,6 +2621,16 @@
         }
       }
     },
+    "Moving in": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переезд"
+          }
+        }
+      }
+    },
     "Music recognition needs a physical device.": {
       "extractionState": "stale",
       "localizations": {
@@ -2538,6 +2638,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Распознавание работает только на реальном устройстве."
+          }
+        }
+      }
+    },
+    "MusicKit switch in App Store Connect · ~5 min": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тумблер MusicKit в App Store Connect · ~5 мин"
           }
         }
       }
@@ -2592,6 +2702,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Название (необязательно)"
+          }
+        }
+      }
+    },
+    "Navidrome, Subsonic, Airsonic": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Navidrome, Subsonic, Airsonic"
           }
         }
       }
@@ -3148,6 +3268,36 @@
         }
       }
     },
+    "Owner setup · Google Cloud key · ~10 min": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настройка владельцем · ключ Google Cloud · ~10 мин"
+          }
+        }
+      }
+    },
+    "Owner setup · developer.tidal.com · ~10 min": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настройка владельцем · developer.tidal.com · ~10 мин"
+          }
+        }
+      }
+    },
+    "Owner setup · registration check pending": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настройка владельцем · проверка кабинета"
+          }
+        }
+      }
+    },
     "PLAYING FROM ALBUM": {
       "extractionState": "stale",
       "localizations": {
@@ -3417,12 +3567,42 @@
         }
       }
     },
+    "Playlists by pasted text · files via Yandex.Disk": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Плейлисты — вставкой текста · файлы — через Яндекс.Диск"
+          }
+        }
+      }
+    },
     "Plays are being scrobbled.": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Прослушивания скробблятся."
+          }
+        }
+      }
+    },
+    "Plays here": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Играет здесь"
+          }
+        }
+      }
+    },
+    "Plays through the Spotify app · owner circle of five": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Играет через приложение Spotify · круг пяти владельца"
           }
         }
       }
@@ -3647,12 +3827,32 @@
         }
       }
     },
+    "Reconnect": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переподключить"
+          }
+        }
+      }
+    },
     "Records I live with": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Пластинки, с которыми я живу"
+          }
+        }
+      }
+    },
+    "Remote control": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пульт"
           }
         }
       }
@@ -4213,6 +4413,16 @@
         }
       }
     },
+    "Signed in — no active subscription": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вход есть — активной подписки нет"
+          }
+        }
+      }
+    },
     "Six accent themes and six app icons.": {
       "localizations": {
         "ru": {
@@ -4323,6 +4533,16 @@
         }
       }
     },
+    "SoundCloud": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SoundCloud"
+          }
+        }
+      }
+    },
     "Sources": {
       "localizations": {
         "ru": {
@@ -4355,6 +4575,16 @@
         }
       }
     },
+    "Spotify": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spotify"
+          }
+        }
+      }
+    },
     "Spotify / Apple Music": {
       "shouldTranslate": false
     },
@@ -4364,6 +4594,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Архив Spotify — глубокое прошлое"
+          }
+        }
+      }
+    },
+    "Spotify, Yandex, CSV, M3U — matched to your sources": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spotify, Яндекс, CSV, M3U — с матчем в ваши источники"
           }
         }
       }
@@ -4569,6 +4809,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "ЗА НЕДЕЛЮ"
+          }
+        }
+      }
+    },
+    "TIDAL": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TIDAL"
           }
         }
       }
@@ -4810,6 +5060,7 @@
       }
     },
     "This device has no working microphone.": {
+      "extractionState": "stale",
       "localizations": {
         "ru": {
           "stringUnit": {
@@ -5135,6 +5386,16 @@
       "comment": "A name for the user's Subsonic server.",
       "isCommentAutoGenerated": true
     },
+    "Yandex Music": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Яндекс.Музыка"
+          }
+        }
+      }
+    },
     "Yandex.Disk": {
       "comment": "Name of the provider of the Yandex.Disk cloud storage.",
       "isCommentAutoGenerated": true
@@ -5145,6 +5406,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Яндекс.Диск, Облако Mail.ru, Nextcloud или любой NAS с WebDAV. Файлы остаются вашими — Sonava их просто играет."
+          }
+        }
+      }
+    },
+    "Yandex.Disk, Mail.ru, any WebDAV": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Яндекс.Диск, Mail.ru, любой WebDAV"
           }
         }
       }
@@ -5165,6 +5436,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Прослушано"
+          }
+        }
+      }
+    },
+    "YouTube playlists": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Плейлисты YouTube"
           }
         }
       }
@@ -5453,6 +5734,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "час пик"
+          }
+        }
+      }
+    },
+    "plays": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "прослушиваний"
           }
         }
       }
