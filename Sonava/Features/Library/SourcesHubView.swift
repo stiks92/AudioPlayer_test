@@ -82,7 +82,10 @@ struct SourcesHubView: View {
                             spotifyCard
                         }
                         #endif
-                        section("Moving in", ordinal: 3) {
+                        // Release has no section 02, and a visible 01/03
+                        // numbering would read as a bug and out the cut —
+                        // so the ordinal is computed, not hard-wired.
+                        section("Moving in", ordinal: movingInOrdinal) {
                             importCard
                             historyCard
                             youtubeCard
@@ -121,6 +124,14 @@ struct SourcesHubView: View {
         .preferredColorScheme(.dark)
     }
 
+    private var movingInOrdinal: Int {
+        #if DEBUG
+        3
+        #else
+        2
+        #endif
+    }
+
     private func section(_ title: LocalizedStringKey, ordinal: Int,
                          @ViewBuilder cards: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: Space.m) {
@@ -137,7 +148,7 @@ struct SourcesHubView: View {
 
     private var filesCard: some View {
         SourceCard(glyph: .download, title: "Your files",
-                   fact: "\(library.songs.count) \(String(localized: "TRACKS"))",
+                   fact: String(localized: "\(library.songs.count) tracks"),
                    state: .connected) { showImportFiles = true }
     }
 
@@ -216,7 +227,7 @@ struct SourcesHubView: View {
         SourceCard(glyph: .restore, title: "Listening history",
                    fact: journeyStore.journey.tracks.isEmpty
                        ? String(localized: "ListenBrainz · Spotify archive")
-                       : "\(journeyStore.journey.totalPlays) \(String(localized: "plays"))",
+                       : String(localized: "\(journeyStore.journey.totalPlays) plays"),
                    state: .importOnly) { showHistoryImport = true }
     }
 

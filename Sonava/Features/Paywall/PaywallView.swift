@@ -357,6 +357,15 @@ struct PaywallView: View {
                 .font(.system(.caption2))
                 .foregroundColor(.white.opacity(0.55))
                 .multilineTextAlignment(.center)
+
+            // 3.1.2 requires both links beside any subscription offer — a
+            // guaranteed rejection without them, per the release audit.
+            HStack(spacing: Space.l) {
+                Link("Privacy Policy", destination: Links.privacyPolicy)
+                Link("Terms of Use", destination: Links.termsOfUse)
+            }
+            .font(.system(.caption2).weight(.semibold))
+            .foregroundColor(.white.opacity(0.7))
         }
     }
 }

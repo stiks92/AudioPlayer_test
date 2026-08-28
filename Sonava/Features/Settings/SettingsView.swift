@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject private var proStore: ProStore
+    @Environment(\.openURL) private var openURL
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var journeyStore: JourneyStore
     @ObservedObject private var appleMusic = AppleMusicService.shared
@@ -487,6 +488,14 @@ struct SettingsView: View {
                 divider
                 staticRow(icon: .shield, title: "Privacy",
                           value: "On-device", valueColor: Theme.textSecondary)
+                divider
+                row(icon: .shield, title: "Privacy Policy", value: nil) {
+                    openURL(Links.privacyPolicy)
+                }
+                divider
+                row(icon: .lock, title: "Terms of Use", value: nil) {
+                    openURL(Links.termsOfUse)
+                }
                 #if DEBUG
                 divider
                 Toggle(isOn: Binding(

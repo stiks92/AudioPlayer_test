@@ -20,7 +20,14 @@ and monetization are in `ROADMAP.md`.
   **Zero third-party dependencies** — SwiftUI, AVFoundation, MediaPlayer,
   ShazamKit, StoreKit 2, CryptoKit, Security.
 - **Bilingual EN/RU.** The owner communicates in **Russian**; mirror that.
-- ~75 Swift files, MVVM-ish, `@MainActor` services in the SwiftUI environment.
+- ~120 Swift files, MVVM-ish, `@MainActor` services in the SwiftUI environment.
+- **The Backroom («Подсобка»)** is the differentiator platform: on-device track
+  passports (BPM/key/sections via vDSP), headphone-correction DSP, Crate Mix
+  (DJ-style ordering with beat-matched overlaps), listening-history import +
+  year recap + share flyer, and the ownership ledger. All analysis is local.
+- **Sources hub** (Library) is the content answer: files, folder bookmarks,
+  Subsonic/Navidrome, WebDAV, Apple Music via MusicKit, playlist and
+  listening-history import. Connector policy lives in `INTEGRATIONS.md`.
 
 > **Renamed from "Aurora".** That name is taken in the App Store by a direct
 > competitor. "Sonava" was cleared against the store and trademark registries.
@@ -151,7 +158,7 @@ hand-editing target graphs is too error-prone.
 
 ## 8. Tests
 
-155 unit + 37 UI, each run in **English and Russian** via `Config/Sonava.xctestplan`.
+350+ unit + 42 UI, each run in **English and Russian** via `Config/Sonava.xctestplan`.
 
 - Unit (`SonavaTests`): import round trip, favourites/recents persistence, `Song`
   identity/coding, safe degradation of on-disk state, AI Mix intent parsing

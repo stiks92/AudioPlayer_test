@@ -45,8 +45,16 @@ final class ProStore: ObservableObject {
     private var updatesTask: Task<Void, Never>?
 
     init() {
-        // Local developer override (persists a manual unlock, e.g. from Settings in DEBUG).
+        #if DEBUG
+        // Local developer override (persists a manual unlock, from Settings).
         if UserDefaults.standard.bool(forKey: overrideKey) { isPro = true }
+        #else
+        // The audit's worst find: this key used to be honoured in Release
+        // too, and UserDefaults survives reinstalls via device backups — a
+        // phone that ever ran a debug build with the toggle on would get
+        // permanent free Pro. Release now scrubs it instead of reading it.
+        UserDefaults.standard.removeObject(forKey: overrideKey)
+        #endif
         updatesTask = listenForTransactions()
         Task {
             await loadProducts()
@@ -101,7 +109,9 @@ final class ProStore: ObservableObject {
     }
 
     func refreshEntitlements() async {
+        #if DEBUG
         if UserDefaults.standard.bool(forKey: overrideKey) { isPro = true; return }
+        #endif
         var entitled = false
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result,
@@ -124,8 +134,9 @@ final class ProStore: ObservableObject {
         }
     }
 
-    // MARK: - Developer override (DEBUG only)
+    // MARK: - Developer override (compiled out of Release entirely)
 
+    #if DEBUG
     func setDeveloperOverride(_ on: Bool) {
         UserDefaults.standard.set(on, forKey: overrideKey)
         Task { await refreshEntitlements() }
@@ -135,6 +146,7 @@ final class ProStore: ObservableObject {
     var developerOverride: Bool {
         UserDefaults.standard.bool(forKey: overrideKey)
     }
+    #endif
 
     // MARK: - Display helpers
 

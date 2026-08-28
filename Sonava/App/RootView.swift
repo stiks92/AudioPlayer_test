@@ -108,8 +108,12 @@ struct RootView: View {
         .environmentObject(proStore)
         .environmentObject(serverStore)
         .environmentObject(playlistStore)
-            .environmentObject(journeyStore)
+        .environmentObject(journeyStore)
         .environmentObject(scrobbleStore)
+        // The audit found this restore living inside a DEBUG block: in
+        // Release every relaunch showed Apple Music as disconnected. It
+        // belongs to the app, not to the debug rig.
+        .task { await AppleMusicService.shared.restoreIfAuthorized() }
         .environmentObject(cloudStore)
         .environmentObject(history)
         .preferredColorScheme(.dark)

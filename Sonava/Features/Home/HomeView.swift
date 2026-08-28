@@ -202,7 +202,7 @@ struct HomeView: View {
         if madeForYou.state == .loaded, !madeForYou.songs.isEmpty {
             VStack(alignment: .leading, spacing: Space.m) {
                 Department(title: "Monday Mix",
-                           fact: "\(madeForYou.songs.count) \(String(localized: "TRACKS"))")
+                           fact: String(localized: "\(madeForYou.songs.count) tracks").uppercased())
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(alignment: .bottom, spacing: Space.m) {
                         ForEach(Array(madeForYou.songs.enumerated()), id: \.element.id) { index, song in
@@ -518,7 +518,7 @@ extension HomeView {
 
     func weekLine(_ stats: ListeningStats) -> String {
         var parts = [String(localized: "THIS WEEK")]
-        if stats.plays > 0 { parts.append("\(stats.plays) \(String(localized: "TRACKS"))") }
+        if stats.plays > 0 { parts.append(String(localized: "\(stats.plays) tracks").uppercased()) }
         if stats.artistCount > 0 { parts.append("\(stats.artistCount) \(String(localized: "ARTISTS"))") }
         if stats.streak > 0 { parts.append("\(String(localized: "DAY")) \(stats.streak)") }
         return parts.joined(separator: " · ")

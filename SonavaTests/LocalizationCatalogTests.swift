@@ -108,6 +108,9 @@ struct LocalizationCatalogTests {
             "Applied to files and streams alike, before your own EQ. One profile for both ears for now.",
             "From a file", "From a list", "Playlist name",
             "Those credentials weren't accepted. Yandex and Mail.ru need an app password, not your account password.",
+            // The legal links App Review requires beside any subscription
+            // offer (3.1.2) — on the paywall and in Settings.
+            "Privacy Policy", "Terms of Use",
         ]
     )
     func stringsAreTranslatedToRussian(key: String) throws {
@@ -137,5 +140,35 @@ struct LocalizationCatalogTests {
         #expect(one == "1 трек")
         #expect(few == "3 трека")
         #expect(many == "5 треков")
+    }
+
+    @Test(
+        "Every count-bearing format declines in Russian",
+        arguments: [
+            // (key, the substring its many-form must contain at n = 5)
+            ("%lld plays", "прослушиваний"),
+            ("%lld tracks · %lld min", "треков"),
+            ("In your life since %@ · %lld plays", "прослушиваний"),
+        ]
+    )
+    func russianCountFormatsDecline(key: String, manyForm: String) throws {
+        let appBundle = Bundle(identifier: "com.sonava.player") ?? .main
+        let path = try #require(appBundle.path(forResource: "ru", ofType: "lproj"))
+        let russian = try #require(Bundle(path: path))
+
+        let format = russian.localizedString(forKey: key, value: nil, table: nil)
+        #expect(format != key, "\"\(key)\" is missing from the ru catalogue")
+
+        // Feed 5 into every numeric slot; a %@ slot gets a throwaway string.
+        let rendered: String
+        if key.contains("%@") {
+            rendered = String(format: format, locale: Locale(identifier: "ru_RU"), "2019", 5)
+        } else if key.components(separatedBy: "%lld").count > 2 {
+            rendered = String(format: format, locale: Locale(identifier: "ru_RU"), 5, 5)
+        } else {
+            rendered = String(format: format, locale: Locale(identifier: "ru_RU"), 5)
+        }
+        #expect(rendered.contains(manyForm),
+                "\"\(key)\" at n=5 renders \"\(rendered)\" — the many-form must decline")
     }
 }

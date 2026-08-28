@@ -285,7 +285,7 @@ struct JourneyTimelineView: View {
                         ForEach(journeyStore.timeline(), id: \.year) { entry in
                             VStack(alignment: .leading, spacing: Space.m) {
                                 Department(title: LocalizedStringKey(entry.year),
-                                           fact: "\(entry.plays) \(String(localized: "TRACKS"))")
+                                           fact: String(localized: "\(entry.plays) tracks").uppercased())
                                 VStack(alignment: .leading, spacing: 6) {
                                     ForEach(Array(entry.topArtists.enumerated()), id: \.offset) { index, artist in
                                         HStack(spacing: Space.m) {

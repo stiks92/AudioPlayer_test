@@ -13,6 +13,19 @@
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Sonava plays your Apple Music subscription inside its own player.</string>
 
+	<!-- Self-hosted servers on a home LAN are a first-class citizen here,
+	     and plain http:// on a private network is a setup the UI itself
+	     calls legitimate. ATS keeps blocking arbitrary internet http. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoadsForMedia</key>
+		<true/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Sonava connects to music servers and drives on your own network.</string>
+
 	<!-- Lets the user import their own audio files from Files / iCloud Drive
 	     and re-open them on later launches via security-scoped bookmarks. -->
 	<key>UIFileSharingEnabled</key>
@@ -40,11 +53,6 @@
 	<!-- Many internet radio streams are still delivered over plain HTTP.
 	     This exception relaxes ATS only for media loaded through AVFoundation,
 	     never for general networking (all our APIs are HTTPS). -->
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoadsForMedia</key>
-		<true/>
-	</dict>
 
 	<!-- App Store: we use no non-exempt encryption, so review never asks. -->
 	<key>ITSAppUsesNonExemptEncryption</key>

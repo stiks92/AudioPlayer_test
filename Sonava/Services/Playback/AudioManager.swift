@@ -457,7 +457,9 @@ final class AudioManager: NSObject, ObservableObject {
         // Prefer an offline copy — it plays with no network and, being a file,
         // runs through the local engine (so it gets the equalizer too).
         guard let url = downloads.localURL(for: song) ?? song.url else {
+            #if DEBUG
             print("AudioManager: missing URL for \(song.id)")
+            #endif
             return
         }
 

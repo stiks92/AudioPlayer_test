@@ -197,8 +197,8 @@ keep playing offline even if the original is moved or evicted.
 | Podcasts (RSS) | ✅ episodes | 0.8×–2× playback speed. |
 | Subsonic | ✅ full | Navidrome / Airsonic / Gonic; credentials in Keychain. |
 | ShazamKit | ⚠️ device only | Needs the capability enabled and a real mic. |
-| Apple Music (MusicKit) | ⛔ not built | The remaining content unlock. |
-| Spotify | ⛔ not built | Premium + SDK gated. |
+| Apple Music (MusicKit) | ✅ built | Full-catalogue playback with the user's subscription; DRM plays on device only, DSP honestly disabled. |
+| Spotify | 🔒 DEBUG-only | Dev-mode caps at 5 whitelisted users forever — unshippable; kept behind `#if DEBUG`. |
 
 Free full-length *mainstream* streaming does not exist legally. The app never
 implies otherwise; the honest path to a mainstream catalogue is MusicKit.
@@ -207,12 +207,12 @@ implies otherwise; the honest path to a mainstream catalogue is MusicKit.
 
 ## Tests
 
-155 unit + 37 UI tests, all green, each run in both languages.
+350+ unit + 42 UI tests, all green, each run in both languages.
 
 | Target | What it covers |
 | --- | --- |
-| `SonavaTests` | Import round trip (copy, metadata, dedupe, prune, delete), favourites/recents persistence and capping, `Song` identity and coding, safe degradation of on-disk state, AI Mix intent parsing in **English and Russian**, offline downloads, scrobble payloads, taste profile, theme palettes, listening stats (windowing, ranking, streaks, localized durations), multi-server rules and legacy migration, Siri intents, alternate-icon bundling, catalogue completeness and Russian plural rules. |
-| `SonavaUITests` | Onboarding, all five tabs, tab-state preservation, settings, empty states, playlist creation, the Files picker, Pro gating and paywall disclosure, the stats screen and its share/clear paths, multi-server switching and its Pro gate, accent + app-icon personalisation (including a relaunch round trip), and a Russian-locale pass over the same screens. |
+| `SonavaTests` | Import round trip (copy, metadata, dedupe, prune, delete), favourites/recents persistence and capping, `Song` identity and coding, safe degradation of on-disk state, AI Mix intent parsing in **English and Russian**, the stream/file EQ DSP measured in decibels, headphone-correction parsing and shelves, track passports (BPM/key/sections), Crate Mix ordering + overlap planning, listening-history import (Spotify/ListenBrainz) and the recap, the track resolver, Apple Music mapping, lyrics fallback + offline cache, offline downloads, scrobble payloads, taste profile, theme palettes, listening stats (windowing, ranking, streaks, localized durations), multi-server rules and legacy migration, Siri intents, alternate-icon bundling, catalogue completeness and Russian plural rules. |
+| `SonavaUITests` | Onboarding, all five tabs, tab-state preservation, settings, empty states, playlist creation, the Files picker, Pro gating and paywall disclosure, the stats screen and its share/clear paths, multi-server switching and its Pro gate, accent + app-icon personalisation (including a relaunch round trip), the sources hub, and a Russian-locale pass over the same screens. |
 
 UI tests find controls by **accessibility identifier** (`AccessibilityID`), never
 by visible text — text changes with the display language. Identifiers are added
