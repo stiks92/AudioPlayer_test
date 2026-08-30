@@ -128,6 +128,16 @@ final class CorrectionStore: ObservableObject {
         didSet { file.write(profile) }
     }
 
+    /// Mirrors the subscription, like `ServerStore.isPro` — set only from
+    /// RootView's single propagation point. A lapse never deletes the
+    /// installed profile: it stays on disk and on screen, it just stops
+    /// being applied until Pro returns. Hiding the data would make the gate
+    /// feel like confiscation, the same rule the servers follow.
+    @Published var isPro = false
+
+    /// What the engines actually run: the measured profile only while Pro.
+    var effectiveProfile: CorrectionProfile? { isPro ? profile : nil }
+
     private let file: JSONFileStore<CorrectionProfile?>
 
     init(filename: String = "headphone-correction.json") {

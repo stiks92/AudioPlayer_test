@@ -18,37 +18,83 @@ import UniformTypeIdentifiers
 
 struct HeadphoneCorrectionView: View {
     @EnvironmentObject private var audio: AudioManager
+    @EnvironmentObject private var proStore: ProStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var pasted = ""
     @State private var showFilePicker = false
     @State private var parseFailed = false
+    @State private var showPaywall = false
 
     var body: some View {
         NavigationStack {
             ZStack {
                 Theme.background.ignoresSafeArea()
-                ScrollView {
-                    VStack(alignment: .leading, spacing: Space.xl) {
-                        if let profile = audio.correction.profile {
-                            installed(profile)
-                        } else {
-                            importer
+                // The whole screen is Pro (the `EqualizerView` pattern). An
+                // installed profile survives a lapse on disk — the lock is on
+                // the door, not on the listener's data.
+                if proStore.isPro {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: Space.xl) {
+                            if let profile = audio.correction.profile {
+                                installed(profile)
+                            } else {
+                                importer
+                            }
                         }
+                        .padding(Space.screenMargin)
                     }
-                    .padding(Space.screenMargin)
+                } else {
+                    lockedState
                 }
             }
             .foregroundColor(.white)
             .navigationTitle("Headphone correction")
             .navigationBarTitleDisplayMode(.inline)
             .doneToolbar { dismiss() }
+            .sheet(isPresented: $showPaywall) {
+                PaywallView().environmentObject(proStore)
+            }
             .fileImporter(isPresented: $showFilePicker,
                           allowedContentTypes: [.plainText, .text, .data]) { result in
                 if case .success(let url) = result { importFile(url) }
             }
         }
         .preferredColorScheme(.dark)
+    }
+
+    // MARK: - Locked (free tier)
+
+    private var lockedState: some View {
+        VStack(spacing: Space.xl) {
+            Spacer()
+            SonavaIcon(glyph: .wave, size: 56)
+                .font(.system(size: 54, weight: .bold))
+                .foregroundColor(.white)
+                .shadow(color: Theme.accent.opacity(0.6), radius: 18)
+            Text("Headphone correction is a Pro feature")
+                .font(.system(.title2).weight(.bold))
+                .multilineTextAlignment(.center)
+            // The same pitch the importer opens with — the promise is
+            // identical on both sides of the gate.
+            Text("Studio-grade correction for your exact headphones — from a measurement of your model, not a generic bass boost.")
+                .font(.subheadline)
+                .foregroundColor(.white.opacity(0.8))
+                .multilineTextAlignment(.center)
+            Button {
+                showPaywall = true
+            } label: {
+                Text("Unlock with Sonava Pro")
+                    .font(.headline)
+                    .foregroundColor(Theme.background)
+                    .padding(.horizontal, Space.xl).padding(.vertical, Space.l)
+                    .background(Capsule().fill(Color.white))
+            }
+            .buttonStyle(BouncyButtonStyle(scale: 0.96))
+            .accessibilityIdentifier("correction.unlock")
+            Spacer()
+        }
+        .padding(Space.xxl)
     }
 
     // MARK: - Installed state
@@ -70,6 +116,7 @@ struct HeadphoneCorrectionView: View {
                 Text("Correction on").font(.system(.subheadline))
             }
             .tint(Theme.accentDeep)
+            .accessibilityIdentifier("correction.toggle")
 
             // The bands, as a quiet machine-face table — the profile is a
             // measured fact sheet, not a control surface.

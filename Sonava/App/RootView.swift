@@ -173,7 +173,7 @@ struct RootView: View {
             RecapView(year: year).environmentObject(journeyStore)
         }
         .sheet(isPresented: $debugShowCorrection) {
-            HeadphoneCorrectionView().environmentObject(audio)
+            HeadphoneCorrectionView().environmentObject(audio).environmentObject(proStore)
         }
         .sheet(isPresented: $debugShowArtist) {
             if let song = library.songs.first {
@@ -283,6 +283,8 @@ struct RootView: View {
             theme.enforceFreeIfNeeded(isPro: pro)   // don't keep a paid palette if Pro lapses
             serverStore.isPro = pro                 // extra servers stay saved, just unreachable
             cloudStore.isPro = pro                  // same rule for cloud drives
+            audio.isPro = pro                       // Crate Mix: an active plan unwinds, the queue stays
+            audio.correction.isPro = pro            // correction: the profile stays installed, just unapplied
             AppIconManager.shared.enforceFreeIfNeeded(isPro: pro)
         }
     }
@@ -392,7 +394,11 @@ struct RootView: View {
 
         if arguments.contains("-crateMix") {
             // After -demoPlay has queued the library: apply the plan so the
-            // review frame shows the chips, not just the button.
+            // review frame shows the chips, not just the button. Crate Mix is
+            // Pro now, and this task can race the onChange that mirrors the
+            // subscription into the manager — mirror it here first so the
+            // route works the moment the pro override is on.
+            audio.isPro = proStore.isPro
             audio.toggleCrateMix()
         }
         if arguments.contains("-openNowPlaying"), audio.currentSong != nil {

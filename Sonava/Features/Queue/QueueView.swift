@@ -11,7 +11,12 @@ import SwiftUI
 struct QueueView: View {
     @EnvironmentObject private var audio: AudioManager
     @EnvironmentObject private var library: MusicLibrary
+    @EnvironmentObject private var proStore: ProStore
     @Environment(\.dismiss) private var dismiss
+
+    /// Local sheet, not the global route: the queue is itself a sheet, and
+    /// the paywall has to appear above it (the `ConnectServerView` pattern).
+    @State private var showPaywall = false
 
     var body: some View {
         NavigationStack {
@@ -38,18 +43,34 @@ struct QueueView: View {
 
                     if !audio.upNext.isEmpty {
                         Button {
-                            withAnimation(Motion.expressive) { audio.toggleCrateMix() }
+                            // Crate Mix is Pro: the planner is the product,
+                            // the queue underneath it stays free either way.
+                            if proStore.isPro {
+                                withAnimation(Motion.expressive) { audio.toggleCrateMix() }
+                            } else {
+                                showPaywall = true
+                            }
                         } label: {
                             HStack(spacing: Space.s) {
                                 SonavaIcon(glyph: .shuffle, size: 14,
                                            tint: audio.isCrateMixActive ? Theme.background : Theme.accentSoft)
                                 Text("Crate Mix")
+                                if !proStore.isPro {
+                                    Text("PRO")
+                                        .font(.system(.caption2).weight(.heavy))
+                                        .foregroundColor(Theme.background)
+                                        .padding(.horizontal, 8).padding(.vertical, 3)
+                                        .background(Capsule().fill(Color.white))
+                                }
                             }
                         }
                         .buttonStyle(audio.isCrateMixActive
                                      ? AnyButtonStyle(PrimaryCapsuleButtonStyle(expands: false))
                                      : AnyButtonStyle(SecondaryCapsuleButtonStyle(expands: false)))
                         .accessibilityIdentifier("queue.crateMix")
+                        // The active state is drawn only as a fill swap, which
+                        // says nothing to VoiceOver — and nothing to a test.
+                        .accessibilityAddTraits(audio.isCrateMixActive ? [.isSelected] : [])
                         Section {
                             ForEach(audio.upNext) { song in
                                 let transition = audio.isCrateMixActive
@@ -88,6 +109,9 @@ struct QueueView: View {
                 }
             }
             .doneToolbar { dismiss() }
+            .sheet(isPresented: $showPaywall) {
+                PaywallView().environmentObject(proStore)
+            }
         }
         .presentationDetents([.large, .medium])
         .preferredColorScheme(.dark)

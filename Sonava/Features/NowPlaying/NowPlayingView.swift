@@ -19,6 +19,7 @@ struct NowPlayingView: View {
     @EnvironmentObject private var clock: PlaybackClock
     @EnvironmentObject private var library: MusicLibrary
     @EnvironmentObject private var playlistStore: PlaylistStore
+    @EnvironmentObject private var proStore: ProStore
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -85,6 +86,7 @@ struct NowPlayingView: View {
         .gesture(dismissDrag)
         .sheet(isPresented: $showQueue) {
             QueueView().environmentObject(audio).environmentObject(library)
+                .environmentObject(proStore)
         }
         .sheet(isPresented: $showLyrics) {
             LyricsView().environmentObject(audio).environmentObject(clock)

@@ -40,14 +40,14 @@ struct PaywallView: View {
     private let perks: [Perk] = [
         Perk(icon: .download, title: "Offline downloads",
              subtitle: "Save full tracks and listen with no signal.", id: "offline"),
-        Perk(icon: .equalizer, title: "10-band equalizer",
-             subtitle: "Studio presets and per-band control — on files and streams alike.", id: "eq"),
+        Perk(icon: .shuffle, title: "Crate Mix",
+             subtitle: "Your queue reordered like a DJ's crate — beat-matched where the tracks allow.", id: "cratemix"),
+        Perk(icon: .equalizer, title: "Pro sound",
+             subtitle: "10-band equalizer and headphone correction for your exact model.", id: "sound"),
         Perk(icon: .aiMix, title: "AI Mix",
              subtitle: "Describe a vibe, get an instant mix.", id: "aimix"),
         Perk(icon: .palette, title: "Make it yours",
-             subtitle: "Six accent themes and six app icons.", id: "themes"),
-        Perk(icon: .heart, title: "Support indie dev",
-             subtitle: "No ads. No tracking. Ever.", id: "indie")
+             subtitle: "Six accent themes and six app icons.", id: "themes")
     ]
 
     var body: some View {
@@ -163,6 +163,10 @@ struct PaywallView: View {
             }
             VStack(alignment: .leading, spacing: 4) {
                 Text("Plus every self-hosted server you own searched together, and your full listening history.")
+                // Was a perk row of its own; the row went to Crate Mix, which
+                // is a feature, where this is a fact about the developer —
+                // and facts belong down here with the other trust lines.
+                Text("Made by one indie dev — no ads, no tracking, ever.")
                 // Trust, stated where the money is asked for: the things
                 // competitors charge for that Sonava deliberately doesn't.
                 Text("Gapless, loudness levelling and scrobbling are free for everyone — Pro is the extras.")

@@ -86,7 +86,9 @@ struct SettingsView: View {
                     .environmentObject(library)
             }
             .sheet(isPresented: $showCorrection) {
-                HeadphoneCorrectionView().environmentObject(audio)
+                HeadphoneCorrectionView()
+                    .environmentObject(audio)
+                    .environmentObject(proStore)
             }
             .sheet(isPresented: $showEqualizer) {
                 EqualizerView(effects: audio.effects)
@@ -146,7 +148,7 @@ struct SettingsView: View {
                     SonavaIcon(glyph: .aiMix, size: 28)
                     VStack(alignment: .leading, spacing: 3) {
                         Text("Unlock Sonava Pro").font(.system(.body).weight(.bold))
-                        Text("Offline · EQ · AI Mix · themes")
+                        Text("Offline · Crate Mix · Pro sound · AI Mix")
                             .font(.caption).foregroundColor(.white.opacity(0.85))
                     }
                     Spacer()
@@ -319,7 +321,13 @@ struct SettingsView: View {
                 showEqualizer = true
             }
             divider
-            row(icon: .wave, title: "Headphone correction", value: correctionValue) {
+            // Pro since the paid zone widened; the badge says so at the door,
+            // the way the AI Mix card does on Home. The value column would
+            // read "Off" to a free user — technically true, but it implies a
+            // switch they could flip, so the badge replaces it.
+            row(icon: .wave, title: "Headphone correction",
+                value: proStore.isPro ? correctionValue : nil,
+                showsProBadge: !proStore.isPro) {
                 showCorrection = true
             }
             divider
@@ -539,6 +547,7 @@ struct SettingsView: View {
         icon: SonavaIcon.Glyph,
         title: LocalizedStringKey,
         value: LocalizedStringKey?,
+        showsProBadge: Bool = false,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
@@ -547,6 +556,14 @@ struct SettingsView: View {
                     .frame(width: Space.iconColumn, height: Space.iconColumn)
                 Text(title).font(.system(.subheadline))
                 Spacer()
+                if showsProBadge {
+                    // The Home AI Mix card's badge, at row scale.
+                    Text("PRO")
+                        .font(.system(.caption2).weight(.heavy))
+                        .foregroundColor(Theme.background)
+                        .padding(.horizontal, 8).padding(.vertical, 3)
+                        .background(Capsule().fill(Color.white))
+                }
                 if let value {
                     Text(value).font(.system(.footnote)).foregroundColor(Theme.textSecondary)
                 }

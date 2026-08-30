@@ -27,11 +27,16 @@ App Service). Without a subscription the connector states this honestly and
 the rest of the app is unaffected. Note: DRM playback does not work in the
 simulator — device only.
 
-**Pro subscription.** Sonava Pro gates convenience features (offline downloads
-of the user's own server music, EQ presets sync, accent themes, scrobbling,
-Crate Mix). Free tier is fully usable. Lifetime is a non-consumable; monthly /
-yearly are auto-renewable with an introductory trial. Privacy Policy and Terms
-of Use (Apple standard EULA) are linked on the paywall and in Settings.
+**Pro subscription.** Sonava Pro gates convenience features: offline downloads
+of the user's own server music, Crate Mix (DJ-style queue ordering), the
+10-band equalizer, headphone correction, AI Mix, accent themes and alternate
+app icons, more than one self-hosted server / cloud drive (and searching all
+servers at once), and listening stats beyond the current week. Free tier is
+fully usable: playback, one server, one cloud drive, radio, podcasts, lyrics,
+gapless, loudness levelling and scrobbling are all free. Lifetime is a
+non-consumable; monthly / yearly are auto-renewable with an introductory
+trial. Privacy Policy and Terms of Use (Apple standard EULA) are linked on
+the paywall and in Settings.
 
 **Microphone** is used only for the "what's playing" recognizer (ShazamKit),
 triggered explicitly by the user from Home. **Local network** access is used

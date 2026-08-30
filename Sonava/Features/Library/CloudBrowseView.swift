@@ -15,6 +15,7 @@ import SwiftUI
 struct CloudBrowseView: View {
     @EnvironmentObject private var cloudStore: CloudStore
     @EnvironmentObject private var audio: AudioManager
+    @EnvironmentObject private var proStore: ProStore
 
     @State private var showConnect = false
 
@@ -27,7 +28,7 @@ struct CloudBrowseView: View {
             }
         }
         .sheet(isPresented: $showConnect) {
-            ConnectCloudView().environmentObject(cloudStore)
+            ConnectCloudView().environmentObject(cloudStore).environmentObject(proStore)
         }
     }
 
@@ -198,12 +199,14 @@ struct CloudFolderView: View {
 
 struct ConnectCloudView: View {
     @EnvironmentObject private var cloudStore: CloudStore
+    @EnvironmentObject private var proStore: ProStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var provider: WebDAVService.Provider = .yandex
     @State private var address = ""
     @State private var username = ""
     @State private var password = ""
+    @State private var showPaywall = false
 
     private var canConnect: Bool {
         !username.trimmingCharacters(in: .whitespaces).isEmpty
@@ -241,17 +244,28 @@ struct ConnectCloudView: View {
                         }
 
                         Button {
-                            Task {
-                                if await cloudStore.add(provider: provider, urlString: address,
-                                                        username: username, password: password) {
-                                    dismiss()
+                            // The second drive is Pro. This used to fall
+                            // through to the store's guard, which could only
+                            // answer with an inline error — the one gate in
+                            // the app with no road to the paywall. Now the
+                            // button takes the `ConnectServerView` route.
+                            if cloudStore.canAddDrive {
+                                Task {
+                                    if await cloudStore.add(provider: provider, urlString: address,
+                                                            username: username, password: password) {
+                                        dismiss()
+                                    }
                                 }
+                            } else {
+                                showPaywall = true
                             }
                         } label: {
                             HStack {
                                 if cloudStore.isConnecting {
                                     AnimatedIcon(glyph: .loading, mode: .loop(true),
                                                  size: 20, tint: Theme.background)
+                                } else if !cloudStore.canAddDrive {
+                                    SonavaIcon(glyph: .lock, size: 16, tint: Theme.background)
                                 }
                                 Text(cloudStore.isConnecting ? "Connecting…" : "Connect")
                             }
@@ -259,6 +273,14 @@ struct ConnectCloudView: View {
                         .buttonStyle(PrimaryCapsuleButtonStyle())
                         .disabled(!canConnect)
                         .accessibilityIdentifier("cloud.submit")
+
+                        if !cloudStore.canAddDrive {
+                            // The store's own sentence, shown *before* the
+                            // listener types credentials that can't be saved.
+                            Text("Connecting more than one drive needs Sonava Pro.")
+                                .font(.footnote)
+                                .foregroundColor(Theme.textTertiary)
+                        }
 
                         Text("Your password is kept in the iPhone's Keychain and never leaves it — not in a backup, not in a shared link.")
                             .font(.system(.caption2))
@@ -271,6 +293,9 @@ struct ConnectCloudView: View {
             .navigationTitle("Connect a drive")
             .navigationBarTitleDisplayMode(.inline)
             .doneToolbar { dismiss() }
+            .sheet(isPresented: $showPaywall) {
+                PaywallView().environmentObject(proStore)
+            }
         }
         .preferredColorScheme(.dark)
     }

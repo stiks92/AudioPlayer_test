@@ -72,6 +72,19 @@ final class AudioManager: NSObject, ObservableObject {
     /// both engines must be told about every change, like the EQ.
     let correction = CorrectionStore()
 
+    /// Mirrors the subscription, like `ServerStore.isPro` — set only from
+    /// RootView's single propagation point. Crate Mix is Pro: a lapse unwinds
+    /// an active plan, but never touches the queue itself — the songs are the
+    /// listener's, only the planner is the product.
+    @Published var isPro = false {
+        didSet {
+            if !isPro && isCrateMixActive {
+                crateMixTransitions = [:]
+                isCrateMixActive = false
+            }
+        }
+    }
+
     var isLive: Bool { currentSong?.isLive ?? false }
 
     /// Speed control is only meaningful for spoken-word content (podcasts).
@@ -141,8 +154,13 @@ final class AudioManager: NSObject, ObservableObject {
         effectsCancellable = effects.$equalizer
             .sink { [weak self] settings in self?.activeEngine?.apply(settings) }
 
+        // Profile *and* subscription: correction is Pro, and a lapse must be
+        // heard (profile withheld) without the profile itself being touched.
         correctionCancellable = correction.$profile
-            .sink { [weak self] profile in self?.activeEngine?.applyCorrection(profile) }
+            .combineLatest(correction.$isPro)
+            .sink { [weak self] profile, isPro in
+                self?.activeEngine?.applyCorrection(isPro ? profile : nil)
+            }
 
         // Re-read the sleeve whenever the *track* changes (not on every
         // republish of the same song — hence the id-based dedup).
@@ -339,6 +357,12 @@ final class AudioManager: NSObject, ObservableObject {
             isCrateMixActive = false
             return
         }
+        // The Pro gate, enforced in the store as well as at the button —
+        // downloads set the precedent of call-site gating, but the planner
+        // also rewrites the queue, so a forgotten UI check must not be able
+        // to run it for a free listener. Switching an active mix *off* stays
+        // ungated above: locking the exit would be confiscation.
+        guard isPro else { return }
         let steps = CrateMix.plan(anchor: currentSong, songs: upNext) {
             PassportStore.shared.passport(for: $0.id)
         }
@@ -491,7 +515,7 @@ final class AudioManager: NSObject, ObservableObject {
         }
         engine.setVolume(volume)
         engine.apply(effects.equalizer)
-        engine.applyCorrection(correction.profile)
+        engine.applyCorrection(correction.effectiveProfile)
         // Order matters: `apply` writes the pre-amp, and the levelling is
         // summed on top of it inside the engine.
         engine.setLoudnessGain(loudness.gain(for: song, fileURL: url.isFileURL ? url : nil))
@@ -703,6 +727,14 @@ final class AudioManager: NSObject, ObservableObject {
     /// the previous case left behind.
     static func clearSavedSessionForTesting() {
         JSONFileStore<Data?>("session.json", default: nil).write(nil)
+    }
+
+    /// Sets a queue without touching an engine, so the Crate Mix gate can be
+    /// unit-tested on the shared manager without starting playback.
+    func setQueueForTesting(_ songs: [Song], index: Int = 0) {
+        queue = songs
+        baseQueue = songs
+        currentIndex = index
     }
     #endif
 
