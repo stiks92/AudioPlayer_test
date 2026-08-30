@@ -73,6 +73,29 @@ struct LocalAudioEngineTests {
         #expect(engine.duration > 0)
     }
 
+    @Test("A composed correction (profile + voicing) applies to a live graph without trapping")
+    func applyComposedCorrectionIsSafe() throws {
+        let file = try TestAudioFile.makeTone(named: "voicing-live.m4a", seconds: 1.0)
+        defer { TestAudioFile.cleanUp(file) }
+
+        let engine = LocalAudioEngine()
+        defer { engine.teardown() }
+        _ = engine.prepare(url: file, isLive: false, autoplay: false)
+
+        let profile = CorrectionProfile(name: "t", preampDB: -2, bands: [
+            CorrectionBand(kind: .peaking, frequency: 1_000, gainDB: 3, q: 1),
+        ])
+        let composed = CorrectionStore.effective(
+            profile: profile, tilt: VoicingPreset.deep.tilt, isPro: true, isBypassed: false)
+        engine.applyCorrection(composed)   // profile + both tilt shelves
+        engine.applyCorrection(nil)        // the A/B switch's bypass
+
+        // The real assertion is that neither call trapped the audio unit;
+        // spectral truth for the same filters lives in VoicingDSPTests,
+        // where the arithmetic is deterministic.
+        #expect(engine.duration > 0)
+    }
+
     @Test("Seeking past the end clamps instead of trapping")
     func seekClamps() throws {
         let file = try TestAudioFile.makeTone(named: "seek.m4a", seconds: 2.0)

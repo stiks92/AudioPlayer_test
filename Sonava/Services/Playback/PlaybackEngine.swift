@@ -97,10 +97,12 @@ final class LocalAudioEngine: PlaybackEngine {
     private var primaryIsA = true
     private var primary: AVAudioPlayerNode { primaryIsA ? playerA : playerB }
     private var standby: AVAudioPlayerNode { primaryIsA ? playerB : playerA }
-    /// 10 user bands + up to 14 correction slots (12 peaks + 2 shelves).
-    /// AVAudioUnitEQ's band count is fixed at init, so the headroom is
-    /// allocated up front and unused slots stay bypassed.
-    private static let correctionSlots = 14
+    /// 10 user bands + up to 16 correction slots: 14 for the measured
+    /// profile (12 peaks + 2 shelves) plus 2 for the voicing tilt's shelves,
+    /// which the composed profile places first so they can never fall off
+    /// the prefix. AVAudioUnitEQ's band count is fixed at init, so the
+    /// headroom is allocated up front and unused slots stay bypassed.
+    private static let correctionSlots = 16
     private let eq = AVAudioUnitEQ(numberOfBands: EqualizerBand.count + LocalAudioEngine.correctionSlots)
     private var correctionPreampDB: Double = 0
     private let timePitch = AVAudioUnitTimePitch()

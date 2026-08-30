@@ -70,12 +70,15 @@ struct CrateMixGateTests {
 struct CorrectionGateTests {
 
     private let filename = "correction-gate-test.json"
+    private let tiltFilename = "correction-gate-test-tilt.json"
 
     private func fresh() -> CorrectionStore {
         // Store files outlive runs and suites run in parallel, so this test
-        // writes its own file under its own name first.
+        // writes its own files under its own names first — the tilt file
+        // included, or another suite's voicing would leak into the matrix.
         JSONFileStore<CorrectionProfile?>(filename, default: nil).write(nil)
-        return CorrectionStore(filename: filename)
+        JSONFileStore<VoicingTilt>(tiltFilename, default: VoicingTilt()).write(VoicingTilt())
+        return CorrectionStore(filename: filename, tiltFilename: tiltFilename)
     }
 
     private var profile: CorrectionProfile {
@@ -111,5 +114,23 @@ struct CorrectionGateTests {
         // And Pro returning finds everything where it was left.
         store.isPro = true
         #expect(store.effectiveProfile == profile)
+    }
+
+    @Test("The voicing tilt rides the same Pro gate as the profile")
+    func voicingIsGated() {
+        let store = fresh()
+        store.setTilt(VoicingPreset.deep.tilt)
+
+        store.isPro = false
+        #expect(store.effectiveProfile == nil, "a free listener's engine received the voicing")
+
+        store.isPro = true
+        #expect(store.effectiveProfile?.bands == VoicingPreset.deep.tilt.bands,
+                "a Pro listener's voicing was withheld")
+
+        // The lapse keeps the tilt on disk, exactly like the profile.
+        store.isPro = false
+        #expect(store.tilt == VoicingPreset.deep.tilt,
+                "a lapse reset the listener's voicing — that is confiscation")
     }
 }

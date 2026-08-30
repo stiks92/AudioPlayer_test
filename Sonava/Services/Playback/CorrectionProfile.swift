@@ -128,6 +128,20 @@ final class CorrectionStore: ObservableObject {
         didSet { file.write(profile) }
     }
 
+    /// The voicing tilt — stage 1.5. Persisted beside the profile, in its
+    /// own file, because they are different facts with different lifetimes:
+    /// replacing the headphones' measurement must not reset the listener's
+    /// taste, and clearing the taste must not touch the measurement.
+    @Published private(set) var tilt: VoicingTilt {
+        didSet { tiltFile.write(tilt) }
+    }
+
+    /// The A/B switch: true while the listener is comparing against the
+    /// untouched sound. Deliberately NOT persisted — bypass is a comparison
+    /// instrument, not a setting, and an app relaunch must never silently
+    /// resume "off".
+    @Published private(set) var isBypassed = false
+
     /// Mirrors the subscription, like `ServerStore.isPro` — set only from
     /// RootView's single propagation point. A lapse never deletes the
     /// installed profile: it stays on disk and on screen, it just stops
@@ -135,14 +149,41 @@ final class CorrectionStore: ObservableObject {
     /// feel like confiscation, the same rule the servers follow.
     @Published var isPro = false
 
-    /// What the engines actually run: the measured profile only while Pro.
-    var effectiveProfile: CorrectionProfile? { isPro ? profile : nil }
+    /// What the engines actually run: the measured profile composed with
+    /// the voicing tilt, only while Pro, and nothing at all during A/B.
+    var effectiveProfile: CorrectionProfile? {
+        Self.effective(profile: profile, tilt: tilt, isPro: isPro, isBypassed: isBypassed)
+    }
+
+    /// The one place profile and tilt become a cascade. Static and pure so
+    /// the Combine pipeline can call it with *emitted* values — `@Published`
+    /// fires on willSet, so reading the store's properties from inside a
+    /// sink would read the past.
+    ///
+    /// The tilt's shelves go FIRST in the band list: biquads commute, but
+    /// the local engine's slot count does not — a profile long enough to
+    /// hit the prefix cap must truncate its own tail, never the tilt.
+    static func effective(profile: CorrectionProfile?, tilt: VoicingTilt,
+                          isPro: Bool, isBypassed: Bool) -> CorrectionProfile? {
+        guard isPro, !isBypassed else { return nil }
+        let base = (profile?.isEnabled == true) ? profile : nil
+        if tilt.isNeutral { return base }
+        let tiltBands = tilt.bands
+        guard base != nil || !tiltBands.isEmpty else { return nil }
+        return CorrectionProfile(name: base?.name ?? "Voicing",
+                                 preampDB: (base?.preampDB ?? 0) + tilt.preampDB,
+                                 bands: tiltBands + (base?.bands ?? []))
+    }
 
     private let file: JSONFileStore<CorrectionProfile?>
+    private let tiltFile: JSONFileStore<VoicingTilt>
 
-    init(filename: String = "headphone-correction.json") {
+    init(filename: String = "headphone-correction.json",
+         tiltFilename: String = "headphone-voicing.json") {
         file = JSONFileStore(filename, default: nil)
+        tiltFile = JSONFileStore(tiltFilename, default: VoicingTilt())
         profile = file.read()
+        tilt = tiltFile.read()
     }
 
     func install(_ profile: CorrectionProfile) {
@@ -153,6 +194,16 @@ final class CorrectionStore: ObservableObject {
         guard var current = profile else { return }
         current.isEnabled = enabled
         profile = current
+    }
+
+    /// Re-normalises through the clamping initialiser so a wild value from
+    /// any call site lands inside the shelf ranges.
+    func setTilt(_ tilt: VoicingTilt) {
+        self.tilt = VoicingTilt(bassDB: tilt.bassDB, trebleDB: tilt.trebleDB)
+    }
+
+    func setBypassed(_ bypassed: Bool) {
+        isBypassed = bypassed
     }
 
     func remove() {

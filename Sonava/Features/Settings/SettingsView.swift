@@ -416,8 +416,15 @@ struct SettingsView: View {
     }
 
     private var correctionValue: LocalizedStringKey {
-        guard let profile = audio.correction.profile else { return "Off" }
-        return profile.isEnabled ? LocalizedStringKey(profile.name) : "Off"
+        if let profile = audio.correction.profile, profile.isEnabled {
+            return LocalizedStringKey(profile.name)
+        }
+        // No measured profile (or it is switched off), but the voicing tilt
+        // still colours the sound — "Off" would be a lie.
+        if !audio.correction.tilt.isNeutral {
+            return LocalizedStringKey(VoicingPreset.matching(audio.correction.tilt)?.name ?? "Voicing")
+        }
+        return "Off"
     }
 
     private var equalizerValue: LocalizedStringKey {

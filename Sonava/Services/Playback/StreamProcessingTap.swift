@@ -202,11 +202,20 @@ final class EqualizerDSP {
         let totalDB = min(max(preamp + loudnessGainDB + correctionPreampDB, -24), 24)
         coefficients = bands
         linearGain = pow(10, Float(totalDB) / 20)
-        for channel in memory.indices {
-            memory[channel] = Array(repeating: .zero, count: bands.count)
+        // Keep the delay lines whenever the cascade keeps its shape: zeroing
+        // filter state mid-signal is itself a discontinuity, and the A/B
+        // switch must be silent apart from the change it claims to make. A
+        // cascade that changes length gets fresh state.
+        if memory.first?.count != bands.count {
+            for channel in memory.indices {
+                memory[channel] = Array(repeating: .zero, count: bands.count)
+            }
         }
-        correctionMemory = Array(repeating: Array(repeating: .zero, count: correctionBands.count),
-                                 count: max(2, memory.count))
+        if correctionMemory.count != max(2, memory.count)
+            || correctionMemory.first?.count != correctionBands.count {
+            correctionMemory = Array(repeating: Array(repeating: .zero, count: correctionBands.count),
+                                     count: max(2, memory.count))
+        }
     }
 
     // MARK: Processing (audio thread)

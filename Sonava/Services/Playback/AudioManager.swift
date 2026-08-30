@@ -119,6 +119,7 @@ final class AudioManager: NSObject, ObservableObject {
     private var isExtending = false
     private var effectsCancellable: AnyCancellable?
     private var correctionCancellable: AnyCancellable?
+    private var correctionUICancellable: AnyCancellable?
 
     // Resume last session
     private let resumeSongKey = "resume.song.v1"
@@ -154,13 +155,24 @@ final class AudioManager: NSObject, ObservableObject {
         effectsCancellable = effects.$equalizer
             .sink { [weak self] settings in self?.activeEngine?.apply(settings) }
 
-        // Profile *and* subscription: correction is Pro, and a lapse must be
-        // heard (profile withheld) without the profile itself being touched.
+        // Profile, tilt, subscription and the A/B switch: one composition
+        // point (`CorrectionStore.effective`) so the engines can never hear
+        // a different truth than the store computes. Composed from the
+        // *emitted* values — `@Published` fires on willSet, so reading the
+        // store's properties here would read the past.
         correctionCancellable = correction.$profile
-            .combineLatest(correction.$isPro)
-            .sink { [weak self] profile, isPro in
-                self?.activeEngine?.applyCorrection(isPro ? profile : nil)
+            .combineLatest(correction.$isPro, correction.$tilt, correction.$isBypassed)
+            .sink { [weak self] values in
+                let (profile, isPro, tilt, isBypassed) = values
+                self?.activeEngine?.applyCorrection(CorrectionStore.effective(
+                    profile: profile, tilt: tilt, isPro: isPro, isBypassed: isBypassed))
             }
+
+        // `correction` is a nested ObservableObject: its changes do not
+        // republish `AudioManager`, so without this the correction screen's
+        // controls and the Settings row would read yesterday's state.
+        correctionUICancellable = correction.objectWillChange
+            .sink { [weak self] _ in self?.objectWillChange.send() }
 
         // Re-read the sleeve whenever the *track* changes (not on every
         // republish of the same song — hence the id-based dedup).
