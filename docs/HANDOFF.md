@@ -187,18 +187,26 @@ hand-editing target graphs is too error-prone.
 ## 9. Open backlog
 
 ### Highest leverage next
-- **Apple Music (MusicKit)** — the honest path to a full-length mainstream
-  catalogue, the recurring "content feels thin" answer. Needs a device + the
-  MusicKit capability + entitlement (owner adds in Xcode).
-- **Streaming EQ** — `RemoteAudioEngine` plays flat. Applying the EQ to AVPlayer
-  needs an `MTAudioProcessingTap`. The local EQ, model, presets and UI are done.
-- **Crossfade / gapless** — now feasible on the AVAudioEngine base (schedule the
-  next buffer / a second player node with volume ramps).
+- **Generic crossfade** — the beat-matched A+B overlap engine exists inside
+  Crate Mix; what's missing is a user-facing "crossfade N seconds" preference
+  wired into ordinary track advance.
+- **Backroom stage 1.5** — Harman tilts + an A/B switch for headphone
+  correction (the RBJ shelf cascade is already in place).
+- **Crate Mix taste-tuning** — build a CC golden set and tune the crossing
+  parameters against it; the final listening check needs a device.
+- **Jellyfin connector** — the most-requested self-hosted protocol after
+  Subsonic; fully open API, no vendor keys.
 
 ### Larger
 - Memory/energy profiling in Instruments (device).
-- Platform extensions — Widgets, Live Activities, CarPlay, Watch (new targets).
-- Spotify connect, scrobbling (Last.fm/ListenBrainz), offline downloads, iCloud sync.
+- Platform extensions — Widgets, Live Activities, CarPlay, Watch (new targets,
+  owner adds in Xcode).
+- iCloud sync — lowered in priority: LibraryBackup already covers migration.
+
+### Shipped since this section was first written
+MusicKit full-catalogue playback, streaming EQ via `MTAudioProcessingTap`,
+gapless, scrobbling (Last.fm/ListenBrainz), offline downloads. Spotify connect
+is dead for indies (dev-mode cap) and lives in the dossier graveyard.
 
 ### Known limitations (state honestly, not bugs)
 - Shazam needs a physical device. Preview sources are 30 seconds by design.

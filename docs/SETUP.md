@@ -48,10 +48,11 @@ compiled out of Release and the flag is scrubbed on Release launch.
 
 ## 4. QA checklist (current features)
 
-- **Playback engine** — gapless album playback; crossfade; EBU R128
-  normalization; 10-band EQ **including on radio/podcast streams**; headphone
-  correction profile (import an autoeq.app export); Crate Mix ordering with
-  beat-matched overlaps (device audio check).
+- **Playback engine** — gapless album playback; EBU R128 normalization;
+  10-band EQ **including on radio/podcast streams**; headphone correction
+  profile (import an autoeq.app export); Crate Mix ordering with beat-matched
+  overlaps (device audio check) — the only crossfade in the app; there is no
+  generic "crossfade N seconds" setting for ordinary playback.
 - **Sources hub** — Library → hub: files, folder bookmarks, Subsonic/Navidrome,
   WebDAV (Яндекс.Диск / Mail.ru presets), Apple Music connect, playlist import
   (M3U/CSV/pasted text), listening-history import (Spotify export, ListenBrainz).
