@@ -44,7 +44,7 @@ final class LocalizationUITests: XCTestCase {
         let app = XCUIApplication.launched(language: "ru")
         waitFor(app.buttons["Главная"])
 
-        app.buttons["home.settings"].tap()
+        app.openHomeSettings()
         waitFor(app.navigationBars["Настройки"], "the settings screen is not translated")
 
         XCTAssertTrue(app.staticTexts["ВОСПРОИЗВЕДЕНИЕ"].exists)

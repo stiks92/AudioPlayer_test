@@ -17,7 +17,7 @@ final class EqualizerUITests: XCTestCase {
 
     private func openSettings(_ app: XCUIApplication) {
         waitFor(app.tab("Home"))
-        app.buttons["home.settings"].tap()
+        app.openHomeSettings()
         waitFor(app.navigationBars["Settings"])
     }
 

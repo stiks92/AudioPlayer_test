@@ -124,7 +124,7 @@ final class PaywallAcceptanceTests: XCTestCase {
 
     func testPaywallStatesItsTermsBeforeAskingForMoney() {
         let app = XCUIApplication.launched()
-        app.buttons["home.settings"].tap()
+        app.openHomeSettings()
         waitFor(app.navigationBars["Settings"])
 
         app.staticTexts["Unlock Sonava Pro"].tap()

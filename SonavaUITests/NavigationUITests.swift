@@ -90,7 +90,7 @@ final class NavigationUITests: XCTestCase {
         let app = XCUIApplication.launched()
         waitFor(app.tab("Home"))
 
-        app.buttons["home.settings"].tap()
+        app.openHomeSettings()
         waitFor(app.navigationBars["Settings"], "settings did not open")
 
         app.buttons["Done"].tap()

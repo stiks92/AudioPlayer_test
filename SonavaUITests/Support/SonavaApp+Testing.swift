@@ -45,6 +45,19 @@ extension XCUIApplication {
     func tab(_ name: String) -> XCUIElement {
         buttons[name].firstMatch
     }
+
+    /// Opens Settings from Home's index. The Settings row is the last entry,
+    /// and with a restored queue the floating mini-player capsule can rest
+    /// exactly over it at launch scroll position — a bare `.tap()` then lands
+    /// on the capsule and opens the player instead (XCUITest taps the row's
+    /// centre without scrolling, which no human does). One upward swipe first
+    /// clears the row; on a short Home it's a harmless rubber-band.
+    func openHomeSettings() {
+        let row = buttons["home.settings"]
+        _ = row.waitForExistence(timeout: 10)
+        swipeUp()
+        row.tap()
+    }
 }
 
 extension XCTestCase {

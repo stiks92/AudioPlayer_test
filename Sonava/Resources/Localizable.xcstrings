@@ -6100,6 +6100,806 @@
     },
     "••••••••": {
       "shouldTranslate": false
+    },
+    "Progress": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Прогресс"
+          }
+        }
+      }
+    },
+    "Headphone correction is a Pro feature": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Коррекция наушников — функция Pro"
+          }
+        }
+      }
+    },
+    "Your queue reordered like a DJ's crate — beat-matched where the tracks allow.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Очередь перестроена, как диджейский crate — с бит-матчингом там, где треки позволяют."
+          }
+        }
+      }
+    },
+    "Pro sound": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro-звук"
+          }
+        }
+      }
+    },
+    "10-band equalizer and headphone correction for your exact model.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10-полосный эквалайзер и коррекция под вашу точную модель наушников."
+          }
+        }
+      }
+    },
+    "Made by one indie dev — no ads, no tracking, ever.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сделано одним инди-разработчиком — без рекламы и трекинга. Навсегда."
+          }
+        }
+      }
+    },
+    "Offline · Crate Mix · Pro sound · AI Mix": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Офлайн · Crate Mix · Pro-звук · AI Mix"
+          }
+        }
+      }
+    },
+    "Internet Archive": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Internet Archive"
+          }
+        }
+      }
+    },
+    "Live concerts, netlabels, 78s — full tracks, no key": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Живые концерты, нетлейблы, пластинки на 78 — полные треки, без ключа"
+          }
+        }
+      }
+    },
+    "Jamendo": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jamendo"
+          }
+        }
+      }
+    },
+    "Creative Commons catalogue — full tracks": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Каталог Creative Commons — полные треки"
+          }
+        }
+      }
+    },
+    "Owner setup · free key · devportal.jamendo.com": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настройка владельца · бесплатный ключ · devportal.jamendo.com"
+          }
+        }
+      }
+    },
+    "Key saved — waiting for TIDAL to open full playback": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ключ сохранён — ждём, пока TIDAL откроет полный плейбек"
+          }
+        }
+      }
+    },
+    "Third-party apps get 30-second previews for now": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сторонним приложениям TIDAL пока даёт только 30-секундные превью"
+          }
+        }
+      }
+    },
+    "Owner setup · needs a SoundCloud Artist Pro subscription": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настройка владельца · нужна подписка SoundCloud Artist Pro"
+          }
+        }
+      }
+    },
+    "Paste a playlist link — titles matched to your sources": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вставьте ссылку на плейлист — названия найдутся в ваших источниках"
+          }
+        }
+      }
+    },
+    "Add key": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавить ключ"
+          }
+        }
+      }
+    },
+    "Service keys": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ключи сервисов"
+          }
+        }
+      }
+    },
+    "Owner keys for self-serve services. They stay on this device.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ключи владельца для self-serve сервисов. Они остаются на этом устройстве."
+          }
+        }
+      }
+    },
+    "Jamendo · Client ID": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jamendo · Client ID"
+          }
+        }
+      }
+    },
+    "Free self-serve key from devportal.jamendo.com — unlocks the Creative Commons catalogue with full playback.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Бесплатный self-serve ключ на devportal.jamendo.com — открывает каталог Creative Commons с полным воспроизведением."
+          }
+        }
+      }
+    },
+    "YouTube · API key": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YouTube · API-ключ"
+          }
+        }
+      }
+    },
+    "A Google Cloud key with YouTube Data API v3 enabled — unlocks playlist import by link. Titles only, never audio.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ключ Google Cloud с включённым YouTube Data API v3 — открывает импорт плейлистов по ссылке. Только названия, никакого аудио."
+          }
+        }
+      }
+    },
+    "TIDAL · Client ID": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TIDAL · Client ID"
+          }
+        }
+      }
+    },
+    "From developer.tidal.com — stored for the day TIDAL opens more than 30-second previews to third-party apps.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "С developer.tidal.com — хранится до дня, когда TIDAL откроет сторонним приложениям больше, чем 30-секундные превью."
+          }
+        }
+      }
+    },
+    "Save keys": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сохранить ключи"
+          }
+        }
+      }
+    },
+    "Key saved": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ключ сохранён"
+          }
+        }
+      }
+    },
+    "Paste the key": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вставьте ключ"
+          }
+        }
+      }
+    },
+    "From a YouTube link": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Из ссылки YouTube"
+          }
+        }
+      }
+    },
+    "Paste a playlist link. Sonava reads the titles and finds each track in your own sources — no audio comes from YouTube.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вставьте ссылку на плейлист. Sonava читает названия и находит каждый трек в ваших собственных источниках — аудио с YouTube не берётся."
+          }
+        }
+      }
+    },
+    "youtube.com/playlist?list=…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "youtube.com/playlist?list=…"
+          }
+        }
+      }
+    },
+    "Read the playlist": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Прочитать плейлист"
+          }
+        }
+      }
+    },
+    "Needs the owner's YouTube API key — add it once and playlist links import here.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нужен API-ключ YouTube от владельца — добавьте его один раз, и ссылки на плейлисты будут импортироваться здесь."
+          }
+        }
+      }
+    },
+    "That doesn't look like a YouTube playlist link.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Это не похоже на ссылку на плейлист YouTube."
+          }
+        }
+      }
+    },
+    "That playlist has no readable tracks — it may be private.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В этом плейлисте нет читаемых треков — возможно, он приватный."
+          }
+        }
+      }
+    },
+    "YouTube playlist": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Плейлист YouTube"
+          }
+        }
+      }
+    },
+    "Couldn't read that playlist — check the link and the key.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось прочитать плейлист — проверьте ссылку и ключ."
+          }
+        }
+      }
+    },
+    "Previews only": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Только превью"
+          }
+        }
+      }
+    },
+    "For these, only a 30-second preview exists in your sources. They save with a PREVIEW badge.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Для этих треков в ваших источниках есть только 30-секундное превью. Они сохранятся со значком PREVIEW."
+          }
+        }
+      }
+    },
+    "Jamendo · full tracks": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jamendo · полные треки"
+          }
+        }
+      }
+    },
+    "Internet Archive · full tracks": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Internet Archive · полные треки"
+          }
+        }
+      }
+    },
+    "Koofr": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koofr"
+          }
+        }
+      }
+    },
+    "Use an app password from Koofr's Preferences → Password — not your account password.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Используйте пароль приложения из настроек Koofr (Preferences → Password) — не пароль от аккаунта."
+          }
+        }
+      }
+    },
+    "Voicing": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Характер"
+          }
+        }
+      }
+    },
+    "A gentle bass and treble tilt — over the measured profile, or on its own.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Мягкий наклон баса и высоких — поверх измеренного профиля или сам по себе."
+          }
+        }
+      }
+    },
+    "Warm": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тёплый"
+          }
+        }
+      }
+    },
+    "Bright": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Яркий"
+          }
+        }
+      }
+    },
+    "Deep": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Глубокий"
+          }
+        }
+      }
+    },
+    "Bass": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Бас"
+          }
+        }
+      }
+    },
+    "Treble": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Высокие"
+          }
+        }
+      }
+    },
+    "Compare": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сравнение"
+          }
+        }
+      }
+    },
+    "Before": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "До"
+          }
+        }
+      }
+    },
+    "After": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "После"
+          }
+        }
+      }
+    },
+    "“Before” is the untouched sound — no profile, no voicing. It resets when you close this screen.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„До“ — звук без обработки: ни профиля, ни характера. Сбрасывается при закрытии экрана."
+          }
+        }
+      }
+    },
+    "Subsonic": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subsonic"
+          }
+        }
+      }
+    },
+    "Jellyfin": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jellyfin"
+          }
+        }
+      }
+    },
+    "Jellyfin · Navidrome · Funkwhale — Subsonic & Jellyfin servers": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jellyfin · Navidrome · Funkwhale — серверы Subsonic и Jellyfin"
+          }
+        }
+      }
+    },
+    "Works with Jellyfin, Navidrome, Airsonic, Gonic and any Subsonic-compatible server.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Работает с Jellyfin, Navidrome, Airsonic, Gonic и любым Subsonic-совместимым сервером."
+          }
+        }
+      }
+    },
+    "Stream your own library straight from Jellyfin, Navidrome, Airsonic or any Subsonic-compatible server.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Стримьте собственную библиотеку прямо с Jellyfin, Navidrome, Airsonic или любого Subsonic-совместимого сервера."
+          }
+        }
+      }
+    },
+    "Connect a Jellyfin, Navidrome, Airsonic or Subsonic server in Settings and your whole library appears here.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключите сервер Jellyfin, Navidrome, Airsonic или Subsonic в настройках — и вся ваша библиотека появится здесь."
+          }
+        }
+      }
+    },
+    "Stop": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Остановить"
+          }
+        }
+      }
+    },
+    "Stations": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Станции"
+          }
+        }
+      }
+    },
+    "Volume": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Громкость"
+          }
+        }
+      }
+    },
+    "Favourite station": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Любимая станция"
+          }
+        }
+      }
+    },
+    "Add to favourites": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В любимые"
+          }
+        }
+      }
+    },
+    "Remove favourite": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Убрать из любимых"
+          }
+        }
+      }
+    },
+    "CONNECTING…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ПОДКЛЮЧЕНИЕ…"
+          }
+        }
+      }
+    },
+    "BUFFERING…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "БУФЕРИЗАЦИЯ…"
+          }
+        }
+      }
+    },
+    "SIGNAL LOST": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "СИГНАЛ ПОТЕРЯН"
+          }
+        }
+      }
+    },
+    "TUNED OUT": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "НЕ В ЭФИРЕ"
+          }
+        }
+      }
+    },
+    "Connecting": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключаюсь"
+          }
+        }
+      }
+    },
+    "Buffering": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Буферизация"
+          }
+        }
+      }
+    },
+    "On air": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В эфире"
+          }
+        }
+      }
+    },
+    "Signal lost": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сигнал потерян"
+          }
+        }
+      }
+    },
+    "Tuned out": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не в эфире"
+          }
+        }
+      }
+    },
+    "Air": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эфир"
+          }
+        }
+      }
+    },
+    "Previous station": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Предыдущая станция"
+          }
+        }
+      }
+    },
+    "Next station": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Следующая станция"
+          }
+        }
+      }
+    },
+    "Now playing: %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сейчас: %@"
+          }
+        }
+      }
+    },
+    "ON AIR · IN TUNE %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В ЭФИРЕ · НА ВОЛНЕ %@"
+          }
+        }
+      }
     }
   },
   "version": "1.1"
