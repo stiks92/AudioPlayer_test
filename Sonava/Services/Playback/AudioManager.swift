@@ -277,6 +277,19 @@ final class AudioManager: NSObject, ObservableObject {
         return Array(queue[start...])
     }
 
+    /// The track a backward step would land on: the one before the current,
+    /// wrapping to the tail of the queue from the first — the same arithmetic
+    /// `previous()` uses, so the left-hand peek behind the player's lens never
+    /// promises a record the swipe won't deliver. (Past the 3-second mark
+    /// `previous()` restarts the current track first; the destination once it
+    /// does step back is still this one.)
+    var previousSong: Song? {
+        guard !queue.isEmpty else { return nil }
+        let index = currentIndex > 0 ? currentIndex - 1 : queue.count - 1
+        guard queue.indices.contains(index) else { return nil }
+        return queue[index]
+    }
+
     func playNext(_ song: Song) {
         guard !queue.isEmpty else { play(song, in: [song]); return }
         queue.insert(song, at: min(currentIndex + 1, queue.count))

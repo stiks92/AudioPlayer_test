@@ -20,9 +20,17 @@ struct NowPlayingView: View {
     @EnvironmentObject private var library: MusicLibrary
     @EnvironmentObject private var playlistStore: PlaylistStore
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     @State private var scrubValue: Double = 0
     @State private var isScrubbing = false
     @State private var dragOffset: CGFloat = 0
+    /// The record's interactive horizontal offset while a swipe is in flight.
+    @State private var artDragX: CGFloat = 0
+    /// The axis a drag on the artwork committed to with its first movement.
+    /// Locked for the life of the gesture: a drag that starts vertical is a
+    /// dismissal even if the finger later wanders sideways, and vice versa.
+    @State private var artworkDragAxis: ArtworkDragAxis?
     @State private var showQueue = false
     @State private var showLyrics = false
     @State private var showSleepOptions = false
@@ -144,9 +152,12 @@ struct NowPlayingView: View {
     /// carousel implies depth. Replaces the full-bleed square sleeve.
     private var artwork: some View {
         ZStack {
-            // Neighbours peek out from behind the lens.
+            // Neighbours peek out from behind the lens: the records a swipe
+            // would actually land on. Left is the *previous* track — the
+            // promise a rightward swipe keeps — right is the next. They lean
+            // slightly with the drag so the carousel reads as one row.
             HStack {
-                if let left = audio.upNext.dropFirst().first {
+                if let left = audio.previousSong {
                     ArtworkImage(song: left, glyphSize: 20)
                         .frame(width: 108, height: 108).clipShape(Circle())
                         .offset(x: -46).opacity(0.85)
@@ -158,6 +169,7 @@ struct NowPlayingView: View {
                         .offset(x: 46).opacity(0.85)
                 }
             }
+            .offset(x: artDragX * 0.3)
             // The lens.
             Circle().fill(.ultraThinMaterial)
                 .frame(width: 316, height: 316)
@@ -167,8 +179,11 @@ struct NowPlayingView: View {
             // reference dresses it: a luminous gradient trail from the track's
             // own palette into white, glowing softly, with a bright head at
             // its tip. When the duration is the unknown-sentinel (== 1) the
-            // arc draws nothing rather than a lie.
-            let arcProgress = clock.duration > 1 ? clock.progress : 0
+            // arc draws nothing rather than a lie. While a finger holds the
+            // ring the arc draws the finger, not the clock — the head must
+            // never fight its own hand.
+            let arcProgress = isScrubbing ? scrubValue
+                            : (clock.duration > 1 ? clock.progress : 0)
             Circle().stroke(.white.opacity(0.10), lineWidth: 4)
                 .frame(width: 272, height: 272)
             Circle().trim(from: 0, to: max(0.003, arcProgress))
@@ -192,7 +207,8 @@ struct NowPlayingView: View {
                     .shadow(color: .white.opacity(0.9), radius: 6)
                     .offset(x: 136 * cos(theta), y: 136 * sin(theta))
             }
-            // The record itself.
+            // The record itself. It follows the finger sideways: the swipe
+            // that changes tracks is this offset made honest.
             if let song {
                 ArtworkImage(song: song, glyphSize: 54)
                     .frame(width: 224, height: 224)
@@ -200,14 +216,62 @@ struct NowPlayingView: View {
                     .overlay(Circle().strokeBorder(.white.opacity(0.2), lineWidth: 1))
                     .opacity(audio.isPlaying ? 1 : 0.75)
                     .animation(Motion.fade, value: audio.isPlaying)
+                    .offset(x: artDragX)
+                    .accessibilityElement()
+                    .identified(AccessibilityID.playerDisc, label: "Now Playing")
+                    .accessibilityValue(Text(verbatim: song.title))
             }
-            Text((clock.duration - clock.currentTime).asClock)
+            // While scrubbing this is the destination, not the countdown —
+            // the number the finger is choosing, seated in the glass.
+            Text(isScrubbing ? (scrubValue * clock.duration).asClock
+                             : (clock.duration - clock.currentTime).asClock)
                 .font(.footnote.weight(.medium).monospacedDigit())
                 .foregroundColor(.white.opacity(0.85))
                 .offset(y: 122)
+            // The scrub surface: an invisible donut over the arc. It sits on
+            // top of everything so the ring always belongs to seeking, while
+            // its hole leaves the record to the carousel. minimumDistance: 0
+            // captures the touch before the root dismiss gesture's 10pt
+            // threshold can.
+            ringScrubSurface
         }
         .frame(maxWidth: .infinity)
         .frame(height: 360)
+        .contentShape(Rectangle())
+        .gesture(artworkDrag)
+    }
+
+    /// Whether the ring can honestly seek: live streams cannot, and a
+    /// duration of 0 (live sentinel) or 1 (unknown sentinel) has no timeline
+    /// to scrub — the same condition that keeps the arc from drawing a lie.
+    private var canScrubRing: Bool { clock.duration > 1 && !audio.isLive }
+
+    /// The displayed position, for VoiceOver: the finger's while it holds the
+    /// ring, the clock's otherwise.
+    private var ringProgressForAccessibility: Double {
+        isScrubbing ? scrubValue : clock.progress
+    }
+
+    private var ringScrubSurface: some View {
+        Circle()
+            .fill(Color.clear)
+            .frame(width: 316, height: 316)
+            .contentShape(RingHitShape(ringRadius: 136, hitWidth: Space.hitTarget),
+                          eoFill: true)
+            .gesture(ringScrubGesture, isEnabled: canScrubRing)
+            .accessibilityElement()
+            .identified(AccessibilityID.playerRing, label: "Progress")
+            .accessibilityValue(Text(verbatim:
+                "\(Int((ringProgressForAccessibility * 100).rounded()))%"))
+            .accessibilityAdjustableAction { direction in
+                guard canScrubRing else { return }
+                let step: Double = direction == .increment ? 0.05 : -0.05
+                let target = min(max(clock.progress + step, 0), 1)
+                audio.seek(to: target * clock.duration)
+            }
+            // A seek control on a live stream would be a lie told to
+            // VoiceOver specifically; the element withdraws instead.
+            .accessibilityHidden(!canScrubRing)
     }
 
     /// "In your life since 2014 · 312 plays" — the imported biography's
@@ -492,21 +556,116 @@ struct NowPlayingView: View {
 
     // MARK: - Drag to dismiss
 
+    /// The dismiss handlers stand alone so two gestures can share them: the
+    /// root drag below, and the vertical branch of the artwork drag — a pull
+    /// down that happens to start on the record must close the player exactly
+    /// like a pull down anywhere else.
+    private func dismissDragChanged(_ value: DragGesture.Value) {
+        if value.translation.height > 0 {
+            dragOffset = value.translation.height
+        }
+    }
+
+    private func dismissDragEnded(_ value: DragGesture.Value) {
+        if value.translation.height > 140 {
+            onClose()
+        }
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            dragOffset = 0
+        }
+    }
+
     private var dismissDrag: some Gesture {
         DragGesture()
+            .onChanged { dismissDragChanged($0) }
+            .onEnded { dismissDragEnded($0) }
+    }
+
+    // MARK: - Ring scrubbing
+
+    /// Finger on the arc → position in the track. The donut's `contentShape`
+    /// keeps this to the ring; the geometry lives in `RingScrubberGeometry`
+    /// so it is testable as arithmetic.
+    private var ringScrubGesture: some Gesture {
+        DragGesture(minimumDistance: 0)
             .onChanged { value in
-                if value.translation.height > 0 {
-                    dragOffset = value.translation.height
+                guard canScrubRing else { return }
+                let center = CGPoint(x: 158, y: 158)   // the 316pt surface's middle
+                guard let raw = RingScrubberGeometry.progress(at: value.location,
+                                                              center: center) else { return }
+                if isScrubbing {
+                    scrubValue = RingScrubberGeometry.resolved(raw: raw,
+                                                               previous: scrubValue)
+                } else {
+                    isScrubbing = true
+                    scrubValue = raw
+                    Haptics.selection()
+                }
+            }
+            .onEnded { _ in
+                guard isScrubbing else { return }
+                audio.seek(to: scrubValue * clock.duration)
+                isScrubbing = false
+            }
+    }
+
+    // MARK: - Artwork swipe (carousel / dismiss)
+
+    private enum ArtworkDragAxis { case horizontal, vertical }
+
+    /// One gesture, two meanings, decided once. The first movement picks the
+    /// axis and the gesture keeps it: mostly-horizontal drags drive the track
+    /// carousel, anything else delegates to the dismiss handlers so the
+    /// pull-down keeps working from the record itself.
+    private var artworkDrag: some Gesture {
+        DragGesture(minimumDistance: 12)
+            .onChanged { value in
+                let axis = artworkDragAxis
+                    ?? (abs(value.translation.width) > abs(value.translation.height)
+                        ? .horizontal : .vertical)
+                artworkDragAxis = axis
+                switch axis {
+                case .horizontal: artDragX = value.translation.width
+                case .vertical: dismissDragChanged(value)
                 }
             }
             .onEnded { value in
-                if value.translation.height > 140 {
-                    onClose()
-                }
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                    dragOffset = 0
+                let axis = artworkDragAxis
+                artworkDragAxis = nil
+                switch axis {
+                case .horizontal: endArtworkSwipe(value)
+                case .vertical, nil: dismissDragEnded(value)
                 }
             }
+    }
+
+    private func endArtworkSwipe(_ value: DragGesture.Value) {
+        let width = value.translation.width
+        // Either a real displacement or a flick: a short, fast swipe is the
+        // most common way people actually skip tracks.
+        let commits = abs(width) > 60 || abs(value.velocity.width) > 500
+        guard commits, audio.currentSong != nil else {
+            withAnimation(Motion.standard) { artDragX = 0 }
+            return
+        }
+        Haptics.selection()
+        let forward = width < 0    // leftward swipe pushes the row left → next
+        if reduceMotion {
+            // No transit: the record changes in place (PlayerShell's pattern).
+            artDragX = 0
+            if forward { audio.next() } else { audio.previous() }
+            return
+        }
+        // The record leaves in the direction of the throw, the incoming one
+        // arrives from the other side — the neighbours made literal.
+        let exit: CGFloat = forward ? -340 : 340
+        withAnimation(Motion.standard, completionCriteria: .logicallyComplete) {
+            artDragX = exit
+        } completion: {
+            if forward { audio.next() } else { audio.previous() }
+            artDragX = -exit
+            withAnimation(Motion.standard) { artDragX = 0 }
+        }
     }
 }
 

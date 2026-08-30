@@ -25,6 +25,13 @@ enum AccessibilityID {
 
     static let miniPlayer = "player.mini"
     static let playPauseButton = "player.playPause"
+    /// The circular progress ring around the record — the seek control.
+    static let playerRing = "player.ring"
+    /// The record itself: swipe left/right to change track, down to dismiss.
+    /// ("player.artwork" is taken — it is the matched-geometry id in
+    /// `PlayerTransition`, which is a different namespace, but two meanings
+    /// for one string is how tests end up matching the wrong thing.)
+    static let playerDisc = "player.disc"
 
     static let eqEnable = "eq.enable"
 
