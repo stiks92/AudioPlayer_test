@@ -116,6 +116,65 @@ struct PlaylistSharingTests {
         #expect(payload.contains("music.home.arpa"))   // host only, no auth
     }
 
+    /// A Jellyfin track exactly as `JellyfinService.map` builds one: the same
+    /// `.subsonic` source (their own server), a `jellyfin:` id prefix, and a
+    /// stream URL that carries the session token in `api_key`.
+    private func jellyfinSong() -> Song {
+        Song(
+            id: "jellyfin:F1E2-LOCAL-UUID:842",
+            title: "Dreams", artist: "Fleetwood Mac", album: "Rumours",
+            source: .subsonic,
+            artworkURL: URL(string: "https://jf.home.arpa/Items/842/Images/Primary?fillWidth=512&api_key=tok-SECRET"),
+            streamURL: URL(string: "https://jf.home.arpa/Audio/842/universal?UserId=user-1&api_key=tok-SECRET"),
+            gradientHex: Palette.hex(for: 0),
+            durationSeconds: 257)
+    }
+
+    @Test("A Jellyfin track travels as identity only — the session token never leaves")
+    func jellyfinLinkCarriesNoToken() throws {
+        let link = try #require(PlaylistSharing.link(for:
+            UserPlaylist(name: "Media box", tracks: [jellyfinSong()])))
+        let encoded = try #require(URLComponents(url: link, resolvingAgainstBaseURL: false)?
+            .queryItems?.first(where: { $0.name == "d" })?.value)
+        var padded = encoded.replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        while padded.count % 4 != 0 { padded.append("=") }
+        let payload = String(data: try #require(Data(base64Encoded: padded)), encoding: .utf8) ?? ""
+
+        for secret in ["tok-SECRET", "api_key", "user-1", "/Audio/"] {
+            #expect(!payload.contains(secret), "the payload leaks \(secret)")
+        }
+        // Identity still travels: host + the server's own track id, so the
+        // recipient's own connection to that box can rebuild it.
+        #expect(payload.contains("jf.home.arpa"))
+        #expect(payload.contains("842"))
+        #expect(payload.contains("Fleetwood Mac"))
+    }
+
+    @Test("A Jellyfin track re-resolves through the recipient's own connection")
+    func jellyfinTrackWithResolver() throws {
+        let link = try #require(PlaylistSharing.link(for:
+            UserPlaylist(name: "Media box", tracks: [jellyfinSong()])))
+        var seenHost: String?
+        var seenID: String?
+        let decoded = try #require(PlaylistSharing.playlist(from: link, resolver: {
+            host, trackID, title, artist, album, duration in
+            seenHost = host; seenID = trackID
+            // What `ServerStore.resolveSharedTrack` mints for a Jellyfin
+            // connection to that host.
+            return Song(id: "jellyfin:MY-UUID:\(trackID)", title: title, artist: artist,
+                        album: album, source: .subsonic,
+                        streamURL: URL(string: "https://jf.home.arpa/Audio/\(trackID)/universal?api_key=my-own"),
+                        gradientHex: Palette.hex(for: 1), durationSeconds: duration)
+        }))
+
+        #expect(seenHost == "jf.home.arpa")
+        #expect(seenID == "842")
+        let track = try #require(decoded.tracks.first)
+        #expect(track.id == "jellyfin:MY-UUID:842")
+        #expect(track.streamURL?.absoluteString.contains("my-own") == true)
+    }
+
     @Test("A server track imports unplayable when the recipient has no such server")
     func serverTrackWithoutResolver() throws {
         let link = try #require(PlaylistSharing.link(for:

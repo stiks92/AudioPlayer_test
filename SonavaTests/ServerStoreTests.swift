@@ -23,8 +23,12 @@ struct ServerStoreTests {
 
     private func makeStore(pro: Bool = false) -> ServerStore {
         let file = JSONFileStore<[ServerConnection]>(Self.filename, default: [])
-        // Leave no passwords behind from an earlier run.
-        for connection in file.read() { _ = Keychain.delete(ServerStore.passwordKey(connection.id)) }
+        // Leave no credentials behind from an earlier run — passwords and
+        // Jellyfin tokens alike.
+        for connection in file.read() {
+            _ = Keychain.delete(ServerStore.passwordKey(connection.id))
+            _ = Keychain.delete(ServerStore.tokenKey(connection.id))
+        }
         file.write([])
         UserDefaults.standard.removeObject(forKey: "server.active.v2")
         let store = ServerStore(store: file)
@@ -179,6 +183,90 @@ struct ServerStoreTests {
         let store = makeStore()
         let results = try await store.search("anything")
         #expect(results.isEmpty)
+    }
+
+    // MARK: - Protocols on one rack
+
+    @Test("A record saved before `kind` existed decodes as Subsonic, never as nothing")
+    func legacyRecordDecodesAsSubsonic() throws {
+        // Byte-for-byte what the pre-Jellyfin build wrote to servers.json.
+        let legacy = """
+        [{"id":"OLD-1","label":"Home server","urlString":"https://music.home.arpa","username":"me"}]
+        """
+        let decoded = try JSONDecoder().decode([ServerConnection].self, from: Data(legacy.utf8))
+        #expect(decoded.count == 1)
+        #expect(decoded[0].kind == .subsonic)
+        #expect(decoded[0].jellyfinUserID == nil)
+        #expect(decoded[0].username == "me")
+    }
+
+    @Test("A Jellyfin connection round-trips its kind and user id through JSON")
+    func jellyfinRecordRoundTrips() throws {
+        let connection = ServerConnection(id: "JF-1", label: "Media box",
+                                          urlString: "https://jf.home.arpa",
+                                          username: "alice", kind: .jellyfin,
+                                          jellyfinUserID: "user-1")
+        let data = try JSONEncoder().encode([connection])
+        let decoded = try JSONDecoder().decode([ServerConnection].self, from: data)
+        #expect(decoded[0].kind == .jellyfin)
+        #expect(decoded[0].jellyfinUserID == "user-1")
+    }
+
+    @Test("The factory builds the client each connection's kind names")
+    func factoryFollowsKind() {
+        let store = makeStore(pro: true)
+        store.save(url: url("music.example.com"), username: "a", password: "pw")
+        store.save(url: url("jelly.example.com"), username: "b", password: "pw",
+                   kind: .jellyfin, jellyfinUserID: "user-1", jellyfinToken: "tok-1")
+
+        #expect(store.service(for: store.servers[0]) is SubsonicService)
+        #expect(store.service(for: store.servers[1]) is JellyfinService)
+        #expect(store.service(for: store.servers[1])?.username == "b")
+        // Two protocols must not be able to mint colliding track ids either.
+        #expect(store.service(for: store.servers[0])?.libraryID
+                != store.service(for: store.servers[1])?.libraryID)
+        store.removeAll()
+    }
+
+    @Test("A Jellyfin connection without its token yields no service, not a broken one")
+    func jellyfinWithoutTokenIsUnbuildable() {
+        let store = makeStore(pro: true)
+        store.save(url: url("jelly.example.com"), username: "b", password: "pw",
+                   kind: .jellyfin, jellyfinUserID: "user-1", jellyfinToken: nil)
+        #expect(store.service(for: store.servers[0]) == nil)
+        store.removeAll()
+    }
+
+    @Test("Removing a Jellyfin server forgets its token along with its password")
+    func removalForgetsToken() {
+        let store = makeStore(pro: true)
+        store.save(url: url("jelly.example.com"), username: "b", password: "pw",
+                   kind: .jellyfin, jellyfinUserID: "user-1", jellyfinToken: "tok-9")
+        let connection = store.servers[0]
+        #expect(Keychain.get(ServerStore.tokenKey(connection.id)) == "tok-9")
+
+        store.remove(connection)
+
+        #expect(Keychain.get(ServerStore.tokenKey(connection.id)) == nil,
+                "the token outlived the connection")
+        #expect(Keychain.get(ServerStore.passwordKey(connection.id)) == nil)
+    }
+
+    @Test("A shared track re-resolves against a Jellyfin host with this listener's own session")
+    func sharedTrackResolvesThroughJellyfin() {
+        let store = makeStore(pro: true)
+        store.save(url: url("jelly.example.com"), username: "b", password: "pw",
+                   kind: .jellyfin, jellyfinUserID: "user-1", jellyfinToken: "tok-1")
+
+        let song = store.resolveSharedTrack(host: "jelly.example.com", trackID: "tr-9",
+                                            title: "T", artist: "A", album: "B",
+                                            duration: 120)
+
+        #expect(song?.id == "jellyfin:\(store.servers[0].id):tr-9")
+        #expect(song?.source == .subsonic)
+        #expect(song?.streamURL?.path == "/Audio/tr-9/universal")
+        #expect(song?.streamURL?.query?.contains("api_key=tok-1") == true)
+        store.removeAll()
     }
 
     // MARK: - Migration

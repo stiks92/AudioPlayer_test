@@ -2,7 +2,8 @@
 //  ConnectServerView.swift
 //  Sonava
 //
-//  Manage self-hosted Subsonic-compatible servers (Navidrome, Airsonic…).
+//  Manage self-hosted servers — Subsonic-compatible (Navidrome, Airsonic…)
+//  and Jellyfin, side by side on one rack.
 //  One connection is free; several — and searching them all at once — is Pro.
 //
 //  A design review named what was wrong with this screen better than a list of
@@ -232,7 +233,7 @@ struct ConnectServerView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("No server connected")
                 .font(.system(.body).weight(.bold))
-            Text("Stream your own library straight from Navidrome, Airsonic or any Subsonic-compatible server.")
+            Text("Stream your own library straight from Jellyfin, Navidrome, Airsonic or any Subsonic-compatible server.")
                 .font(.footnote)
                 .foregroundColor(Theme.textSecondary)
         }
@@ -271,7 +272,7 @@ struct ConnectServerView: View {
 
     private var infoNote: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("Works with Navidrome, Airsonic, Gonic and any Subsonic-compatible server.", systemImage: "info.circle")
+            Label("Works with Jellyfin, Navidrome, Airsonic, Gonic and any Subsonic-compatible server.", systemImage: "info.circle")
             Label("Your password is stored securely in the Keychain and only used to sign requests to your server.", systemImage: "lock.shield")
             if !proStore.isPro {
                 Label {
@@ -355,6 +356,7 @@ struct AddServerView: View {
     @EnvironmentObject private var serverStore: ServerStore
     @Environment(\.dismiss) private var dismiss
 
+    @State private var kind: ServerKind = .subsonic
     @State private var urlString = ""
     @State private var username = ""
     @State private var password = ""
@@ -367,6 +369,19 @@ struct AddServerView: View {
                 Theme.background.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: Space.l) {
+                        // Which protocol the box speaks. The fields below are
+                        // identical either way — address, login, password —
+                        // so the choice is one segment, not a second screen.
+                        // Brand names, not translated.
+                        SegmentedControl(
+                            segments: [
+                                .init(value: ServerKind.subsonic, title: "Subsonic",
+                                      identifier: "server.kind.subsonic"),
+                                .init(value: ServerKind.jellyfin, title: "Jellyfin",
+                                      identifier: "server.kind.jellyfin"),
+                            ],
+                            selection: $kind)
+
                         field("Server URL", text: $urlString,
                               placeholder: "https://music.example.com", keyboard: .URL)
                         field("Username", text: $username, placeholder: "Username")
@@ -415,7 +430,7 @@ struct AddServerView: View {
         isConnecting = true
         Task {
             let ok = await serverStore.add(urlString: urlString, username: username,
-                                           password: password, label: label)
+                                           password: password, label: label, kind: kind)
             isConnecting = false
             if ok { dismiss() }
         }

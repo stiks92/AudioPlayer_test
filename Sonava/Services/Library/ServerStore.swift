@@ -2,8 +2,11 @@
 //  ServerStore.swift
 //  Sonava
 //
-//  The user's self-hosted (Subsonic) libraries. Non-secret config lives in a
-//  JSON file; every password lives in the Keychain under its connection's id.
+//  The user's self-hosted libraries — Subsonic and Jellyfin alike. Non-secret
+//  config lives in a JSON file; every password (and Jellyfin access token)
+//  lives in the Keychain under its connection's id. Each connection names its
+//  protocol in `kind`, and `service(for:)` builds the matching client behind
+//  the one `MusicServerService` face the rest of the app talks to.
 //
 //  One connection is free. Connecting several — a home server and a NAS, work
 //  and home, yours and a friend's — is a Sonava Pro perk, and Pro also searches
@@ -15,12 +18,24 @@ import SwiftUI
 import Combine
 
 /// One saved server. The password is deliberately absent — it is in the
-/// Keychain, keyed by `id`.
+/// Keychain, keyed by `id` (and for Jellyfin, so is the access token).
 struct ServerConnection: Identifiable, Codable, Equatable, Sendable {
     let id: String
     var label: String
     var urlString: String
     var username: String
+    /// Which protocol the box speaks. Absent from every record written
+    /// before Jellyfin existed, and those must all read back as `.subsonic`
+    /// — see `init(from:)`.
+    var kind: ServerKind = .subsonic
+    /// Jellyfin's user id, handed out at sign-in and needed on most of its
+    /// routes. Nil for Subsonic. Not a secret — the token is the secret,
+    /// and it lives in the Keychain.
+    var jellyfinUserID: String? = nil
+
+    enum CodingKeys: String, CodingKey {
+        case id, label, urlString, username, kind, jellyfinUserID
+    }
 
     var url: URL? { URL(string: urlString) }
     /// What the UI shows: the host, falling back to whatever was typed.
@@ -46,6 +61,23 @@ struct ServerConnection: Identifiable, Codable, Equatable, Sendable {
     var addressLine: String {
         guard let scheme = url?.scheme?.lowercased() else { return host }
         return "\(scheme)://\(host)"
+    }
+}
+
+extension ServerConnection {
+    /// Custom decoding for one reason only: every record on disk from before
+    /// the second protocol existed has no `kind`, and each of them *is* a
+    /// Subsonic connection. A synthesized decoder would throw on the missing
+    /// key and silently empty the user's saved rack — the exact category of
+    /// loss this app treats as unforgivable.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        label = try container.decode(String.self, forKey: .label)
+        urlString = try container.decode(String.self, forKey: .urlString)
+        username = try container.decode(String.self, forKey: .username)
+        kind = try container.decodeIfPresent(ServerKind.self, forKey: .kind) ?? .subsonic
+        jellyfinUserID = try container.decodeIfPresent(String.self, forKey: .jellyfinUserID)
     }
 }
 
@@ -131,14 +163,26 @@ final class ServerStore: ObservableObject {
     var canAddServer: Bool { isPro || servers.count < Self.freeLimit }
 
     /// The active connection's client, or nil if it can't be built.
-    var service: SubsonicService? { active.flatMap(service(for:)) }
+    var service: (any MusicServerService)? { active.flatMap(service(for:)) }
 
-    func service(for connection: ServerConnection) -> SubsonicService? {
-        guard let url = connection.url,
-              let password = Keychain.get(Self.passwordKey(connection.id))
-        else { return nil }
-        return SubsonicService(baseURL: url, username: connection.username,
-                               password: password, libraryID: connection.id)
+    /// Builds the client a connection's `kind` names. Nil when the secret it
+    /// needs — a Subsonic password, a Jellyfin token — is not in the
+    /// Keychain, which is what a restored-from-backup row looks like until
+    /// its credentials are re-entered.
+    func service(for connection: ServerConnection) -> (any MusicServerService)? {
+        guard let url = connection.url else { return nil }
+        switch connection.kind {
+        case .subsonic:
+            guard let password = Keychain.get(Self.passwordKey(connection.id)) else { return nil }
+            return SubsonicService(baseURL: url, username: connection.username,
+                                   password: password, libraryID: connection.id)
+        case .jellyfin:
+            guard let token = Keychain.get(Self.tokenKey(connection.id)),
+                  let userID = connection.jellyfinUserID else { return nil }
+            return JellyfinService(baseURL: url, username: connection.username,
+                                   userID: userID, accessToken: token,
+                                   libraryID: connection.id)
+        }
     }
 
     /// Rebuilds a track someone shared from *their* copy of a server this
@@ -156,8 +200,12 @@ final class ServerStore: ObservableObject {
             $0.url?.host?.caseInsensitiveCompare(host) == .orderedSame
         }), let service = service(for: connection) else { return nil }
 
+        // The match is by host alone, not by protocol: whichever kind of
+        // server answers at that host, the track is rebuilt with *this*
+        // listener's client for it — so a Jellyfin link re-resolves exactly
+        // the way a Subsonic one always has.
         return Song(
-            id: "subsonic:\(connection.id):\(trackID)",
+            id: "\(connection.kind.idPrefix):\(connection.id):\(trackID)",
             title: title,
             artist: artist,
             album: album,
@@ -185,7 +233,7 @@ final class ServerStore: ObservableObject {
         #if DEBUG
         if isDemoSeeded { return }
         #endif
-        let probes: [(String, SubsonicService)] = servers.compactMap { connection in
+        let probes: [(String, any MusicServerService)] = servers.compactMap { connection in
             service(for: connection).map { (connection.id, $0) }
         }
         guard !probes.isEmpty else { return }
@@ -219,8 +267,14 @@ final class ServerStore: ObservableObject {
     // MARK: - Editing
 
     /// Validates credentials against the server and, on success, saves them.
+    ///
+    /// Validation is what differs by protocol: Subsonic proves itself with a
+    /// salted-token `ping`, Jellyfin with a real sign-in that mints the
+    /// token every later request rides on. The one-free-server limit is
+    /// checked before either, so it counts both kinds as one rack.
     @discardableResult
-    func add(urlString: String, username: String, password: String, label: String = "") async -> Bool {
+    func add(urlString: String, username: String, password: String,
+             label: String = "", kind: ServerKind = .subsonic) async -> Bool {
         lastError = nil
         guard canAddServer else {
             lastError = String(localized: "Connecting more than one server needs Sonava Pro.")
@@ -234,21 +288,42 @@ final class ServerStore: ObservableObject {
         }
 
         let id = UUID().uuidString
-        let candidate = SubsonicService(baseURL: url, username: username,
-                                        password: password, libraryID: id)
-        do {
-            guard try await candidate.ping() else {
-                lastError = String(localized: "Server rejected the credentials.")
+        switch kind {
+        case .subsonic:
+            let candidate = SubsonicService(baseURL: url, username: username,
+                                            password: password, libraryID: id)
+            do {
+                guard try await candidate.ping() else {
+                    lastError = String(localized: "Server rejected the credentials.")
+                    return false
+                }
+            } catch {
+                lastError = String(localized: "Couldn't reach the server. Check the URL and your network.")
                 return false
             }
-        } catch {
-            lastError = String(localized: "Couldn't reach the server. Check the URL and your network.")
-            return false
+            guard save(id: id, url: url, username: username, password: password, label: label) else {
+                return false
+            }
+
+        case .jellyfin:
+            let session: JellyfinService.AuthSession
+            do {
+                session = try await JellyfinService.authenticate(
+                    baseURL: url, username: username, password: password)
+            } catch JellyfinService.AuthError.rejected {
+                lastError = String(localized: "Server rejected the credentials.")
+                return false
+            } catch {
+                lastError = String(localized: "Couldn't reach the server. Check the URL and your network.")
+                return false
+            }
+            guard save(id: id, url: url, username: username, password: password, label: label,
+                       kind: .jellyfin, jellyfinUserID: session.userID,
+                       jellyfinToken: session.accessToken) else {
+                return false
+            }
         }
 
-        guard save(id: id, url: url, username: username, password: password, label: label) else {
-            return false
-        }
         Haptics.success()
         return true
     }
@@ -277,7 +352,10 @@ final class ServerStore: ObservableObject {
         url: URL,
         username: String,
         password: String,
-        label: String = ""
+        label: String = "",
+        kind: ServerKind = .subsonic,
+        jellyfinUserID: String? = nil,
+        jellyfinToken: String? = nil
     ) -> Bool {
         guard canAddServer else {
             lastError = String(localized: "Connecting more than one server needs Sonava Pro.")
@@ -287,12 +365,24 @@ final class ServerStore: ObservableObject {
             lastError = String(localized: "Couldn't save the password securely.")
             return false
         }
+        // The Jellyfin token is a credential too — same store, same rules.
+        // The password is kept alongside it so a future re-sign-in (a
+        // revoked token, a wiped Devices table) needs no re-typing.
+        if let jellyfinToken {
+            guard Keychain.set(jellyfinToken, for: Self.tokenKey(id)) else {
+                _ = Keychain.delete(Self.passwordKey(id))
+                lastError = String(localized: "Couldn't save the password securely.")
+                return false
+            }
+        }
         let trimmedLabel = label.trimmingCharacters(in: .whitespaces)
         servers.append(
             ServerConnection(id: id,
                              label: trimmedLabel.isEmpty ? (url.host ?? url.absoluteString) : trimmedLabel,
                              urlString: url.absoluteString,
-                             username: username)
+                             username: username,
+                             kind: kind,
+                             jellyfinUserID: jellyfinUserID)
         )
         activeID = id
         persist()
@@ -307,6 +397,7 @@ final class ServerStore: ObservableObject {
 
     func remove(_ connection: ServerConnection) {
         _ = Keychain.delete(Self.passwordKey(connection.id))
+        _ = Keychain.delete(Self.tokenKey(connection.id))
         servers.removeAll { $0.id == connection.id }
         healthByID[connection.id] = nil
         if activeID == connection.id { activeID = usableServers.first?.id }
@@ -315,7 +406,10 @@ final class ServerStore: ObservableObject {
 
     /// Removes every connection — the "start over" escape hatch.
     func removeAll() {
-        for connection in servers { _ = Keychain.delete(Self.passwordKey(connection.id)) }
+        for connection in servers {
+            _ = Keychain.delete(Self.passwordKey(connection.id))
+            _ = Keychain.delete(Self.tokenKey(connection.id))
+        }
         servers = []
         healthByID = [:]
         activeID = nil
@@ -369,6 +463,9 @@ final class ServerStore: ObservableObject {
     }
 
     static func passwordKey(_ id: String) -> String { "server.password.\(id)" }
+    /// A Jellyfin connection's access token — the credential its requests
+    /// actually carry — stored beside the password it was minted from.
+    static func tokenKey(_ id: String) -> String { "server.token.\(id)" }
 
     /// Pro gates *how many* servers you can use, not whether saved connections
     /// survive. On lapse the extras stay on disk and the active one falls back

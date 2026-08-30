@@ -170,11 +170,12 @@ struct SourcesHubView: View {
 
     private var serverCard: some View {
         // Named in full because each name is a community that searches for
-        // it: all three speak Subsonic, all three already work.
+        // it: Jellyfin has its own protocol now, the rest speak Subsonic,
+        // and all of them already work.
         SourceCard(glyph: .server, title: "Self-hosted server",
                    fact: serverStore.isConnected
                        ? (serverStore.servers.first?.host ?? "")
-                       : String(localized: "Navidrome · Funkwhale · Airsonic — any Subsonic server"),
+                       : String(localized: "Jellyfin · Navidrome · Funkwhale — Subsonic & Jellyfin servers"),
                    state: serverStore.isConnected ? .connected : .disconnected) {
             showConnectServer = true
         }

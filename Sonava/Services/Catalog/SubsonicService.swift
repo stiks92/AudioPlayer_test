@@ -13,7 +13,10 @@ import Foundation
 import SwiftUI
 import CryptoKit
 
-struct SubsonicService {
+// `Sendable` is spelled here rather than inferred because the
+// `MusicServerService` conformance (declared beside the protocol) requires
+// it, and Swift insists a Sendable promise lives in the type's own file.
+struct SubsonicService: Sendable {
     let baseURL: URL
     let username: String
     let password: String

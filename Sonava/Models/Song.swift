@@ -14,7 +14,10 @@ enum TrackSource: String, Codable {
     case local          // bundled resource
     case audius         // Audius direct-stream catalogue
     case radio          // internet radio (live stream)
-    case subsonic       // user's self-hosted server (Navidrome/Airsonic/…)
+    case subsonic       // user's self-hosted server (Navidrome/Airsonic/Jellyfin/…)
+                        // — one case for both protocols: every switch on it
+                        // means "their own box", which is equally true of a
+                        // Jellyfin track. The id prefix tells them apart.
     case itunes         // Apple/iTunes 30-second previews
     case deezer         // Deezer 30-second previews
     case jamendo

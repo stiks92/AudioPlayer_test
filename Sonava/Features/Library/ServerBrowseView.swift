@@ -69,7 +69,7 @@ struct ServerBrowseView: View {
             Text("No server connected")
                 .font(.headline)
                 .foregroundColor(Theme.textSecondary)
-            Text("Connect a Navidrome, Airsonic or Subsonic server in Settings and your whole library appears here.")
+            Text("Connect a Jellyfin, Navidrome, Airsonic or Subsonic server in Settings and your whole library appears here.")
                 .font(.subheadline)
                 .foregroundColor(Theme.textTertiary)
                 .multilineTextAlignment(.center)
