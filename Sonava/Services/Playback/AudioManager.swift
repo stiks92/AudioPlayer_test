@@ -42,6 +42,14 @@ final class AudioManager: NSObject, ObservableObject {
     /// EQ screen can state what is happening to a stream instead of guessing.
     @Published private(set) var streamProcessingActive = false
 
+    /// What the live stream is honestly doing — connecting, buffering, on
+    /// air, or dropped. Meaningful only while `isLive`; the radio screen is
+    /// its one reader. Low-frequency, so it lives here and not in the clock.
+    @Published private(set) var liveState: LiveStreamState = .connecting
+    /// The station's ICY now-playing title, parsed and deduplicated by the
+    /// engine — nil when the station sends none, and nothing is shown then.
+    @Published private(set) var liveNowPlaying: String?
+
     /// Live time/level updates — observed only by Now Playing / mini / lyrics.
     let clock = PlaybackClock()
 
@@ -106,6 +114,63 @@ final class AudioManager: NSObject, ObservableObject {
             Task { @MainActor in self?.streamProcessingActive = attached }
         }
     }
+
+    private func wireRemoteLiveState() {
+        remoteEngine.onLiveStateChange = { [weak self] state in
+            Task { @MainActor in self?.handleLiveState(state) }
+        }
+        remoteEngine.onLiveMetadata = { [weak self] title in
+            Task { @MainActor in self?.handleLiveMetadata(title) }
+        }
+    }
+
+    /// Internal rather than private so the plumbing is testable without a
+    /// station on the air; this *is* the path the engine's callback takes.
+    func handleLiveState(_ state: LiveStreamState) {
+        guard isLive else { return }
+        #if DEBUG
+        guard !liveStateOverridden else { return }
+        #endif
+        liveState = state
+        if state == .dropped, isPlaying {
+            // The stream died under us. The transport must say stopped —
+            // pretending to play a dead connection is the old bug with a new
+            // face — but the queue must NOT advance: the listener retries
+            // this station, they don't get thrown onto the next one.
+            isPlaying = false
+            accrueListenTime()
+            stopTimer()
+            reportListen()
+            updateNowPlayingInfo()
+        }
+    }
+
+    /// Same door as `handleLiveState`, for the ICY title.
+    func handleLiveMetadata(_ title: String?) {
+        guard isLive else { return }
+        liveNowPlaying = title
+        updateNowPlayingInfo()
+    }
+
+    #if DEBUG
+    /// `-liveStateDemo connecting|buffering|onair|dropped` pins the published
+    /// state for capture and review, overriding the engine's reports.
+    private var liveStateOverridden = false
+    func applyLiveStateDemo(_ name: String) {
+        let state: LiveStreamState?
+        switch name.lowercased() {
+        case "connecting": state = .connecting
+        case "buffering":  state = .buffering
+        case "onair":      state = .onAir
+        case "dropped":    state = .dropped
+        default:           state = nil
+        }
+        guard let state else { return }
+        liveState = state
+        liveStateOverridden = true
+    }
+    #endif
+
     private var activeEngine: PlaybackEngine?
     private var timer: Timer?
     private var baseQueue: [Song] = []
@@ -150,6 +215,7 @@ final class AudioManager: NSObject, ObservableObject {
         configureSession()
         setupRemoteCommands()
         wireRemoteProcessingState()
+        wireRemoteLiveState()
 
         // Reshape the live engine whenever the EQ curve changes.
         effectsCancellable = effects.$equalizer
@@ -263,6 +329,8 @@ final class AudioManager: NSObject, ObservableObject {
         activeEngine = nil
         isPlaying = false
         currentSong = nil
+        liveNowPlaying = nil
+        liveState = .connecting
         queue = []
         baseQueue = []
         currentIndex = 0
@@ -484,6 +552,11 @@ final class AudioManager: NSObject, ObservableObject {
         let song = queue[currentIndex]
         beginListenSession()        // closes out the outgoing track's listen
         currentSong = song
+
+        // Live facts follow the station they were measured on, not the next
+        // one: the ICY title and the stream state die with the track change.
+        liveNowPlaying = nil
+        liveState = .connecting
 
         // Apple Music rides its own DRM player: no URL, no DSP, its own door.
         if song.source == .appleMusic, let catalogID = AppleMusicService.catalogID(of: song) {
@@ -845,9 +918,14 @@ final class AudioManager: NSObject, ObservableObject {
 
     private func updateNowPlayingInfo() {
         guard let song = currentSong else { return }
+        // A live station with ICY metadata: the lock screen shows the track
+        // the station says it is playing, credited to the station — instead
+        // of the bare station name standing in for a title all evening.
+        let title = (song.isLive ? liveNowPlaying : nil) ?? song.title
+        let artist = (song.isLive && liveNowPlaying != nil) ? song.title : song.artist
         var info: [String: Any] = [
-            MPMediaItemPropertyTitle: song.title,
-            MPMediaItemPropertyArtist: song.artist,
+            MPMediaItemPropertyTitle: title,
+            MPMediaItemPropertyArtist: artist,
             MPMediaItemPropertyAlbumTitle: song.album,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: clock.currentTime,
             MPNowPlayingInfoPropertyPlaybackRate: isPlaying ? 1.0 : 0.0,

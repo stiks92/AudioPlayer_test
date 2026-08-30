@@ -578,6 +578,65 @@ final class LocalAudioEngine: PlaybackEngine {
     }
 }
 
+// MARK: - Live stream state
+
+/// What a live stream is honestly doing right now. Four states, no more:
+/// the moment between tuning and the first audio (`connecting`), a stall in
+/// the middle of the air (`buffering`), audio flowing (`onAir`), and a
+/// connection that died (`dropped`). There is deliberately no `paused` —
+/// a live stream cannot be paused, only tuned out of, and that fact belongs
+/// to the transport, not to the stream.
+enum LiveStreamState: Equatable {
+    case connecting
+    case buffering
+    case onAir
+    case dropped
+}
+
+/// Pulls a display title out of an ICY `StreamTitle` value, or nothing.
+///
+/// At file scope on purpose, and pure on purpose: it can be tested as
+/// arithmetic, and it never guesses. Stations send real "Artist - Title"
+/// strings, empty strings, bare separators, and ad-tag URLs down the same
+/// pipe — everything that isn't a title becomes `nil`, and `nil` is rendered
+/// as no line at all rather than as a placeholder.
+func parseStreamTitle(_ raw: String?) -> String? {
+    guard let raw else { return nil }
+    let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { return nil }
+    // A separator with nothing on either side ("-", " - ") is ICY's way of
+    // sending nothing.
+    if trimmed.trimmingCharacters(in: CharacterSet(charactersIn: "-–—· ")).isEmpty { return nil }
+    // A bare URL is an ad marker or a stream id, not a track.
+    let lowered = trimmed.lowercased()
+    if lowered.hasPrefix("http://") || lowered.hasPrefix("https://") { return nil }
+    return trimmed
+}
+
+/// Receives timed ICY metadata from AVFoundation and forwards the raw
+/// StreamTitle string.
+///
+/// A separate object rather than the engine itself: the engine is pinned to
+/// the main actor by its protocol, and `AVPlayerItemMetadataOutput` calls its
+/// delegate from whatever queue it was handed — the callback must not carry
+/// an actor's isolation stamp (the StreamProcessingTap C callbacks earned
+/// that rule the hard way).
+private final class LiveMetadataRelay: NSObject, AVPlayerItemMetadataOutputPushDelegate {
+    let onStreamTitle: @Sendable (String?) -> Void
+    init(onStreamTitle: @escaping @Sendable (String?) -> Void) {
+        self.onStreamTitle = onStreamTitle
+    }
+
+    nonisolated func metadataOutput(_ output: AVPlayerItemMetadataOutput,
+                                    didOutputTimedMetadataGroups groups: [AVTimedMetadataGroup],
+                                    from track: AVPlayerItemTrack?) {
+        let raw = groups.flatMap(\.items)
+            .first { $0.identifier == .icyMetadataStreamTitle }?
+            .stringValue
+        onStreamTitle(raw)
+    }
+}
+
 // MARK: - Network streams & live radio (AVPlayer)
 
 final class RemoteAudioEngine: NSObject, PlaybackEngine {
@@ -605,6 +664,47 @@ final class RemoteAudioEngine: NSObject, PlaybackEngine {
         get { tap.onAttachChange }
         set { tap.onAttachChange = newValue }
     }
+
+    // MARK: Live stream facts
+
+    /// Fired on every honest change of the live stream's state. Low-frequency;
+    /// AudioManager republishes it for the radio screen.
+    var onLiveStateChange: ((LiveStreamState) -> Void)?
+    /// The parsed, deduplicated ICY now-playing title — or nil when the
+    /// station stops sending one. Never fired twice with the same value.
+    var onLiveMetadata: ((String?) -> Void)?
+
+    private(set) var liveStreamState: LiveStreamState = .connecting
+    private var liveURL: URL?
+    private var livePausedAt: Date?
+    private var lastStreamTitle: String?
+    private var timeControlObservation: NSKeyValueObservation?
+    private var itemStatusObservation: NSKeyValueObservation?
+    private var stallObserver: NSObjectProtocol?
+    private var metadataOutput: AVPlayerItemMetadataOutput?
+    private var metadataRelay: LiveMetadataRelay?
+    private var dropCountdown: Task<Void, Never>?
+
+    /// How long a stall may buffer before it is called what it is. Injectable
+    /// so the transition can be tested without eight wall-clock seconds.
+    var liveDropTimeout: TimeInterval = 8
+    /// A live pause longer than this resumes at the live edge, not from a
+    /// protracted buffer — resuming stale audio and calling it live would be
+    /// a lie. Injectable for the same reason as the timeout.
+    var liveResumeThreshold: TimeInterval = 5
+    /// The clock the pause bookkeeping reads. Tests replace it instead of
+    /// sleeping through real seconds.
+    var nowProvider: () -> Date = Date.init
+
+    #if DEBUG
+    /// Puts the engine in live mode without touching AVFoundation, so the
+    /// state machine and the ICY dedup can be exercised as arithmetic.
+    func enterLiveModeForTesting() {
+        live = true
+        liveStreamState = .connecting
+    }
+    var currentItemForTesting: AVPlayerItem? { player?.currentItem }
+    #endif
 
     var isLive: Bool { live }
     var isPlaying: Bool { playing }
@@ -635,6 +735,22 @@ final class RemoteAudioEngine: NSObject, PlaybackEngine {
         // exactly the kind of seam a listener notices once and distrusts.
         tap.dsp.update(settings: equalizer, loudnessGainDB: loudnessGainDB)
         MainActor.assumeIsolated { tap.attach(to: item) }
+        attachItemObservers(to: item)
+        if live {
+            liveURL = url
+            livePausedAt = nil
+            lastStreamTitle = nil
+            liveStreamState = .connecting
+            onLiveStateChange?(.connecting)
+            observeLivePlayer(p)
+        }
+        if autoplay { play() }
+        return true
+    }
+
+    /// Everything watched on one specific item — reattached whenever the item
+    /// is rebuilt for a live-edge rejoin, torn down with it.
+    private func attachItemObservers(to item: AVPlayerItem) {
         endObserver = NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,
             object: item,
@@ -645,20 +761,201 @@ final class RemoteAudioEngine: NSObject, PlaybackEngine {
             MainActor.assumeIsolated {
                 guard let self else { return }
                 self.playing = false
-                self.onFinish?()
+                if self.live {
+                    // A live stream has no end; reaching one means the
+                    // connection died. That is a fact about this station —
+                    // it must never advance the queue to the next one.
+                    self.transitionLive(to: .dropped)
+                } else {
+                    self.onFinish?()
+                }
             }
         }
-        if autoplay { play() }
-        return true
+        guard live else { return }
+
+        // Timed ICY metadata: what the station says it is playing right now.
+        let output = AVPlayerItemMetadataOutput(identifiers: nil)
+        let relay = LiveMetadataRelay { [weak self] raw in
+            Task { @MainActor in self?.ingestStreamTitle(raw) }
+        }
+        output.setDelegate(relay, queue: .main)
+        item.add(output)
+        metadataOutput = output
+        metadataRelay = relay
+
+        itemStatusObservation = Self.observeStatus(of: item) { [weak self] in
+            Task { @MainActor in self?.handleLiveItemFailed() }
+        }
+        stallObserver = NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemPlaybackStalled,
+            object: item,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.handleLiveStall() }
+        }
+    }
+
+    /// The player-level observation survives item rebuilds; only teardown
+    /// removes it.
+    private func observeLivePlayer(_ player: AVPlayer) {
+        timeControlObservation = Self.observeTimeControl(of: player) { [weak self] status in
+            Task { @MainActor in self?.handleTimeControl(status) }
+        }
+    }
+
+    // KVO handlers are built from a nonisolated context on purpose: a closure
+    // born inside a main-actor method carries the actor's isolation check, and
+    // AVFoundation delivers KVO from whatever thread it likes — the same trap
+    // the stream tap's C callbacks sprang once already. The handlers hop to
+    // the main actor through a Task instead of asserting an executor.
+    nonisolated private static func observeTimeControl(
+        of player: AVPlayer,
+        onChange: @escaping @Sendable (AVPlayer.TimeControlStatus) -> Void
+    ) -> NSKeyValueObservation {
+        player.observe(\.timeControlStatus, options: [.new]) { player, _ in
+            onChange(player.timeControlStatus)
+        }
+    }
+
+    nonisolated private static func observeStatus(
+        of item: AVPlayerItem,
+        onFailure: @escaping @Sendable () -> Void
+    ) -> NSKeyValueObservation {
+        item.observe(\.status, options: [.new]) { item, _ in
+            guard item.status == .failed else { return }
+            onFailure()
+        }
+    }
+
+    private func removeItemObservers() {
+        if let endObserver {
+            NotificationCenter.default.removeObserver(endObserver)
+            self.endObserver = nil
+        }
+        if let stallObserver {
+            NotificationCenter.default.removeObserver(stallObserver)
+            self.stallObserver = nil
+        }
+        itemStatusObservation?.invalidate()
+        itemStatusObservation = nil
+        metadataOutput = nil
+        metadataRelay = nil
+    }
+
+    // MARK: Live state machine
+
+    /// One door for every state change: deduplicates, cancels a pending drop
+    /// countdown when the stream recovers, and reports outward.
+    func transitionLive(to state: LiveStreamState) {
+        guard live, state != liveStreamState else { return }
+        liveStreamState = state
+        if state != .buffering {
+            dropCountdown?.cancel()
+            dropCountdown = nil
+        }
+        onLiveStateChange?(state)
+    }
+
+    func handleTimeControl(_ status: AVPlayer.TimeControlStatus) {
+        guard live else { return }
+        switch status {
+        case .playing:
+            transitionLive(to: .onAir)
+        case .waitingToPlayAtSpecifiedRate:
+            // The first wait is the connection being made; any later wait is
+            // the middle of the air falling out.
+            guard liveStreamState != .connecting, liveStreamState != .dropped else { return }
+            transitionLive(to: .buffering)
+            beginDropCountdown()
+        case .paused:
+            break   // the listener's stop, or a teardown — not the stream's state
+        @unknown default:
+            break
+        }
+    }
+
+    func handleLiveStall() {
+        guard live, playing else { return }
+        transitionLive(to: .buffering)
+        beginDropCountdown()
+    }
+
+    func handleLiveItemFailed() {
+        guard live else { return }
+        playing = false
+        transitionLive(to: .dropped)
+    }
+
+    /// A stall that outlives the timeout stops being a buffer and becomes a
+    /// lost signal. Sleep-based rather than polled; the injected timeout is
+    /// what tests shrink.
+    private func beginDropCountdown() {
+        dropCountdown?.cancel()
+        let timeout = liveDropTimeout
+        dropCountdown = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(timeout))
+            guard !Task.isCancelled, let self,
+                  self.live, self.liveStreamState == .buffering else { return }
+            self.playing = false
+            self.transitionLive(to: .dropped)
+        }
+    }
+
+    /// Parse, dedupe, report. The station repeats its StreamTitle with every
+    /// metadata interval; the app only cares when it actually changes.
+    func ingestStreamTitle(_ raw: String?) {
+        guard live else { return }
+        let title = parseStreamTitle(raw)
+        guard title != lastStreamTitle else { return }
+        lastStreamTitle = title
+        onLiveMetadata?(title)
+    }
+
+    // MARK: Live resume
+
+    /// Tuning back in. An `AVPlayer` resumed after a long live pause plays
+    /// the protracted buffer — minutes-old audio presented as the air. Past
+    /// the threshold (or after a drop) the item is rebuilt from the same URL,
+    /// which is what actually rejoins the live edge; the tap and the metadata
+    /// output ride the new item.
+    private func rejoinLiveEdgeIfStale() {
+        guard live, let url = liveURL else { return }
+        let stale: Bool
+        if liveStreamState == .dropped {
+            stale = true
+        } else if let pausedAt = livePausedAt {
+            stale = nowProvider().timeIntervalSince(pausedAt) > liveResumeThreshold
+        } else {
+            stale = false
+        }
+        livePausedAt = nil
+        guard stale, let player else { return }
+
+        removeItemObservers()
+        MainActor.assumeIsolated { tap.detach() }
+        let item = AVPlayerItem(url: url)
+        item.audioTimePitchAlgorithm = .timeDomain
+        tap.dsp.update(settings: equalizer, loudnessGainDB: loudnessGainDB)
+        MainActor.assumeIsolated { tap.attach(to: item) }
+        attachItemObservers(to: item)
+        lastStreamTitle = nil
+        liveStreamState = .connecting
+        onLiveStateChange?(.connecting)
+        player.replaceCurrentItem(with: item)
     }
 
     func play() {
+        if live { rejoinLiveEdgeIfStale() }
         playing = true
         // Setting rate resumes playback; live streams always play at 1×.
         player?.rate = live ? 1.0 : rate
     }
 
-    func pause() { player?.pause(); playing = false }
+    func pause() {
+        if live { livePausedAt = nowProvider() }
+        player?.pause()
+        playing = false
+    }
 
     func seek(to time: Double) {
         guard !live else { return }
@@ -705,10 +1002,15 @@ final class RemoteAudioEngine: NSObject, PlaybackEngine {
     }
 
     func teardown() {
-        if let endObserver = endObserver {
-            NotificationCenter.default.removeObserver(endObserver)
-            self.endObserver = nil
-        }
+        removeItemObservers()
+        timeControlObservation?.invalidate()
+        timeControlObservation = nil
+        dropCountdown?.cancel()
+        dropCountdown = nil
+        liveURL = nil
+        livePausedAt = nil
+        lastStreamTitle = nil
+        liveStreamState = .connecting
         MainActor.assumeIsolated { tap.detach() }
         player?.pause()
         player = nil

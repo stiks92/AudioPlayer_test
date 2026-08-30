@@ -201,8 +201,75 @@ struct HeartButton: View {
                          size: size * 3.6,
                          tint: isOn ? Theme.destructive : Theme.textSecondary)
                 .frame(width: size + 16, height: size + 16)
+                // The animation view refuses hits (it must not eat the
+                // button's own gesture), which left the button with no
+                // tappable surface at all — a tap on the heart's exact centre
+                // fell straight through to whatever sat behind it. The shape
+                // is the button's honest hit area.
+                .contentShape(Rectangle())
         }
         .buttonStyle(BouncyButtonStyle())
+    }
+}
+
+// MARK: - Volume row
+
+/// The volume block the players share: low glyph, scrubber, high glyph, and
+/// the route picker beside it — how loud, then where the sound goes.
+///
+/// Under VoiceOver the three volume pieces collapse into one adjustable
+/// element ("Volume, NN%") stepped in fives, because a drag-only scrubber is
+/// unusable by swipe. The collapse is gated on VoiceOver actually running:
+/// an adjustable container swallows the child elements that Voice Control
+/// and the UI tests address, so it must never be the default shape.
+struct VolumeRow: View {
+    /// The radio booth turns this off: its transport already leads with the
+    /// route picker, and one screen must not offer the same control twice.
+    var showsRoutePicker = true
+
+    @EnvironmentObject private var audio: AudioManager
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverOn
+
+    var body: some View {
+        HStack(spacing: Space.m) {
+            slider
+            if showsRoutePicker {
+                // Where the sound goes, next to how loud it is.
+                RoutePickerButton(tint: .white.opacity(0.6), size: 18)
+                    .frame(width: 30, height: 30)
+                    .accessibilityLabel(Text("Output device"))
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var slider: some View {
+        if voiceOverOn {
+            sliderRow
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Text("Volume"))
+                .accessibilityValue(Text(verbatim: "\(Int((audio.volume * 100).rounded()))%"))
+                .accessibilityAdjustableAction { direction in
+                    let step: Float = direction == .increment ? 0.05 : -0.05
+                    audio.volume = min(max(audio.volume + step, 0), 1)
+                }
+        } else {
+            sliderRow
+        }
+    }
+
+    private var sliderRow: some View {
+        HStack(spacing: Space.m) {
+            SonavaIcon(glyph: .volumeLow, size: 16, tint: .white.opacity(0.6))
+            ScrubberView(
+                value: Binding(
+                    get: { Double(audio.volume) },
+                    set: { audio.volume = Float($0) }
+                ),
+                onEditingChanged: { _ in }
+            )
+            SonavaIcon(glyph: .volumeHigh, size: 16, tint: .white.opacity(0.6))
+        }
     }
 }
 

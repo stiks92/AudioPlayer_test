@@ -17,9 +17,16 @@ struct MarqueeText: View {
     @State private var textWidth: CGFloat = 0
     @State private var offset: CGFloat = 0
 
+    /// A permanently scrolling line is exactly what this setting exists to
+    /// calm. With it on, an overflowing line holds still and dissolves at its
+    /// trailing edge instead — the reader still learns there is more, without
+    /// the motion.
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         GeometryReader { geo in
-            let shouldScroll = textWidth > geo.size.width + 1
+            let overflows = textWidth > geo.size.width + 1
+            let shouldScroll = overflows && !reduceMotion
             ZStack(alignment: .leading) {
                 if shouldScroll {
                     HStack(spacing: spacing) {
@@ -37,6 +44,18 @@ struct MarqueeText: View {
             }
             .frame(width: geo.size.width, height: geo.size.height, alignment: .leading)
             .clipped()
+            .mask(alignment: .leading) {
+                if overflows && reduceMotion {
+                    HStack(spacing: 0) {
+                        Rectangle()
+                        LinearGradient(colors: [.black, .clear],
+                                       startPoint: .leading, endPoint: .trailing)
+                            .frame(width: 24)
+                    }
+                } else {
+                    Rectangle()
+                }
+            }
         }
         .background(widthReader)
     }

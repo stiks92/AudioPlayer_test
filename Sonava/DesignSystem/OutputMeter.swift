@@ -37,6 +37,11 @@ struct OutputMeter: View {
     var isPlaying: Bool = true
     var segments: Int = 40
     var tint: Color = .white
+    /// Overrides the trailing provenance stamp. The radio screen passes
+    /// "RMS · STREAM": there the moving needle *is* a stream, measured for
+    /// real through the processing tap, and the default "LOCAL FILE" would
+    /// be a printed lie. nil keeps the local-file/stream default.
+    var caption: String? = nil
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -49,7 +54,7 @@ struct OutputMeter: View {
             HStack(alignment: .firstTextBaseline) {
                 Text("OUTPUT")
                 Spacer(minLength: Space.m)
-                Text(metered ? "RMS · LOCAL FILE" : "NO METER · STREAM")
+                Text(caption ?? (metered ? "RMS · LOCAL FILE" : "NO METER · STREAM"))
             }
             .font(.sonavaStamp)
             .tracking(1.2)

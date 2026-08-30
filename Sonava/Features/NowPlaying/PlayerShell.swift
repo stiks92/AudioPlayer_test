@@ -54,10 +54,24 @@ struct PlayerShell: View {
                     // can reach the physical edges; the player's *content* must
                     // not — without these paddings the header slid under the
                     // status bar, chevron pressed against the clock.
-                    NowPlayingView(namespace: ns) { dismiss() }
-                        .padding(.top, expanded ? geo.safeAreaInsets.top : 0)
-                        .padding(.bottom, expanded ? geo.safeAreaInsets.bottom : 0)
-                        .opacity(expanded ? 1 : 0)
+                    //
+                    // Two players, one shell: a live station opens the radio
+                    // booth, everything else the track player. `currentSong`
+                    // is published, so a queue that walks from a track into a
+                    // station cross-fades between them in place.
+                    ZStack {
+                        if audio.isLive {
+                            RadioLiveView(namespace: ns) { dismiss() }
+                                .transition(.opacity)
+                        } else {
+                            NowPlayingView(namespace: ns) { dismiss() }
+                                .transition(.opacity)
+                        }
+                    }
+                    .animation(Motion.fade, value: audio.isLive)
+                    .padding(.top, expanded ? geo.safeAreaInsets.top : 0)
+                    .padding(.bottom, expanded ? geo.safeAreaInsets.bottom : 0)
+                    .opacity(expanded ? 1 : 0)
                     capsule
                         .opacity(expanded ? 0 : 1)
                 }

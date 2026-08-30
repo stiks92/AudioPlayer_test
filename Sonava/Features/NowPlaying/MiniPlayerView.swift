@@ -72,7 +72,11 @@ struct MiniPlayerView: View {
                     VStack(alignment: .leading, spacing: 1) {
                         MarqueeText(text: song.title, font: .subheadline.weight(.semibold))
                             .frame(height: 18)
-                        Text(song.artist)
+                        // On air, the second line is what the station says it
+                        // is playing (ICY), falling back to the station's
+                        // country/genre when it says nothing.
+                        Text(verbatim: song.isLive ? (audio.liveNowPlaying ?? song.artist)
+                                                   : song.artist)
                             .font(.sonavaRowMeta)
                             .foregroundColor(Theme.textSecondary)
                             .lineLimit(1)

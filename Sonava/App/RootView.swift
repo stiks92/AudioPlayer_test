@@ -392,6 +392,24 @@ struct RootView: View {
             if let first = queue.first { audio.play(first, in: queue) }
         }
 
+        if arguments.contains("-demoRadio") {
+            // The radio booth, reviewable without a network: the demo dial
+            // starts turning and the booth opens over it. The invalid demo
+            // stream fails deterministically, which is itself a reviewable
+            // state (SIGNAL LOST) — `-liveStateDemo` below pins any other.
+            let stations = DemoCatalog.stations
+            if let first = stations.first {
+                audio.play(first, in: stations)
+                showNowPlaying = true
+            }
+        }
+        // `-liveStateDemo connecting|buffering|onair|dropped` pins the
+        // published live state for capture, overriding the engine's reports.
+        if let index = arguments.firstIndex(of: "-liveStateDemo"),
+           index + 1 < arguments.count {
+            audio.applyLiveStateDemo(arguments[index + 1])
+        }
+
         if arguments.contains("-crateMix") {
             // After -demoPlay has queued the library: apply the plan so the
             // review frame shows the chips, not just the button. Crate Mix is

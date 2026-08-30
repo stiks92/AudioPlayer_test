@@ -33,6 +33,20 @@ enum AccessibilityID {
     /// for one string is how tests end up matching the wrong thing.)
     static let playerDisc = "player.disc"
 
+    // The radio booth — the live player screen.
+    /// The screen's own container, so a test can tell which player opened.
+    static let radioLive = "radio.live"
+    /// The station identity block; its label carries the station name.
+    static let radioStation = "radio.station"
+    /// The stream-state line (CONNECTING… / ON AIR · … / SIGNAL LOST).
+    static let radioStatus = "radio.status"
+    static let radioPlayStop = "radio.playStop"
+    static let radioNext = "radio.next"
+    static let radioPrevious = "radio.previous"
+    /// Carries `.isSelected` while the station is a favourite, so tests read
+    /// state without matching localized text.
+    static let radioHeart = "radio.heart"
+
     static let eqEnable = "eq.enable"
 
     static let paywallClose = "paywall.close"

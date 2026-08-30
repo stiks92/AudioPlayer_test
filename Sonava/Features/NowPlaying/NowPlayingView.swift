@@ -408,55 +408,11 @@ struct NowPlayingView: View {
         }
     }
 
-    @ViewBuilder
-    private var scrubber: some View {
-        if audio.isLive {
-            HStack(spacing: 8) {
-                Circle()
-                    .fill(Theme.destructive)
-                    .frame(width: 8, height: 8)
-                    .opacity(audio.isPlaying ? 1 : 0.4)
-                Text("LIVE")
-                    .font(.system(.footnote).weight(.heavy))
-                    .tracking(2)
-                Spacer()
-                Text("Radio")
-                    .font(.system(.caption).weight(.medium))
-                    .foregroundColor(.white.opacity(0.6))
-            }
-            .frame(height: 24)
-        } else {
-            VStack(spacing: 6) {
-                ScrubberView(
-                    value: Binding(
-                        get: { isScrubbing ? scrubValue : clock.progress },
-                        set: { scrubValue = $0 }
-                    ),
-                    onEditingChanged: { editing in
-                        if editing {
-                            isScrubbing = true
-                        } else {
-                            audio.seek(to: scrubValue * clock.duration)
-                            isScrubbing = false
-                        }
-                    }
-                )
-                HStack {
-                    Text((isScrubbing ? scrubValue * clock.duration : clock.currentTime).asClock)
-                    Spacer()
-                    Text(clock.duration.asClock)
-                }
-                .font(.system(.caption).weight(.medium).monospacedDigit())
-                .foregroundColor(.white.opacity(0.6))
-            }
-        }
-    }
-
-    private var visualizer: some View {
-        OutputMeter(level: clock.audioLevel,
-                    metered: clock.isMetered,
-                    isPlaying: audio.isPlaying)
-    }
+    // The dead `scrubber` (with its live pill), `visualizer` and `volume`
+    // blocks that sat here unreferenced are gone: live playback has its own
+    // screen now (`RadioLiveView` carries the LIVE stamp in `Theme.live`),
+    // and the volume block lives on as the shared `VolumeRow` in
+    // DesignComponents.
 
     private var controls: some View {
         HStack {
@@ -492,24 +448,6 @@ struct NowPlayingView: View {
                            tint: audio.repeatMode.isActive ? Theme.accentSoft : .white.opacity(0.7))
             }
             .buttonStyle(BouncyButtonStyle())
-        }
-    }
-
-    private var volume: some View {
-        HStack(spacing: Space.m) {
-            SonavaIcon(glyph: .volumeLow, size: 16, tint: .white.opacity(0.6))
-            ScrubberView(
-                value: Binding(
-                    get: { Double(audio.volume) },
-                    set: { audio.volume = Float($0) }
-                ),
-                onEditingChanged: { _ in }
-            )
-            SonavaIcon(glyph: .volumeHigh, size: 16, tint: .white.opacity(0.6))
-            // Where the sound goes, next to how loud it is.
-            RoutePickerButton(tint: .white.opacity(0.6), size: 18)
-                .frame(width: 30, height: 30)
-                .accessibilityLabel(Text("Output device"))
         }
     }
 

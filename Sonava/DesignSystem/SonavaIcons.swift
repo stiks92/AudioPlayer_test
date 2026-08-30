@@ -58,7 +58,7 @@ enum Icon {
 struct SonavaIcon: View {
     enum Glyph {
         case home, search, radio, podcasts, library
-        case play, pause, next, previous, shuffle
+        case play, pause, stop, next, previous, shuffle
         case aiMix, equalizer, download, note, streak, heart, server, stats
         case chevronRight, chevronDown, more, sleep, infinity
         case restore, shield, scrobble, wave, lock, close, plus
@@ -190,6 +190,19 @@ struct SonavaIcon: View {
             weight = 4.4          // two bars read light at the family stroke
             bar(&stroked, x: 8.6, from: 5.4, to: 18.6)
             bar(&stroked, x: 15.4, from: 5.4, to: 18.6)
+
+        case .stop:
+            // The live transport's second state. Play/stop is the honest pair
+            // for a stream — resume means rejoining the live edge, not
+            // continuing from where a pause left off — so the booth gets a
+            // stop, not a pause. A filled, rounded square in the family's own
+            // corner language, sized to the play triangle's optical mass: a
+            // solid square reads heavier than a triangle at equal bounds, so
+            // it is drawn a shade smaller than the frame play fills.
+            filled = Path(roundedRect: CGRect(x: p(5.6, 5.6).x, y: p(5.6, 5.6).y,
+                                              width: p(12.8, 0).x, height: p(12.8, 0).x),
+                          cornerSize: CGSize(width: p(2.8, 0).x, height: p(2.8, 0).x),
+                          style: .continuous)
 
         case .next, .previous:
             let mirror: (CGFloat) -> CGFloat = { glyph == .next ? $0 : Icon.grid - $0 }
@@ -575,7 +588,7 @@ struct SonavaIcon: View {
 #if DEBUG
 #Preview("The set") {
     let all: [SonavaIcon.Glyph] = [.home, .search, .radio, .podcasts, .library,
-                                   .play, .pause, .next, .previous, .shuffle,
+                                   .play, .pause, .stop, .next, .previous, .shuffle,
                                    .aiMix, .equalizer, .download, .note,
                                    .streak, .heart, .server, .stats,
                                    .chevronRight, .chevronDown, .more, .sleep,
@@ -605,7 +618,7 @@ struct IconGallery: View {
     private let all: [(SonavaIcon.Glyph, String)] = [
         (.home, "home"), (.search, "search"), (.radio, "radio"),
         (.podcasts, "podcasts"), (.library, "library"),
-        (.play, "play"), (.pause, "pause"), (.next, "next"),
+        (.play, "play"), (.pause, "pause"), (.stop, "stop"), (.next, "next"),
         (.previous, "previous"), (.shuffle, "shuffle"),
         (.aiMix, "aiMix"), (.equalizer, "equalizer"), (.download, "download"),
         (.note, "note"), (.streak, "streak"), (.heart, "heart"),

@@ -56,29 +56,43 @@ final class RadioBrowserService: TrackProvider {
 
     // MARK: - Mapping
 
-    private func map(_ station: RadioStation) -> Song? {
+    /// Internal, not private: the mapping is a contract worth pinning in a
+    /// test — quality fields must ride through when the directory reports
+    /// them and stay absent when it doesn't.
+    func map(_ station: RadioStation) -> Song? {
         let streamString = station.urlResolved ?? station.url
         guard let streamString, let stream = URL(string: streamString) else { return nil }
         let subtitle = [station.country, station.tags?.replacingOccurrences(of: ",", with: " · ")]
             .compactMap { $0?.isEmpty == false ? $0 : nil }
             .first ?? "Live radio"
+        // What the directory truthfully knows about the transmission. Radio
+        // Browser sends bitrate 0 and codec "UNKNOWN" when a station never
+        // told it — both become absent, never a guess. The codec travels as
+        // the file extension because that is where `qualityParts` reads a
+        // format from, and a station has no path extension to read.
+        let codec = station.codec?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let knownCodec = (codec?.isEmpty == false && codec?.uppercased() != "UNKNOWN")
+            ? codec : nil
+        let bitrate = (station.bitrate ?? 0) > 0 ? station.bitrate : nil
         return Song(
             id: "radio:\(station.stationuuid)",
             title: station.name.trimmingCharacters(in: .whitespacesAndNewlines),
             artist: subtitle,
             album: "Radio",
             source: .radio,
+            fileExtension: knownCodec?.lowercased() ?? "",
             artworkURL: station.favicon.flatMap { $0.isEmpty ? nil : URL(string: $0) },
             streamURL: stream,
             isLive: true,
-            gradientHex: Palette.hex(forSeed: station.stationuuid)
+            gradientHex: Palette.hex(forSeed: station.stationuuid),
+            bitRate: bitrate
         )
     }
 }
 
 // MARK: - DTOs
 
-private struct RadioStation: Decodable {
+struct RadioStation: Decodable {
     let stationuuid: String
     let name: String
     let url: String?
@@ -86,9 +100,13 @@ private struct RadioStation: Decodable {
     let favicon: String?
     let country: String?
     let tags: String?
+    /// kbit/s as the station registered it; 0 means "never said".
+    let bitrate: Int?
+    /// "MP3" / "AAC+" / "UNKNOWN" — the transmission codec, when reported.
+    let codec: String?
 
     enum CodingKeys: String, CodingKey {
-        case stationuuid, name, url, favicon, country, tags
+        case stationuuid, name, url, favicon, country, tags, bitrate, codec
         case urlResolved = "url_resolved"
     }
 }
