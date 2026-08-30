@@ -59,6 +59,7 @@ struct SourcesHubView: View {
     @State private var showImportFiles = false
     @State private var showImportPlaylist = false
     @State private var showHistoryImport = false
+    @State private var showServiceKeys = false
 
     var body: some View {
         NavigationStack {
@@ -71,6 +72,8 @@ struct SourcesHubView: View {
                             cloudCard
                             serverCard
                             appleMusicCard
+                            archiveCard
+                            jamendoCard
                             tidalCard
                             soundcloudCard
                         }
@@ -113,6 +116,9 @@ struct SourcesHubView: View {
             }
             .sheet(isPresented: $showHistoryImport) {
                 ImportHistoryView().environmentObject(journeyStore).environmentObject(library)
+            }
+            .sheet(isPresented: $showServiceKeys) {
+                ServiceKeysView()
             }
             .fileImporter(isPresented: $showImportFiles,
                           allowedContentTypes: [.audio], allowsMultipleSelection: true) { result in
@@ -163,12 +169,32 @@ struct SourcesHubView: View {
     }
 
     private var serverCard: some View {
+        // Named in full because each name is a community that searches for
+        // it: all three speak Subsonic, all three already work.
         SourceCard(glyph: .server, title: "Self-hosted server",
                    fact: serverStore.isConnected
                        ? (serverStore.servers.first?.host ?? "")
-                       : String(localized: "Navidrome, Subsonic, Airsonic"),
+                       : String(localized: "Navidrome · Funkwhale · Airsonic — any Subsonic server"),
                    state: serverStore.isConnected ? .connected : .disconnected) {
             showConnectServer = true
+        }
+    }
+
+    private var archiveCard: some View {
+        // Keyless and legal by the collections' own terms — nothing to
+        // connect, so the card just states what is already true.
+        SourceCard(glyph: .wave, title: "Internet Archive",
+                   fact: String(localized: "Live concerts, netlabels, 78s — full tracks, no key"),
+                   state: .connected, action: nil)
+    }
+
+    private var jamendoCard: some View {
+        SourceCard(glyph: .note, title: "Jamendo",
+                   fact: serviceKeys.key(JamendoService.clientIDKey) != nil
+                       ? String(localized: "Creative Commons catalogue — full tracks")
+                       : String(localized: "Owner setup · free key · devportal.jamendo.com"),
+                   state: serviceKeys.key(JamendoService.clientIDKey) != nil ? .connected : .ownerKey) {
+            showServiceKeys = true
         }
     }
 
@@ -191,16 +217,24 @@ struct SourcesHubView: View {
     }
 
     private var tidalCard: some View {
+        // The honest 2026 status: TIDAL hands out self-serve keys but never
+        // opened production access — third-party apps get 30-second previews
+        // and a guidelines ban on mixing TIDAL into other audio. The key is
+        // still worth saving for a preview integration later.
         SourceCard(glyph: .wave, title: "TIDAL",
                    fact: serviceKeys.key("tidal.clientID") != nil
-                       ? String(localized: "Key saved — player integration next")
-                       : String(localized: "Owner setup · developer.tidal.com · ~10 min"),
-                   state: .ownerKey, action: nil)
+                       ? String(localized: "Key saved — waiting for TIDAL to open full playback")
+                       : String(localized: "Third-party apps get 30-second previews for now"),
+                   state: .ownerKey) {
+            showServiceKeys = true
+        }
     }
 
     private var soundcloudCard: some View {
+        // Self-serve since May 2026 — behind a paid Artist Pro subscription
+        // on the owner's account, which is the sentence the card says.
         SourceCard(glyph: .scrobble, title: "SoundCloud",
-                   fact: String(localized: "Owner setup · registration check pending"),
+                   fact: String(localized: "Owner setup · needs a SoundCloud Artist Pro subscription"),
                    state: .ownerKey, action: nil)
     }
 
@@ -231,12 +265,20 @@ struct SourcesHubView: View {
                    state: .importOnly) { showHistoryImport = true }
     }
 
+    @ViewBuilder
     private var youtubeCard: some View {
-        SourceCard(glyph: .chevronRight, title: "YouTube playlists",
-                   fact: serviceKeys.key("youtube.apiKey") != nil
-                       ? String(localized: "Key saved — link import next")
-                       : String(localized: "Owner setup · Google Cloud key · ~10 min"),
-                   state: .ownerKey, action: nil)
+        // With a key the link import genuinely works (titles only — playback
+        // stays on YouTube, as their policies demand). Without one, the card
+        // leads to the keys screen instead of pretending.
+        if serviceKeys.key(YouTubePlaylistImporter.apiKeyKey) != nil {
+            SourceCard(glyph: .chevronRight, title: "YouTube playlists",
+                       fact: String(localized: "Paste a playlist link — titles matched to your sources"),
+                       state: .importOnly) { showImportPlaylist = true }
+        } else {
+            SourceCard(glyph: .chevronRight, title: "YouTube playlists",
+                       fact: String(localized: "Owner setup · Google Cloud key · ~10 min"),
+                       state: .ownerKey) { showServiceKeys = true }
+        }
     }
 
     private var yandexCard: some View {
@@ -304,7 +346,12 @@ struct SourceCard: View {
                 .buttonStyle(SecondaryCapsuleButtonStyle(expands: false))
             }
         case .ownerKey:
-            EmptyView()
+            // A key-entry door when there is one: opening a form is honest
+            // in anyone's hands — unlike a connect button that would 403.
+            if let action {
+                Button("Add key", action: action)
+                    .buttonStyle(QuietButtonStyle())
+            }
         case .importOnly:
             if let action {
                 Button(action: action) {

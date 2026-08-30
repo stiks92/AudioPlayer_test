@@ -18,9 +18,12 @@ struct SearchView: View {
     @StateObject private var audiusFeed = SongFeed()
     @StateObject private var appleMusicFeed = SongFeed()
     @ObservedObject private var appleMusic = AppleMusicService.shared
+    @ObservedObject private var serviceKeys = ServiceKeysStore.shared
     @StateObject private var appleFeed = SongFeed()
     @StateObject private var deezerFeed = SongFeed()
     @StateObject private var serverFeed = SongFeed()
+    @StateObject private var archiveFeed = SongFeed()
+    @StateObject private var jamendoFeed = SongFeed()
 
     private var localResults: [Song] { library.search(query) }
 
@@ -77,6 +80,8 @@ struct SearchView: View {
                     appleFeed.clear()
                     deezerFeed.clear()
                     serverFeed.clear()
+                    archiveFeed.clear()
+                    jamendoFeed.clear()
                     return
                 }
                 // Debounce keystrokes; task(id:) cancels the previous run.
@@ -91,6 +96,12 @@ struct SearchView: View {
                 await deezerFeed.load { try await DeezerService.shared.search(trimmed) }
                 await appleFeed.load { try await iTunesService.shared.searchMusic(trimmed) }
                 await audiusFeed.load { try await AudiusService.shared.search(trimmed) }
+                if let clientID = serviceKeys.key(JamendoService.clientIDKey) {
+                    await jamendoFeed.load { try await JamendoService(clientID: clientID).search(trimmed) }
+                }
+                // Last on purpose: the Archive's search index is the slowest
+                // answerer here, and it must not hold up the quick shelves.
+                await archiveFeed.load { try await ArchiveService.shared.search(trimmed) }
             }
         }
     }
@@ -106,6 +117,8 @@ struct SearchView: View {
                 appleFeed.clear()
                 deezerFeed.clear()
                 serverFeed.clear()
+                archiveFeed.clear()
+                jamendoFeed.clear()
             } label: {
                 AnimatedIcon(glyph: .searchToX, mode: .toggle(!query.isEmpty),
                              size: 20, tint: Theme.textSecondary)
@@ -152,6 +165,12 @@ struct SearchView: View {
                     }
                 }
                 audiusResults
+            }
+            if jamendoFeed.state == .loaded, !jamendoFeed.songs.isEmpty {
+                sourceSection("Jamendo · full tracks", songs: jamendoFeed.songs)
+            }
+            if archiveFeed.state == .loaded, !archiveFeed.songs.isEmpty {
+                sourceSection("Internet Archive · full tracks", songs: archiveFeed.songs)
             }
 
             // ── 30-second previews ─────────────────────────────

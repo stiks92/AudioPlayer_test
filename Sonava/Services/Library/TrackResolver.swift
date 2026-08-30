@@ -107,7 +107,15 @@ final class TrackResolver {
                 ? { term in (try? await serverStore.search(term)) ?? [] } : nil,
             appleMusicSearch: AppleMusicService.shared.isReady
                 ? { term in try await AppleMusicService.shared.search(term) } : nil,
-            audiusSearch: { term in try await AudiusService.shared.search(term) }
+            audiusSearch: { term in try await AudiusService.shared.search(term) },
+            // The consolation door, honestly labelled: Deezer and iTunes
+            // 30-second previews, asked only after every full-track door
+            // said no, and surfaced as `.preview`, never as a match.
+            previewSearch: { term in
+                let deezer = (try? await DeezerService.shared.search(term)) ?? []
+                let itunes = (try? await iTunesService.shared.searchMusic(term)) ?? []
+                return deezer + itunes
+            }
         ))
     }
 

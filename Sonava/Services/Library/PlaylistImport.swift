@@ -217,11 +217,41 @@ enum PlaylistImport {
     /// What the import actually managed.
     struct Outcome: Equatable, Sendable {
         var matched: [Song] = []
+        /// Tracks where only a 30-second preview exists anywhere the listener
+        /// can reach — its own column in the ledger, because a preview
+        /// claiming to be a match would be a lie with a play button.
+        var previews: [Song] = []
         /// The ones nothing could be found for, kept in the order they were
         /// listed so the screen can show them as the original playlist read.
         var missing: [ParsedTrack] = []
 
-        var total: Int { matched.count + missing.count }
+        var total: Int { matched.count + previews.count + missing.count }
+    }
+
+    /// Buckets the resolver's answers into the ledger the import screen
+    /// speaks: found · preview-only · not found, order preserved.
+    static func outcome(from results: [(ForeignTrack, TrackResolution)]) -> Outcome {
+        var outcome = Outcome()
+        for (foreign, resolution) in results {
+            switch resolution {
+            case .matched(let song):
+                outcome.matched.append(song)
+            case .preview(let song):
+                outcome.previews.append(song)
+            case .notFound:
+                outcome.missing.append(ParsedTrack(title: foreign.title,
+                                                   artist: foreign.artist,
+                                                   album: foreign.album))
+            }
+        }
+        return outcome
+    }
+
+    /// The importer's rows, dressed for the resolver.
+    static func foreignTracks(_ tracks: [ParsedTrack], origin: TrackOrigin) -> [ForeignTrack] {
+        tracks.map {
+            ForeignTrack(title: $0.title, artist: $0.artist, album: $0.album, origin: origin)
+        }
     }
 
     /// Scores a candidate against what was asked for. Deliberately strict:

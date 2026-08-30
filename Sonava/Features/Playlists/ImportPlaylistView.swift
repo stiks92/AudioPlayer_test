@@ -21,14 +21,22 @@ struct ImportPlaylistView: View {
     @EnvironmentObject private var library: MusicLibrary
     @EnvironmentObject private var playlistStore: PlaylistStore
     @EnvironmentObject private var serverStore: ServerStore
+    @ObservedObject private var appleMusic = AppleMusicService.shared
+    @ObservedObject private var serviceKeys = ServiceKeysStore.shared
     @Environment(\.dismiss) private var dismiss
 
     @State private var pasted = ""
     @State private var name = ""
+    @State private var youtubeLink = ""
     @State private var showFileImporter = false
+    @State private var showServiceKeys = false
     @State private var isMatching = false
     @State private var outcome: PlaylistImport.Outcome?
     @State private var failure: String?
+    /// The hub's engine room, shared with every other import path. Built
+    /// lazily so it snapshots the doors the listener actually has open, and
+    /// rebuilt (after invalidate) when a connection changes underneath it.
+    @State private var resolver: TrackResolver?
 
     var body: some View {
         NavigationStack {
@@ -41,6 +49,7 @@ struct ImportPlaylistView: View {
                         } else {
                             intro
                             fileSection
+                            linkSection
                             pasteSection
                         }
                     }
@@ -70,8 +79,28 @@ struct ImportPlaylistView: View {
             } message: {
                 Text(failure ?? "")
             }
+            .sheet(isPresented: $showServiceKeys) {
+                ServiceKeysView()
+            }
         }
         .preferredColorScheme(.dark)
+        // A door changed (server connected, Apple Music authorized): earlier
+        // resolutions may now be beatable, so the resolver expires and the
+        // next import snapshots fresh doors.
+        .onChange(of: serverStore.isConnected) { _, _ in rebuildResolver() }
+        .onChange(of: appleMusic.availability) { _, _ in rebuildResolver() }
+    }
+
+    private func rebuildResolver() {
+        resolver?.invalidate()
+        resolver = nil
+    }
+
+    private func currentResolver() -> TrackResolver {
+        if let resolver { return resolver }
+        let built = TrackResolver.live(library: library, serverStore: serverStore)
+        resolver = built
+        return built
     }
 
     // MARK: - Before
@@ -101,6 +130,53 @@ struct ImportPlaylistView: View {
             }
             .buttonStyle(SecondaryCapsuleButtonStyle())
             .accessibilityIdentifier("import.file")
+        }
+    }
+
+    /// YouTube by link — composition only. The Data API reads the playlist's
+    /// titles (that much their terms allow); the audio never comes from
+    /// YouTube — every row is matched into the listener's own sources like
+    /// any other import.
+    @ViewBuilder
+    private var linkSection: some View {
+        VStack(alignment: .leading, spacing: Space.m) {
+            Department(title: "From a YouTube link")
+            if serviceKeys.key(YouTubePlaylistImporter.apiKeyKey) != nil {
+                Text("Paste a playlist link. Sonava reads the titles and finds each track in your own sources — no audio comes from YouTube.")
+                    .font(.system(.footnote))
+                    .foregroundColor(Theme.textTertiary)
+                TextField("", text: $youtubeLink,
+                          prompt: Text("youtube.com/playlist?list=…").foregroundColor(Theme.textTertiary))
+                    .font(.system(.footnote, design: .monospaced))
+                    .foregroundColor(.white)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.URL)
+                    .padding(.horizontal, Space.l).padding(.vertical, Space.m)
+                    .card(cornerRadius: Radius.control)
+                Button {
+                    Task { await importFromLink() }
+                } label: {
+                    Text(isMatching ? "Searching…" : "Read the playlist")
+                }
+                .buttonStyle(SecondaryCapsuleButtonStyle())
+                .disabled(youtubeLink.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isMatching)
+                .accessibilityIdentifier("import.youtube")
+            } else {
+                // No key — the honest sentence and the door to the screen
+                // where the owner can change that. Never a button that 403s.
+                Text("Needs the owner's YouTube API key — add it once and playlist links import here.")
+                    .font(.system(.footnote))
+                    .foregroundColor(Theme.textTertiary)
+                Button { showServiceKeys = true } label: {
+                    HStack(spacing: Space.s) {
+                        SonavaIcon(glyph: .chevronRight, size: 14, tint: Theme.accentSoft)
+                        Text("Service keys")
+                    }
+                }
+                .buttonStyle(SecondaryCapsuleButtonStyle())
+                .accessibilityIdentifier("import.youtubeKeys")
+            }
         }
     }
 
@@ -154,17 +230,18 @@ struct ImportPlaylistView: View {
                 Text("\(outcome.matched.count) of \(outcome.total) found")
                     .font(.system(.title2).weight(.light))
                     .foregroundColor(Theme.textPrimary)
-                if outcome.matched.isEmpty {
+                if outcome.matched.isEmpty && outcome.previews.isEmpty {
                     Text("Nothing in that list matched anything Sonava can reach.")
                         .font(.system(.subheadline))
                         .foregroundColor(Theme.textSecondary)
                 }
             }
 
-            if !outcome.matched.isEmpty {
+            if !outcome.matched.isEmpty || !outcome.previews.isEmpty {
                 Button {
                     playlistStore.importShared(
-                        UserPlaylist(name: playlistName, tracks: outcome.matched))
+                        UserPlaylist(name: playlistName,
+                                     tracks: outcome.matched + outcome.previews))
                     Haptics.success()
                     dismiss()
                 } label: {
@@ -176,6 +253,23 @@ struct ImportPlaylistView: View {
                 VStack(spacing: 0) {
                     ForEach(outcome.matched.prefix(30)) { song in
                         SongRow(song: song)
+                    }
+                }
+            }
+
+            // The middle column of the ledger: rows where only a 30-second
+            // preview exists anywhere the listener can reach. Saved with
+            // their PREVIEW badge, never dressed up as full matches.
+            if !outcome.previews.isEmpty {
+                VStack(alignment: .leading, spacing: Space.s) {
+                    Department(title: "Previews only")
+                    Text("For these, only a 30-second preview exists in your sources. They save with a PREVIEW badge.")
+                        .font(.system(.caption2))
+                        .foregroundColor(Theme.textTertiary)
+                    VStack(spacing: 0) {
+                        ForEach(outcome.previews.prefix(30)) { song in
+                            SongRow(song: song, showBadge: true)
+                        }
                     }
                 }
             }
@@ -206,6 +300,7 @@ struct ImportPlaylistView: View {
             Button("Start over") {
                 self.outcome = nil
                 pasted = ""
+                youtubeLink = ""
             }
             .buttonStyle(QuietButtonStyle())
         }
@@ -228,36 +323,46 @@ struct ImportPlaylistView: View {
         Task { await match(PlaylistImport.parse(text, name: playlistName)) }
     }
 
-    /// Looks every parsed line up, in the order that costs least: what the
-    /// listener already owns first, then their server, then the streaming
-    /// catalogues. A track found locally never touches the network.
-    private func match(_ parsed: PlaylistImport.ParseResult) async {
+    /// Every parsed line goes through the shared TrackResolver — the same
+    /// door order every import path speaks: files → server → the listener's
+    /// Apple Music subscription → Audius → previews (labelled as previews).
+    /// The old hand-rolled chain here skipped Apple Music entirely, which
+    /// meant a subscriber's import pretended their subscription didn't exist.
+    private func match(_ parsed: PlaylistImport.ParseResult,
+                       origin: TrackOrigin = .pastedText) async {
         isMatching = true
         defer { isMatching = false }
 
-        var result = PlaylistImport.Outcome()
-        let owned = library.songs
-        let service = serverStore.service
+        let foreign = PlaylistImport.foreignTracks(parsed.tracks, origin: origin)
+        let results = await currentResolver().resolveAll(foreign)
+        outcome = PlaylistImport.outcome(from: results)
+    }
 
-        for track in parsed.tracks {
-            if let local = owned.first(where: { PlaylistImport.matches($0, track) }) {
-                result.matched.append(local)
-                continue
-            }
-            if let service,
-               let hits = try? await service.search(track.query),
-               let hit = hits.first(where: { PlaylistImport.matches($0, track) }) {
-                result.matched.append(hit)
-                continue
-            }
-            if let hits = try? await AudiusService.shared.search(track.query),
-               let hit = hits.first(where: { PlaylistImport.matches($0, track) }) {
-                result.matched.append(hit)
-                continue
-            }
-            result.missing.append(track)
+    /// Reads the YouTube playlist's titles (names only — see `linkSection`)
+    /// and sends them through the same matcher as every other list.
+    private func importFromLink() async {
+        guard let key = serviceKeys.key(YouTubePlaylistImporter.apiKeyKey) else { return }
+        guard let playlistID = YouTubePlaylistImporter.playlistID(from: youtubeLink) else {
+            failure = String(localized: "That doesn't look like a YouTube playlist link.")
+            return
         }
-        outcome = result
+        isMatching = true
+        do {
+            let tracks = try await YouTubePlaylistImporter(apiKey: key).tracks(playlistID: playlistID)
+            isMatching = false
+            guard !tracks.isEmpty else {
+                failure = String(localized: "That playlist has no readable tracks — it may be private.")
+                return
+            }
+            if name.trimmingCharacters(in: .whitespaces).isEmpty {
+                name = String(localized: "YouTube playlist")
+            }
+            await match(PlaylistImport.ParseResult(name: playlistName, tracks: tracks),
+                        origin: .youtubeLink)
+        } catch {
+            isMatching = false
+            failure = String(localized: "Couldn't read that playlist — check the link and the key.")
+        }
     }
 }
 

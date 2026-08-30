@@ -34,12 +34,13 @@ struct WebDAVService: Sendable {
     /// "Other" exists because the whole point of WebDAV is that it isn't a
     /// list of blessed vendors.
     enum Provider: String, CaseIterable, Codable, Sendable {
-        case yandex, mailru, other
+        case yandex, mailru, koofr, other
 
         var title: LocalizedStringKey {
             switch self {
             case .yandex: return "Yandex.Disk"
             case .mailru: return "Mail.ru Cloud"
+            case .koofr:  return "Koofr"
             case .other:  return "Other (WebDAV)"
             }
         }
@@ -49,6 +50,9 @@ struct WebDAVService: Sendable {
             switch self {
             case .yandex: return URL(string: "https://webdav.yandex.ru")
             case .mailru: return URL(string: "https://webdav.cloud.mail.ru")
+            // The trailing /Koofr is the account's primary storage mount —
+            // Koofr's own WebDAV docs give this exact path.
+            case .koofr:  return URL(string: "https://app.koofr.net/dav/Koofr")
             case .other:  return nil
             }
         }
@@ -60,6 +64,8 @@ struct WebDAVService: Sendable {
                 return "Use an app password from Yandex ID — not your account password."
             case .mailru:
                 return "Use an app password from your Mail.ru account settings."
+            case .koofr:
+                return "Use an app password from Koofr's Preferences → Password — not your account password."
             case .other:
                 return "The address of your Nextcloud, ownCloud or NAS, including https://."
             }
